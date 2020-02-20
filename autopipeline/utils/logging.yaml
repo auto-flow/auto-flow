@@ -1,0 +1,46 @@
+---
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+
+  file_handler:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: simple
+    filename: autosklearn.log
+
+root:
+  level: DEBUG
+  handlers: [console, file_handler]
+
+loggers:
+  autosklearn.metalearning:
+    level: DEBUG
+    handlers: [file_handler]
+    propagate: no
+
+  dautosklearn.util.backend:
+    level: DEBUG
+    handlers: [file_handler]
+    propagate: no
+
+  dsmac.intensification.intensification.Intensifier:
+    level: DEBUG
+    handlers: [ console]
+
+  dsmac.optimizer.local_search.LocalSearch:
+    level: DEBUG
+    handlers: [ console]
+
+  dsmac.optimizer.smbo.SMBO:
+    level: DEBUG
+    handlers: [ console]
