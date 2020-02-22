@@ -1,15 +1,5 @@
-# XQSAR
+# auto-pipeline
 
-AutoML for QSAR
+分布式自动机器学习框架
 
-Release Notes:
-
-v0.3:
-1.适配nitrogen
-
-v0.2:
-1.模型保存
-2.适配hdfs
-
-v0.1:
-xqsar各种功能的实现
+正在施工中。。。
