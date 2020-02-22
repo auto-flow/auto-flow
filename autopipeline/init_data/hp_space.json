@@ -1,0 +1,168 @@
+{
+  "classification": {
+    "adaboost.AdaboostClassifier": {
+      "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
+      "learning_rate": {"_type": "loguniform", "_value": [0.0001,1],"_default": 0.1},
+      "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3}
+    },
+    "bernoulli_nb.BernoulliNB": {
+      "alpha": {"_type": "loguniform", "_value": [1e-2,100],"_default": 1},
+      "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
+    },
+    "decision_tree.DecisionTree": {
+      "criterion": {"_type": "choice","_value": ["gini","entropy"],"_default": "gini"},
+//      "max_depth_factor": {"_type": "uniform", "_value": [0,2],"_default": 0.5},
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+//      "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
+//      "max_features": {"_type": "choice","_value": ["sqrt","log2",null],"_default": null},
+      "max_features": null,
+      "min_weight_fraction_leaf": 0,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0
+    },
+    "extra_trees.ExtraTreesClassifier": {
+      "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
+//      "max_features": {"_type": "uniform", "_value": [0,1],"_default": 0.5},
+      "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
+      "max_depth": null,
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+      "min_weight_fraction_leaf": 0,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0,
+      "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
+    },
+    "gaussian_nb.GaussianNB": {
+    },
+    "gradient_boosting.GradientBoostingClassifier": {
+      "loss": "deviance", // ""exponential" make it performs like adaboost
+      "subsample":  {"_type": "uniform", "_value": [0.1,0.9],"_default": 0.5},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
+      "_estimators_lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
+      "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
+      "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"}
+    },
+    "k_nearest_neighbors.KNearestNeighborsClassifier": {
+      "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
+      "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
+      "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
+    },
+    "lda.LDA": {
+      "shrinkage": {"_type": "choice", "_value": [null, "auto"],"_default": null},  //, "manual"
+//      "shrinkage_factor": {"_type": "uniform", "_value": [0.0,1.0],"_default": 0.5},
+      "_n_components_ratio": {"_type": "uniform", "_value": [0.1,0.9],"_default": 0.5}
+    },
+    "liblinear_svc.LibLinear_SVC": {
+      "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
+      "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},
+      "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
+      "multi_class": "ovr"
+    },
+    "libsvm_svc.LibSVM_SVC": {
+      "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
+      "kernel":{"_type": "choice", "_value": ["rbf","poly","sigmoid"],"_default": "rbf"},
+      "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
+      "gamma":{"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 0.1},
+      "coef0":{"_type": "uniform", "_value": [-1,1],"_default": 0},
+      "shrinking": {"_type": "choice", "_value": [true,false],"_default": true},
+      "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": null}
+    },
+    "multinomial_nb.MultinomialNB": {
+      "alpha": {"_type": "loguniform", "_value": [1e-2, 100],"_default": 1.0},
+      "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
+    },
+    "qda.QDA": {
+      "reg_param": {"_type": "uniform", "_value": [0.0,1.0],"_default": 0}
+    },
+    "random_forest.RandomForest": {
+      "n_estimators": {"_type": "int_loguniform", "_value": [10,1000],"_default": 100},
+      "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
+      "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
+      "max_depth": null,  //todo:  restrict
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+      "min_samples_leaf": 1,
+      "min_weight_fraction_leaf": 0.0,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
+    },
+    "sgd.SGD": {
+      "loss":  {"_type": "choice", "_value": ["hinge", "log","modified_huber","squared_hinge","perceptron"],"_default": "log"},
+      "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
+      "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
+      "l1_ratio":  {"_type": "loguniform", "_value": [1e-9, 1],"_default": 0.15},
+      "fit_intercept": true,
+      "epsilon": {"_type": "loguniform", "_value": [1e-5, 1e-1],"_default": 1e-4},
+      "learning_rate": {"_type": "choice", "_value": ["optimal", "invscaling", "constant"],"_default": "invscaling"},
+      "eta0": {"_type": "loguniform", "_value": [1e-7, 1e-1],"_default": 0.01},
+      "power_t": {"_type": "loguniform", "_value": [1e-5, 1],"_default": 0.5},
+      "average": {"_type": "choice", "_value": [true,false],"_default": false}
+    }
+  },
+  "regression": {
+    "adaboost.AdaboostRegressor": {
+      "loss": {"_type": "choice", "_value": ["linear", "square", "exponential"],"_default": "linear"},
+      "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
+      "learning_rate": {"_type": "loguniform", "_value": [0.0001,1],"_default": 0.1},
+      "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3}
+    },
+    "ard_regression.ARDRegression": {
+      "n_iter": 300,
+      "alpha_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "alpha_2": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "lambda_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "lambda_2": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "threshold_lambda": {"_type": "loguniform", "_value": [1e3,10e5],"_default": 1e4},
+      "fit_intercept": true
+    },
+    "decision_tree.DecisionTree": {
+      "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "mse"},//delete "mae"
+//      "max_depth_factor": {"_type": "uniform", "_value": [0,2],"_default": 0.5},
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+//      "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
+//      "max_features": {"_type": "choice","_value": ["sqrt","log2",null],"_default": null},
+      "max_features": null,
+      "min_weight_fraction_leaf": 0,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0
+    },
+    "extra_trees.ExtraTreesRegressor": {
+      "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "mse"},//delete "mae"
+//      "max_features": {"_type": "uniform", "_value": [0,1],"_default": 0.5},
+      "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
+      "max_depth": null,
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+      "min_weight_fraction_leaf": 0,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0,
+      "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
+    },
+    "gaussian_process.GaussianProcess": {
+      "n_restarts_optimizer": 10,
+      "optimizer": "fmin_l_bfgs_b",
+      "alpha": {"_type": "loguniform", "_value": [1e-14,1],"_default": 1e-8},
+      "copy_X_train": true,
+      "normalize_y": true,
+      "thetaL": {"_type": "loguniform", "_value": [1e-10,1e-3],"_default": 1e-6},
+      "thetaU": {"_type": "loguniform", "_value": [1,100000],"_default": 100000},
+    },
+    "gradient_boosting.GradientBoosting": {
+
+    },
+  },
+  "feature_engineer": {
+    "reduce": {
+      "kernel_pca.KernelPCA": {
+        "n_components_ratio": 0.5,
+        "kernel": "rbf",
+        "gamma": null,
+        "degree": 3,
+        "coef0": 1
+      },
+      "pca.PCA": {
+        "n_components_ratio": 0.5,
+        "whiten": false
+      }
+    }
+  }
+}

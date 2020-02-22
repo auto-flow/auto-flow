@@ -1,23 +1,20 @@
-import itertools
-import sys
 import time
-import copy
 import logging
+import time
 import typing
 from collections import Counter
-from collections import OrderedDict
-from pprint import pprint
 from typing import Callable
+
 import numpy as np
 
-from dsmac.distributer import  SingleDistributer, Distributer
+from dsmac.configspace import Configuration
+from dsmac.distributer import SingleDistributer, Distributer
 from dsmac.optimizer.ei_optimization import ChallengerList
 from dsmac.optimizer.objective import sum_cost
-from dsmac.stats.stats import Stats
-from dsmac.utils.constants import MAXINT, MAX_CUTOFF
-from dsmac.configspace import Configuration
 from dsmac.runhistory.runhistory import RunHistory
-from dsmac.tae.execute_ta_run import StatusType, BudgetExhaustedException, CappedRunException, ExecuteTARun
+from dsmac.stats.stats import Stats
+from dsmac.tae.execute_ta_run import BudgetExhaustedException, CappedRunException, ExecuteTARun
+from dsmac.utils.constants import MAXINT, MAX_CUTOFF
 from dsmac.utils.io.traj_logging import TrajLogger
 
 __author__ = "Katharina Eggensperger, Marius Lindauer"
@@ -186,29 +183,29 @@ class Intensifier(object):
                 self.logger.info(challenger)
                 continue
             to_run.append(challenger)
-            count+=1
-            if count>=self.distributer.n_jobs and allow_all==False:
+            count += 1
+            if count >= self.distributer.n_jobs and allow_all == False:
                 break
-        ans=self.distributer.run(to_run,run_history)  #(status, cost, dur, res)
-        costs=[item[1] for item in ans]
-        costs=np.array(costs)
-        id_=np.argmin(costs)
-        min_costs=np.min(costs)
-        new_incumbent:Configuration
+        ans = self.distributer.run(to_run, run_history)  # (status, cost, dur, res)
+        costs = [item[1] for item in ans]
+        costs = np.array(costs)
+        id_ = np.argmin(costs)
+        min_costs = np.min(costs)
+        new_incumbent: Configuration
         if inc_runs:
-            if min_costs<run_history.get_cost(incumbent):
-                new_incumbent=to_run[id_]
+            if min_costs < run_history.get_cost(incumbent):
+                new_incumbent = to_run[id_]
             else:
-                new_incumbent=incumbent
+                new_incumbent = incumbent
         else:
-            new_incumbent=to_run[id_]
-        new_incumbent_runs=run_history.get_runs_for_config(new_incumbent)
+            new_incumbent = to_run[id_]
+        new_incumbent_runs = run_history.get_runs_for_config(new_incumbent)
         if not new_incumbent_runs:
             raise Exception('no run')
-        inc_perf=run_history.get_cost(new_incumbent)
+        inc_perf = run_history.get_cost(new_incumbent)
         self.logger.info("Updated estimated cost of incumbent on %d runs: %.4f"
                          % (iter, inc_perf))
-        return new_incumbent,inc_perf
+        return new_incumbent, inc_perf
         # -----------------
 
         # Line 1 + 2

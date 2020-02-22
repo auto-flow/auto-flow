@@ -1,9 +1,7 @@
-from typing import Dict, Callable
+from typing import Dict
 
 import numpy as np
-from ConfigSpace.configuration_space import ConfigurationSpace
 
-from autopipeline.constants import Task, binary_classification_task
 from autopipeline.data.xy_data_manager import XYDataManager
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
@@ -19,10 +17,10 @@ from dsmac.scenario.scenario import Scenario
 class SmacPipelineTuner(PipelineTuner):
     def __init__(
             self,
-            runcount_limit:int=50,
-            initial_runs:int=20,
-            random_state:int=42,
-            evaluator: TrainEvaluator=None,
+            runcount_limit: int = 50,
+            initial_runs: int = 20,
+            random_state: int = 42,
+            evaluator: TrainEvaluator = None,
             distributer=SingleDistributer(n_jobs=1),
     ):
         super(SmacPipelineTuner, self).__init__(
@@ -63,7 +61,7 @@ class SmacPipelineTuner(PipelineTuner):
                 "cs": self.phps,  # configuration space
                 "deterministic": "true"
             },
-            distributer=SingleDistributer(n_jobs=40),
+            distributer=self.distributer,
             initial_runs=self.initial_runs
         )
         smac = SMAC4HPO(
@@ -75,7 +73,6 @@ class SmacPipelineTuner(PipelineTuner):
         self.incumbent = smac.optimize()
         # todo: ensemble
 
-
     def php2model(self, php):
         php2dhp = SmacPHP2DHP()
         dhp = php2dhp(php)
@@ -84,7 +81,6 @@ class SmacPipelineTuner(PipelineTuner):
         pipeline = concat_pipeline(preprocessor, estimator)
         return pipeline
 
-
     def hdl2phps(self, hdl: Dict):
-        hdl2phps= SmacHDL2PHPS()
+        hdl2phps = SmacHDL2PHPS()
         return hdl2phps(hdl)

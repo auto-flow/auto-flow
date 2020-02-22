@@ -24,7 +24,27 @@ class PipelineTuner():
         if not self.evaluator:
             self.evaluator=TrainEvaluator()
 
+    def set_default_hp(self,default_hp):
+        self._default_hp=default_hp
+
+    @property
+    def default_hp(self):
+        if not hasattr(self,"_default_hp"):
+            raise NotImplementedError()
+        return self._default_hp
+
+    def set_addition_info(self, addition_info):
+        self._addition_info = addition_info
+
+    @property
+    def addition_info(self):
+        if not hasattr(self, "_addition_info"):
+            raise NotImplementedError()
+        return self._addition_info
+
     def set_phps(self,hdl:Dict):
+        self.hdl=hdl
+        self._FE_keys = list(self.hdl["FE"].keys())
         self.phps = self.hdl2phps(hdl)
 
     def get_rely_param_in_dhp(self, dhp, key, module_class) -> Dict:
@@ -38,11 +58,22 @@ class PipelineTuner():
         assert isinstance(ret, dict)
         return ret
 
+    def set_FE_keys(self,FE_keys):
+        self._FE_keys=FE_keys
+
+    @property
+    def FE_keys(self):
+        if not hasattr(self,"_FE_keys"):
+            raise NotImplementedError()
+        return self._FE_keys
+
     def create_preprocessor(self, dhp: Dict):
         # 将估计器之前的步骤都整合成一个Pipeline，返回
         FE_dict: dict = dhp["FE"]
         pipeline_list = []
-        for name, module_class in FE_dict.items():
+        # for name, module_class in FE_dict.items():
+        for name in self.FE_keys:
+            module_class=FE_dict[name]
             if module_class is None:
                 continue
             splited = module_class.split(".")
@@ -55,11 +86,14 @@ class PipelineTuner():
             cls = getattr(M, _class)
             param = self.get_rely_param_in_dhp(dhp, f"FE/{name}", module_class)
             preprocessor = cls()
-            preprocessor.update_hyperparams(param)
+            default_hp=self.default_hp.get("feature_engineer",{})\
+                .get(name,{}).get(f"{_module}.{_class}",{})
+            default_hp.update(param)
+            preprocessor.update_hyperparams(default_hp)
+            preprocessor.set_addition_info(self.addition_info)
             pipeline_list.append(
                 (name, preprocessor)
             )
-        # todo: fix if pipeline is empty
         if not pipeline_list:
             pipeline_list=[('no_preprocessing',NoPreprocessing())]
         return Pipeline(pipeline_list)
@@ -76,8 +110,12 @@ class PipelineTuner():
         )
         assert hasattr(M, _class)
         cls = getattr(M, _class)
+        default_hp=self.default_hp.get(self.task.mainTask,{})\
+            .get(f"{_module}.{_class}",{})
+        default_hp.update(param)
         estimator = cls()
-        estimator.update_hyperparams(param)
+        estimator.set_addition_info(self.addition_info)
+        estimator.update_hyperparams(default_hp)
         return Pipeline([(
             self.task.role,
             estimator

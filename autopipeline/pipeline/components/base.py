@@ -1,6 +1,11 @@
 from copy import deepcopy
 from importlib import import_module
+from typing import Dict
+
 from sklearn.base import BaseEstimator
+from sklearn.multiclass import OneVsRestClassifier
+
+from autopipeline.utils.data import get_task_from_y
 
 
 class AutoPLComponent(BaseEstimator):
@@ -22,46 +27,38 @@ class AutoPLComponent(BaseEstimator):
 
     # @classmethod
     @property
-    def module_(cls):
-        if not cls.module__:
+    def module_(self):
+        if not self.module__:
             raise NotImplementedError()
-        return cls.module__
+        return self.module__
 
     def get_estimator_class(self):
-        M=import_module(self.module_)
-        return getattr(M,self.class_)
+        M = import_module(self.module_)
+        return getattr(M, self.class_)
 
-    def fit(self,X,y):
-        cls=self.get_estimator_class()
-        self.estimator=cls(**self.hyperparams)
-        self.estimator.fit(X,y)
+    def after_process_hyperparams(self) -> Dict:
+        return self.hyperparams
+
+    def after_process_estimator(self, estimator, X, y):
+        return estimator
+
+    def fit(self, X, y):
+        self.shape = X.shape
+        cls = self.get_estimator_class()
+        self.estimator = cls(**self.after_process_hyperparams())
+        self.estimator = self.after_process_estimator(self.estimator, X, y)
+        self.estimator.fit(X, y)
         return self
 
-
-    @classmethod
-    def set_params_from_dict(cls, dict_: dict):
+    def set_addition_info(self, dict_: dict):
         for key, value in dict_.items():
-            setattr(cls, key, value)
-
-    @classmethod
-    def _get_param_names(cls):
-        # in base class, return several parameters from __init__ function
-        return list(cls.cls_hyperparams.keys())
-
-    @classmethod
-    def set_cls_hyperparams(cls, hp: dict):
-        '''set default hyperparameters in init'''
-        cls.cls_hyperparams = hp
-
-    @classmethod
-    def update_cls_hyperparams(cls, hp: dict):
-        '''set default hyperparameters in init'''
-        cls.cls_hyperparams.update(hp)
+            setattr(self, key, value)
 
     def update_hyperparams(self, hp: dict):
         '''set default hyperparameters in init'''
         self.hyperparams.update(hp)
-        self.set_params(**self.hyperparams)
+        # fixme ValueError: Invalid parameter C for estimator LibSVM_SVC(). Check the list of available parameters with `estimator.get_params().keys()`.
+        # self.set_params(**self.hyperparams)
 
     @staticmethod
     def get_properties(dataset_properties=None):
@@ -131,10 +128,20 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
 
     See :ref:`extending` for more information."""
 
+    OVR__: bool = False
+
+    def isOVR(self):
+        return self.OVR__
+
     def __init__(self):
         super(AutoPLClassificationAlgorithm, self).__init__()
         self.estimator = None
         self.properties = None
+
+    def after_process_estimator(self, estimator, X, y):
+        if self.isOVR() and get_task_from_y(y).subTask != "binary":
+            estimator = OneVsRestClassifier(estimator, n_jobs=1)
+        return estimator
 
     def predict(self, X):
         """The predict function calls the predict function of the
@@ -193,12 +200,6 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
         super(AutoPLPreprocessingAlgorithm, self).__init__()
         self.preprocessor = None
 
-    def fit(self,X,y=None):
-        cls=self.get_estimator_class()
-        self.preprocessor=cls(**self.rebuild_hyperparameters())
-        self.preprocessor.fit(X,y)
-        return self
-
     def transform(self, X):
         """The transform function calls the transform function of the
         underlying scikit-learn model and returns the transformed array.
@@ -234,15 +235,19 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
         """
         return self.preprocessor
 
-    def rebuild_hyperparameters(self):
-        hp = self.hyperparams
-        __n_components_ratio = "n_components_ratio"
-        if __n_components_ratio in hp:
-            n_components_ratio = hp[__n_components_ratio]
-            hp.pop(__n_components_ratio)
+    def after_process_hyperparams(self):
+        hyperparams = deepcopy(self.hyperparams)
+        pop_name = "_n_components_ratio"
+        if pop_name in hyperparams:
+            n_components_ratio = hyperparams[pop_name]
+            hyperparams.pop(pop_name)
             if hasattr(self, "shape"):
-                n_components = int(self.shape[1] * n_components_ratio)
+                n_components = max(
+                    int(self.shape[1] * n_components_ratio),
+                    1
+                )
             else:
+
                 n_components = 100
-            hp["n_components"] = n_components
-        return hp
+            hyperparams["n_components"] = n_components
+        return hyperparams

@@ -1,10 +1,11 @@
+import json
+from pathlib import Path
 from typing import Dict
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
-
+from autopipeline.init_data import add_public_info
 from autopipeline.data.xy_data_manager import XYDataManager
-from autopipeline.init_data import init_all
 from autopipeline.tuner.base import PipelineTuner
 from autopipeline.metrics import accuracy
 
@@ -24,6 +25,13 @@ class AutoPipelineEstimator(BaseEstimator):
         else:
             pass
             # todo: 根据具体的任务装配一个默认的管道
+        if not self.custom_init_param:
+            from autopipeline import init_data
+            self.default_hp=json.loads((Path(init_data.__file__).parent/f"init_hp_space.json").read_text())
+        else:
+            self.default_hp=self.custom_init_param
+        add_public_info(self.default_hp,{"random_state":tuner.random_state})
+
 
 
     def fit(
@@ -34,11 +42,13 @@ class AutoPipelineEstimator(BaseEstimator):
             all_scoring_functions=False,
             spliter=KFold(5,True,42)
     ):
-        init_all(
-            self.custom_init_param,
-            {"shape": X.shape},
-            {'random_state':self.tuner.random_state}
-        )
+        # init_all(
+        #     self.custom_init_param,
+        #     {"shape": X.shape},
+        #     {'random_state':self.tuner.random_state}
+        # )
+        self.tuner.set_addition_info({"shape": X.shape})
+        self.tuner.set_default_hp(self.default_hp)
         self.datamanager=XYDataManager(
             X,y,X_test,y_test,None,dataset_name
         )

@@ -1,5 +1,11 @@
 {
   "classification": {
+    "decision_tree.DecisionTree": {
+        "min_weight_fraction_leaf" :0,
+        "max_features" : 1.0,
+        "max_leaf_nodes": null,
+        "min_impurity_decrease" : 0
+    },
     "libsvm_svc.LibSVM_SVC": {
       "C": 1.0,
       "kernel": "rbf",
