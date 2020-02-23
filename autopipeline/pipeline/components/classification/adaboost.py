@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from autopipeline.pipeline.components.base import AutoPLClassificationAlgorithm
 
+__all__=["AdaboostClassifier"]
 
 class AdaboostClassifier(AutoPLClassificationAlgorithm):
     class__ = "AdaBoostClassifier"

@@ -4,6 +4,7 @@ from sklearn.ensemble import ExtraTreesClassifier
 
 from autopipeline.pipeline.components.base import AutoPLPreprocessingAlgorithm
 
+__all__=["ExtraTreesPreprocessorClassification"]
 
 class ExtraTreesPreprocessorClassification(AutoPLPreprocessingAlgorithm):
     class__ = "SelectFromModel"

@@ -4,6 +4,7 @@ from sklearn.svm import LinearSVC
 
 from autopipeline.pipeline.components.base import AutoPLPreprocessingAlgorithm
 
+__all__=["LibLinear_Preprocessor"]
 
 class LibLinear_Preprocessor(AutoPLPreprocessingAlgorithm):
     class__ = "SelectFromModel"

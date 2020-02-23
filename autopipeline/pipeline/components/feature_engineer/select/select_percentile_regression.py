@@ -1,5 +1,9 @@
-from autopipeline.pipeline.components.feature_engineer.select.select_percentile import SelectPercentileBase
 import sklearn.feature_selection
+
+from autopipeline.pipeline.components.feature_engineer.select.select_percentile import SelectPercentileBase
+
+__all__ = ["SelectPercentileRegression"]
+
 
 class SelectPercentileRegression(SelectPercentileBase):
     def get_default_name(self):

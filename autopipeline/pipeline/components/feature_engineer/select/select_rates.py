@@ -1,6 +1,8 @@
 from autopipeline.pipeline.components.feature_engineer.select.select_percentile import SelectPercentileBase
 import sklearn.feature_selection
 
+__all__=["SelectRates"]
+
 class SelectRates(SelectPercentileBase):
     class__ = "GenericUnivariateSelect"
 

@@ -44,6 +44,7 @@ class PipelineTuner():
 
     def set_phps(self,hdl:Dict):
         self.hdl=hdl
+        # todo: 泛化ML管线后，可能存在多个FE
         self._FE_keys = list(self.hdl["FE"].keys())
         self.phps = self.hdl2phps(hdl)
 
@@ -95,8 +96,10 @@ class PipelineTuner():
                 (name, preprocessor)
             )
         if not pipeline_list:
-            pipeline_list=[('no_preprocessing',NoPreprocessing())]
-        return Pipeline(pipeline_list)
+            # pipeline_list=[('no_preprocessing',NoPreprocessing())]
+            return None
+        else:
+            return Pipeline(pipeline_list)
 
     def create_estimator(self, dhp: Dict):
         # 根据超参构造一个估计器

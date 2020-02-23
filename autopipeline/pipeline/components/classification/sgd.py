@@ -1,6 +1,7 @@
 import numpy as np
 
 from autopipeline.pipeline.components.base import AutoPLClassificationAlgorithm
+__all__=["SGD"]
 
 
 class SGD(

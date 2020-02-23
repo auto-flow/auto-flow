@@ -1,5 +1,6 @@
 from autopipeline.pipeline.components.base import AutoPLClassificationAlgorithm
 
+__all__=["QDA"]
 
 class QDA(AutoPLClassificationAlgorithm):
     class__ = "QuadraticDiscriminantAnalysis"

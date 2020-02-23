@@ -3,6 +3,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from autopipeline.pipeline.components.base import AutoPLClassificationAlgorithm
 from autopipeline.utils.data import softmax
 
+__all__=["LibLinear_SVC"]
 
 class LibLinear_SVC(AutoPLClassificationAlgorithm):
     class__ = "LinearSVC"

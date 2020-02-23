@@ -1,4 +1,5 @@
 from autopipeline.pipeline.components.base import AutoPLClassificationAlgorithm
+__all__=["ExtraTreesClassifier"]
 
 
 class ExtraTreesClassifier(
