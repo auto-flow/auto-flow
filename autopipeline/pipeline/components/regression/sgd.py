@@ -9,7 +9,7 @@ class SGD(
     module__ = "sklearn.linear_model.stochastic_gradient"
     class__ = "SGDRegressor"
 
-    def after_process_fit_y(self, y):
+    def before_fit_y(self, y):
         self.scaler = StandardScaler(copy=True)
         return self.scaler.fit(y.reshape((-1, 1))).ravel()
 

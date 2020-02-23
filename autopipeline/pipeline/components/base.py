@@ -43,18 +43,18 @@ class AutoPLComponent(BaseEstimator):
     def after_process_estimator(self, estimator, X, y):
         return estimator
 
-    def after_process_fit_X(self,X):
+    def before_fit_X(self, X):
         return X
 
-    def after_process_fit_y(self,y):
+    def before_fit_y(self, y):
         return y
 
     def fit(self, X, y):
         self.shape = X.shape
         cls = self.get_estimator_class()
         self.estimator = cls(**self.after_process_hyperparams(self.hyperparams))
-        X=self.after_process_fit_X(X)
-        y=self.after_process_fit_X(y)
+        X=self.before_fit_X(X)
+        y=self.before_fit_y(y)
         self.estimator = self.after_process_estimator(self.estimator, X, y)
         self.estimator.fit(X, y)
         return self
@@ -89,7 +89,6 @@ class AutoPLRegressionAlgorithm(AutoPLComponent):
             raise NotImplementedError()
         pred_y= self.estimator.predict(X)
         return self.after_process_pred_y(pred_y)
-
 
 class AutoPLClassificationAlgorithm(AutoPLComponent):
     """Provide an abstract interface for classification algorithms in
@@ -127,10 +126,13 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
     auto-sklearn.
 
     See :ref:`extending` for more information."""
+    def before_trans_X(self, X):
+        return X
 
     def transform(self, X):
         if not self.estimator or (not hasattr(self.estimator, "transform")):
             raise NotImplementedError()
+        X=self.before_trans_X(X)
         return self.estimator.transform(X)
 
     def fit_transform(self, X, y=None):

@@ -5,7 +5,7 @@ class LibLinear_SVR(AutoPLRegressionAlgorithm):
     class__ = "LinearSVR"
     module__ = "sklearn.svm"
 
-    def after_process_fit_y(self,y):
+    def before_fit_y(self, y):
         self.scaler=StandardScaler(copy=True)
         return self.scaler.fit(y.reshape((-1,1))).ravel()
 
