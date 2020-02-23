@@ -25,7 +25,8 @@
 //      "max_features": {"_type": "uniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,
-      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
+      "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
       "min_weight_fraction_leaf": 0,
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0,
@@ -35,9 +36,10 @@
     },
     "gradient_boosting.GradientBoostingClassifier": {
       "loss": "deviance", // ""exponential" make it performs like adaboost
-      "subsample":  {"_type": "uniform", "_value": [0.1,0.9],"_default": 0.5},
+      "subsample":  {"_type": "uniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
       "_estimators_lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"}
@@ -79,8 +81,8 @@
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,  //todo:  restrict
-      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
-      "min_samples_leaf": 1,
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
+      "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
       "min_weight_fraction_leaf": 0.0,
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0.0,
@@ -127,11 +129,12 @@
       "min_impurity_decrease": 0
     },
     "extra_trees.ExtraTreesRegressor": {
-      "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "mse"},//delete "mae"
+      "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},//delete "mae"
 //      "max_features": {"_type": "uniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,
-      "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
+      "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
       "min_weight_fraction_leaf": 0,
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0,
@@ -147,8 +150,67 @@
       "thetaU": {"_type": "loguniform", "_value": [1,100000],"_default": 100000},
     },
     "gradient_boosting.GradientBoosting": {
-
+      "loss": ["ls","lad","huber","quantile"],
+      "subsample":  {"_type": "uniform", "_value": [0.1,1],"_default": 1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
+      "_estimators_lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
+      "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
+      "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
+      "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"}
     },
+    "k_nearest_neighbors.KNearestNeighborsRegressor": {
+      "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
+      "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
+      "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
+    },
+    "liblinear_svr.LibLinear_SVR": {
+      "loss":  {"_type": "choice", "_value": ["epsilon_insensitive", "squared_epsilon_insensitive"],"_default": "squared_epsilon_insensitive"},
+      "epsilon": {"_type": "loguniform", "_value": [0.001,1],"_default": 0.1},
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
+    },
+    "libsvm_svr.LibSVM_SVR": {
+       "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
+      "kernel":{"_type": "choice", "_value": ["rbf","poly","sigmoid"],"_default": "rbf"},
+      "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
+      "gamma":{"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 0.1},
+      "coef0":{"_type": "uniform", "_value": [-1,1],"_default": 0},
+      "shrinking": {"_type": "choice", "_value": [true,false],"_default": true},
+      "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": null}
+    },
+    "random_forest.RandomForest": {
+      "n_estimators": {"_type": "int_loguniform", "_value": [10,1000],"_default": 100},
+      "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},
+      "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
+      "max_depth": null,  //todo:  restrict
+      "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
+      "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
+      "min_weight_fraction_leaf": 0.0,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
+    },
+    "ridge_regression.RidgeRegression": {
+      "alpha":{"_type": "loguniform", "_value": [1e-05, 10],"_default": 1},
+      "fit_intercept":true,
+      "copy_X":true,
+      "normalize":false,
+    },
+    "sgd.SGD": {
+      "loss":  {"_type": "choice", "_value": ["squared_loss", "huber","epsilon_insensitive","squared_hinge","squared_epsilon_insensitive"],"_default": "squared_loss"},
+      "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
+      "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
+      "l1_ratio":  {"_type": "loguniform", "_value": [1e-9, 1],"_default": 0.15},
+      "fit_intercept": true,
+      "epsilon": {"_type": "loguniform", "_value": [1e-5, 1e-1],"_default": 0.1},
+      "learning_rate": {"_type": "choice", "_value": ["optimal", "invscaling", "constant"],"_default": "invscaling"},
+      "eta0": {"_type": "loguniform", "_value": [1e-7, 1e-1],"_default": 0.01},
+      "power_t": {"_type": "loguniform", "_value": [1e-5, 1],"_default": 0.25},
+      "average": {"_type": "choice", "_value": [true,false],"_default": false}
+    }
   },
   "feature_engineer": {
     "reduce": {

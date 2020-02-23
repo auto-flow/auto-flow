@@ -7,9 +7,9 @@ class GaussianProcess(AutoPLRegressionAlgorithm):
     class__ = "GaussianProcessRegressor"
     module__ = "sklearn.gaussian_process"
 
-    def after_process_hyperparams(self):
+    def after_process_hyperparams(self,hyperparams):
         from sklearn.gaussian_process.kernels import RBF
-        hyperparams=deepcopy(self.hyperparams)
+        hyperparams=deepcopy(hyperparams)
         thetaL=hyperparams.pop("thetaL")
         thetaU=hyperparams.pop("thetaU")
         n_features = self.shape[1]

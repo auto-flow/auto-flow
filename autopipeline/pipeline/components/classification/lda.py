@@ -9,8 +9,8 @@ class LDA(AutoPLClassificationAlgorithm):
     module__ = "sklearn.discriminant_analysis"
     OVR__ = True
 
-    def after_process_hyperparams(self) -> Dict:
-        hyperparams = deepcopy(self.hyperparams)
+    def after_process_hyperparams(self,hyperparams) -> Dict:
+        hyperparams = deepcopy(hyperparams)
         pop_name = "_n_components_ratio"
         if pop_name in hyperparams:
             n_components_ratio = hyperparams[pop_name]
