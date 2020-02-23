@@ -12,7 +12,7 @@ class ExtraTreesPreprocessorRegression(AutoPLPreprocessingAlgorithm):
 
 
     def after_process_hyperparams(self,hyperparams):
-        hyperparams=deepcopy(self.hyperparams)
+        hyperparams=super(ExtraTreesPreprocessorRegression, self).after_process_hyperparams(hyperparams)
         self.base_estimator=ExtraTreesRegressor()
         hyperparams.update({
             "estimator":self.base_estimator

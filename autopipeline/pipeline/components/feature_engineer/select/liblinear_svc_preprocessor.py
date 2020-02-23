@@ -12,7 +12,7 @@ class LibLinear_Preprocessor(AutoPLPreprocessingAlgorithm):
 
 
     def after_process_hyperparams(self,hyperparams):
-        hyperparams=deepcopy(self.hyperparams)
+        hyperparams=super(LibLinear_Preprocessor, self).after_process_hyperparams(hyperparams)
         self.base_estimator=LinearSVC()
         hyperparams.update({
             "estimator":self.base_estimator

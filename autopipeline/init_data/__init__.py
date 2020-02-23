@@ -1,20 +1,45 @@
-import os
-from importlib import import_module
-from pathlib import Path
-from typing import Dict, Optional
+from copy import deepcopy
+from typing import Dict
 
-try:
-    import json5 as json
-except:
-    import json
 
-def add_public_info(default_hp:Dict,public_info:Dict):
-    for key,value in default_hp.items():
-        if isinstance(key,str) and len(key.split("."))==2 and isinstance(value,dict):
-            for p_k,p_v in public_info.items():
-                value[p_k]=p_v
-        elif isinstance(value,dict):
-            add_public_info(default_hp[key],public_info)
+def __recursion(dict_: Dict):
+    should_pop = []
+    should_recursion = []
+    for key, value in dict_.items():
+        if isinstance(value, dict):
+            if "_type" in value:
+                should_pop.append(key)
+            else:
+                should_recursion.append(value)
+    for key in should_pop:
+        dict_.pop(key)
+    for sub_dict_ in should_recursion:
+        __recursion(sub_dict_)
+
+
+def extract_default_hp_from_hdl_db(hdl_db: Dict) -> Dict:
+    dict_ = deepcopy(hdl_db)
+    __recursion(dict_)
+    return dict_
+
+
+def is_bottom_dict(value):
+    if isinstance(value, dict) :
+        value_list=list(value.values())
+        if len(value_list)==0:
+            return True
+        if not isinstance(value_list[0],dict):
+            return True
+    return False
+
+
+def add_public_info(default_hp: Dict, public_info: Dict):
+    for key, value in default_hp.items():
+        if is_bottom_dict(value):
+            for p_k, p_v in public_info.items():
+                value[p_k] = p_v
+        elif isinstance(value, dict):
+            add_public_info(default_hp[key], public_info)
 
 # def init_all(
 #         specific_init_dict=None,

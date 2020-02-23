@@ -17,7 +17,7 @@ class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
         raise NotImplementedError()
 
     def after_process_hyperparams(self, hyperparams) -> Dict:
-        hyperparams = deepcopy(hyperparams)
+        hyperparams=super(SelectPercentileBase, self).after_process_hyperparams(hyperparams)
         name2func = self.get_name2func()
         default_name = self.get_default_name()
         name = hyperparams.get("score_func", default_name)

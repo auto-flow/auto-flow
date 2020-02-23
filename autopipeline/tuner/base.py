@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
-from autopipeline.pipeline.components.feature_engineer.no_preprocessing import NoPreprocessing
+from autopipeline.utils.packages import get_class_of_module
 
 
 class PipelineTuner():
@@ -22,14 +22,14 @@ class PipelineTuner():
         self.runcount_limit = runcount_limit
         self.random_state = random_state
         if not self.evaluator:
-            self.evaluator=TrainEvaluator()
+            self.evaluator = TrainEvaluator()
 
-    def set_default_hp(self,default_hp):
-        self._default_hp=default_hp
+    def set_default_hp(self, default_hp):
+        self._default_hp = default_hp
 
     @property
     def default_hp(self):
-        if not hasattr(self,"_default_hp"):
+        if not hasattr(self, "_default_hp"):
             raise NotImplementedError()
         return self._default_hp
 
@@ -42,8 +42,8 @@ class PipelineTuner():
             raise NotImplementedError()
         return self._addition_info
 
-    def set_phps(self,hdl:Dict):
-        self.hdl=hdl
+    def set_phps(self, hdl: Dict):
+        self.hdl = hdl
         # todo: 泛化ML管线后，可能存在多个FE
         self._FE_keys = list(self.hdl["FE"].keys())
         self.phps = self.hdl2phps(hdl)
@@ -59,12 +59,12 @@ class PipelineTuner():
         assert isinstance(ret, dict)
         return ret
 
-    def set_FE_keys(self,FE_keys):
-        self._FE_keys=FE_keys
+    def set_FE_keys(self, FE_keys):
+        self._FE_keys = FE_keys
 
     @property
     def FE_keys(self):
-        if not hasattr(self,"_FE_keys"):
+        if not hasattr(self, "_FE_keys"):
             raise NotImplementedError()
         return self._FE_keys
 
@@ -74,21 +74,20 @@ class PipelineTuner():
         pipeline_list = []
         # for name, module_class in FE_dict.items():
         for name in self.FE_keys:
-            module_class=FE_dict[name]
-            if module_class is None:
+            _module = FE_dict[name]
+            if _module is None:
                 continue
-            splited = module_class.split(".")
-            assert len(splited) == 2
-            _module, _class = splited
+            module_path=f"autopipeline.pipeline.components.feature_engineer.{name}.{_module}"
+            _class = get_class_of_module(module_path)
             M = import_module(
-                f"autopipeline.pipeline.components.feature_engineer.{name}.{_module}"
+                module_path
             )
             assert hasattr(M, _class)
             cls = getattr(M, _class)
-            param = self.get_rely_param_in_dhp(dhp, f"FE/{name}", module_class)
+            param = self.get_rely_param_in_dhp(dhp, f"FE/{name}", _module)
             preprocessor = cls()
-            default_hp=self.default_hp.get("feature_engineer",{})\
-                .get(name,{}).get(f"{_module}.{_class}",{})
+            default_hp = self.default_hp.get("feature_engineer", {}) \
+                .get(name, {}).get(_module, {})
             default_hp.update(param)
             preprocessor.update_hyperparams(default_hp)
             preprocessor.set_addition_info(self.addition_info)
@@ -103,18 +102,17 @@ class PipelineTuner():
 
     def create_estimator(self, dhp: Dict):
         # 根据超参构造一个估计器
-        selected_model = dhp["MHP"]
-        param = dhp["[MHP]"][selected_model]
-        splited = selected_model.split(".")
-        assert len(splited) == 2
-        _module, _class = splited
+        _module = dhp["MHP"]
+        param = dhp["[MHP]"][_module]
+        module_path=f"autopipeline.pipeline.components.{self.task.mainTask}.{_module}"
+        _class=get_class_of_module(module_path)
         M = import_module(
-            f"autopipeline.pipeline.components.{self.task.mainTask}.{_module}"
+            module_path
         )
         assert hasattr(M, _class)
         cls = getattr(M, _class)
-        default_hp=self.default_hp.get(self.task.mainTask,{})\
-            .get(f"{_module}.{_class}",{})
+        default_hp = self.default_hp.get(self.task.mainTask, {}) \
+            .get(f"{_module}", {})
         default_hp.update(param)
         estimator = cls()
         estimator.set_addition_info(self.addition_info)
@@ -124,7 +122,7 @@ class PipelineTuner():
             estimator
         )])
 
-    def run(self,*args):
+    def run(self, *args):
         raise NotImplementedError()
 
     def php2model(self, php):

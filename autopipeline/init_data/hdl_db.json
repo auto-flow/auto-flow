@@ -1,15 +1,15 @@
 {
   "classification": {
-    "adaboost.AdaboostClassifier": {
+    "adaboost": {
       "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
       "learning_rate": {"_type": "loguniform", "_value": [0.0001,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3}
     },
-    "bernoulli_nb.BernoulliNB": {
+    "bernoulli_nb": {
       "alpha": {"_type": "loguniform", "_value": [1e-2,100],"_default": 1},
       "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
     },
-    "decision_tree.DecisionTree": {
+    "decision_tree": {
       "criterion": {"_type": "choice","_value": ["gini","entropy"],"_default": "gini"},
 //      "max_depth_factor": {"_type": "uniform", "_value": [0,2],"_default": 0.5},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
@@ -20,7 +20,7 @@
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0
     },
-    "extra_trees.ExtraTreesClassifier": {
+    "extra_trees": {
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
 //      "max_features": {"_type": "uniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -32,9 +32,9 @@
       "min_impurity_decrease": 0,
       "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
     },
-    "gaussian_nb.GaussianNB": {
+    "gaussian_nb": {
     },
-    "gradient_boosting.GradientBoostingClassifier": {
+    "gradient_boosting": {
       "loss": "deviance", // ""exponential" make it performs like adaboost
       "subsample":  {"_type": "uniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
@@ -44,39 +44,41 @@
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"}
     },
-    "k_nearest_neighbors.KNearestNeighborsClassifier": {
+    "k_nearest_neighbors": {
       "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
       "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
       "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
     },
-    "lda.LDA": {
+    "lda": {
       "shrinkage": {"_type": "choice", "_value": [null, "auto"],"_default": null},  //, "manual"
 //      "shrinkage_factor": {"_type": "uniform", "_value": [0.0,1.0],"_default": 0.5},
       "_n_components_ratio": {"_type": "uniform", "_value": [0.1,0.9],"_default": 0.5}
     },
-    "liblinear_svc.LibLinear_SVC": {
+    "liblinear_svc": {
       "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
       "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},
       "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
       "multi_class": "ovr"
     },
-    "libsvm_svc.LibSVM_SVC": {
+    "libsvm_svc": {
       "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
       "kernel":{"_type": "choice", "_value": ["rbf","poly","sigmoid"],"_default": "rbf"},
       "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
       "gamma":{"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 0.1},
       "coef0":{"_type": "uniform", "_value": [-1,1],"_default": 0},
       "shrinking": {"_type": "choice", "_value": [true,false],"_default": true},
-      "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": null}
+      "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": null},
+      "probability": true,
+      "decision_function_shape": "ovr"
     },
-    "multinomial_nb.MultinomialNB": {
+    "multinomial_nb": {
       "alpha": {"_type": "loguniform", "_value": [1e-2, 100],"_default": 1.0},
       "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
     },
-    "qda.QDA": {
+    "qda": {
       "reg_param": {"_type": "uniform", "_value": [0.0,1.0],"_default": 0}
     },
-    "random_forest.RandomForest": {
+    "random_forest": {
       "n_estimators": {"_type": "int_loguniform", "_value": [10,1000],"_default": 100},
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -88,7 +90,7 @@
       "min_impurity_decrease": 0.0,
       "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
     },
-    "sgd.SGD": {
+    "sgd": {
       "loss":  {"_type": "choice", "_value": ["hinge", "log","modified_huber","squared_hinge","perceptron"],"_default": "log"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
@@ -102,13 +104,13 @@
     }
   },
   "regression": {
-    "adaboost.AdaboostRegressor": {
+    "adaboost": {
       "loss": {"_type": "choice", "_value": ["linear", "square", "exponential"],"_default": "linear"},
       "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
       "learning_rate": {"_type": "loguniform", "_value": [0.0001,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3}
     },
-    "ard_regression.ARDRegression": {
+    "ard_regression": {
       "n_iter": 300,
       "alpha_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
       "alpha_2": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
@@ -117,7 +119,7 @@
       "threshold_lambda": {"_type": "loguniform", "_value": [1e3,10e5],"_default": 1e4},
       "fit_intercept": true
     },
-    "decision_tree.DecisionTree": {
+    "decision_tree": {
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "mse"},//delete "mae"
 //      "max_depth_factor": {"_type": "uniform", "_value": [0,2],"_default": 0.5},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,10],"_default": 2},
@@ -128,7 +130,7 @@
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0
     },
-    "extra_trees.ExtraTreesRegressor": {
+    "extra_trees": {
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},//delete "mae"
 //      "max_features": {"_type": "uniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -140,7 +142,7 @@
       "min_impurity_decrease": 0,
       "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
     },
-    "gaussian_process.GaussianProcess": {
+    "gaussian_process": {
       "n_restarts_optimizer": 10,
       "optimizer": "fmin_l_bfgs_b",
       "alpha": {"_type": "loguniform", "_value": [1e-14,1],"_default": 1e-8},
@@ -149,7 +151,7 @@
       "thetaL": {"_type": "loguniform", "_value": [1e-10,1e-3],"_default": 1e-6},
       "thetaU": {"_type": "loguniform", "_value": [1,100000],"_default": 100000},
     },
-    "gradient_boosting.GradientBoosting": {
+    "gradient_boosting": {
       "loss": ["ls","lad","huber","quantile"],
       "subsample":  {"_type": "uniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
@@ -159,12 +161,12 @@
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"}
     },
-    "k_nearest_neighbors.KNearestNeighborsRegressor": {
+    "k_nearest_neighbors": {
       "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
       "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
       "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
     },
-    "liblinear_svr.LibLinear_SVR": {
+    "liblinear_svr": {
       "loss":  {"_type": "choice", "_value": ["epsilon_insensitive", "squared_epsilon_insensitive"],"_default": "squared_epsilon_insensitive"},
       "epsilon": {"_type": "loguniform", "_value": [0.001,1],"_default": 0.1},
       "dual": false,
@@ -172,7 +174,7 @@
       "intercept_scaling": 1,
       "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
     },
-    "libsvm_svr.LibSVM_SVR": {
+    "libsvm_svr": {
        "C": {"_type": "loguniform", "_value": [0.03125, 32768],"_default": 1.0},
       "kernel":{"_type": "choice", "_value": ["rbf","poly","sigmoid"],"_default": "rbf"},
       "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
@@ -181,7 +183,7 @@
       "shrinking": {"_type": "choice", "_value": [true,false],"_default": true},
       "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": null}
     },
-    "random_forest.RandomForest": {
+    "random_forest": {
       "n_estimators": {"_type": "int_loguniform", "_value": [10,1000],"_default": 100},
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -193,13 +195,13 @@
       "min_impurity_decrease": 0.0,
       "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
     },
-    "ridge_regression.RidgeRegression": {
+    "ridge_regression": {
       "alpha":{"_type": "loguniform", "_value": [1e-05, 10],"_default": 1},
       "fit_intercept":true,
       "copy_X":true,
       "normalize":false,
     },
-    "sgd.SGD": {
+    "sgd": {
       "loss":  {"_type": "choice", "_value": ["squared_loss", "huber","epsilon_insensitive","squared_hinge","squared_epsilon_insensitive"],"_default": "squared_loss"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
@@ -213,18 +215,76 @@
     }
   },
   "feature_engineer": {
-    "reduce": {
-      "kernel_pca.KernelPCA": {
-        "n_components_ratio": 0.5,
-        "kernel": "rbf",
-        "gamma": null,
-        "degree": 3,
-        "coef0": 1
+    "expand": {
+      "kitchen_sinks": {
+        "gamma": {"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 1},
+        "_n_components_ratio": {"_type": "uniform", "_value": [1.1,2],"_default": 1.5}
       },
-      "pca.PCA": {
-        "n_components_ratio": 0.5,
-        "whiten": false
+      "nystroem_sampler": {
+        "kernel": {"_type": "choice", "_value": ["poly","rbf", "sigmoid", "cosine"],"_default": "rbf"}, // todo: chi2
+        "_n_components_ratio":  {"_type": "uniform", "_value": [1.1,2],"_default": 1.5},
+        "gamma": {"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 1},
+        "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
+        "coef0":  {"_type": "uniform", "_value": [-1,1],"_default": 0}
+      },
+      "polynomial": {
+        "degree": {"_type": "choice", "_value": ["poly","rbf", "sigmoid", "cosine"],"_default": "rbf"},
+        "interaction_only":  {"_type": "choice", "_value": [true,false],"_default": true},
+        "include_bias":false
       }
+    },
+    "reduce": {
+      "fast_ica": {
+        "_n_components_ratio": {"_type": "uniform", "_value": [0.5,0.95],"_default": 0.8},
+        "algorithm":  {"_type": "choice", "_value": ["parallel", "deflation"],"_default": "parallel"},
+        "fun": {"_type": "choice", "_value": ["logcosh", "exp", "cube"],"_default": "logcosh"},
+        "whiten": {"_type": "choice", "_value": [true,false],"_default": true},
+      },
+      "feature_agglomeration": {
+        "pooling_func": {"_type": "choice", "_value": ["numpy.mean","numpy.median","numpy.max"],"_default": "numpy.median"},
+        "_n_clusters_ratio": {"_type": "uniform", "_value": [0.5,0.95],"_default": 0.8},
+        "affinity":  {"_type": "choice", "_value": ["euclidean", "manhattan", "cosine"],"_default": "euclidean"},
+        "linkage":  {"_type": "choice", "_value": ["ward", "complete", "average"],"_default": "ward"}
+      },
+      "kernel_pca": {
+        "_n_components_ratio":  {"_type": "uniform", "_value": [0.5,0.95],"_default": 0.8},
+        "kernel":  {"_type": "choice", "_value": ["poly", "rbf", "sigmoid", "cosine"],"_default": "rbf"},
+        "gamma": {"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 1},
+        "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
+        "coef0": {"_type": "uniform", "_value": [-1,1],"_default": 0}
+      },
+      "pca": {
+        "n_components": {"_type": "uniform", "_value": [0.5, 0.9999],"_default": 0.9999},    //keep_variance
+        "whiten": {"_type": "choice", "_value": [true,false],"_default": true},
+        "copy": true
+      },
+      "random_trees_embedding": {
+        "n_estimators": {"_type": "int_uniform", "_value": [10,100],"_default": 10},
+        "max_depth": {"_type": "int_uniform", "_value": [2,10],"_default": 5},
+        "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
+        "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
+        "min_weight_fraction_leaf": 1.0,
+        "max_leaf_nodes": null,
+        "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
+      }
+    },
+    "scale": {
+      "minmax": {
+      },
+      "normalize": {
+        "copy": false,
+      },
+      "quantile_transformer": {
+        "n_quantiles": "uniform", "_value": [10,2000],"_default": 1000,
+        "output_distribution":  {"_type": "choice", "_value": ["uniform", "normal"],"_default": "normal"},
+        "copy": false
+      }
+    },
+    "select": {
+
+    },
+    "variance_threshold": {
+
     }
   }
 }
