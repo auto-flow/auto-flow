@@ -28,7 +28,7 @@ def _decode(str_value: str) -> Any:
 def choice(label: str, options: Iterable, default=None):
     kwargs = {}
     if default:
-        kwargs.update({'default_value': default})
+        kwargs.update({'default_value': _encode(default)})
     return CategoricalHyperparameter(label, [_encode(option) for option in options], **kwargs)
 
 
