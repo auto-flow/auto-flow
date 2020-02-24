@@ -9,7 +9,7 @@ __all__=["LibLinear_Preprocessor"]
 class LibLinear_Preprocessor(AutoPLPreprocessingAlgorithm):
     class__ = "SelectFromModel"
     module__ = "sklearn.feature_selection"
-
+    classification_only = True
 
     def after_process_hyperparams(self,hyperparams):
         hyperparams=super(LibLinear_Preprocessor, self).after_process_hyperparams(hyperparams)

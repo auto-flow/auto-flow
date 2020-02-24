@@ -6,6 +6,7 @@ __all__ = ["SelectPercentileRegression"]
 
 
 class SelectPercentileRegression(SelectPercentileBase):
+    regression_only = True
     def get_default_name(self):
         return "f_regression"
 

@@ -51,25 +51,4 @@ def loguniform(label: str, low: float, high: float, default=None):
     return UniformFloatHyperparameter(label, low, high, **kwargs)
 
 
-def param_dict_to_ConfigurationSpace(param_dict: dict):
-    cs = ConfigurationSpace()
-    for key, value in param_dict.items():
-        assert isinstance(key, str)
-        assert isinstance(value, Hyperparameter)
-        value.name = key
-        cs.add_hyperparameter(value)
-    return cs
-
-
-def Configuration_to_param_dict(cfg: Configuration):
-    cfg = cfg.get_dictionary()  # fixme : None value ?
-    cfg_ = {}
-    for key, value in cfg.items():
-        if value is None:
-            continue
-        if isinstance(value, str) and len(value.split(':')) == 2:
-            value = _decode(value)
-        cfg_[key] = value
-    return cfg_
-
 

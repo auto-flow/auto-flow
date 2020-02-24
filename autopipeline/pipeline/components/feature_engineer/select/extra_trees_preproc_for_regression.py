@@ -9,7 +9,7 @@ __all__=["ExtraTreesPreprocessorRegression"]
 class ExtraTreesPreprocessorRegression(AutoPLPreprocessingAlgorithm):
     class__ = "SelectFromModel"
     module__ = "sklearn.feature_selection"
-
+    regression_only = True
 
     def after_process_hyperparams(self,hyperparams):
         hyperparams=super(ExtraTreesPreprocessorRegression, self).after_process_hyperparams(hyperparams)

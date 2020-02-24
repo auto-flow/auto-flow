@@ -266,6 +266,9 @@
         "min_weight_fraction_leaf": 1.0,
         "max_leaf_nodes": null,
         "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
+      },
+      "truncatedSVD": {
+        //target_dim
       }
     },
     "scale": {
@@ -275,16 +278,43 @@
         "copy": false,
       },
       "quantile_transformer": {
-        "n_quantiles": "uniform", "_value": [10,2000],"_default": 1000,
+        "n_quantiles": {"_type": "int_uniform", "_value": [10,2000],"_default": 1000},
         "output_distribution":  {"_type": "choice", "_value": ["uniform", "normal"],"_default": "normal"},
+        "copy": false
+      },
+      "robust_scaler": {
+        "q_min": {"_type":  "uniform", "_value": [0.001, 0.3],"_default": 0.25},
+        "q_max":  {"_type": "uniform", "_value": [0.001, 0.3],"_default": 0.25}
+      },
+      "standardize": {
         "copy": false
       }
     },
     "select": {
-
+      "extra_trees_preproc_for_classification": {
+        "threshold": "mean",
+        "prefit": true
+      },
+      "extra_trees_preproc_for_regression": {
+        "threshold": "mean",
+        "prefit": true
+      },
+      "liblinear_svc_preprocessor": {
+        "threshold": "mean",
+        "prefit": true
+      },
+      "select_percentile_classification": {
+        "score_func": {"_type": "choice", "_value": ["chi2", "f_classif", "mutual_info"],"_default": "chi2"},
+        "percentile": {"_type": "int_uniform", "_value": [1,99],"_default": 50}
+      },
+      "select_percentile_regression": {
+        "score_func": {"_type": "choice", "_value": ["f_regression", "mutual_info"],"_default": "f_regression"},
+        "percentile": {"_type": "int_uniform", "_value": [1,99],"_default": 50}
+      },
+      "select_rates": {}
     },
     "variance_threshold": {
-
+      "threshold": 0
     }
   }
 }

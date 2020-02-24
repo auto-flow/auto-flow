@@ -13,6 +13,8 @@ class AutoPLComponent(BaseEstimator):
     name: dict = None
     module__ = None
     class__ = None
+    classification_only=False
+    regression_only=False
 
     def __init__(self):
         self.estimator=None

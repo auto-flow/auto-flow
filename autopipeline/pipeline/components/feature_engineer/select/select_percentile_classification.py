@@ -6,6 +6,7 @@ __all__ = ["SelectPercentileClassification"]
 
 
 class SelectPercentileClassification(SelectPercentileBase):
+    classification_only = True
     def get_default_name(self):
         return "chi2"
 

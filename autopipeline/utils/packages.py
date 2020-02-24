@@ -17,3 +17,11 @@ def get_class_of_module(input_module):
 
 def get_default_hdl_db()->Dict:
     return json.loads((Path(init_data.__file__).parent / f"hdl_db.json").read_text())
+
+def get_hdl_db(path:str)->Dict:
+    path=Path(path)
+    if path.exists():
+        return json.loads(path.read_text())
+    else:
+        print("warn")
+        return get_default_hdl_db()

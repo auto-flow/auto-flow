@@ -4,6 +4,7 @@ import sklearn.feature_selection
 __all__=["SelectRates"]
 
 class SelectRates(SelectPercentileBase):
+    classification_only = True
     class__ = "GenericUnivariateSelect"
 
     def get_default_name(self):
