@@ -44,10 +44,9 @@ class PipelineTuner():
             raise NotImplementedError()
         return self._addition_info
 
-    def set_phps(self, hdl: Dict):
+    def set_hdl(self, hdl: Dict):
         self.hdl = hdl
         # todo: 泛化ML管线后，可能存在多个FE
-        self._FE_keys = list(self.hdl["FE"].keys())
         self.phps = self.hdl2phps(hdl)
 
     def get_rely_param_in_dhp(self, dhp, key, module_class) -> Dict:
@@ -68,7 +67,7 @@ class PipelineTuner():
     def feature_groups(self):
         if not hasattr(self, "_feature_groups"):
             raise NotImplementedError()
-        return self.feature_groups
+        return self._feature_groups
 
     def __create_preprocessor(self, dhp, selected_group=None, feature_groups=None):
         if selected_group is None:
@@ -77,7 +76,7 @@ class PipelineTuner():
             key = f"FE-{selected_group}"
         if key not in self.hdl:
             return None
-        sequences = list(self.hdl[key].keys)
+        sequences = list(map(lambda x:x.replace("(choice)",""),self.hdl[key].keys()))
         pipeline_list = []
         # todo
         if feature_groups and selected_group:
@@ -152,7 +151,7 @@ class PipelineTuner():
     def hdl2phps(self, hdl: Dict):
         raise NotImplementedError()
 
-    def init_task(self, task: Task):
+    def set_task(self, task: Task):
         self._task = task
 
     @property

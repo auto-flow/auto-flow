@@ -25,7 +25,7 @@ class AutoPipelineEstimator(BaseEstimator):
         self.tuner = tuner
         if self.custom_hyper_param:
             self.hyperparams = self.custom_hyper_param
-            self.tuner.set_phps(self.hyperparams)
+            self.tuner.set_hdl(self.hyperparams)
         else:
             pass
             # todo: 根据具体的任务装配一个默认的管道

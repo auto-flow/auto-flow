@@ -17,7 +17,7 @@ def concat_pipeline(*args) -> Optional[Pipeline]:
 def union_pipeline(preprocessors: Dict) -> Optional[Pipeline]:
     name = "feature_union"
     pipeline_list = []
-    for key, value in preprocessors:
+    for key, value in preprocessors.items():
         if isinstance(value, Pipeline):
             pipeline_list.append((
                 key,

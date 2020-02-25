@@ -92,6 +92,9 @@ class AutoPLRegressionAlgorithm(AutoPLComponent):
         pred_y= self.estimator.predict(X)
         return self.after_process_pred_y(pred_y)
 
+    def score(self,X,y):
+        return self.estimator.score(X,y)
+
 class AutoPLClassificationAlgorithm(AutoPLComponent):
     """Provide an abstract interface for classification algorithms in
     auto-sklearn.
@@ -122,6 +125,9 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
         if not self.estimator or (not hasattr(self.estimator, "predict_proba")):
             raise NotImplementedError()
         return self.estimator.predict_proba(X)
+
+    def score(self,X,y):
+        return self.estimator.score(X,y)
 
 class AutoPLPreprocessingAlgorithm(AutoPLComponent):
     """Provide an abstract interface for preprocessing algorithms in

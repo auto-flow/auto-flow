@@ -16,11 +16,11 @@ class FeatureGroup(TransformerMixin, BaseEstimator):
     def __init__(self, selected_group: str, feature_groups: Union[List, GroupSeries]):
         self.feature_groups = GroupSeries(feature_groups)
         self.selected_group = selected_group
-        assert selected_group in feature_groups.to_list()
+        assert selected_group in self.feature_groups.to_list()
 
     def __validate_X(self,X):
         assert len(X.shape)==2
-        assert X.shape[1]==self.feature_groups.shape[1]
+        assert X.shape[1]==self.feature_groups.shape[0]
 
     def fit(self, X, y=None):
         self.__validate_X(X)

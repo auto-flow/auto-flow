@@ -45,7 +45,7 @@ class SmacPipelineTuner(PipelineTuner):
             all_scoring_functions: bool,
             spliter
     ):
-        self.init_task(datamanager.task)
+        self.set_task(datamanager.task)
         self.evaluator.init_data(
             datamanager,
             metric,
