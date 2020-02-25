@@ -41,11 +41,6 @@ class AutoPipelineEstimator(BaseEstimator):
             all_scoring_functions=False,
             spliter=KFold(5, True, 42)
     ):
-        # init_all(
-        #     self.custom_init_param,
-        #     {"shape": X.shape},
-        #     {'random_state':self.tuner.random_state}
-        # )
         self.tuner.set_addition_info({"shape": X.shape})
         self.tuner.set_default_hp(self.default_hp)
         self.datamanager = XYDataManager(

@@ -1,11 +1,10 @@
-import re
 from collections import defaultdict
 from copy import deepcopy
-from typing import Optional, Tuple, Dict
+from typing import Dict
 
 from ConfigSpace.conditions import InCondition, EqualsCondition
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import Hyperparameter
+from ConfigSpace.hyperparameters import Hyperparameter, CategoricalHyperparameter, Constant
 
 import autopipeline.hdl.smac as smac_hdl
 from autopipeline.hdl2phps.base import HDL2PHPS
@@ -20,50 +19,128 @@ def param_dict_to_ConfigurationSpace(param_dict: dict):
         cs.add_hyperparameter(value)
 
 
-class SmacHDL2PHPS(HDL2PHPS):
-    def eval_str_to_dict(self, hdl):
-        hdl_ = deepcopy(hdl)
-        self.__recursion_eval(hdl_)
-        return hdl_
+def is_bottom(key, value):
+    if isinstance(key, str) and key.startswith("__"):
+        return True
+    if isinstance(value, dict) and "_type" in value:
+        return True
+    return False
 
-    def after_process_dict(self, dict_: dict):
+
+class SmacHDL2PHPS(HDL2PHPS):
+
+    def __call__(self, hdl: Dict):
+        return self.recursion(hdl)
+
+    def __condition(self, item: Dict, store: Dict):
+        child = item["_child"]
+        child = store[child]
+        parent = item["_parent"]
+        parent = store[parent]
+        value = item["_values"]
+        if (isinstance(value, list) and len(value) == 1):
+            value = value[0]
+        if isinstance(value, list):
+            cond = InCondition(child, parent, value)
+        else:
+            cond = EqualsCondition(child, parent, value)
+        return cond
+
+    # def activate_helper(self,value):
+    def reverse_dict(self, dict_: Dict):
+        reversed_dict = defaultdict(list)
+        for key, value in dict_.items():
+            if isinstance(value, list):
+                for v in value:
+                    reversed_dict[v].append(key)
+            else:
+                reversed_dict[value].append(key)
+        reversed_dict = dict(reversed_dict)
+        for key, value in reversed_dict.items():
+            reversed_dict[key] = list(set(value))
+        return reversed_dict
+
+    def pop_covered_item(self, dict_: Dict, length: int):
+        dict_ = deepcopy(dict_)
+        should_pop = []
+        for key, value in dict_.items():
+            assert isinstance(value, list)
+            if len(value) > length:
+                print("warn")
+                should_pop.append(key)
+            elif len(value) == length:
+                should_pop.append(key)
+        for key in should_pop:
+            dict_.pop(key)
+        return dict_
+
+    def __activate(self, value: Dict,store:Dict,cs:ConfigurationSpace):
+        assert isinstance(value, dict)
+        for k, v in value.items():
+            assert isinstance(v, dict)
+            reversed_dict = self.reverse_dict(v)
+            reversed_dict = self.pop_covered_item(reversed_dict, len(v))
+            for sk, sv in reversed_dict.items():
+                cond=self.__condition({
+                    "_child":sk,
+                    "_values":sv,
+                    "_parent":k
+                },store)
+                cs.add_condition(cond)
+
+    def recursion(self, hdl: Dict) -> ConfigurationSpace:
         cs = ConfigurationSpace()
-        conditions = defaultdict(list)
-        ret = self.__recursion_after_process(dict_,conditions)
-        for name, hyperparam in ret.items():
-            cs.add_hyperparameter(hyperparam)
-        # ----conditions----
-        InCondition_bins=defaultdict(list)
-        for item in conditions["conditions"]:
-            child=item["_child"]
-            child=ret[child]
-            parent=item["_parent"]
-            parent=ret[parent]
-            value=item["_values"]
-            _type=item.get("_type","InCondition")
-            if _type=="InCondition":
-                InCondition_bins[child].append([child,parent,value])
+        # 检测一下这个dict是否在直接描述超参
+        key_list = list(hdl.keys())
+        if len(key_list) == 0:
+            cs.add_hyperparameter(Constant("placeholder", "placeholder"))
+            return cs
+        else:
+            sample_key = key_list[0]
+            sample_value = hdl[sample_key]
+            if is_bottom(sample_key, sample_value):
+                store = {}
+                conditions_dict = {}
+                for key, value in hdl.items():
+                    if key.startswith("__"):
+                        conditions_dict[key] = value
+                    else:
+                        assert isinstance(value, dict)
+                        hp = self.__parse_dict_to_config(value)
+                        hp.name = key
+                        cs.add_hyperparameter(hp)
+                        store[key] = hp
+                for key, value in conditions_dict.items():
+                    if key == "__condition":
+                        assert isinstance(value, list)
+                        for item in value:
+                            cond = self.__condition(item, store)
+                            cs.add_condition(cond)
+                    elif key == "__activate":
+                        self.__activate(value,store,cs)
+
+                return cs
+        for key, value in hdl.items():
+            if key.endswith("(choice)"):
+                prefix_name = key.split("(choice)")[0]
+                cur_cs = ConfigurationSpace()
+                assert isinstance(value, dict)
+                option_param = CategoricalHyperparameter('__choice__',
+                                                         list(value.keys()))  # todo : default
+                cur_cs.add_hyperparameter(option_param)
+                for sub_key, sub_value in value.items():
+                    assert isinstance(sub_value, dict)
+                    sub_cs = self.recursion(sub_value)
+                    parent_hyperparameter = {'parent': option_param, 'value': sub_key}
+                    cur_cs.add_configuration_space(sub_key, sub_cs, parent_hyperparameter=parent_hyperparameter)
+                cs.add_configuration_space(prefix_name, cur_cs)
+            elif isinstance(value, dict):
+                sub_cs = self.recursion(value)
+                cs.add_configuration_space(key, sub_cs)
             else:
                 raise NotImplementedError()
-        for members in InCondition_bins.values():
-            if len(members)==1:
 
-            cs.add_condition(
-                cond
-            )
-            cs.add_condition(cond)
         return cs
-
-    def __recursion_eval(self, dict_: dict):
-        # 用含"_type"的dict描述超参。这里将这个值翻译出来
-        for key, value in dict_.items():
-            if isinstance(value, dict):
-                if ("_type" in value):
-                    dict_[key] = self.__parse_dict_to_config(value)
-                else:
-                    self.__recursion_eval(value)
-            # else:
-            #     raise AttributeError()
 
     def __parse_dict_to_config(self, dict_: dict):
         _type = dict_.get("_type")
@@ -74,64 +151,6 @@ class SmacHDL2PHPS(HDL2PHPS):
             return smac_hdl.choice("", _value, _default)
         else:
             return eval(f'''smac_hdl.{_type}("",*_value,_default)''')
-
-    def __concat_prefix(self, prefix, name):
-        if not prefix:
-            return name
-        else:
-            return f'{prefix}/{name}'
-
-    def __get_rely(self, key) -> Optional[Tuple]:
-        pattern_str = r'^\[(.*)\]$'
-        pattern = re.compile(pattern_str)
-        m = pattern.match(key)
-        if m:
-            rely_tuple: tuple = m.groups()
-            if len(rely_tuple) == 1:
-                return rely_tuple[0]
-        return None
-
-    def add_inside_conditions_prefix(self, prefix, inside_conditions):
-        keys=["_child","_parent"]
-        for key in keys:
-            value=inside_conditions[key]
-            value=self.__concat_prefix(prefix,value)
-            inside_conditions[key]=value
-
-    def __recursion_after_process(
-            self, dict_: dict,conditions:Dict, prefix: str = None, rely_parent=None, rely_value=None,
-
-    ) -> Dict:
-        ret = {}
-        for key, value in dict_.items():
-            if isinstance(value, Hyperparameter):
-                cur_prefix = self.__concat_prefix(prefix, key)
-                value.name = cur_prefix
-                ret[cur_prefix] = value
-                if rely_parent and rely_value:
-                    conditions["conditions"].append(
-                        {"_child":cur_prefix,"_parent":rely_parent,"_values":rely_value}
-                    )
-            elif isinstance(value, dict) and (not  key.startswith("__")):
-                rely_on = self.__get_rely(key)
-                cur_prefix = self.__concat_prefix(prefix, key)
-                if rely_on:
-                    sub_ret= self.__recursion_after_process(value, conditions,cur_prefix, rely_on)
-                    ret.update(sub_ret)
-                else:
-                    sub_ret = self.__recursion_after_process(value, conditions,cur_prefix, rely_parent,
-                                                                               rely_value=key)
-                    ret.update(sub_ret)
-            elif key=="__condition":
-                assert isinstance(value,list)
-                for item in value:
-                    assert isinstance(item, dict)
-                    self.add_inside_conditions_prefix(prefix,item)
-                    conditions["conditions"].append(item)
-            else:
-                raise Exception()
-
-        return ret
 
 
 if __name__ == '__main__':

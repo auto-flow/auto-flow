@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from ConfigSpace.configuration_space import Configuration
 
@@ -14,34 +14,43 @@ class SmacPHP2DHP(PHP2DHP):
                 if key not in tmp:
                     tmp[key] = {}
                 tmp = tmp[key]
-        tmp[key_path[-1]] = value
+        key=key_path[-1]
+        if (key=="placeholder" and value=="placeholder"):
+            pass
+        else:
+            tmp[key] = value
 
-    def split_key(self,key,token="/",ignore=("[","]"))->List[str]:
-        L=len(key)
-        stack=0
-        res=[]
-        cursor=""
-        for i,e in enumerate(key):
+    def split_key(self, key, token=":", ignore=("[", "]")) -> List[str]:
+        L = len(key)
+        stack = 0
+        res = []
+        cursor = ""
+        for i, e in enumerate(key):
             if e == ignore[0]:
-                stack+=1
-            if e==token and stack==0:
+                stack += 1
+            if e == token and stack == 0:
                 res.append(cursor)
-                cursor=""
+                cursor = ""
             else:
-                cursor=cursor+e
-            if e==ignore[1]:
-                stack-=1
+                cursor = cursor + e
+            if e == ignore[1]:
+                stack -= 1
         res.append(cursor)
         return res
 
-    def convert(self, php:Configuration):
-        dict_=php.get_dictionary()
-        ret={}
-        for k,v in dict_.items():
-            if isinstance(v,str):
-                v=_decode(v)
-            self.set_kv(ret,self.split_key(k),v)
+
+
+    def convert(self, php: Configuration):
+        dict_ = php.get_dictionary()
+        ret = {}
+        for k, v in dict_.items():
+            if "__choice__" in k:
+                continue
+            if isinstance(v, str):
+                v = _decode(v)
+            self.set_kv(ret, k.split(":"), v)  #self.split_key(k)
         return ret
+
 
 if __name__ == '__main__':
     d = {1: {2: {4: 6}}}

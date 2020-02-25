@@ -5,7 +5,9 @@ from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
+from autopipeline.pipeline.components.feature_engineer.feature_group import FeatureGroup
 from autopipeline.utils.packages import get_class_of_module
+from autopipeline.utils.pipeline import union_pipeline, concat_pipeline
 
 
 class PipelineTuner():
@@ -59,53 +61,72 @@ class PipelineTuner():
         assert isinstance(ret, dict)
         return ret
 
-    def set_FE_keys(self, FE_keys):
-        self._FE_keys = FE_keys
+    def set_feature_groups(self, feature_groups):
+        self._feature_groups = feature_groups
 
     @property
-    def FE_keys(self):
-        if not hasattr(self, "_FE_keys"):
+    def feature_groups(self):
+        if not hasattr(self, "_feature_groups"):
             raise NotImplementedError()
-        return self._FE_keys
+        return self.feature_groups
 
-    def create_preprocessor(self, dhp: Dict):
-        # 将估计器之前的步骤都整合成一个Pipeline，返回
-        FE_dict: dict = dhp["FE"]
+    def __create_preprocessor(self, dhp, selected_group=None, feature_groups=None):
+        if selected_group is None:
+            key = "FE"
+        else:
+            key = f"FE-{selected_group}"
+        if key not in self.hdl:
+            return None
+        sequences = list(self.hdl[key].keys)
         pipeline_list = []
-        # for name, module_class in FE_dict.items():
-        for name in self.FE_keys:
-            _module = FE_dict[name]
+        # todo
+        if feature_groups and selected_group:
+            pipeline_list.append((
+                f"{selected_group}-split",
+                FeatureGroup(selected_group, feature_groups)
+            ))
+        for phase in sequences:
+            _module = list(dhp[key][phase].keys())[0]
             if _module is None:
                 continue
-            module_path=f"autopipeline.pipeline.components.feature_engineer.{name}.{_module}"
+            module_path = f"autopipeline.pipeline.components.feature_engineer.{phase}.{_module}"
             _class = get_class_of_module(module_path)
             M = import_module(
                 module_path
             )
             assert hasattr(M, _class)
             cls = getattr(M, _class)
-            param = self.get_rely_param_in_dhp(dhp, f"FE/{name}", _module)
+            param = dhp[key][phase][_module]
             preprocessor = cls()
             default_hp = self.default_hp.get("feature_engineer", {}) \
-                .get(name, {}).get(_module, {})
+                .get(phase, {}).get(_module, {})
             default_hp.update(param)
             preprocessor.update_hyperparams(default_hp)
             preprocessor.set_addition_info(self.addition_info)
             pipeline_list.append(
-                (name, preprocessor)
+                (phase, preprocessor)
             )
-        if not pipeline_list:
-            # pipeline_list=[('no_preprocessing',NoPreprocessing())]
-            return None
-        else:
+        if pipeline_list:
             return Pipeline(pipeline_list)
+        else:
+            return None
 
-    def create_estimator(self, dhp: Dict):
+    def create_preprocessor(self, dhp: Dict) -> Pipeline:
+        feature_groups_set = set(self.feature_groups)
+        preprocessors = {}
+        for selected_group in feature_groups_set:
+            preprocessors[selected_group] = self.__create_preprocessor(dhp, selected_group, self.feature_groups)
+        # 将估计器之前的步骤都整合成一个Pipeline，返回
+        union_feature_pipeline = union_pipeline(preprocessors)
+        union_preprocessor = self.__create_preprocessor(dhp)
+        return concat_pipeline(union_feature_pipeline, union_preprocessor)
+
+    def create_estimator(self, dhp: Dict) -> Pipeline:
         # 根据超参构造一个估计器
-        _module = dhp["MHP"]
-        param = dhp["[MHP]"][_module]
-        module_path=f"autopipeline.pipeline.components.{self.task.mainTask}.{_module}"
-        _class=get_class_of_module(module_path)
+        _module = list(dhp["MHP"].keys())[0]
+        param = dhp["MHP"][_module]
+        module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{_module}"
+        _class = get_class_of_module(module_path)
         M = import_module(
             module_path
         )
