@@ -1,8 +1,8 @@
-from typing import Any, Iterable
+from typing import Any, Iterable, List
 
 from ConfigSpace import ConfigurationSpace, Configuration
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
-    UniformFloatHyperparameter, UniformIntegerHyperparameter, Hyperparameter
+    UniformFloatHyperparameter, UniformIntegerHyperparameter, Hyperparameter, Constant
 
 
 def _encode(value: Any) -> str:
@@ -25,7 +25,9 @@ def _decode(str_value: str) -> Any:
         raise Exception()
 
 
-def choice(label: str, options: Iterable, default=None):
+def choice(label: str, options: List, default=None):
+    if len(options)==1:
+        return Constant(label,_encode(options[0]))
     kwargs = {}
     if default:
         kwargs.update({'default_value': _encode(default)})

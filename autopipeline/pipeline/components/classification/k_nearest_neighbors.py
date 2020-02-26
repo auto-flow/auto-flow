@@ -1,5 +1,5 @@
+from autopipeline.pipeline.components.classification_base import AutoPLClassificationAlgorithm
 
-from autopipeline.pipeline.components.base import AutoPLClassificationAlgorithm
 __all__=["KNearestNeighborsClassifier"]
 
 

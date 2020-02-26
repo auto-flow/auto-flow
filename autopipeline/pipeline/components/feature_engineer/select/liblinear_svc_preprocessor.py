@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from sklearn.svm import LinearSVC
 
-from autopipeline.pipeline.components.base import AutoPLPreprocessingAlgorithm
+from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 
 __all__=["LibLinear_Preprocessor"]
 

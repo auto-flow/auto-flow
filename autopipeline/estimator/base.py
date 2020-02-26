@@ -6,10 +6,10 @@ from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
 from autopipeline.data.xy_data_manager import XYDataManager
-from autopipeline.init_data import add_public_info, extract_default_hp_from_hdl_db
+from autopipeline.hdl.default_hp import add_public_info_in_default_hp, extract_default_hp_from_hdl_db
 from autopipeline.metrics import accuracy
 from autopipeline.tuner.base import PipelineTuner
-from autopipeline.utils.packages import get_default_hdl_db
+from autopipeline.hdl.utils import get_default_hdl_db
 
 
 class AutoPipelineEstimator(BaseEstimator):
@@ -31,7 +31,7 @@ class AutoPipelineEstimator(BaseEstimator):
             # todo: 根据具体的任务装配一个默认的管道
         hdl_db=get_default_hdl_db()
         self.default_hp = extract_default_hp_from_hdl_db(hdl_db)
-        add_public_info(self.default_hp, {"random_state": tuner.random_state})
+        add_public_info_in_default_hp(self.default_hp, {"random_state": tuner.random_state})
 
     def fit(
             self, X: np.ndarray, y,

@@ -1,4 +1,4 @@
-from autopipeline.pipeline.components.base import AutoPLPreprocessingAlgorithm
+from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 
 __all__=["NoPreprocessing"]
 

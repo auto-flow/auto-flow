@@ -3,7 +3,7 @@ from typing import Dict
 
 import sklearn.feature_selection
 
-from autopipeline.pipeline.components.base import AutoPLPreprocessingAlgorithm
+from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 
 
 class SelectPercentileBase(AutoPLPreprocessingAlgorithm):

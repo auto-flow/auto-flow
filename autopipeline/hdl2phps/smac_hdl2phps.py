@@ -1,30 +1,15 @@
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict
+from typing import Dict, List
 
 from ConfigSpace.conditions import InCondition, EqualsCondition
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import Hyperparameter, CategoricalHyperparameter, Constant
+from ConfigSpace.forbidden import ForbiddenInClause, ForbiddenEqualsClause, ForbiddenAndConjunction
+from ConfigSpace.hyperparameters import CategoricalHyperparameter, Constant
 
 import autopipeline.hdl.smac as smac_hdl
+from autopipeline.hdl.utils import is_hdl_bottom
 from autopipeline.hdl2phps.base import HDL2PHPS
-
-
-def param_dict_to_ConfigurationSpace(param_dict: dict):
-    cs = ConfigurationSpace()
-    for key, value in param_dict.items():
-        assert isinstance(key, str)
-        assert isinstance(value, Hyperparameter)
-        value.name = key
-        cs.add_hyperparameter(value)
-
-
-def is_bottom(key, value):
-    if isinstance(key, str) and key.startswith("__"):
-        return True
-    if isinstance(value, dict) and "_type" in value:
-        return True
-    return False
 
 
 class SmacHDL2PHPS(HDL2PHPS):
@@ -37,14 +22,28 @@ class SmacHDL2PHPS(HDL2PHPS):
         child = store[child]
         parent = item["_parent"]
         parent = store[parent]
-        value = item["_values"]
+        value = (item["_values"])
         if (isinstance(value, list) and len(value) == 1):
             value = value[0]
         if isinstance(value, list):
-            cond = InCondition(child, parent, value)
+            cond = InCondition(child, parent, list(map(smac_hdl._encode, value)))
         else:
-            cond = EqualsCondition(child, parent, value)
+            cond = EqualsCondition(child, parent, smac_hdl._encode(value))
         return cond
+
+    def __forbidden(self, value: List, store: Dict, cs: ConfigurationSpace):
+        assert isinstance(value, list)
+        for item in value:
+            assert isinstance(item, dict)
+            clauses = []
+            for k, v in item.items():
+                if isinstance(v, list) and len(v) == 1:
+                    v = v[0]
+                if isinstance(v, list):
+                    clauses.append(ForbiddenInClause(store[k], list(map(smac_hdl._encode, v))))
+                else:
+                    clauses.append(ForbiddenEqualsClause(store[k], smac_hdl._encode(v)))
+            cs.add_forbidden_clause(ForbiddenAndConjunction(*clauses))
 
     # def activate_helper(self,value):
     def reverse_dict(self, dict_: Dict):
@@ -74,18 +73,18 @@ class SmacHDL2PHPS(HDL2PHPS):
             dict_.pop(key)
         return dict_
 
-    def __activate(self, value: Dict,store:Dict,cs:ConfigurationSpace):
+    def __activate(self, value: Dict, store: Dict, cs: ConfigurationSpace):
         assert isinstance(value, dict)
         for k, v in value.items():
             assert isinstance(v, dict)
             reversed_dict = self.reverse_dict(v)
             reversed_dict = self.pop_covered_item(reversed_dict, len(v))
             for sk, sv in reversed_dict.items():
-                cond=self.__condition({
-                    "_child":sk,
-                    "_values":sv,
-                    "_parent":k
-                },store)
+                cond = self.__condition({
+                    "_child": sk,
+                    "_values": sv,
+                    "_parent": k
+                }, store)
                 cs.add_condition(cond)
 
     def recursion(self, hdl: Dict) -> ConfigurationSpace:
@@ -98,7 +97,7 @@ class SmacHDL2PHPS(HDL2PHPS):
         else:
             sample_key = key_list[0]
             sample_value = hdl[sample_key]
-            if is_bottom(sample_key, sample_value):
+            if is_hdl_bottom(sample_key, sample_value):
                 store = {}
                 conditions_dict = {}
                 for key, value in hdl.items():
@@ -106,8 +105,8 @@ class SmacHDL2PHPS(HDL2PHPS):
                         conditions_dict[key] = value
                     else:
                         assert isinstance(value, dict)
-                        hp = self.__parse_dict_to_config(value)
-                        hp.name = key
+                        hp = self.__parse_dict_to_config(key,value)
+                        # hp.name = key
                         cs.add_hyperparameter(hp)
                         store[key] = hp
                 for key, value in conditions_dict.items():
@@ -117,7 +116,9 @@ class SmacHDL2PHPS(HDL2PHPS):
                             cond = self.__condition(item, store)
                             cs.add_condition(cond)
                     elif key == "__activate":
-                        self.__activate(value,store,cs)
+                        self.__activate(value, store, cs)
+                    elif key == "__forbidden":
+                        self.__forbidden(value, store, cs)
 
                 return cs
         for key, value in hdl.items():
@@ -125,6 +126,7 @@ class SmacHDL2PHPS(HDL2PHPS):
                 prefix_name = key.split("(choice)")[0]
                 cur_cs = ConfigurationSpace()
                 assert isinstance(value, dict)
+                # 不能用constant，会报错
                 option_param = CategoricalHyperparameter('__choice__',
                                                          list(value.keys()))  # todo : default
                 cur_cs.add_hyperparameter(option_param)
@@ -142,15 +144,15 @@ class SmacHDL2PHPS(HDL2PHPS):
 
         return cs
 
-    def __parse_dict_to_config(self, dict_: dict):
+    def __parse_dict_to_config(self,key, dict_: dict):
         _type = dict_.get("_type")
         _value = dict_.get("_value")
         _default = dict_.get("_default")
         assert _value is not None
         if _type == "choice":
-            return smac_hdl.choice("", _value, _default)
+            return smac_hdl.choice(key, _value, _default)
         else:
-            return eval(f'''smac_hdl.{_type}("",*_value,_default)''')
+            return eval(f'''smac_hdl.{_type}("{key}",*_value,_default)''')
 
 
 if __name__ == '__main__':

@@ -14,6 +14,12 @@ def concat_pipeline(*args) -> Optional[Pipeline]:
         return None
 
 
+def purify_node(node):
+    if isinstance(node, Pipeline) and len(node) == 1:
+        return node[0]
+    return node
+
+
 def union_pipeline(preprocessors: Dict) -> Optional[Pipeline]:
     name = "feature_union"
     pipeline_list = []
@@ -21,7 +27,7 @@ def union_pipeline(preprocessors: Dict) -> Optional[Pipeline]:
         if isinstance(value, Pipeline):
             pipeline_list.append((
                 key,
-                value
+                purify_node(value)
             ))
     if pipeline_list:
         return Pipeline([(
