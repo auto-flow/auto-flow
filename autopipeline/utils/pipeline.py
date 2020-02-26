@@ -32,7 +32,7 @@ def union_pipeline(preprocessors: Dict) -> Optional[Pipeline]:
     if pipeline_list:
         return Pipeline([(
             name,
-            FeatureUnion(pipeline_list)
+            FeatureUnion(pipeline_list,n_jobs=1)
         )])
     else:
         return None

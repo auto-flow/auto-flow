@@ -33,20 +33,19 @@ def extract_pure_hdl_db_from_hdl_db(hdl_db: Dict) -> Dict:
     pure_hdl_db_recursion(dict_)
     return dict_
 
-def is_default_hp(key,value):
-    if (not key.startswith("__")) and (not isinstance(value,dict)):
-        return True
-    return False
+
 
 def pure_hdl_db_recursion(dict_:Dict):
     should_pop = []
     should_recursion = []
     for key, value in dict_.items():
-        if isinstance(value, dict):
-            if is_default_hp(key, value):
-                should_pop.append(key)
-            else:
-                should_recursion.append(value)
+        if is_hdl_bottom(key,value):
+            pass
+        elif not isinstance(value,dict):
+            should_pop.append(key)
+        elif isinstance(value,dict):
+            should_recursion.append(value)
+
     for key in should_pop:
         dict_.pop(key)
     for sub_dict_ in should_recursion:

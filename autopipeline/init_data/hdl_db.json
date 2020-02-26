@@ -38,7 +38,7 @@
       "loss": "deviance", // ""exponential" make it performs like adaboost
       "subsample":  {"_type": "uniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
-      "_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
@@ -168,7 +168,7 @@
       "loss": ["ls","lad","huber","quantile"],
       "subsample":  {"_type": "uniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
-      "_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
@@ -241,6 +241,9 @@
     }
   },
   "feature_engineer": {
+    "encode": {
+      "one_hot_encode": {}
+    },
     "expand": {
       "kitchen_sinks": {
         "gamma": {"_type": "loguniform", "_value": [3.0517578125e-05, 8],"_default": 1},
@@ -331,7 +334,7 @@
       },
       "robust_scaler": {
         "q_min": {"_type":  "uniform", "_value": [0.001, 0.3],"_default": 0.25},
-        "q_max":  {"_type": "uniform", "_value": [0.001, 0.3],"_default": 0.25}
+        "q_max":  {"_type": "uniform", "_value": [0.7, 0.999],"_default": 0.75}
       },
       "standardize": {
         "copy": false
@@ -351,21 +354,23 @@
         "prefit": true
       },
       "select_percentile_classification": {
-        "score_func": {"_type": "choice", "_value": ["chi2", "f_classif", "mutual_info"],"_default": "chi2"},
+        "score_func": {"_type": "choice", "_value": ["chi2", "f_classif", "mutual_info_classif"],"_default": "chi2"},
         "percentile": {"_type": "int_uniform", "_value": [1,99],"_default": 50}
       },
       "select_percentile_regression": {
-        "score_func": {"_type": "choice", "_value": ["f_regression", "mutual_info"],"_default": "f_regression"},
+        "score_func": {"_type": "choice", "_value": ["f_regression", "mutual_info_regression"],"_default": "f_regression"},
         "percentile": {"_type": "int_uniform", "_value": [1,99],"_default": 50}
       },
       "select_rates": {
-        "alpha": {"_type": "uniform", "_value": [0.01,0.5],"_default": 0.1},
+        "param": {"_type": "uniform", "_value": [0.01,0.5],"_default": 0.1},
         "score_func": {"_type": "choice", "_value": ["chi2", "f_classif"],"_default": "chi2"},
-        "model": {"_type": "choice", "_value": ["fpr", "fdr", "fwe"],"_default": "chi2"}
+        "mode": {"_type": "choice", "_value": ["fpr", "fdr", "fwe"],"_default": "fpr"}
       }
     },
-    "variance_threshold": {
-      "threshold": 0
+    "threshold": {
+      "variance_threshold": {
+        "threshold": 0
+      }
     }
   }
 }

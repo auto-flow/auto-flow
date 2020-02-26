@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List
 
 from ConfigSpace.configuration_space import Configuration
 
@@ -14,8 +14,8 @@ class SmacPHP2DHP(PHP2DHP):
                 if key not in tmp:
                     tmp[key] = {}
                 tmp = tmp[key]
-        key=key_path[-1]
-        if (key=="placeholder" and value=="placeholder"):
+        key = key_path[-1]
+        if (key == "placeholder" and value == "placeholder"):
             pass
         else:
             tmp[key] = value
@@ -38,17 +38,21 @@ class SmacPHP2DHP(PHP2DHP):
         res.append(cursor)
         return res
 
-
-
     def convert(self, php: Configuration):
         dict_ = php.get_dictionary()
         ret = {}
         for k, v in dict_.items():
-            if "__choice__" in k:
-                continue
             if isinstance(v, str):
                 v = _decode(v)
-            self.set_kv(ret, k.split(":"), v)  #self.split_key(k)
+            key_path = k.split(":")
+            if key_path[-1]=="__choice__" :
+                # fixme
+                if v is None:
+                    key_path=key_path[:-1]
+                else:
+                    continue
+
+            self.set_kv(ret, key_path, v)  # self.split_key(k)
         return ret
 
 

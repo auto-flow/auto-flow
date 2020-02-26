@@ -38,15 +38,17 @@ class AutoPLComponent(BaseEstimator):
     def after_process_hyperparams(self, hyperparams) -> Dict:
         hyperparams = deepcopy(hyperparams)
         should_pop = []
+        updated={}
         for key, value in hyperparams.items():
             key: str
             if key.startswith("_") and (not key.startswith("__")):
                 should_pop.append(key)
                 key = key[1:]
                 new_key, indicator = key.split("-")
-                hyperparams[new_key] = self.do_process(indicator, hyperparams, value)
+                updated[new_key] = self.do_process(indicator, hyperparams, value)
         for key in should_pop:
             hyperparams.pop(key)
+        hyperparams.update(updated)
         return hyperparams
 
     def after_process_estimator(self, estimator, X, y):
@@ -84,7 +86,7 @@ class AutoPLComponent(BaseEstimator):
     def do_process(self, indicator, hyperparams, value):
         if indicator == "lr_ratio":
             lr = hyperparams["learning_rate"]
-            return value * (1 / lr)
+            return int(value * (1 / lr))
         elif indicator == "sp1_ratio":
             if hasattr(self, "shape"):
                 n_components = max(

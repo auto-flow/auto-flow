@@ -1,6 +1,6 @@
 from importlib import import_module
 from typing import Dict
-
+import re
 from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
@@ -76,7 +76,8 @@ class PipelineTuner():
             key = f"FE-{selected_group}"
         if key not in self.hdl:
             return None
-        sequences = list(map(lambda x:x.replace("(choice)",""),self.hdl[key].keys()))
+        # 删除括号
+        sequences = list(map(lambda x: re.sub(r"\(.*\)","",x), self.hdl[key].keys()))
         pipeline_list = []
         # todo
         if feature_groups and selected_group:
@@ -85,8 +86,10 @@ class PipelineTuner():
                 FeatureGroup(selected_group, feature_groups)
             ))
         for phase in sequences:
+            if dhp[key][phase] is None:
+                continue
             _module = list(dhp[key][phase].keys())[0]
-            if _module is None:
+            if _module is None:  # optional-choice
                 continue
             module_path = f"autopipeline.pipeline.components.feature_engineer.{phase}.{_module}"
             _class = get_class_of_module(module_path)
@@ -161,24 +164,3 @@ class PipelineTuner():
         return self._task
 
 
-if __name__ == '__main__':
-    from autopipeline.init_data import init_all
-    import numpy as np
-
-    init_all(additional={"shape": (1000, 200)}, public_hp={'random_state': 42})
-    sample = \
-        {'FE': {'reduce': 'kernel_pca.KernelPCA', 'scale': None},
-         'MHP': 'libsvm_svc.LibSVM_SVC',
-         '[FE/reduce]': {
-             'kernel_pca.KernelPCA':
-                 {
-                     'kernel': 'rbf',
-                     'n_components_ratio': 0.1
-                 }
-         },
-         '[MHP]': {'libsvm_svc.LibSVM_SVC': {'C': 4, 'kernel': 'rbf'}}}
-    ans = PipelineTuner().create_preprocessor(sample)
-    X_ = ans.fit_transform(np.random.rand(1000, 200))
-    print(X_.shape)
-    ans = PipelineTuner().create_estimator(sample)
-    print(ans)

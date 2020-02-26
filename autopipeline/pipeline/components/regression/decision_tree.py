@@ -1,5 +1,5 @@
 
-from autopipeline.pipeline.components.base import AutoPLRegressionAlgorithm
+from autopipeline.pipeline.components.regression_base import AutoPLRegressionAlgorithm
 
 
 class DecisionTree(AutoPLRegressionAlgorithm):

@@ -5,6 +5,8 @@ import sklearn.feature_selection
 
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 
+excludeToken = True
+
 
 class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
     class__ = "SelectPercentile"
@@ -17,7 +19,7 @@ class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
         raise NotImplementedError()
 
     def after_process_hyperparams(self, hyperparams) -> Dict:
-        hyperparams=super(SelectPercentileBase, self).after_process_hyperparams(hyperparams)
+        hyperparams = super(SelectPercentileBase, self).after_process_hyperparams(hyperparams)
         name2func = self.get_name2func()
         default_name = self.get_default_name()
         name = hyperparams.get("score_func", default_name)

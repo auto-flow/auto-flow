@@ -13,5 +13,5 @@ class SelectPercentileRegression(SelectPercentileBase):
     def get_name2func(self):
         return {
             "f_regression": sklearn.feature_selection.f_regression,
-            "mutual_info": sklearn.feature_selection.mutual_info_regression,
+            "mutual_info_regression": sklearn.feature_selection.mutual_info_regression,
         }

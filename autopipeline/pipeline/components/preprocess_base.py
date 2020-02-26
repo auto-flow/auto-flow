@@ -12,11 +12,14 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
     def before_trans_X(self, X):
         return X
 
+    def after_trans_X(self,X):
+        return X
+
     def transform(self, X):
         if not self.estimator or (not hasattr(self.estimator, "transform")):
             raise NotImplementedError()
         X=self.before_trans_X(X)
-        return self.estimator.transform(X)
+        return self.after_trans_X(self.estimator.transform(X))
 
     def fit_transform(self, X, y=None):
         self.fit(X, y)

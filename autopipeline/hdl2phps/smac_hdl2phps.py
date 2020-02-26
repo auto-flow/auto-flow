@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List
@@ -105,7 +106,7 @@ class SmacHDL2PHPS(HDL2PHPS):
                         conditions_dict[key] = value
                     else:
                         assert isinstance(value, dict)
-                        hp = self.__parse_dict_to_config(key,value)
+                        hp = self.__parse_dict_to_config(key, value)
                         # hp.name = key
                         cs.add_hyperparameter(hp)
                         store[key] = hp
@@ -121,14 +122,26 @@ class SmacHDL2PHPS(HDL2PHPS):
                         self.__forbidden(value, store, cs)
 
                 return cs
+        pattern = re.compile(r"(.*)\((.*)\)")
         for key, value in hdl.items():
-            if key.endswith("(choice)"):
-                prefix_name = key.split("(choice)")[0]
+            mat = pattern.match(key)
+            if mat:
+                groups = mat.groups()
+                assert len(groups) == 2
+                prefix_name, method = groups
+                value_list = list(value.keys())
+                assert len(value_list) >= 1
+                if method == "choice":
+                    pass
+                elif method == "optional-choice":
+                    value_list.append(None)
+                else:
+                    raise NotImplementedError()
                 cur_cs = ConfigurationSpace()
                 assert isinstance(value, dict)
                 # 不能用constant，会报错
-                option_param = CategoricalHyperparameter('__choice__',
-                                                         list(value.keys()))  # todo : default
+                value_list = list(map(smac_hdl._encode, value_list))
+                option_param = CategoricalHyperparameter('__choice__', value_list)  # todo : default
                 cur_cs.add_hyperparameter(option_param)
                 for sub_key, sub_value in value.items():
                     assert isinstance(sub_value, dict)
@@ -144,7 +157,7 @@ class SmacHDL2PHPS(HDL2PHPS):
 
         return cs
 
-    def __parse_dict_to_config(self,key, dict_: dict):
+    def __parse_dict_to_config(self, key, dict_: dict):
         _type = dict_.get("_type")
         _value = dict_.get("_value")
         _default = dict_.get("_default")
