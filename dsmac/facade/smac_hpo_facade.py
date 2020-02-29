@@ -3,7 +3,7 @@ from dsmac.runhistory.runhistory2epm import RunHistory2EPM4LogScaledCost
 from dsmac.optimizer.acquisition import LogEI
 from dsmac.epm.rf_with_instances import RandomForestWithInstances
 from dsmac.initial_design.sobol_design import SobolDesign
-
+from dsmac.initial_design.random_configuration_design import RandomConfigurations
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2018, ML4AAD"
 __license__ = "3-clause BSD"
@@ -36,7 +36,7 @@ class SMAC4HPO(SMAC4AC):
 
         scenario = kwargs['scenario']
 
-        kwargs['initial_design'] = kwargs.get('initial_design', SobolDesign)
+        kwargs['initial_design'] = kwargs.get('initial_design', RandomConfigurations)#SobolDesign
         kwargs['runhistory2epm'] = kwargs.get('runhistory2epm', RunHistory2EPM4LogScaledCost)
 
         init_kwargs = kwargs.get('initial_design_kwargs', dict())

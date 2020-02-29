@@ -1,4 +1,5 @@
 from autopipeline.pipeline.components.base import AutoPLComponent
+from autopipeline.utils.data import densify
 
 
 class AutoPLRegressionAlgorithm(AutoPLComponent):
@@ -13,6 +14,7 @@ class AutoPLRegressionAlgorithm(AutoPLComponent):
         return y
 
     def predict(self, X):
+        X=densify(X)
         if not self.estimator:
             raise NotImplementedError()
         pred_y= self.estimator.predict(X)

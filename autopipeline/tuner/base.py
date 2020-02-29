@@ -4,6 +4,7 @@ import re
 from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
+from autopipeline.data.xy_data_manager import XYDataManager
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.pipeline.components.feature_engineer.feature_group import FeatureGroup
 from autopipeline.utils.packages import get_class_of_module
@@ -60,14 +61,14 @@ class PipelineTuner():
         assert isinstance(ret, dict)
         return ret
 
-    def set_feature_groups(self, feature_groups):
-        self._feature_groups = feature_groups
+    def set_data_manager(self, data_manager:XYDataManager):
+        self._data_manager = data_manager
 
     @property
-    def feature_groups(self):
-        if not hasattr(self, "_feature_groups"):
+    def data_manager(self):
+        if not hasattr(self, "_data_manager"):
             raise NotImplementedError()
-        return self._feature_groups
+        return self._data_manager
 
     def __create_preprocessor(self, dhp, selected_group=None, feature_groups=None):
         if selected_group is None:
@@ -114,12 +115,15 @@ class PipelineTuner():
             return None
 
     def create_preprocessor(self, dhp: Dict) -> Pipeline:
-        feature_groups_set = set(self.feature_groups)
-        preprocessors = {}
-        for selected_group in feature_groups_set:
-            preprocessors[selected_group] = self.__create_preprocessor(dhp, selected_group, self.feature_groups)
-        # 将估计器之前的步骤都整合成一个Pipeline，返回
-        union_feature_pipeline = union_pipeline(preprocessors)
+        if self.data_manager.feature_groups:
+            feature_groups_set = set(self.data_manager.feature_groups)
+            preprocessors = {}
+            for selected_group in feature_groups_set:
+                preprocessors[selected_group] = self.__create_preprocessor(dhp, selected_group, self.feature_groups)
+            # 将估计器之前的步骤都整合成一个Pipeline，返回
+            union_feature_pipeline = union_pipeline(preprocessors)
+        else:
+            union_feature_pipeline=None
         union_preprocessor = self.__create_preprocessor(dhp)
         return concat_pipeline(union_feature_pipeline, union_preprocessor)
 

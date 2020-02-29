@@ -1,10 +1,12 @@
+from copy import deepcopy
+
 import ray
 from dsmac.runhistory.runhistory import RunHistory
 from dsmac.tae.execute_ta_run import ExecuteTARun
 from frozendict import frozendict
 import multiprocessing as mp
 
-
+from joblib import parallel_backend,delayed,Parallel
 
 class Distributer():
     def __init__(self,tae_runner:ExecuteTARun=None,n_jobs=1):
@@ -67,9 +69,10 @@ class RayDistributer(Distributer):
         ray_ans= ray.get(ans)   # (status, cost, dur, res)
         return ray_ans
 
-def mp_run_fun(tae_runner,config,inst,q):
+def mp_run_fun(tae_runner,config,inst): #,q
     ans=tae_runner.start(config,inst)
-    q.put((config,ans))
+    return ans
+    # q.put((config,ans))
 
 class MultiProcessDistributer(Distributer):
     def _run(self,to_run):
@@ -84,6 +87,27 @@ class MultiProcessDistributer(Distributer):
         results = [q.get() for j in processes]
         anss=[result[1] for result in results]
         return anss
+
+global g_tae_runner
+
+def joblib_run_fun( challenger):
+    status, cost, dur, res = g_tae_runner.start(
+        config=challenger,
+        instance=None)
+    return (status, cost, dur, res)
+
+
+class JoblibDistributer(Distributer):
+    def __init__(self,*args,**kwargs):
+        super(JoblibDistributer, self).__init__(*args,**kwargs)
+        global g_tae_runner
+        g_tae_runner=self.tae_runner
+
+    def _run(self, to_run:list) ->list:
+        with parallel_backend(backend="multiprocessing",n_jobs=-1):
+            # ans=Parallel()(delayed(self.tae_runner.start)(x,None) for x in to_run)
+            ans=Parallel()(delayed(mp_run_fun)(deepcopy(self.tae_runner),x,None) for x in to_run)
+        return ans
 
 class SingleDistributer(Distributer):
     def __init__(self,*args,**kwargs):

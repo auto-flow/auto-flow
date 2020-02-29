@@ -4,13 +4,13 @@ from typing import Dict
 from autopipeline.hdl.utils import is_hdl_bottom
 
 
-def add_public_info_in_default_hp(default_hp: Dict, public_info: Dict):
+def add_public_info_to_default_hp(default_hp: Dict, public_info: Dict):
     for key, value in default_hp.items():
         if is_bottom_dict_in_default_hp(value):
             for p_k, p_v in public_info.items():
                 value[p_k] = p_v
         elif isinstance(value, dict):
-            add_public_info_in_default_hp(default_hp[key], public_info)
+            add_public_info_to_default_hp(default_hp[key], public_info)
 
 
 def is_bottom_dict_in_default_hp(value):

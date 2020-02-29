@@ -8,7 +8,7 @@ import numpy as np
 
 from dsmac.configspace import Configuration, ConfigurationSpace
 from dsmac.tae.execute_ta_run import StatusType
-from dsmac.utils.io.file_system import LocalFS
+from general_fs.file_system import LocalFS
 from dsmac.utils.logging import PickableLoggerAdapter
 
 __author__ = "Marius Lindauer"

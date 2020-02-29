@@ -1,7 +1,7 @@
 from sklearn.multiclass import OneVsRestClassifier
 
 from autopipeline.pipeline.components.base import AutoPLComponent
-from autopipeline.utils.data import get_task_from_y
+from autopipeline.utils.data import get_task_from_y, softmax, densify
 
 
 class AutoPLClassificationAlgorithm(AutoPLComponent):
@@ -25,14 +25,22 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
         return y
 
     def predict(self, X):
+        X=densify(X)
         if not self.estimator:
             raise NotImplementedError()
         pred_y= self.estimator.predict(X)
         return self.after_process_pred_y(pred_y)
 
     def predict_proba(self, X):
-        if not self.estimator or (not hasattr(self.estimator, "predict_proba")):
+        X=densify(X)
+        if not self.estimator :
             raise NotImplementedError()
+        if not hasattr(self,"predict_proba"):
+            if hasattr(self,"decision_function"):
+                df = self.estimator.decision_function(X)
+                return softmax(df)
+            else:
+                raise NotImplementedError()
         return self.estimator.predict_proba(X)
 
     def score(self,X,y):

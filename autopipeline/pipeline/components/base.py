@@ -1,8 +1,11 @@
+import inspect
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict
 
 from sklearn.base import BaseEstimator
+
+from autopipeline.utils.data import densify
 
 
 class AutoPLComponent(BaseEstimator):
@@ -38,7 +41,7 @@ class AutoPLComponent(BaseEstimator):
     def after_process_hyperparams(self, hyperparams) -> Dict:
         hyperparams = deepcopy(hyperparams)
         should_pop = []
-        updated={}
+        updated = {}
         for key, value in hyperparams.items():
             key: str
             if key.startswith("_") and (not key.startswith("__")):
@@ -60,13 +63,27 @@ class AutoPLComponent(BaseEstimator):
     def before_fit_y(self, y):
         return y
 
+    def filter_invalid(self, cls, hyperparams: Dict) -> Dict:
+        validated = {}
+        for key, value in hyperparams.items():
+            if key in inspect.signature(cls.__init__).parameters.keys():
+                validated[key] = value
+            else:
+                pass
+        return validated
+
     def fit(self, X, y):
         self.shape = X.shape
         cls = self.get_estimator_class()
-        self.estimator = cls(**self.after_process_hyperparams(self.hyperparams))
+        self.estimator = cls(
+            **self.filter_invalid(
+                cls, self.after_process_hyperparams(self.hyperparams)
+            )
+        )
         X = self.before_fit_X(X)
         y = self.before_fit_y(y)
         self.estimator = self.after_process_estimator(self.estimator, X, y)
+        X=densify(X)
         self.estimator.fit(X, y)
         return self
 

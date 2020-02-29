@@ -14,7 +14,7 @@ def get_class_of_module(input_module):
     if hasattr(_module,"__all__"):
         return _module.__all__[0]
     else:
-        return inspect.getmembers(_module,inspect.isclass)[0][0]
+        return inspect.getmembers(_module,inspect.isclass)[-1][0]
 
 def find_components(package, directory, base_class):
     components = OrderedDict()

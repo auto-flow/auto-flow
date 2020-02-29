@@ -32,7 +32,7 @@ class SmacPipelineTuner(PipelineTuner):
 
         self.distributer = distributer
 
-        self.evaluator.init_php2model(self.php2model)
+        self.evaluator.set_php2model(self.php2model)
 
         # 将smac中的参数迁移过来
         # 与训练任务有关的一些参数（如分类回归任务，数据集（用于初始化所有算法模型的默认超参））
@@ -43,14 +43,16 @@ class SmacPipelineTuner(PipelineTuner):
             datamanager: XYDataManager,
             metric: Scorer,
             all_scoring_functions: bool,
-            spliter
+            splitter
     ):
+        if hasattr(splitter,"random_state"):
+            setattr(splitter,"random_state",self.random_state)
         self.set_task(datamanager.task)
         self.evaluator.init_data(
             datamanager,
             metric,
             all_scoring_functions,
-            spliter,
+            splitter,
         )
         # todo: metalearn
 
@@ -79,6 +81,7 @@ class SmacPipelineTuner(PipelineTuner):
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
+        print(pipeline,pipeline[-1].hyperparams)
         return pipeline
 
     def hdl2phps(self, hdl: Dict):

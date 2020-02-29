@@ -1,7 +1,8 @@
 from importlib import import_module
-from typing import Union, List, Dict
+from typing import List, Dict
 
 from autopipeline.constants import Task
+from autopipeline.data.xy_data_manager import XYDataManager
 from autopipeline.hdl.default_hp import extract_pure_hdl_db_from_hdl_db, extract_default_hp_from_hdl_db
 from autopipeline.hdl.utils import get_hdl_db, get_default_hdl_db
 from autopipeline.utils.packages import get_class_of_module
@@ -37,7 +38,7 @@ class HDL_Constructor():
                 else:
                     assert key.startswith("FE_")
                     selected_group = key.replace("FE_", "")
-                    if selected_group in self.feature_groups:
+                    if selected_group in self.data_manager.unique_feature_groups:
                         self.FE_seq[f"FE-{selected_group}"] = value
                     else:
                         print("warn")
@@ -51,29 +52,15 @@ class HDL_Constructor():
             raise NotImplementedError()
         return self._task
 
-    def set_feature_groups(self, feature_groups: Union[None, List, str]):
-        # feature_group:
-        #    auto: 自动搜索 numerical categorical
-        #    list
-        if isinstance(feature_groups, str):
-            if feature_groups == "auto":
-                pass
-                # todo  auto 依赖 data_manager
-        elif isinstance(feature_groups, list):
-            self._feature_groups = feature_groups
-        else:
-            self._feature_groups = None
-        # ----
-        if self.feature_groups:
-            self.unique_feature_groups = set(self.feature_groups)
-        else:
-            self.unique_feature_groups = None
+    def set_data_manager(self, data_manager: XYDataManager):
+        self._data_manager = data_manager
+        self._task=data_manager.task
 
     @property
-    def feature_groups(self):
-        if not hasattr(self, "_feature_groups"):
+    def data_manager(self):
+        if not hasattr(self, "_data_manager"):
             raise NotImplementedError()
-        return self._feature_groups
+        return self._data_manager
 
     def purify(self, dict_: Dict, module_path, authorized_methods=None) -> Dict:
         ret = {}
@@ -125,8 +112,8 @@ class HDL_Constructor():
         self.pure_hdl_db = extract_pure_hdl_db_from_hdl_db(self.hdl_db)
         self.default_hp = extract_default_hp_from_hdl_db(self.hdl_db)
         self.parse_kwarg(self.kwargs)
-        if self.unique_feature_groups:
-            for selected_group in self.unique_feature_groups:
+        if self.data_manager.feature_groups:
+            for selected_group in self.data_manager.unique_feature_groups:
                 FE_seq_key = f"FE-{selected_group}"
                 if FE_seq_key not in self.FE_seq:
                     seq = []
@@ -190,9 +177,10 @@ if __name__ == '__main__':
 
     hdl_constructor = HDL_Constructor(
         include_estimators=["gradient_boosting"],
-        FE=["scale","select"],FE_categorical=[{"scale":["minmax","normalize"]},"threshold"])
+        FE=["scale", "select"], FE_categorical=[{"scale": ["minmax", "normalize"]}, "threshold"])
     hdl_constructor.set_task(multiclass_classification_task)
-    hdl_constructor.set_feature_groups(
+    # todo 完善测试用例
+    hdl_constructor.set_data_manager(
         ["numerical", "categorical", "numerical", "categorical", "numerical", "categorical"])
     hdl_constructor.run()
     hdl = hdl_constructor.get_hdl()

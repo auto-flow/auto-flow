@@ -6,7 +6,7 @@ import numpy as np
 
 from dsmac.distributer import SingleDistributer, Distributer
 from dsmac.utils.io.cmd_reader import CMDReader
-from dsmac.utils.io.file_system import HDFS, LocalFS
+from general_fs.file_system import HDFS, LocalFS
 from dsmac.utils.io.input_reader import InputReader
 from dsmac.utils.io.output_writer import OutputWriter
 

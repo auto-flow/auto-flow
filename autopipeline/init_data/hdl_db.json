@@ -50,9 +50,9 @@
       "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
     },
     "lda": {
-      "shrinkage": {"_type": "choice", "_value": [null, "auto"],"_default": null},  //, "manual"
+      "shrinkage": null, //{"_type": "choice", "_value": [null, "auto"],"_default": null},  //, "manual"
 //      "shrinkage_factor": {"_type": "uniform", "_value": [0.0,1.0],"_default": 0.5},
-      "_n_components-sp1_ratio": {"_type": "uniform", "_value": [0.1,0.9],"_default": 0.5}
+      "_n_components-sp1_ratio": {"_type": "uniform", "_value": [0.5,0.95],"_default": 0.8}
     },
     "liblinear_svc": {
       "penalty":  "l2",//{"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
@@ -313,7 +313,7 @@
         "max_depth": {"_type": "int_uniform", "_value": [2,10],"_default": 5},
         "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
         "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
-        "min_weight_fraction_leaf": 1.0,
+        "min_weight_fraction_leaf": 0,
         "max_leaf_nodes": null,
         "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
       },

@@ -24,17 +24,17 @@ class AbstractEvaluator(object):
             datamanager:XYDataManager,
             metric:Scorer,
             all_scoring_functions:bool,
-            spliter=None,
+            splitter=None,
     ):
-        self.spliter=spliter
+        self.splitter=splitter
         # self.datamanager = self.backend.load_datamanager()
         self.datamanager=datamanager
         self.X_train = self.datamanager.data['X_train']
-        self.y_train = self.datamanager.data['Y_train']
+        self.y_train = self.datamanager.data['y_train']
         self.X_valid = self.datamanager.data.get('X_valid')
-        self.y_valid = self.datamanager.data.get('Y_valid')
+        self.y_valid = self.datamanager.data.get('y_valid')
         self.X_test = self.datamanager.data.get('X_test')
-        self.y_test = self.datamanager.data.get('Y_test')
+        self.y_test = self.datamanager.data.get('y_test')
 
         self.metric = metric
         self.task_type:Task = self.datamanager.task
@@ -49,14 +49,6 @@ class AbstractEvaluator(object):
         else:
             self.predict_function = self._predict_proba
 
-        categorical_mask = []
-        for feat in self.datamanager.feat_type:
-            if feat.lower() == 'numerical':
-                categorical_mask.append(False)
-            elif feat.lower() == 'categorical':
-                categorical_mask.append(True)
-            else:
-                raise ValueError(feat)
 
         # self.subsample = subsample
 
@@ -114,13 +106,16 @@ class AbstractEvaluator(object):
     def evaluate(self,model,X,y):
         raise NotImplementedError()
 
+    def set_php2model(self, php2model):
+        self.php2model=php2model
+
     def __call__(self, php:Dict):
         # 1. 将php变成model
-        # model=self.php2model(php)
+        model=self.php2model(php)
         # 2. 获取数据
         X,y= self.get_Xy()
         # 3. 进行评价
-        return self.evaluate(php,X,y)
+        return self.evaluate(model,X,y)
 
 
 

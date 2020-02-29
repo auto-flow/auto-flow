@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import numpy as np
+from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
 
 from autopipeline.constants import binary_classification_task, multiclass_classification_task, \
@@ -111,3 +112,10 @@ def softmax(df):
         tmp = df - np.max(df, axis=1).reshape((-1, 1))
         tmp = np.exp(tmp)
         return tmp / np.sum(tmp, axis=1).reshape((-1, 1))
+
+
+def densify(X):
+    if issparse(X):
+        return X.todense().getA()
+    else:
+        return X

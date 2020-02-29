@@ -1,56 +1,70 @@
-import json
-from pathlib import Path
+from typing import Union, List
 
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
 from autopipeline.data.xy_data_manager import XYDataManager
-from autopipeline.hdl.default_hp import add_public_info_in_default_hp, extract_default_hp_from_hdl_db
-from autopipeline.metrics import accuracy
+from autopipeline.hdl.default_hp import add_public_info_to_default_hp
+from autopipeline.hdl.hdl_constructor import HDL_Constructor
+from autopipeline.metrics import r2,accuracy
 from autopipeline.tuner.base import PipelineTuner
-from autopipeline.hdl.utils import get_default_hdl_db
+from autopipeline.tuner.smac import SmacPipelineTuner
 
 
 class AutoPipelineEstimator(BaseEstimator):
 
     def __init__(
             self,
-            tuner: PipelineTuner,  # 抽象化的优化的全过程
-            custom_init_param=None,  # 用户自定义初始超参
-            custom_hyper_param=None,  # 用户自定义超参
+            tuner: PipelineTuner = None,  # 抽象化的优化的全过程
+            hdl_constructor: HDL_Constructor = None,  # 用户自定义初始超参
     ):
-        self.custom_hyper_param = custom_hyper_param
-        self.custom_init_param = custom_init_param
+        if not tuner:
+            tuner = SmacPipelineTuner()
         self.tuner = tuner
-        if self.custom_hyper_param:
-            self.hyperparams = self.custom_hyper_param
-            self.tuner.set_hdl(self.hyperparams)
-        else:
-            pass
-            # todo: 根据具体的任务装配一个默认的管道
-        hdl_db=get_default_hdl_db()
-        self.default_hp = extract_default_hp_from_hdl_db(hdl_db)
-        add_public_info_in_default_hp(self.default_hp, {"random_state": tuner.random_state})
+        if not hdl_constructor:
+            hdl_constructor = HDL_Constructor()
+        if isinstance(hdl_constructor, dict):
+            print("使用用户自定义超参描述语言")
+        self.hdl_constructor = hdl_constructor
+        self.random_state = tuner.random_state
 
     def fit(
             self, X: np.ndarray, y,
-            metric=accuracy,
+            metric=None,
             X_test=None, y_test=None,
             dataset_name="default_dataset_name",
             all_scoring_functions=False,
-            spliter=KFold(5, True, 42)
+            splitter=KFold(5, True, 42),
+            feature_groups: Union[None, str, List] = None
     ):
-        self.tuner.set_addition_info({"shape": X.shape})
-        self.tuner.set_default_hp(self.default_hp)
-        self.datamanager = XYDataManager(
-            X, y, X_test, y_test, None, dataset_name
+        self.data_manager = XYDataManager(  # todo: 将feature groups 纳入 data_manager 管理
+            X, y, X_test, y_test, dataset_name, feature_groups
         )
+        self.hdl_constructor.set_data_manager(self.data_manager)
+        self.hdl_constructor.run()
+        self.hdl = self.hdl_constructor.get_hdl()
+        self.default_hp = self.hdl_constructor.get_default_hp()
+        self.tuner.set_data_manager(self.data_manager)
+        self.tuner.set_hdl(self.hdl)
+        self.tuner.set_addition_info({})  #{"shape": X.shape}
+        add_public_info_to_default_hp(
+            self.default_hp, {"random_state": self.random_state}
+        )
+        self.tuner.set_default_hp(self.default_hp)
+        self.task=self.data_manager.task
+        if metric is None:
+            if self.task.mainTask=="regression":
+                metric=r2
+            elif self.task.mainTask=="classification":
+                metric=accuracy
+            else:
+                raise NotImplementedError()
         # todo: 根据datamanager获取的task信息构造HDL
         self.tuner.run(
-            self.datamanager,
+            self.data_manager,
             metric,
             all_scoring_functions,
-            spliter
+            splitter
         )
         return self

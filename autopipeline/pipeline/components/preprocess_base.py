@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Dict
 
 from autopipeline.pipeline.components.base import AutoPLComponent
+from autopipeline.utils.data import densify
 
 
 class AutoPLPreprocessingAlgorithm(AutoPLComponent):
@@ -16,6 +17,7 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
         return X
 
     def transform(self, X):
+        X=densify(X)
         if not self.estimator or (not hasattr(self.estimator, "transform")):
             raise NotImplementedError()
         X=self.before_trans_X(X)
