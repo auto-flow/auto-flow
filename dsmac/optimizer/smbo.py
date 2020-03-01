@@ -1,36 +1,35 @@
-import os
 import logging
-import numpy as np
+import os
 import time
 import typing
 
+import numpy as np
+
 import dsmac
-from dsmac.configspace import ConfigurationSpace, Configuration, Constant,\
-     CategoricalHyperparameter, UniformFloatHyperparameter, \
-     UniformIntegerHyperparameter, InCondition
+from dsmac.configspace import ConfigurationSpace, Configuration, Constant, \
+    CategoricalHyperparameter, UniformFloatHyperparameter, \
+    UniformIntegerHyperparameter, InCondition
 from dsmac.configspace.util import convert_configurations_to_array
 from dsmac.epm.base_epm import AbstractEPM
-from dsmac.epm.rf_with_instances import RandomForestWithInstances
 from dsmac.epm.gaussian_process_mcmc import GaussianProcessMCMC
 from dsmac.epm.gp_base_prior import LognormalPrior, HorseshoePrior
+from dsmac.epm.rf_with_instances import RandomForestWithInstances
 from dsmac.epm.util_funcs import get_types
 from dsmac.initial_design.initial_design import InitialDesign
 from dsmac.intensification.intensification import Intensifier
-from dsmac.optimizer import pSMAC
-from dsmac.optimizer.acquisition import AbstractAcquisitionFunction, EI, LogEI,\
+from dsmac.optimizer.acquisition import AbstractAcquisitionFunction, EI, LogEI, \
     LCB, PI
-from dsmac.optimizer.random_configuration_chooser import ChooserNoCoolDown, \
-    ChooserLinearCoolDown
 from dsmac.optimizer.ei_optimization import AcquisitionFunctionMaximizer, \
     RandomSearch
+from dsmac.optimizer.random_configuration_chooser import ChooserNoCoolDown, \
+    ChooserLinearCoolDown
 from dsmac.runhistory.runhistory import RunHistory
 from dsmac.runhistory.runhistory2epm import AbstractRunHistory2EPM
 from dsmac.scenario.scenario import Scenario
 from dsmac.stats.stats import Stats
+from dsmac.utils.constants import MAXINT
 from dsmac.utils.io.traj_logging import TrajLogger
 from dsmac.utils.validate import Validator
-from dsmac.utils.constants import MAXINT
-
 
 __author__ = "Aaron Klein, Marius Lindauer, Matthias Feurer"
 __copyright__ = "Copyright 2015, ML4AAD"
@@ -227,6 +226,8 @@ class SMBO(object):
             # if self.stats.is_budget_exhausted():
             #     break
 
+            if self.scenario.after_run_callback:
+                self.scenario.after_run_callback()
             self.stats.print_stats(debug_out=True)
 
         return self.incumbent

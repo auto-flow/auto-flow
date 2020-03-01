@@ -103,7 +103,7 @@ class AutoPLComponent(BaseEstimator):
     def do_process(self, indicator, hyperparams, value):
         if indicator == "lr_ratio":
             lr = hyperparams["learning_rate"]
-            return int(value * (1 / lr))
+            return max(int(value * (1 / lr)),10)
         elif indicator == "sp1_ratio":
             if hasattr(self, "shape"):
                 n_components = max(

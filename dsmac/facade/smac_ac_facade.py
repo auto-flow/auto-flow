@@ -211,8 +211,7 @@ class SMAC4AC(object):
                              'SMAC deterministic and only evaluate one configuration per iteration!')
             scenario.intensification_percentage = 1e-10
             scenario.min_chall = 1
-        # fixme
-        # scenario.write()
+        scenario.write()
 
         # initialize stats object
         if stats:

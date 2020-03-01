@@ -3,7 +3,7 @@ import os
 from fnmatch import fnmatchcase
 from glob import glob
 from pathlib import Path
-
+import shutil
 import hdfs
 
 
@@ -119,6 +119,14 @@ class LocalFS(FileSystem):
 
     def isfile(self, path):
         return os.path.isfile(path)
+
+    def delete(self,path):
+        if self.isfile(path):
+            os.remove(path)
+        elif self.isdir(path):
+            os.rmdir(path)
+        else:
+            pass
 
 
 if __name__ == '__main__':

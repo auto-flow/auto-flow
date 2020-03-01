@@ -16,6 +16,7 @@ from dsmac.stats.stats import Stats
 from dsmac.tae.execute_ta_run import BudgetExhaustedException, CappedRunException, ExecuteTARun
 from dsmac.utils.constants import MAXINT, MAX_CUTOFF
 from dsmac.utils.io.traj_logging import TrajLogger
+from general_fs.utils import get_id
 
 __author__ = "Katharina Eggensperger, Marius Lindauer"
 __copyright__ = "Copyright 2018, ML4AAD"
@@ -182,10 +183,13 @@ class Intensifier(object):
                 self.logger.info("Challenger did not accepted by filter_callback:")
                 self.logger.info(challenger)
                 continue
+            # challenger.trial_id=get_id()
             to_run.append(challenger)
             count += 1
             if count >= self.distributer.n_jobs and allow_all == False:
                 break
+        for x in to_run:
+            setattr(x,"trial_id",get_id())
         ans = self.distributer.run(to_run, run_history)  # (status, cost, dur, res)
         costs = [item[1] for item in ans]
         costs = np.array(costs)

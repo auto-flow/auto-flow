@@ -32,7 +32,8 @@ class Scenario(object):
             runtime='local', runtime_config=None,
             distributer: Distributer = SingleDistributer(),
             initial_runs=20,
-            filter_callback: typing.Optional[typing.Callable]=None
+            filter_callback: typing.Optional[typing.Callable]=None,
+            after_run_callback: typing.Optional[typing.Callable]=None
     ):
         """ Creates a scenario-object. The output_dir will be
         "output_dir/run_id/" and if that exists already, the old folder and its
@@ -49,6 +50,7 @@ class Scenario(object):
         cmd_options : dict
             Options from parsed command line arguments
         """
+        self.after_run_callback = after_run_callback
         self.filter_callback = filter_callback
         self.initial_runs = initial_runs
         self.distributer = distributer

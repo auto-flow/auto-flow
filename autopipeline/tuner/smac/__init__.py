@@ -43,10 +43,11 @@ class SmacPipelineTuner(PipelineTuner):
             datamanager: XYDataManager,
             metric: Scorer,
             all_scoring_functions: bool,
-            splitter
+            splitter,
+            smac_output_dir
     ):
-        if hasattr(splitter,"random_state"):
-            setattr(splitter,"random_state",self.random_state)
+        if hasattr(splitter, "random_state"):
+            setattr(splitter, "random_state", self.random_state)
         self.set_task(datamanager.task)
         self.evaluator.init_data(
             datamanager,
@@ -61,11 +62,14 @@ class SmacPipelineTuner(PipelineTuner):
                 "run_obj": "quality",
                 "runcount-limit": self.runcount_limit,
                 "cs": self.phps,  # configuration space
-                "deterministic": "true"
+                "deterministic": "true",
+                "output_dir": smac_output_dir
             },
             distributer=self.distributer,
-            initial_runs=self.initial_runs
+            initial_runs=self.initial_runs,
+            after_run_callback=self.evaluator.resource_manager.delete_models
         )
+        # todo 将 file_system 传入，或者给file_system添加 runtime 参数
         smac = SMAC4HPO(
             scenario=self.scenario,
             rng=np.random.RandomState(self.random_state),
@@ -81,8 +85,8 @@ class SmacPipelineTuner(PipelineTuner):
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
-        print(pipeline,pipeline[-1].hyperparams)
-        return pipeline
+        print(pipeline, pipeline[-1].hyperparams)
+        return dhp,pipeline
 
     def hdl2phps(self, hdl: Dict):
         hdl2phps = SmacHDL2PHPS()

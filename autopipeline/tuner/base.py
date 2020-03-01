@@ -1,6 +1,8 @@
 from importlib import import_module
 from typing import Dict
 import re
+
+from ConfigSpace.configuration_space import ConfigurationSpace
 from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
@@ -48,7 +50,8 @@ class PipelineTuner():
     def set_hdl(self, hdl: Dict):
         self.hdl = hdl
         # todo: 泛化ML管线后，可能存在多个FE
-        self.phps = self.hdl2phps(hdl)
+        self.phps:ConfigurationSpace = self.hdl2phps(hdl)
+        self.phps.seed(self.random_state)
 
     def get_rely_param_in_dhp(self, dhp, key, module_class) -> Dict:
         wrap_key = f"[{key}]"
