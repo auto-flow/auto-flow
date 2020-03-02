@@ -3,10 +3,14 @@ import sqlite3
 import time
 from typing import Dict
 
+import joblib
 import json5 as json
 import pandas as pd
 from joblib import dump
+from mlxtend.classifier import EnsembleVoteClassifier
+# from mlxtend.regressor import
 
+from autopipeline.constants import Task
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from general_fs import LocalFS
 
@@ -53,6 +57,17 @@ class ResourceManager():
         trial_id = info["trial_id"]
         file_name = f"{self.trials_dir}/{trial_id}.bz2"
         dump(info, file_name)
+
+    def load_best_estimator(self,task:Task):
+        df=pd.read_csv(self.csv_path)
+        df.sort_values(by=["loss", "cost_time"], inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        assert len(df)>0
+        path= self.trials_dir+"/"+df["trial_id"][0]+".bz2"
+        models=joblib.load(path)["models"]
+        if task.mainTask=="classification":
+            pass
+
 
     def init_db(self):
         conn = sqlite3.connect(self.db_path)

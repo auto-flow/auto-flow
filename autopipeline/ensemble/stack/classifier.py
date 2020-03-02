@@ -25,7 +25,7 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
         self.drop_last_proba = drop_last_proba
 
     def fit(self, X, y):
-        meta_features = self.predict_meta_features(X, y)
+        meta_features = self.predict_meta_features(X, True)
         self.meta_learner.fit(meta_features, y)
 
     def predict_meta_features(self, X, is_train):

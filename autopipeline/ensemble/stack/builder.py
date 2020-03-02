@@ -6,7 +6,6 @@ from joblib import load
 from pandas import DataFrame
 from sklearn.linear_model import LogisticRegression, Lasso
 
-from autopipeline.constants import Task
 from autopipeline.data.xy_data_manager import XYDataManager
 from autopipeline.ensemble.stack.classifier import StackingClassifier
 from general_fs import LocalFS
@@ -22,7 +21,7 @@ def get_model_path_list_of_df(models: DataFrame, df: DataFrame):
 class StackEnsembleBuilder():
     def __init__(
             self,
-            set_model: Union[int, List, DataFrame, str] = 50,
+            set_model: Union[int, List, DataFrame, str] = 10,
             meta_learner=None,
             file_system=None,
             stack_estimator_kwargs=None
@@ -30,7 +29,7 @@ class StackEnsembleBuilder():
         self.set_model = set_model
         self.meta_learner = meta_learner
         if not stack_estimator_kwargs:
-            stack_estimator_kwargs = None
+            stack_estimator_kwargs = {}
         self.stack_estimator_kwargs = stack_estimator_kwargs
 
         self.file_system = file_system
@@ -40,18 +39,18 @@ class StackEnsembleBuilder():
             data_manager: Union[XYDataManager, Dict],
             dataset_paths: Union[List, str],
     ):
-        self.dataset_paths=dataset_paths
+        self.dataset_paths = dataset_paths
         self.data_manager = data_manager
 
     def init_data(self):
         if not self.file_system:
             self.file_system = LocalFS()
-        self.task=self.data_manager.task
+        self.task = self.data_manager.task
         if not self.meta_learner:
             if self.task.mainTask == "classification":
-                self.meta_learner = LogisticRegression(penalty='l1')
+                self.meta_learner = LogisticRegression(penalty='l2',solver="lbfgs",multi_class="auto",random_state=10)
             else:
-                self.meta_learner  = Lasso()
+                self.meta_learner = Lasso()
         self.set_model = self.set_model
         if isinstance(self.dataset_paths, str):
             self.dataset_paths = [self.dataset_paths]
@@ -66,6 +65,7 @@ class StackEnsembleBuilder():
         df = pd.concat(df_list, ignore_index=True)
         df["path"] = df["dir"].str.cat(df["trial_id"], sep="/") + ".bz2"
         df.sort_values(by=["loss", "cost_time"], inplace=True)
+        df.reset_index(drop=True, inplace=True)
         if isinstance(set_model, int):
             model_path_list = list(df.loc[:set_model - 1, "path"])
         elif isinstance(set_model, list):

@@ -1,5 +1,6 @@
 from typing import Union, List, Optional
 
+import joblib
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
@@ -18,13 +19,16 @@ class AutoPipelineEstimator(BaseEstimator):
 
     def __init__(
             self,
-            tuner: PipelineTuner = None,  # 抽象化的优化的全过程
-            hdl_constructor: HDL_Constructor = None,  # 用户自定义初始超参
+            tuner: Optional[PipelineTuner] = None,  # 抽象化的优化的全过程
+            hdl_constructor: Optional[StackEnsembleBuilder] = None,  # 用户自定义初始超参
             resource_manager: Optional[ResourceManager] = None,
-            ensemble_builder: StackEnsembleBuilder = None
+            ensemble_builder: Union[StackEnsembleBuilder, None, bool] = None
     ):
-        if not ensemble_builder:
+        if ensemble_builder is None:
+            print("info: 使用默认的stack集成学习器")
             ensemble_builder = StackEnsembleBuilder()
+        elif ensemble_builder == False:
+            print("info: 不使用集成学习")
         self.ensemble_builder = ensemble_builder
         if not tuner:
             tuner = SmacPipelineTuner()
@@ -41,6 +45,7 @@ class AutoPipelineEstimator(BaseEstimator):
         elif resource_manager is None:
             resource_manager = ResourceManager()
         self.resource_manager = resource_manager
+        self.estimator = None
 
     def fit(
             self,
@@ -94,6 +99,10 @@ class AutoPipelineEstimator(BaseEstimator):
             splitter,
             self.resource_manager.smac_output_dir
         )
+        if self.ensemble_builder:
+            self.estimator = self.fit_estimator()
+        else:
+            self.estimator = self.resource_manager.load_best()
         return self
 
     def fit_estimator(
@@ -102,7 +111,14 @@ class AutoPipelineEstimator(BaseEstimator):
             dataset_paths=None,
     ):
         if not data_manager:
-            data_manager = self.data_manager
+            if hasattr(self, "data_manager"):
+                data_manager = self.data_manager
+            else:
+                if isinstance(dataset_paths, str):
+                    dataset_path = dataset_paths
+                else:
+                    dataset_path = dataset_paths[0]
+                data_manager = joblib.load(dataset_path + "/data_manager.bz2")
         if not dataset_paths:
             dataset_paths = self.resource_manager.dataset_path
         self.ensemble_builder.set_data(
@@ -111,4 +127,10 @@ class AutoPipelineEstimator(BaseEstimator):
         )
         self.ensemble_builder.init_data()
         self.stack_estimator = self.ensemble_builder.build()
-        self.estimator = self.stack_estimator
+        return self.stack_estimator
+
+    def predict(self, X):
+        return self.estimator.predict(X)
+
+    def predict_proba(self, X):
+        return self.estimator.predict_proba(X)
