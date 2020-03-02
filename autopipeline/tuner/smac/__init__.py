@@ -77,7 +77,6 @@ class SmacPipelineTuner(PipelineTuner):
             initial_configurations=self.phps.get_default_configuration()
         )
         self.incumbent = smac.optimize()
-        # todo: ensemble
 
     def php2model(self, php):
         php2dhp = SmacPHP2DHP()

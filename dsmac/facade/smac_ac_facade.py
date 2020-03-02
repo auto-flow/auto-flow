@@ -191,7 +191,9 @@ class SMAC4AC(object):
             # run_id, rng = get_rng(rng=rng, run_id=run_id, logger=self.logger)
             # run_id=datetime.now().strftime("%Y%m%d%H%M%S%f")
             run_id=uuid1()
-            self.output_dir = create_output_directory(scenario, run_id)   # fixme run_id
+            # self.output_dir = create_output_directory(scenario, run_id)   # fixme run_id
+            self.output_dir = scenario.output_dir #create_output_directory(scenario, run_id)   # fixme run_id
+
         elif scenario.output_dir is not None:
             run_id, rng = get_rng(rng=rng, run_id=run_id, logger=self.logger)
             # output-directory is created in CLI when restoring from a

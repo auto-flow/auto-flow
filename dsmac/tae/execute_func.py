@@ -158,7 +158,6 @@ class AbstractTAFunc(ExecuteTARun):
         
             runtime = float(obj.wall_clock_time)
         else:
-            pprint('run')
             start_time = time.time()
             result = self.ta(config, **obj_kwargs)
             

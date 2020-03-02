@@ -17,10 +17,12 @@ from dsmac.epm.rf_with_instances import RandomForestWithInstances
 from dsmac.epm.util_funcs import get_types
 from dsmac.initial_design.initial_design import InitialDesign
 from dsmac.intensification.intensification import Intensifier
+from dsmac.optimizer import pSMAC
 from dsmac.optimizer.acquisition import AbstractAcquisitionFunction, EI, LogEI, \
     LCB, PI
 from dsmac.optimizer.ei_optimization import AcquisitionFunctionMaximizer, \
     RandomSearch
+from dsmac.optimizer.pSMAC import RUNHISTORY_FILEPATTERN
 from dsmac.optimizer.random_configuration_chooser import ChooserNoCoolDown, \
     ChooserLinearCoolDown
 from dsmac.runhistory.runhistory import RunHistory
@@ -182,6 +184,13 @@ class SMBO(object):
         incumbent: np.array(1, H)
             The best found configuration
         """
+        # todo: runhistory 用数据库存储
+        file=self.scenario.output_dir+"/"+RUNHISTORY_FILEPATTERN
+        if self.scenario.file_system.exists(file):
+            new_runhistory = RunHistory(self.aggregate_func,file_system=self.scenario.file_system)
+            new_runhistory.load_json(file, self.config_space)
+            self.runhistory=new_runhistory
+
         self.start()
 
         # Main BO loop
@@ -192,7 +201,9 @@ class SMBO(object):
         if run_limit<=0:
             run_limit=np.inf
         iter=0
+
         while run_limit>0:
+
             iter+=1
             run_limit-=1
             start_time = time.time()
@@ -216,7 +227,9 @@ class SMBO(object):
                 time_bound=max(self.intensifier._min_time, time_left),
                 iter=iter
             )
-
+            pSMAC.write(run_history=self.runhistory,
+                        output_directory=self.scenario.output_dir,
+                        logger=self.logger)
 
             logging.debug("Remaining budget: %f (wallclock), %f (ta costs), %f (target runs)" % (
                 self.stats.get_remaing_time_budget(),
