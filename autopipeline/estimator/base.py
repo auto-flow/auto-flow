@@ -20,7 +20,7 @@ class AutoPipelineEstimator(BaseEstimator):
             self,
             tuner: Optional[SmacPipelineTuner] = None,  # 抽象化的优化的全过程
             hdl_constructor: Optional[HDL_Constructor] = None,  # 用户自定义初始超参
-            resource_manager: Optional[ResourceManager, str] = None,
+            resource_manager: Union[ResourceManager, str] = None,
             ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None
     ):
         if ensemble_builder is None:
@@ -112,11 +112,11 @@ class AutoPipelineEstimator(BaseEstimator):
             self.resource_manager.smac_output_dir
         )
         if self.ensemble_builder:
-            self.estimator = self.fit_estimator()
+            self.estimator = self.fit_ensemble()
         else:
             self.estimator = self.resource_manager.load_best_estimator(self.task)
 
-    def fit_estimator(
+    def fit_ensemble(
             self,
             data_manager=None,
             dataset_paths=None,
@@ -143,7 +143,6 @@ class AutoPipelineEstimator(BaseEstimator):
     def refit(
             self,
             dataset_name="default_dataset_name",
-            tuner: SmacPipelineTuner = None,
             metric=None,
             all_scoring_functions=None,
             splitter=None
@@ -152,9 +151,8 @@ class AutoPipelineEstimator(BaseEstimator):
             if value is not None:
                 dict_.update({value_name: value})
 
-        if not tuner:
-            tuner = SmacPipelineTuner()
-        self.tunner = tuner
+
+        self.tuner.initial_runs=0
         # resource_manager
         self.resource_manager.load_dataset_path(dataset_name)
         # data_manager

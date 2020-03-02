@@ -154,23 +154,9 @@ class SMBO(object):
         """
         self.stats.start_timing()
         # Initialization, depends on input
-        if self.stats.ta_runs == 0 and self.incumbent is None:
+        if self.stats.ta_runs == 0 and self.incumbent is None and self.scenario.initial_runs>0:
             self.incumbent = self.initial_design.run()
 
-        elif self.stats.ta_runs > 0 and self.incumbent is None:
-            raise ValueError("According to stats there have been runs performed, "
-                             "but the optimizer cannot detect an incumbent. Did "
-                             "you set the incumbent (e.g. after restoring state)?")
-        elif self.stats.ta_runs == 0 and self.incumbent is not None:
-            raise ValueError("An incumbent is specified, but there are no runs "
-                             "recorded in the Stats-object. If you're restoring "
-                             "a state, please provide the Stats-object.")
-        else:
-            # Restoring state!
-            self.logger.info("State Restored! Starting optimization with "
-                             "incumbent %s", self.incumbent)
-            self.logger.info("State restored with following budget:")
-            self.stats.print_stats()
 
         # To be on the safe side -> never return "None" as incumbent
         if not self.incumbent:
@@ -190,7 +176,17 @@ class SMBO(object):
             new_runhistory = RunHistory(self.aggregate_func,file_system=self.scenario.file_system)
             new_runhistory.load_json(file, self.config_space)
             self.runhistory=new_runhistory
-
+        all_configs=self.runhistory.get_all_configs()
+        if len(all_configs):
+            # 根据runhistory选出最优
+            incumbent=all_configs[0]
+            min_cost=np.inf
+            for config in all_configs[1:]:
+                cost=self.runhistory.get_cost(config)
+                if cost < min_cost:
+                    min_cost=cost
+                    incumbent=config
+            self.incumbent=incumbent
         self.start()
 
         # Main BO loop

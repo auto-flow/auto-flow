@@ -92,7 +92,8 @@ class InitialDesign:
         self.logger = self.logger = logging.getLogger(self.__module__ + "." + self.__class__.__name__)
 
         n_params = len(self.scenario.cs.get_hyperparameters())
-        self.init_budget = max(scenario.initial_runs,10)
+        # self.init_budget = max(scenario.initial_runs,10)
+        self.init_budget = max(scenario.initial_runs,1)
         self.logger.info("Running initial design for %d configurations" %(self.init_budget))
 
     def select_configurations(self) -> typing.List[Configuration]:
