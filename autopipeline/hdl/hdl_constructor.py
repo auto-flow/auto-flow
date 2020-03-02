@@ -29,6 +29,12 @@ class HDL_Constructor():
         self.hdl_db = hdl_db
         self.FE_seq = {}
         self.kwargs = kwargs
+        self.params={
+            "hdl_db_path":hdl_db_path,
+            "include_estimators":include_estimators,
+            "exclude_estimators":exclude_estimators,
+            "kwargs":kwargs
+        }
 
     def parse_kwarg(self, kwargs: Dict):
         for key, value in kwargs.items():

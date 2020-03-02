@@ -18,7 +18,6 @@ class Distributer():
         ans=[]
         for i in range(0, len(to_run), n_jobs):
             ret=self._run(to_run[i:i + n_jobs])
-            print('ret:len',len(ret))
             ans.extend(ret)
         self.add_runhistory(to_run,ans,runhistory)
         return ans

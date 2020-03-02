@@ -41,6 +41,9 @@ class FileSystem():
     def exists(self, path):
         raise NotImplementedError
 
+    def delete(self, path):
+        raise NotImplementedError
+
 
 class HDFS(FileSystem):
     def __init__(self, url='http://0.0.0.0:50070'):
@@ -119,6 +122,9 @@ class LocalFS(FileSystem):
 
     def isfile(self, path):
         return os.path.isfile(path)
+
+    def exists(self, path):
+        return os.path.exists(path)
 
     def delete(self,path):
         if self.isfile(path):

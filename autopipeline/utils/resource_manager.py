@@ -3,14 +3,16 @@ import sqlite3
 import time
 from typing import Dict
 
+import json5 as json
 import pandas as pd
 from joblib import dump
 
+from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from general_fs import LocalFS
 
 
 class ResourceManager():
-    def __init__(self, file_system=None, project_path=None, max_persistent_model=50):
+    def __init__(self, project_path=None, file_system=None, max_persistent_model=50):
         self.max_persistent_model = max_persistent_model
         if not file_system:
             file_system = LocalFS()
@@ -19,12 +21,33 @@ class ResourceManager():
             project_path = os.getcwd() + f'''/auto-pipeline-{time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())}'''
         self.project_path = project_path
         self.file_system.mkdir(self.project_path)
-        self.smac_output_dir = self.project_path + "/smac_output"
-        self.trials_dir = self.project_path + f"/trials"
+
+    def init_dataset_path(self, dataset_name):
+        # 在fit的时候调用
+        self.dataset_path = self.project_path + "/" + dataset_name
+        self.smac_output_dir = self.dataset_path + "/smac_output"
+        self.trials_dir = self.dataset_path + f"/trials"
         self.file_system.mkdir(self.trials_dir)
-        self.db_path = self.project_path + f"/trials.db"
-        self.csv_path = self.project_path + f"/trials.csv"
+        self.db_path = self.dataset_path + f"/trials.db"
+        self.csv_path = self.dataset_path + f"/trials.csv"
+        self.data_manager_path = self.dataset_path + "/data_manager.bz2"
         self.init_db()
+
+    def dump_hdl(self, hdl_construct: HDL_Constructor):
+        self.hdl_dir = self.dataset_path + "/hdl_constructor"
+        self.file_system.mkdir(self.hdl_dir)
+        persistent_data = {
+            "hdl_db": hdl_construct.hdl_db,
+            "default_hp": hdl_construct.default_hp,
+            "hdl": hdl_construct.hdl,
+            "params": hdl_construct.params,
+        }
+        for name, data in persistent_data.items():
+            self.file_system.write_txt(self.hdl_dir + f"/{name}.json", json.dumps(data, indent=4))
+
+    def dump_object(self, name, data):
+        path = self.dataset_path + f"/{name}.bz2"
+        dump(data, path)
 
     def persistent_evaluated_model(self, info: Dict):
         trial_id = info["trial_id"]

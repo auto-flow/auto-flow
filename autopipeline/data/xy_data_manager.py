@@ -69,3 +69,4 @@ class XYDataManager(AbstractDataManager):
             raise ValueError('X and y must have the same number of '
                              'datapoints, but have %d and %d.' % (X.shape[0],
                                                                   y.shape[0]))
+
