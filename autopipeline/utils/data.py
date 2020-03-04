@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+import math
+
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
@@ -38,6 +40,7 @@ def get_task_from_y(y):
     else:
         raise NotImplementedError()
     return task
+
 
 def binarization(array):
     # Takes a binary-class datafile and turn the max value (positive class)
@@ -98,6 +101,7 @@ def predict_RAM_usage(X, categorical):
     estimated_ram = estimated_columns * X.shape[0] * X.dtype.itemsize
     return estimated_ram
 
+
 def softmax(df):
     if len(df.shape) == 1:
         df[df > 20] = 20
@@ -119,3 +123,20 @@ def densify(X):
         return X.todense().getA()
     else:
         return X
+
+
+def float_gcd(a, b):
+    def is_int(x):
+        return not bool(int(x) - x)
+
+    base = 1
+    while not(is_int(a) and is_int(b)):
+        a *= 10
+        b *= 10
+        base *= 10
+    return math.gcd(int(a), int(b)) / base
+
+
+if __name__ == '__main__':
+    ans=float_gcd(0.1,0.999)
+    print(ans)

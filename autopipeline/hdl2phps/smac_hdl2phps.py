@@ -106,6 +106,8 @@ class SmacHDL2PHPS(HDL2PHPS):
                         conditions_dict[key] = value
                     else:
                         assert isinstance(value, dict)
+                        print(key,value)
+                        print(cs)
                         hp = self.__parse_dict_to_config(key, value)
                         # hp.name = key
                         cs.add_hyperparameter(hp)
@@ -165,7 +167,7 @@ class SmacHDL2PHPS(HDL2PHPS):
         if _type == "choice":
             return smac_hdl.choice(key, _value, _default)
         else:
-            return eval(f'''smac_hdl.{_type}("{key}",*_value,_default)''')
+            return eval(f'''smac_hdl.{_type}("{key}",*_value,default=_default)''')
 
 
 if __name__ == '__main__':
