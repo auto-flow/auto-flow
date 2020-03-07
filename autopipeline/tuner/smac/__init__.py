@@ -9,7 +9,6 @@ from autopipeline.metrics import Scorer
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
 from autopipeline.tuner.base import PipelineTuner
 from autopipeline.utils.pipeline import concat_pipeline
-from dsmac.distributer import SingleDistributer
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
 
@@ -21,7 +20,6 @@ class SmacPipelineTuner(PipelineTuner):
             initial_runs: int = 20,
             random_state: int = 42,
             evaluator: TrainEvaluator = None,
-            distributer=SingleDistributer(n_jobs=1),
     ):
         super(SmacPipelineTuner, self).__init__(
             runcount_limit,
@@ -30,7 +28,6 @@ class SmacPipelineTuner(PipelineTuner):
             evaluator,
         )
 
-        self.distributer = distributer
 
         self.evaluator.set_php2model(self.php2model)
 
@@ -44,7 +41,7 @@ class SmacPipelineTuner(PipelineTuner):
             metric: Scorer,
             all_scoring_functions: bool,
             splitter,
-            smac_output_dir
+            initial_configs
     ):
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
@@ -63,18 +60,21 @@ class SmacPipelineTuner(PipelineTuner):
                 "runcount-limit": self.runcount_limit,
                 "cs": self.phps,  # configuration space
                 "deterministic": "true",
-                "output_dir": smac_output_dir
+                "output_dir": self.resource_manager.smac_output_dir,
             },
-            distributer=self.distributer,
+            # distributer=self.distributer,
             initial_runs=self.initial_runs,
-            after_run_callback=self.evaluator.resource_manager.delete_models
+            after_run_callback=self.evaluator.resource_manager.delete_models,
+            db_type=self.resource_manager.db_type,
+            db_args=self.resource_manager.rh_db_args,
+            db_kwargs=self.resource_manager.rh_db_kwargs,
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
         smac = SMAC4HPO(
             scenario=self.scenario,
             rng=np.random.RandomState(self.random_state),
             tae_runner=self.evaluator,
-            initial_configurations=self.phps.get_default_configuration()
+            initial_configurations=initial_configs
         )
         self.incumbent = smac.optimize()
 

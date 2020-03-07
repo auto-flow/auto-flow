@@ -4,6 +4,7 @@ import math
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
+from typing import Dict
 
 from autopipeline.constants import binary_classification_task, multiclass_classification_task, \
     multilabel_classification_task, regression_task
@@ -135,6 +136,20 @@ def float_gcd(a, b):
         b *= 10
         base *= 10
     return math.gcd(int(a), int(b)) / base
+
+def replace_kv(dict_:Dict,rk,rv):
+    for k,v in dict_.items():
+        if isinstance(v,dict):
+            replace_kv(v,rk,rv)
+        elif k==rk:
+            dict_[k]=rv
+
+def get_chunks(iterable, chunks=1):
+    # This is from http://stackoverflow.com/a/2136090/2073595
+    lst = list(iterable)
+    return [lst[i::chunks] for i in range(chunks)]
+
+
 
 
 if __name__ == '__main__':

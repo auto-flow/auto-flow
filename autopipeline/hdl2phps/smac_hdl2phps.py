@@ -106,8 +106,6 @@ class SmacHDL2PHPS(HDL2PHPS):
                         conditions_dict[key] = value
                     else:
                         assert isinstance(value, dict)
-                        print(key,value)
-                        print(cs)
                         hp = self.__parse_dict_to_config(key, value)
                         # hp.name = key
                         cs.add_hyperparameter(hp)

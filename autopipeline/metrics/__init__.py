@@ -1,11 +1,13 @@
-from abc import ABCMeta, abstractmethod
 import copy
+from abc import ABCMeta, abstractmethod
 from functools import partial
+
 import numpy as np
 import sklearn.metrics
 from sklearn.utils.multiclass import type_of_target
 
 from autopipeline.constants import Task
+from autopipeline.metrics import classification_metrics
 from autopipeline.utils.data import sanitize_array
 
 
@@ -200,8 +202,9 @@ median_absolute_error = make_scorer('median_absolute_error',
 # Standard Classification Scores
 accuracy = make_scorer('accuracy',
                        sklearn.metrics.accuracy_score)
-# balanced_accuracy = make_scorer('balanced_accuracy',
-#                                 classification_metrics.balanced_accuracy)
+mcc = make_scorer('mcc', sklearn.metrics.matthews_corrcoef)
+balanced_accuracy = make_scorer('balanced_accuracy',
+                                classification_metrics.balanced_accuracy)
 f1 = make_scorer('f1',
                  sklearn.metrics.f1_score)
 
@@ -224,10 +227,10 @@ log_loss = make_scorer('log_loss',
                        optimum=0,
                        greater_is_better=False,
                        needs_proba=True)
-# pac_score = make_scorer('pac_score',
-#                         classification_metrics.pac_score,
-#                         greater_is_better=True,
-#                         needs_proba=True)
+pac_score = make_scorer('pac_score',
+                        classification_metrics.pac_score,
+                        greater_is_better=True,
+                        needs_proba=True)
 # TODO what about mathews correlation coefficient etc?
 
 
@@ -238,14 +241,26 @@ for scorer in [r2, mean_squared_error, mean_absolute_error,
 
 CLASSIFICATION_METRICS = dict()
 
-for scorer in [accuracy, roc_auc, average_precision,log_loss,
-               # balanced_accuracy, pac_score
+for scorer in [accuracy, roc_auc, average_precision, log_loss,
+               balanced_accuracy, pac_score, mcc
                ]:
     CLASSIFICATION_METRICS[scorer.name] = scorer
 
 for name, metric in [('precision', sklearn.metrics.precision_score),
                      ('recall', sklearn.metrics.recall_score),
-                     ('f1', sklearn.metrics.f1_score)]:
+                     ('f1', sklearn.metrics.f1_score),
+                     ('roc_auc', sklearn.metrics.roc_auc_score)
+                     ]:
+    if name == "roc_auc":
+        for multi_class in ["ovo", "ovr"]:
+            for average in ['macro', 'micro', 'samples', 'weighted']:
+                qualified_name = '{0}_{1}_{2}'.format(name, multi_class,average)
+                globals()[qualified_name] = make_scorer(qualified_name,
+                                                        partial(metric,
+                                                                multi_class=multi_class,
+                                                                average=average),needs_proba=True)
+                CLASSIFICATION_METRICS[qualified_name] = globals()[qualified_name]
+        continue
     globals()[name] = make_scorer(name, metric)
     CLASSIFICATION_METRICS[name] = globals()[name]
     for average in ['macro', 'micro', 'samples', 'weighted']:
@@ -257,13 +272,11 @@ for name, metric in [('precision', sklearn.metrics.precision_score),
         CLASSIFICATION_METRICS[qualified_name] = globals()[qualified_name]
 
 
-def calculate_score(solution, prediction, task:Task, metric,
+def calculate_score(solution, prediction, task: Task, metric,
                     all_scoring_functions=False):
-
-
     if all_scoring_functions:
         score = dict()
-        if task.mainTask=="regression":
+        if task.mainTask == "regression":
             # TODO put this into the regression metric itself
             cprediction = sanitize_array(prediction)
             metric_dict = copy.copy(REGRESSION_METRICS)
@@ -282,22 +295,22 @@ def calculate_score(solution, prediction, task:Task, metric,
                 # handle?
 
                 try:
-                    score[func.name] = func(solution, prediction)
+                    score[func.name] = float(func(solution, prediction))
                 except ValueError as e:
                     if e.args[0] == 'multiclass format is not supported':
                         continue
-                    elif e.args[0] == "Samplewise metrics are not available "\
-                            "outside of multilabel classification.":
+                    elif e.args[0] == "Samplewise metrics are not available " \
+                                      "outside of multilabel classification.":
                         continue
-                    elif e.args[0] == "Target is multiclass but "\
-                            "average='binary'. Please choose another average "\
-                            "setting, one of [None, 'micro', 'macro', 'weighted'].":
+                    elif e.args[0] == "Target is multiclass but " \
+                                      "average='binary'. Please choose another average " \
+                                      "setting, one of [None, 'micro', 'macro', 'weighted'].":
                         continue
                     # else:
                     #     raise e
 
     else:
-        if  task.mainTask=="regression":
+        if task.mainTask == "regression":
             # TODO put this into the regression metric itself
             cprediction = sanitize_array(prediction)
             score = metric(solution, cprediction)

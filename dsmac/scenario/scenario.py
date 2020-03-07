@@ -4,7 +4,6 @@ import typing
 
 import numpy as np
 
-from dsmac.distributer import SingleDistributer, Distributer
 from dsmac.utils.io.cmd_reader import CMDReader
 from general_fs.file_system import HDFS, LocalFS
 from dsmac.utils.io.input_reader import InputReader
@@ -30,10 +29,12 @@ class Scenario(object):
     def __init__(
             self, scenario=None, cmd_options: dict = None,
             runtime='local', runtime_config=None,
-            distributer: Distributer = SingleDistributer(),
             initial_runs=20,
             filter_callback: typing.Optional[typing.Callable]=None,
-            after_run_callback: typing.Optional[typing.Callable]=None
+            after_run_callback: typing.Optional[typing.Callable]=None,
+            db_type = "sqlite",
+            db_args = None,
+            db_kwargs = None,
     ):
         """ Creates a scenario-object. The output_dir will be
         "output_dir/run_id/" and if that exists already, the old folder and its
@@ -50,10 +51,12 @@ class Scenario(object):
         cmd_options : dict
             Options from parsed command line arguments
         """
+        self.db_kwargs = db_kwargs
+        self.db_args = db_args
+        self.db_type = db_type
         self.after_run_callback = after_run_callback
         self.filter_callback = filter_callback
         self.initial_runs = initial_runs
-        self.distributer = distributer
         self.runtime_config: dict = runtime_config
         self.runtime = runtime
         if self.runtime == 'hdfs':

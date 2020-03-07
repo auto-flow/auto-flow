@@ -8,6 +8,7 @@ from sklearn.linear_model import LogisticRegression, Lasso
 
 from autopipeline.data.xy_data_manager import XYDataManager
 from autopipeline.ensemble.stack.classifier import StackingClassifier
+from autopipeline.utils.resource_manager import ResourceManager
 from general_fs import LocalFS
 
 
@@ -23,7 +24,6 @@ class StackEnsembleBuilder():
             self,
             set_model: Union[int, List, DataFrame, str] = 10,
             meta_learner=None,
-            file_system=None,
             stack_estimator_kwargs=None
     ):
         self.set_model = set_model
@@ -32,15 +32,17 @@ class StackEnsembleBuilder():
             stack_estimator_kwargs = {}
         self.stack_estimator_kwargs = stack_estimator_kwargs
 
-        self.file_system = file_system
 
     def set_data(
             self,
             data_manager: Union[XYDataManager, Dict],
             dataset_paths: Union[List, str],
+            resource_manager: ResourceManager
     ):
         self.dataset_paths = dataset_paths
         self.data_manager = data_manager
+        self.resource_manager = resource_manager
+        self.file_system=resource_manager.file_system
 
     def init_data(self):
         if not self.file_system:
@@ -48,7 +50,8 @@ class StackEnsembleBuilder():
         self.task = self.data_manager.task
         if not self.meta_learner:
             if self.task.mainTask == "classification":
-                self.meta_learner = LogisticRegression(penalty='l2',solver="lbfgs",multi_class="auto",random_state=10)
+                self.meta_learner = LogisticRegression(penalty='l2', solver="lbfgs", multi_class="auto",
+                                                       random_state=10)
             else:
                 self.meta_learner = Lasso()
         self.set_model = self.set_model
@@ -66,6 +69,7 @@ class StackEnsembleBuilder():
         df["path"] = df["dir"].str.cat(df["trial_id"], sep="/") + ".bz2"
         df.sort_values(by=["loss", "cost_time"], inplace=True)
         df.reset_index(drop=True, inplace=True)
+
         if isinstance(set_model, int):
             model_path_list = list(df.loc[:set_model - 1, "path"])
         elif isinstance(set_model, list):

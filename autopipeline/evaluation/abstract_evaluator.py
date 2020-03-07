@@ -1,11 +1,13 @@
 from time import time
-from typing import Dict
+
+from ConfigSpace.configuration_space import Configuration
 
 from autopipeline.constants import Task
 from autopipeline.data.xy_data_manager import XYDataManager
-from autopipeline.metrics import calculate_score, CLASSIFICATION_METRICS, Scorer
+from autopipeline.metrics import calculate_score, CLASSIFICATION_METRICS, Scorer, REGRESSION_METRICS
 from autopipeline.utils.logging_ import get_logger
 from autopipeline.utils.resource_manager import ResourceManager
+from dsmac.runhistory.utils import get_id_of_config
 
 __all__ = [
     'AbstractEvaluator'
@@ -49,7 +51,7 @@ class AbstractEvaluator(object):
         self.Y_optimization = None
         self.Y_actual_train = None
 
-    def _loss(self, y_true, y_hat):
+    def loss(self, y_true, y_hat):
         all_scoring_functions = (
             self.all_scoring_functions
             if self.all_scoring_functions is None
@@ -60,16 +62,16 @@ class AbstractEvaluator(object):
             y_true, y_hat, self.task, self.metric,
             all_scoring_functions=all_scoring_functions)
 
-        if hasattr(score, '__len__'):
-            # TODO: instead of using self.metric, it should use all metrics given by key.
-            # But now this throws error...
-            # FIXME： Regression  ?
-            err = {key: metric._optimum - score[key] for key, metric in
-                   CLASSIFICATION_METRICS.items() if key in score}
-        else:
+        if isinstance(score, dict):
+            err = self.metric._optimum - score[self.metric.name]
+            all_score = score
+        elif isinstance(score, (int, float)):
             err = self.metric._optimum - score
+            all_score = None
+        else:
+            raise TypeError
 
-        return err
+        return err, all_score
 
     def set_resource_manager(self, resource_manager: ResourceManager):
         self._resouce_manager = resource_manager
@@ -77,13 +79,6 @@ class AbstractEvaluator(object):
     @property
     def resource_manager(self):
         return self._resouce_manager
-
-    def loss(self, y_true, y_hat):
-        err = self._loss(y_true, y_hat)
-        if isinstance(err, dict):
-            # todo: 做记录
-            return err[self.metric.name]
-        return err
 
     def _predict_proba(self, X, model):
         Y_pred = model.predict_proba(X)
@@ -98,31 +93,30 @@ class AbstractEvaluator(object):
     def get_Xy(self):
         raise NotImplementedError()
 
-    def evaluate(self, model, X, y):
+    def evaluate(self, model, X_train, y_train,X_test,y_test):
         raise NotImplementedError()
 
     def set_php2model(self, php2model):
         self.php2model = php2model
 
-    def __call__(self, php: Dict):
+    def __call__(self, php: Configuration):
         # 1. 将php变成model
-        trial_id = getattr(php, "trial_id")
-        start=time()
+        trial_id = get_id_of_config(php)
+        start = time()
         dhp, model = self.php2model(php)
         # 2. 获取数据
-        X, y = self.get_Xy()
+        X_train, y_train,X_test,y_test = self.get_Xy()
         # 3. 进行评价
-        loss, info = self.evaluate(model, X, y)  # todo : 考虑失败的情况
+        loss, info = self.evaluate(model, X_train, y_train,X_test,y_test)  # todo : 考虑失败的情况
         # 4. 持久化
-        cost_time=time()-start
-        info["php"] = php
-        info["dhp"] = dhp
+        cost_time = time() - start
+        info["trial_id"] = trial_id
+        info["status"] = "success"
+        info["program_hyper_param"] = php
+        info["dict_hyper_param"] = dhp
         estimator = list(dhp.get("MHP", {"unk": ""}).keys())[0]
         info["estimator"] = estimator
         info["trial_id"] = trial_id
         info["cost_time"] = cost_time
-        self.resource_manager.persistent_evaluated_model(info)
-        # 记录必要的信息，用于后续删除表现差的模型
-        self.resource_manager.insert_to_db(trial_id, estimator, loss,cost_time)
-        # 向数据库insert一条记录，避免互斥写文件?
+        self.resource_manager.insert_to_db(info)
         return loss

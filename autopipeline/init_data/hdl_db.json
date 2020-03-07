@@ -46,7 +46,7 @@
     },
     "k_nearest_neighbors": {
       "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
-      "weights" : {"_type": "choice", "_value": ["quniform", "distance"],"_default": "quniform"},
+      "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
       "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
     },
     "lda": {
@@ -55,10 +55,17 @@
       "_n_components-sp1_ratio": {"_type": "quniform", "_value": [0.1,0.9],"_default": 0.5}
     },
     "liblinear_svc": {
-      "penalty":  "l2",//{"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
+      "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
+      "dual": {"_type": "choice", "_value": [true,false],"_default": false},
       "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},
       "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
-      "multi_class": "ovr"
+      "multi_class": "ovr",
+      "__forbidden": [
+          {"penalty": "l1","loss": "hinge"},
+          {"penalty": "l2","dual": false,"loss": "hinge"},
+          {"penalty": "l1","dual": false},
+          {"penalty": "l1","dual": true,"loss": "squared_hinge"},
+      ]
     },
     "libsvm_svc": {
       "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
@@ -176,16 +183,18 @@
     },
     "k_nearest_neighbors": {
       "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
-      "weights" : {"_type": "choice", "_value": ["quniform", "distance"],"_default": "quniform"},
+      "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
       "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
     },
     "liblinear_svr": {
       "loss":  {"_type": "choice", "_value": ["epsilon_insensitive", "squared_epsilon_insensitive"],"_default": "squared_epsilon_insensitive"},
       "epsilon": {"_type": "loguniform", "_value": [0.001,1],"_default": 0.1},
-//      "dual": false,
-      "fit_intercept": true,
-      "intercept_scaling": 1,
-      "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0}
+      "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
+      "dual": {"_type": "choice", "_value": [true,false],"_default": false},
+      "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
+      "__forbidden": [
+          {"loss": "epsilon_insensitive","dual": false},
+      ]
     },
     "libsvm_svr": {
       "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
@@ -313,7 +322,7 @@
         "max_depth": {"_type": "int_uniform", "_value": [2,10],"_default": 5},
         "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
         "min_samples_leaf": {"_type": "int_uniform", "_value": [1,20],"_default": 1},
-        "min_weight_fraction_leaf": 1.0,
+        "min_weight_fraction_leaf": 0.0,
         "max_leaf_nodes": null,
         "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
       },
@@ -329,7 +338,7 @@
       },
       "quantile_transformer": {
         "n_quantiles": {"_type": "int_uniform", "_value": [10,2000],"_default": 1000},
-        "output_distribution":  {"_type": "choice", "_value": ["quniform", "normal"],"_default": "normal"},
+        "output_distribution":  {"_type": "choice", "_value": ["uniform", "normal"],"_default": "normal"},
         "copy": false
       },
       "robust_scaler": {

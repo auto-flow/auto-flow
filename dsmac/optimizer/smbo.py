@@ -170,12 +170,12 @@ class SMBO(object):
         incumbent: np.array(1, H)
             The best found configuration
         """
-        # todo: runhistory 用数据库存储
-        file=self.scenario.output_dir+"/"+RUNHISTORY_FILEPATTERN
-        if self.scenario.file_system.exists(file):
-            new_runhistory = RunHistory(self.aggregate_func,file_system=self.scenario.file_system)
-            new_runhistory.load_json(file, self.config_space)
-            self.runhistory=new_runhistory
+        # file=self.scenario.output_dir+"/"+RUNHISTORY_FILEPATTERN
+        # if self.scenario.file_system.exists(file):
+        #     new_runhistory = RunHistory(self.aggregate_func,file_system=self.scenario.file_system)
+        #     new_runhistory.load_json(file, self.config_space)
+        #     self.runhistory=new_runhistory
+        self.runhistory.db.fetch_new_runhistory(True)
         all_configs=self.runhistory.get_all_configs()
         if len(all_configs):
             # 根据runhistory选出最优
@@ -187,6 +187,7 @@ class SMBO(object):
                     min_cost=cost
                     incumbent=config
             self.incumbent=incumbent
+            print(min_cost)
         self.start()
 
         # Main BO loop
@@ -199,11 +200,15 @@ class SMBO(object):
         iter=0
 
         while run_limit>0:
-
             iter+=1
             run_limit-=1
             start_time = time.time()
-
+            cur_cost=self.runhistory.get_cost(self.incumbent)
+            config_cost=self.runhistory.db.fetch_new_runhistory(False)
+            for config,cost in config_cost:
+                if cost<cur_cost:
+                    self.incumbent=config
+                    cur_cost=cost
             X, Y = self.rh2EPM.transform(self.runhistory)
 
             self.logger.debug("Search for next configuration")
@@ -220,12 +225,11 @@ class SMBO(object):
                 incumbent=self.incumbent,
                 run_history=self.runhistory,
                 aggregate_func=self.aggregate_func,
-                time_bound=max(self.intensifier._min_time, time_left),
-                iter=iter
+                time_bound=max(self.intensifier._min_time, time_left)
             )
-            pSMAC.write(run_history=self.runhistory,
-                        output_directory=self.scenario.output_dir,
-                        logger=self.logger)
+            # pSMAC.write(run_history=self.runhistory,
+            #             output_directory=self.scenario.output_dir,
+            #             logger=self.logger)
 
             logging.debug("Remaining budget: %f (wallclock), %f (ta costs), %f (target runs)" % (
                 self.stats.get_remaing_time_budget(),

@@ -1,6 +1,10 @@
+import math
+import os
+from copy import deepcopy
 from typing import Union, List, Optional, Dict
 
 import joblib
+import drill
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
@@ -11,6 +15,8 @@ from autopipeline.hdl.default_hp import add_public_info_to_default_hp
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.metrics import r2, accuracy
 from autopipeline.tuner.smac import SmacPipelineTuner
+from autopipeline.utils.config_space import get_default_initial_configs
+from autopipeline.utils.data import get_chunks
 from autopipeline.utils.resource_manager import ResourceManager
 
 
@@ -56,8 +62,10 @@ class AutoPipelineEstimator(BaseEstimator):
             dataset_name="default_dataset_name",
             metric=None,
             all_scoring_functions=False,
-            splitter=KFold(5, True, 42)
+            splitter=KFold(5, True, 42),
+            n_jobs=1,
     ):
+        self.n_jobs = n_jobs
         # resource_manager
         self.resource_manager.init_dataset_path(dataset_name)
         # data_manager
@@ -90,31 +98,61 @@ class AutoPipelineEstimator(BaseEstimator):
         }
         self.resource_manager.dump_object("evaluate_info", self.evaluate_info)
         # fine tune
-        self.tuner.initial_runs = 0  # 不再初始化
-        self.fine_tune()
-        return self
-
-    def fine_tune(self):
-        self.tuner.set_data_manager(self.data_manager)
-        self.tuner.set_hdl(self.hdl)
-        self.tuner.set_addition_info({})  # {"shape": X.shape}
-        self.tuner.evaluator.set_resource_manager(self.resource_manager)
-        # todo : 增加 n_jobs ? 调研默认值
-        add_public_info_to_default_hp(
-            self.default_hp, {"random_state": self.random_state}
-        )
-        self.tuner.set_default_hp(self.default_hp)
-        self.tuner.run(
-            self.data_manager,
-            self.metric,
-            self.all_scoring_functions,
-            self.splitter,
-            self.resource_manager.smac_output_dir
-        )
+        self.start_tunner()
         if self.ensemble_builder:
             self.estimator = self.fit_ensemble()
         else:
             self.estimator = self.resource_manager.load_best_estimator(self.task)
+        return self
+
+    def start_tunner(self):
+        self.tuner.set_hdl(self.hdl)  # just for get phps of tunner
+        n_jobs = self.n_jobs
+        runcount_limits = [math.ceil(self.tuner.runcount_limit / n_jobs)] * n_jobs
+        # todo: initial_runs 为0 的情况
+        if self.tuner.initial_runs == 0:
+            initial_runs = [0] * n_jobs
+        else:
+            initial_runs = [math.ceil(self.tuner.initial_runs / n_jobs)] * n_jobs
+        is_master_list = [False] * n_jobs
+        is_master_list[0] = True
+        initial_configs_list=get_chunks(get_default_initial_configs(self.tuner.phps,n_jobs),n_jobs)
+        random_states=np.arange(n_jobs)+self.random_state
+        with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
+            joblib.Parallel()(
+                joblib.delayed(self.run)(runcount_limit, initial_run,initial_configs,is_master,random_state)
+                for runcount_limit, initial_run,initial_configs,is_master,random_state in
+                zip(runcount_limits, initial_runs,initial_configs_list,is_master_list,random_states)
+            )
+
+
+    def run(self, runcount_limit, initial_run, initial_configs, is_master, random_state):
+        tuner = deepcopy(self.tuner)
+        resource_manager = deepcopy(self.resource_manager)
+        # resource_manager
+        resource_manager.set_is_master(is_master)
+        resource_manager.smac_output_dir += (f"/{os.getpid()}")
+        # random_state: 1. set_hdl中传给phps 2. 传给所有配置
+        tuner.random_state = random_state
+        tuner.runcount_limit = runcount_limit
+        tuner.initial_runs = initial_run
+        tuner.set_resource_manager(resource_manager)
+        tuner.set_data_manager(self.data_manager)
+        tuner.set_hdl(self.hdl)
+        tuner.set_addition_info({})  # {"shape": X.shape}
+        tuner.evaluator.set_resource_manager(resource_manager)
+        # todo : 增加 n_jobs ? 调研默认值
+        add_public_info_to_default_hp(
+            self.default_hp, {"random_state": random_state}
+        )
+        tuner.set_default_hp(self.default_hp)
+        tuner.run(
+            self.data_manager,
+            self.metric,
+            self.all_scoring_functions,
+            self.splitter,
+            initial_configs
+        )
 
     def fit_ensemble(
             self,
@@ -151,8 +189,8 @@ class AutoPipelineEstimator(BaseEstimator):
             if value is not None:
                 dict_.update({value_name: value})
 
-
-        self.tuner.initial_runs=0
+        # 不再初始化
+        self.tuner.initial_runs = 0
         # resource_manager
         self.resource_manager.load_dataset_path(dataset_name)
         # data_manager
@@ -171,7 +209,12 @@ class AutoPipelineEstimator(BaseEstimator):
         # other
         self.resource_manager.dump_db_to_csv()
         # fine tune
-        self.fine_tune()
+        self.run()
+        if self.ensemble_builder:
+            self.estimator = self.fit_ensemble()
+        else:
+            self.estimator = self.resource_manager.load_best_estimator(self.task)
+
         return self
 
     def predict(self, X):

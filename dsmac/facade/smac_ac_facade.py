@@ -1,53 +1,50 @@
 import inspect
 import logging
 import os
-from datetime import datetime
-from typing import  List, Union, Optional, Type, Callable
+from typing import List, Union, Optional, Type, Callable
 from uuid import uuid1
 
 import numpy as np
 
-# tae
-from dsmac.tae.execute_ta_run import ExecuteTARun
-from dsmac.tae.execute_ta_run_old import ExecuteTARunOld
-from dsmac.tae.execute_func import ExecuteTAFuncDict
-from dsmac.tae.execute_ta_run import StatusType
-# stats and options
-from dsmac.stats.stats import Stats
-from dsmac.scenario.scenario import Scenario
+from dsmac.configspace import Configuration
+from dsmac.epm.base_epm import AbstractEPM
+# epm
+from dsmac.epm.rf_with_instances import RandomForestWithInstances
+from dsmac.epm.rfr_imputator import RFRImputator
+from dsmac.epm.util_funcs import get_types, get_rng
+from dsmac.initial_design.default_configuration_design import \
+    DefaultConfiguration
+from dsmac.initial_design.factorial_design import FactorialInitialDesign
+# Initial designs
+from dsmac.initial_design.initial_design import InitialDesign
+from dsmac.initial_design.latin_hypercube_design import LHDesign
+from dsmac.initial_design.random_configuration_design import RandomConfigurations
+from dsmac.initial_design.sobol_design import SobolDesign
+# intensification
+from dsmac.intensification.intensification import Intensifier
+from dsmac.optimizer.acquisition import EI, LogEI, AbstractAcquisitionFunction, IntegratedAcquisitionFunction
+from dsmac.optimizer.ei_optimization import InterleavedLocalAndRandomSearch, \
+    AcquisitionFunctionMaximizer
+from dsmac.optimizer.objective import average_cost
+from dsmac.optimizer.random_configuration_chooser import RandomConfigurationChooser, ChooserProb
+# optimizer
+from dsmac.optimizer.smbo import SMBO
 # runhistory
 from dsmac.runhistory.runhistory import RunHistory
 from dsmac.runhistory.runhistory2epm import AbstractRunHistory2EPM, \
     RunHistory2EPM4LogCost, RunHistory2EPM4Cost, \
     RunHistory2EPM4InvScaledCost, RunHistory2EPM4LogScaledCost
-# Initial designs
-from dsmac.initial_design.initial_design import InitialDesign
-from dsmac.initial_design.default_configuration_design import \
-    DefaultConfiguration
-from dsmac.initial_design.random_configuration_design import RandomConfigurations
-from dsmac.initial_design.latin_hypercube_design import LHDesign
-from dsmac.initial_design.factorial_design import FactorialInitialDesign
-from dsmac.initial_design.sobol_design import SobolDesign
-
-# intensification
-from dsmac.intensification.intensification import Intensifier
-# optimizer
-from dsmac.optimizer.smbo import SMBO
-from dsmac.optimizer.objective import average_cost
-from dsmac.optimizer.acquisition import EI, LogEI, AbstractAcquisitionFunction, IntegratedAcquisitionFunction
-from dsmac.optimizer.ei_optimization import InterleavedLocalAndRandomSearch, \
-    AcquisitionFunctionMaximizer
-from dsmac.optimizer.random_configuration_chooser import RandomConfigurationChooser, ChooserProb
-# epm
-from dsmac.epm.rf_with_instances import RandomForestWithInstances
-from dsmac.epm.rfr_imputator import RFRImputator
-from dsmac.epm.base_epm import AbstractEPM
-from dsmac.epm.util_funcs import get_types, get_rng
+from dsmac.scenario.scenario import Scenario
+# stats and options
+from dsmac.stats.stats import Stats
+from dsmac.tae.execute_func import ExecuteTAFuncDict
+# tae
+from dsmac.tae.execute_ta_run import ExecuteTARun
+from dsmac.tae.execute_ta_run import StatusType
+from dsmac.tae.execute_ta_run_old import ExecuteTARunOld
+from dsmac.utils.constants import MAXINT
 # utils
 from dsmac.utils.io.traj_logging import TrajLogger
-from dsmac.utils.constants import MAXINT
-from dsmac.utils.io.output_directory import create_output_directory
-from dsmac.configspace import Configuration
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2018, ML4AAD"
@@ -190,9 +187,9 @@ class SMAC4AC(object):
             # initial random number generator
             # run_id, rng = get_rng(rng=rng, run_id=run_id, logger=self.logger)
             # run_id=datetime.now().strftime("%Y%m%d%H%M%S%f")
-            run_id=uuid1()
+            run_id = uuid1()
             # self.output_dir = create_output_directory(scenario, run_id)   # fixme run_id
-            self.output_dir = scenario.output_dir #create_output_directory(scenario, run_id)   # fixme run_id
+            self.output_dir = scenario.output_dir  # create_output_directory(scenario, run_id)   # fixme run_id
 
         elif scenario.output_dir is not None:
             run_id, rng = get_rng(rng=rng, run_id=run_id, logger=self.logger)
@@ -205,9 +202,9 @@ class SMAC4AC(object):
             self.output_dir = scenario.output_dir_for_this_run
 
         if (
-            scenario.deterministic is True
-            and getattr(scenario, 'tuner_timeout', None) is None
-            and scenario.run_obj == 'quality'
+                scenario.deterministic is True
+                and getattr(scenario, 'tuner_timeout', None) is None
+                and scenario.run_obj == 'quality'
         ):
             self.logger.info('Optimizing a deterministic scenario for quality without a tuner timeout - will make '
                              'SMAC deterministic and only evaluate one configuration per iteration!')
@@ -219,7 +216,7 @@ class SMAC4AC(object):
         if stats:
             self.stats = stats
         else:
-            self.stats = Stats(scenario,file_system=scenario.file_system)
+            self.stats = Stats(scenario, file_system=scenario.file_system)
 
         if self.scenario.run_obj == "runtime" and not self.scenario.transform_y == "LOG":
             self.logger.warning("Runtime as objective automatically activates log(y) transformation")
@@ -230,7 +227,13 @@ class SMAC4AC(object):
         if runhistory_kwargs is not None:
             runhistory_def_kwargs.update(runhistory_kwargs)
         if runhistory is None:
-            runhistory = RunHistory(**runhistory_def_kwargs,file_system=scenario.file_system)
+            runhistory = RunHistory(
+                **runhistory_def_kwargs,
+                file_system=scenario.file_system,
+                db_type=scenario.db_type,
+                db_args=scenario.db_args,
+                db_kwargs=scenario.db_kwargs
+            )
         elif inspect.isclass(runhistory):
             runhistory = runhistory(**runhistory_def_kwargs)
         else:
@@ -238,7 +241,7 @@ class SMAC4AC(object):
                 runhistory.aggregate_func = aggregate_func
 
         rand_conf_chooser_kwargs = {
-           'rng': rng
+            'rng': rng
         }
         if random_configuration_chooser_kwargs is not None:
             rand_conf_chooser_kwargs.update(random_configuration_chooser_kwargs)
@@ -257,7 +260,7 @@ class SMAC4AC(object):
         scenario.cs.seed(rng.randint(MAXINT))
 
         # initial Trajectory Logger
-        traj_logger = TrajLogger(output_dir=self.output_dir, stats=self.stats,file_system=scenario.file_system)
+        traj_logger = TrajLogger(output_dir=self.output_dir, stats=self.stats, file_system=scenario.file_system)
 
         # initial EPM
         types, bounds = get_types(scenario.cs, scenario.feature_array)
@@ -289,7 +292,7 @@ class SMAC4AC(object):
             model = model(**model_def_kwargs)
         else:
             raise TypeError(
-                "Model not recognized: %s" %(type(model)))
+                "Model not recognized: %s" % (type(model)))
 
         # initial acquisition function
         acq_def_kwargs = {'model': model}
@@ -319,7 +322,7 @@ class SMAC4AC(object):
             'acquisition_function': acquisition_function,
             'config_space': scenario.cs,
             'rng': rng,
-            }
+        }
         if acquisition_function_optimizer_kwargs is not None:
             acq_func_opt_kwargs.update(acquisition_function_optimizer_kwargs)
         if acquisition_function_optimizer is None:
@@ -349,7 +352,7 @@ class SMAC4AC(object):
             'par_factor': scenario.par_factor,
             'cost_for_crash': scenario.cost_for_crash,
             'abort_on_first_run_crash': scenario.abort_on_first_run_crash
-            }
+        }
         if tae_runner_kwargs is not None:
             tae_def_kwargs.update(tae_runner_kwargs)
         if 'ta' not in tae_def_kwargs:
@@ -387,18 +390,17 @@ class SMAC4AC(object):
             'deterministic': scenario.deterministic,
             'run_obj_time': scenario.run_obj == "runtime",
             'always_race_against': scenario.cs.get_default_configuration()
-                                   if scenario.always_race_default else None,
+            if scenario.always_race_default else None,
             'use_ta_time_bound': scenario.use_ta_time,
             'instance_specifics': scenario.instance_specific,
             'minR': scenario.minR,
             'maxR': scenario.maxR,
             'adaptive_capping_slackfactor': scenario.intens_adaptive_capping_slackfactor,
             'min_chall': scenario.intens_min_chall,
-            'distributer':scenario.distributer,
-            }
-        if hasattr(scenario,'filter_callback') and scenario.filter_callback is not None:
+        }
+        if hasattr(scenario, 'filter_callback') and scenario.filter_callback is not None:
             print('update callback')
-            intensifier_def_kwargs.update({'filter_callback':scenario.filter_callback })
+            intensifier_def_kwargs.update({'filter_callback': scenario.filter_callback})
         if intensifier_kwargs is not None:
             intensifier_def_kwargs.update(intensifier_kwargs)
         if intensifier is None:
@@ -413,8 +415,8 @@ class SMAC4AC(object):
 
         # initial design
         if initial_design is not None and initial_configurations is not None:
-            initial_design.initial_configurations=initial_configurations
-            initial_configurations=None
+            initial_design.initial_configurations = initial_configurations
+            initial_configurations = None
         init_design_def_kwargs = {
             'tae_runner': tae_runner,
             'scenario': scenario,
@@ -427,8 +429,8 @@ class SMAC4AC(object):
             'aggregate_func': aggregate_func,
             'n_configs_x_params': 0,
             'max_config_fracs': 0.0,
-            'initial_configurations':initial_design.initial_configurations
-            }
+            'initial_configurations': initial_design.initial_configurations
+        }
         if initial_design_kwargs is not None:
             init_design_def_kwargs.update(initial_design_kwargs)
         if initial_configurations is not None:
@@ -482,7 +484,7 @@ class SMAC4AC(object):
             'impute_state': [StatusType.CAPPED, ],
             'imputor': imputor,
             'scale_perc': 5
-            }
+        }
         if scenario.run_obj == 'quality':
             r2e_def_kwargs.update({
                 'success_states': [StatusType.SUCCESS, StatusType.CRASHED],
@@ -571,7 +573,7 @@ class SMAC4AC(object):
                  repetitions: int = 1,
                  use_epm: bool = False,
                  n_jobs: int = -1, backend:
-                 str = 'threading'):
+            str = 'threading'):
         """
         Create validator-object and run validation, using
         scenario-information, runhistory from smbo and tae_runner from intensify

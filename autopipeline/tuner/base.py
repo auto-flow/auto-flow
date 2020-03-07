@@ -11,6 +11,7 @@ from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.pipeline.components.feature_engineer.feature_group import FeatureGroup
 from autopipeline.utils.packages import get_class_of_module
 from autopipeline.utils.pipeline import union_pipeline, concat_pipeline
+from autopipeline.utils.resource_manager import ResourceManager
 
 
 class PipelineTuner():
@@ -63,6 +64,13 @@ class PipelineTuner():
         ret = relied_value[module_class]
         assert isinstance(ret, dict)
         return ret
+
+    def set_resource_manager(self,resource_manager:ResourceManager):
+        self._resource_manager=resource_manager
+
+    @property
+    def resource_manager(self):
+        return self._resource_manager
 
     def set_data_manager(self, data_manager:XYDataManager):
         self._data_manager = data_manager

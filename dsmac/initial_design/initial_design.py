@@ -118,16 +118,11 @@ class InitialDesign:
         for config in configs:
             if config.origin is None:
                 config.origin = 'Initial design'
-        if self.initial_configurations is not None:
-            if not isinstance(self.initial_configurations, list):
-                self.initial_configurations=[self.initial_configurations]
-            for config in self.initial_configurations:
-                config.origin= 'Initial Configurations'
-                configs.append(config)
+
         # run first design
         # ensures that first design is part of trajectory file
-        # inc = self._run_first_configuration(configs[0], self.scenario)
-        # fixme 运行候选者
+        inc = self._run_first_configuration(configs[0], self.scenario)
+
         if len(set(configs)) > 1:
             # intensify will skip all challenger that are identical with the incumbent;
             # if <configs> has only identical configurations,
@@ -139,7 +134,6 @@ class InitialDesign:
                 incumbent=configs[0],
                 run_history=self.runhistory,
                 aggregate_func=self.aggregate_func,
-                allow_all=True
             )
 
         return inc

@@ -1,4 +1,3 @@
-import time
 import logging
 import time
 import typing
@@ -8,7 +7,6 @@ from typing import Callable
 import numpy as np
 
 from dsmac.configspace import Configuration
-from dsmac.distributer import SingleDistributer, Distributer
 from dsmac.optimizer.ei_optimization import ChallengerList
 from dsmac.optimizer.objective import sum_cost
 from dsmac.runhistory.runhistory import RunHistory
@@ -16,7 +14,6 @@ from dsmac.stats.stats import Stats
 from dsmac.tae.execute_ta_run import BudgetExhaustedException, CappedRunException, ExecuteTARun
 from dsmac.utils.constants import MAXINT, MAX_CUTOFF
 from dsmac.utils.io.traj_logging import TrajLogger
-from general_fs.utils import get_id
 
 __author__ = "Katharina Eggensperger, Marius Lindauer"
 __copyright__ = "Copyright 2018, ML4AAD"
@@ -71,19 +68,17 @@ class Intensifier(object):
     def __init__(self, tae_runner: ExecuteTARun, stats: Stats,
                  traj_logger: TrajLogger, rng: np.random.RandomState,
                  instances: typing.List[str],
-                 instance_specifics: typing.Mapping[str, np.ndarray]=None,
-                 cutoff: int=MAX_CUTOFF, deterministic:bool=False,
-                 run_obj_time: bool=True,
-                 always_race_against: Configuration=None,
-                 run_limit: int=MAXINT,
-                 use_ta_time_bound: bool=False,
-                 minR: int=1, maxR: int=2000,
-                 adaptive_capping_slackfactor: float=1.2,
-                 min_chall: int=2,
-                 distributer:Distributer=SingleDistributer(),
-                 filter_callback:Callable=lambda x:True):
+                 instance_specifics: typing.Mapping[str, np.ndarray] = None,
+                 cutoff: int = MAX_CUTOFF, deterministic: bool = False,
+                 run_obj_time: bool = True,
+                 always_race_against: Configuration = None,
+                 run_limit: int = MAXINT,
+                 use_ta_time_bound: bool = False,
+                 minR: int = 1, maxR: int = 2000,
+                 adaptive_capping_slackfactor: float = 1.2,
+                 min_chall: int = 2,
+                 filter_callback: Callable = lambda x: True):
         self.filter_callback = filter_callback
-        self.distributer = distributer
         self.logger = logging.getLogger(
             self.__module__ + "." + self.__class__.__name__)
 
@@ -120,15 +115,15 @@ class Intensifier(object):
 
         self._ta_time = 0
         self.use_ta_time_bound = use_ta_time_bound
-        self._min_time = 10**-5
+        self._min_time = 10 ** -5
         self.min_chall = min_chall
 
     def intensify(self, challengers: typing.List[Configuration],
                   incumbent: Configuration,
                   run_history: RunHistory,
                   aggregate_func: typing.Callable,
-                  time_bound: float=float(MAXINT),
-                  log_traj: bool=True,iter=0,allow_all=False):
+                  time_bound: float = float(MAXINT),
+                  log_traj: bool = True):
         """Running intensification to determine the incumbent configuration.
         *Side effect:* adds runs to run_history
 
@@ -160,60 +155,27 @@ class Intensifier(object):
         self._ta_time = 0
 
         if time_bound < self._min_time:
-            raise ValueError("time_bound must be >= %f" %(self._min_time))
+            raise ValueError("time_bound must be >= %f" % (self._min_time))
 
         self._num_run = 0
         self._chall_indx = 0
-        #-----------------
-        if self.distributer.tae_runner is None:
-            self.distributer.tae_runner=self.tae_runner
-        if isinstance(challengers,ChallengerList):
-            challengers=challengers.challengers
-        to_run=[]
-        count=0
-        inc_runs=run_history.get_runs_for_config(incumbent)
-        if not inc_runs:
-            # count+=1
-            to_run.append(incumbent)
-        for challenger in challengers:
-            if challenger == incumbent:
-                self.logger.debug("Challenger was the same as the current incumbent; Skipping challenger")
-                continue
-            if not self.filter_callback(challenger):
-                self.logger.info("Challenger did not accepted by filter_callback:")
-                self.logger.info(challenger)
-                continue
-            # challenger.trial_id=get_id()
-            to_run.append(challenger)
-            count += 1
-            if count >= self.distributer.n_jobs and allow_all == False:
-                break
-        for x in to_run:
-            setattr(x,"trial_id",get_id())
-        ans = self.distributer.run(to_run, run_history)  # (status, cost, dur, res)
-        costs = [item[1] for item in ans]
-        costs = np.array(costs)
-        id_ = np.argmin(costs)
-        min_costs = np.min(costs)
-        new_incumbent: Configuration
-        if inc_runs:
-            if min_costs < run_history.get_cost(incumbent):
-                new_incumbent = to_run[id_]
-            else:
-                new_incumbent = incumbent
-        else:
-            new_incumbent = to_run[id_]
-        new_incumbent_runs = run_history.get_runs_for_config(new_incumbent)
-        if not new_incumbent_runs:
-            raise Exception('no run')
-        inc_perf = run_history.get_cost(new_incumbent)
-        self.logger.info("Updated estimated cost of incumbent on %d runs: %.4f"
-                         % (iter, inc_perf))
-        return new_incumbent, inc_perf
-        # -----------------
 
         # Line 1 + 2
+        if isinstance(challengers, ChallengerList):
+            challengers = challengers.challengers
+        L1 = 10
+        L2 = 10000
+        r = np.random.uniform()
+        if 0.05 < r < 0.2 and len(challengers) > L1:
+            target = np.random.randint(1, L1)
+            challengers[target], challengers[0] = challengers[0], challengers[target]
+        if r < 0.05 and len(challengers) > L2:
+            target = np.random.randint(L1, L2)
+            challengers[target], challengers[0] = challengers[0], challengers[target]
+
         for challenger in challengers:
+            if not run_history.db.appointment_config(challenger):
+                continue
             if challenger == incumbent:
                 self.logger.debug("Challenger was the same as the current incumbent; Skipping challenger")
                 continue
@@ -257,13 +219,13 @@ class Intensifier(object):
                     break
                 if not self.use_ta_time_bound and tm - self.start_time - time_bound >= 0:
                     self.logger.debug("Wallclock time limit for intensification reached ("
-                                        "used: %f sec, available: %f sec)" %
-                                        (tm - self.start_time, time_bound))
+                                      "used: %f sec, available: %f sec)" %
+                                      (tm - self.start_time, time_bound))
                     break
                 elif self._ta_time - time_bound >= 0:
                     self.logger.debug("TA time limit for intensification reached ("
-                                          "used: %f sec, available: %f sec)" %
-                                          (self._ta_time, time_bound))
+                                      "used: %f sec, available: %f sec)" %
+                                      (self._ta_time, time_bound))
                     break
 
         # output estimated performance of incumbent
@@ -350,7 +312,7 @@ class Intensifier(object):
                          incumbent: Configuration,
                          run_history: RunHistory,
                          aggregate_func: typing.Callable,
-                         log_traj:bool=True):
+                         log_traj: bool = True):
         """Aggressively race challenger against incumbent
 
         Parameters
@@ -399,7 +361,7 @@ class Intensifier(object):
             inc_sum_cost = sum_cost(config=incumbent,
                                     instance_seed_pairs=inst_seed_pairs,
                                     run_history=run_history)
-            
+
             if len(to_run) == 0:
                 self.logger.debug("No further runs for challenger available")
 
@@ -439,10 +401,10 @@ class Intensifier(object):
                     return incumbent
 
             new_incumbent = self._compare_configs(
-                    incumbent=incumbent, challenger=challenger,
-                    run_history=run_history,
-                    aggregate_func=aggregate_func,
-                    log_traj=log_traj)
+                incumbent=incumbent, challenger=challenger,
+                run_history=run_history,
+                aggregate_func=aggregate_func,
+                log_traj=log_traj)
             if new_incumbent == incumbent:
                 break
             elif new_incumbent == challenger:
@@ -504,7 +466,7 @@ class Intensifier(object):
                          challenger: Configuration,
                          run_history: RunHistory,
                          aggregate_func: typing.Callable,
-                         log_traj: bool=True):
+                         log_traj: bool = True):
         """
         Compare two configuration wrt the runhistory and return the one which
         performs better (or None if the decision is not safe)

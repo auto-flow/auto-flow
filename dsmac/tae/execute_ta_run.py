@@ -216,6 +216,10 @@ class ExecuteTARun(object):
                                 cost=cost, time=runtime, status=status,
                                 instance_id=instance, seed=seed,
                                 additional_info=additional_info)
+            self.runhistory.db.insert_runhistory(config=config,
+                                cost=cost, time=runtime, status=status,
+                                instance_id=instance, seed=seed,
+                                additional_info=additional_info)
             self.stats.n_configs = len(self.runhistory.config_ids)
 
         if status == StatusType.CAPPED:

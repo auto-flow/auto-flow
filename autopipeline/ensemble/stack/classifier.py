@@ -16,7 +16,6 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
             use_features_in_secondary=False,
             use_probas=True
     ):
-
         self.use_probas = use_probas
         self.prediction_list = prediction_list
         self.models_list = models_list
