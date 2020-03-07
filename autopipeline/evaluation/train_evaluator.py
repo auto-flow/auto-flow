@@ -20,7 +20,7 @@ class TrainEvaluator(AbstractEvaluator):
             # splitter 必须存在
             losses = []
             models = []
-            y_trues = []
+            y_true_indexes = []
             y_preds = []
             all_scores = []
             for train_index, valid_index in self.splitter.split(X, y):
@@ -28,7 +28,7 @@ class TrainEvaluator(AbstractEvaluator):
                 y_train, y_valid = y[train_index], y[valid_index]
                 fitted_model = model.fit(X_train, y_train)
                 models.append(fitted_model)
-                y_trues.append(y[valid_index])
+                y_true_indexes.append(valid_index)
                 y_pred = self.predict_function(X_valid, model)
                 y_preds.append(y_pred)
                 loss, all_score = self.loss(y_valid, y_pred)
@@ -53,7 +53,7 @@ class TrainEvaluator(AbstractEvaluator):
                 "all_score": all_score,
                 "all_scores": all_scores,
                 "models": models,
-                "y_trues": y_trues,
+                "y_true_indexes": y_true_indexes,
                 "y_preds": y_preds,
             }
             if y_test is not None:

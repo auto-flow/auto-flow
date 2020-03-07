@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List, Union, Dict
 
 import numpy as np
@@ -60,41 +61,20 @@ class StackEnsembleBuilder():
 
     def build(self):
         set_model = self.set_model
-        df_list = []
-        for dataset_path in self.dataset_paths:
-            df = pd.read_csv(dataset_path + "/trials.csv")
-            df["dir"] = [dataset_path + "/trials"] * df.shape[0]
-            df_list.append(df)
-        df = pd.concat(df_list, ignore_index=True)
-        df["path"] = df["dir"].str.cat(df["trial_id"], sep="/") + ".bz2"
-        df.sort_values(by=["loss", "cost_time"], inplace=True)
-        df.reset_index(drop=True, inplace=True)
 
         if isinstance(set_model, int):
-            model_path_list = list(df.loc[:set_model - 1, "path"])
+            trial_ids=self.resource_manager.get_best_k_trials(set_model)
         elif isinstance(set_model, list):
-            assert all(map(self.file_system.exists, set_model))
-            model_path_list = set_model
+            trial_ids=deepcopy(set_model)
+            # todo: 验证
         elif isinstance(set_model, DataFrame):
-            model_path_list = get_model_path_list_of_df(set_model, df)
+            raise NotImplementedError
         elif isinstance(set_model, str):
-            set_model = pd.read_csv(set_model)
-            model_path_list = get_model_path_list_of_df(set_model, df)
+            raise NotImplementedError
         else:
             raise NotImplementedError()
-        models_list = []
-        prediction_list = []
-        for model_path in model_path_list:
-            data = load(model_path)
-            y_test_indices = data["y_test_indices"]
-            y_preds = data["y_preds"]
-            models = data["models"]
-            prediction = np.zeros_like(np.vstack(y_preds))
-            for y_index, y_pred in zip(y_test_indices, y_preds):
-                prediction[y_index] = y_pred
-            prediction_list.append(prediction)
-            models_list.append(models)
-            # todo: 内存溢出？
+        estimator_list, y_true_indexes, y_preds_list=\
+            self.resource_manager.load_estimators_in_trials(trial_ids)
         if self.task.mainTask == "classification":
             stack_estimator_cls = StackingClassifier
         else:
@@ -102,10 +82,7 @@ class StackEnsembleBuilder():
 
         stack_estimator = stack_estimator_cls(
             self.meta_learner,
-            models_list,
-            prediction_list,
+            estimator_list, y_true_indexes, y_preds_list,
             **self.stack_estimator_kwargs
         )
-        stack_estimator.model_path_list = model_path_list
-        stack_estimator.fit(self.data_manager.data["X_train"], self.data_manager.data["y_train"])
         return stack_estimator

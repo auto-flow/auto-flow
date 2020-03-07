@@ -1,9 +1,8 @@
 import os
 import sqlite3
 import time
-from typing import Dict
+from typing import Dict, Tuple, List, Union
 
-import joblib
 import json5 as json
 import pandas as pd
 import peewee as pw
@@ -72,7 +71,7 @@ class ResourceManager():
         self.data_manager_path = self.dataset_path + "/data_manager.bz2"
         self.hdl_dir = self.dataset_path + "/hdl_constructor"
         self.file_system.mkdir(self.hdl_dir)
-        self.is_init_db=False
+        self.is_init_db = False
         if self.db_type == "sqlite":
             self.rh_db_args = self.dataset_path + "/runhistory.db"
             self.rh_db_kwargs = None
@@ -98,22 +97,45 @@ class ResourceManager():
     def persistent_evaluated_model(self, info: Dict):
         trial_id = info["trial_id"]
         file_name = f"{self.trials_dir}/{trial_id}.bz2"
-        dump( info["models"],file_name)
+        dump(info["models"], file_name)
         return file_name
 
     def load_best_estimator(self, task: Task):
         # todo: 最后调用分析程序？
         self.init_db()
-        record=self.Model.select().group_by(self.Model.loss,self.Model.cost_time).limit(1)[0]
-        if self.persistent_mode=="fs":
-            models=load(record.models_path)
+        record = self.Model.select().group_by(self.Model.loss, self.Model.cost_time).limit(1)[0]
+        if self.persistent_mode == "fs":
+            models = load(record.models_path)
         else:
-            models=loads_pickle(record.model)
+            models = loads_pickle(record.models_bit)
         if task.mainTask == "classification":
             estimator = VoteClassifier(models)
         else:
             estimator = MeanRegressor(models)
         return estimator
+
+    def get_best_k_trials(self, k):
+        self.init_db()
+        trial_ids = []
+        records = self.Model.select().group_by(self.Model.loss, self.Model.cost_time).limit(k)
+        for record in records:
+            trial_ids.append(record.trial_id)
+        return trial_ids
+
+    def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
+        self.init_db()
+        records = self.Model.select().where(self.Model.trial_id << trials)
+        estimator_list = []
+        y_true_indexes_list = []
+        y_preds_list = []
+        for record in records:
+            if self.persistent_mode == "fs":
+                estimator_list.append(load(record.models_path))
+            else:
+                estimator_list.append(loads_pickle(record.models_bit))
+            y_true_indexes_list.append(loads_pickle(record.y_true_indexes))
+            y_preds_list.append(loads_pickle(record.y_preds))
+        return estimator_list,y_true_indexes_list,y_preds_list
 
     def set_is_master(self, is_master):
         self._is_master = is_master
@@ -133,8 +155,8 @@ class ResourceManager():
             all_scores = pw.TextField(default="")
             test_all_score = pw.FloatField(default=0)
             models_bit = pw.BitField(default=0)
-            models_path = pw.CharField(default="")  # todo : 设置存储模式，持久化模型可以保存数据库中，也保存在文件系统中
-            y_trues = pw.BitField(default=0)
+            models_path = pw.CharField(default="")
+            y_true_indexes = pw.BitField(default=0)
             y_preds = pw.BitField(default=0)
             y_test_true = pw.BitField(default=0)
             y_test_pred = pw.BitField(default=0)
@@ -144,15 +166,17 @@ class ResourceManager():
             status = pw.CharField(default="success")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
+
             class Meta:
                 database = self.db
+
         self.db.create_tables([TrialModel])
         return TrialModel
 
     def init_db(self):
         if self.is_init_db:
             return
-        self.is_init_db=True
+        self.is_init_db = True
         # todo: 其他数据库的实现
         self.db: pw.Database = pw.SqliteDatabase(self.db_path)
         self.Model = self.get_model()
@@ -177,16 +201,16 @@ class ResourceManager():
             test_all_score=json.dumps(info.get("test_all_score")),
             models_bit=models_bit,
             models_path=models_path,
-            y_trues=dumps_pickle(info.get("y_trues")),
+            y_true_indexes=dumps_pickle(info.get("y_true_indexes")),
             y_preds=dumps_pickle(info.get("y_preds")),
             y_test_true=dumps_pickle(info.get("y_test_true")),
             y_test_pred=dumps_pickle(info.get("y_test_pred")),
             program_hyper_param=dumps_pickle(info.get("program_hyper_param")),
             dict_hyper_param=json.dumps(info.get("dict_hyper_param")),  # t,odo: json field
-            cost_time=info.get("cost_time",65535),
-            status=info.get("status","failed"),
-            failed_info=info.get("failed_info",""),
-            warning_info=info.get("warning_info","")
+            cost_time=info.get("cost_time", 65535),
+            status=info.get("status", "failed"),
+            failed_info=info.get("failed_info", ""),
+            warning_info=info.get("warning_info", "")
         )
 
     def delete_models(self):
@@ -201,10 +225,10 @@ class ResourceManager():
             should_delete = self.Model.select().where(self.Model.estimator == estimator).order_by(
                 self.Model.loss, self.Model.cost_time).offset(50)
             if should_delete:
-                if self.persistent_mode=="fs":
+                if self.persistent_mode == "fs":
                     for record in should_delete:
-                        models_path=record.models_path
-                        print("delete:"+models_path)
+                        models_path = record.models_path
+                        print("delete:" + models_path)
                         self.file_system.delete(models_path)
                 self.Model.delete().where(self.Model.trial_id.in_(should_delete.select(self.Model.trial_id))).execute()
 
@@ -228,15 +252,14 @@ class ResourceManager():
 
 
 if __name__ == '__main__':
-    rm=ResourceManager("/home/tqc/PycharmProjects/auto-pipeline/test/test_db")
+    rm = ResourceManager("/home/tqc/PycharmProjects/auto-pipeline/test/test_db")
     rm.init_dataset_path("default_dataset_name")
     rm.init_db()
-    estimators=[]
+    estimators = []
     for record in rm.Model.select().group_by(rm.Model.estimator):
         estimators.append(record.estimator)
     for estimator in estimators:
-        should_delete=rm.Model.select(rm.Model.trial_id).where(rm.Model.estimator == estimator).order_by(rm.Model.loss, rm.Model.cost_time).offset(50)
+        should_delete = rm.Model.select(rm.Model.trial_id).where(rm.Model.estimator == estimator).order_by(
+            rm.Model.loss, rm.Model.cost_time).offset(50)
         if should_delete:
             rm.Model.delete().where(rm.Model.trial_id.in_(should_delete)).execute()
-        
-
