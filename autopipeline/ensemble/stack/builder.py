@@ -85,4 +85,5 @@ class StackEnsembleBuilder():
             estimator_list, y_true_indexes, y_preds_list,
             **self.stack_estimator_kwargs
         )
+        stack_estimator.fit(self.data_manager.data["X_train"], self.data_manager.data["y_train"])
         return stack_estimator

@@ -37,6 +37,7 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y):
         # todo ： 验证所有的 y_true_indexes 合法
+        # todo : 做完stack之后在验证集上的表现
         meta_features = self.predict_meta_features(X, True)
         self.meta_learner.fit(meta_features, y)
 
