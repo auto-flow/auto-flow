@@ -34,6 +34,8 @@ class AutoPipelineEstimator(BaseEstimator):
             ensemble_builder = StackEnsembleBuilder()
         elif ensemble_builder == False:
             print("info: 不使用集成学习")
+        else:
+            ensemble_builder=StackEnsembleBuilder(set_model=ensemble_builder)
         self.ensemble_builder = ensemble_builder
         if not tuner:
             tuner = SmacPipelineTuner()
@@ -172,7 +174,8 @@ class AutoPipelineEstimator(BaseEstimator):
             dataset_paths = self.resource_manager.dataset_path
         self.ensemble_builder.set_data(
             data_manager,
-            dataset_paths
+            dataset_paths,
+            self.resource_manager
         )
         self.ensemble_builder.init_data()
         self.stack_estimator = self.ensemble_builder.build()

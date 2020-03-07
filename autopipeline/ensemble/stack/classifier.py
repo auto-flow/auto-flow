@@ -24,6 +24,7 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
         self.meta_learner = meta_learner
         self.use_features_in_secondary = use_features_in_secondary
         self.drop_last_proba = drop_last_proba
+        self.build_prediction_list()
 
     def build_prediction_list(self):
         prediction_list = []
