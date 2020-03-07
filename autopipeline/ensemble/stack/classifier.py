@@ -10,9 +10,9 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
     def __init__(
             self,
             meta_learner,
-            estimator_list:List,
-            y_true_indexes_list:List,
-            y_preds_list:List,
+            estimator_list: List,
+            y_true_indexes_list: List,
+            y_preds_list: List,
             drop_last_proba=False,
             use_features_in_secondary=False,
             use_probas=True
@@ -26,10 +26,15 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
         self.drop_last_proba = drop_last_proba
 
     def build_prediction_list(self):
-        for y_true_indexes,y_preds in zip(self.y_true_indexes_list,self.y_preds_list):
-            pass
+        prediction_list = []
+        for y_true_indexes, y_preds in zip(self.y_true_indexes_list, self.y_preds_list):
+            prediction = np.zeros_like(np.vstack(y_preds))
+            for y_index, y_pred in zip(y_true_indexes, y_preds):
+                prediction[y_index] = y_pred
+            prediction_list.append(prediction)
+        self.prediction_list = prediction_list
 
-    def fit(self,X,y):
+    def fit(self, X, y):
         # todo ： 验证所有的 y_true_indexes 合法
         meta_features = self.predict_meta_features(X, True)
         self.meta_learner.fit(meta_features, y)
