@@ -3,10 +3,10 @@ from time import time
 from ConfigSpace.configuration_space import Configuration
 
 from autopipeline.constants import Task
-from autopipeline.data.xy_data_manager import XYDataManager
-from autopipeline.metrics import calculate_score, CLASSIFICATION_METRICS, Scorer, REGRESSION_METRICS
+from autopipeline.manager.xy_data_manager import XYDataManager
+from autopipeline.metrics import calculate_score, Scorer
 from autopipeline.utils.logging_ import get_logger
-from autopipeline.utils.resource_manager import ResourceManager
+from autopipeline.manager.resource_manager import ResourceManager
 from dsmac.runhistory.utils import get_id_of_config
 
 __all__ = [

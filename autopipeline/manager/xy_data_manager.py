@@ -4,7 +4,7 @@ import numpy as np
 
 from autopipeline.constants import Task, binary_classification_task, multiclass_classification_task, \
     multilabel_classification_task, regression_task
-from autopipeline.data.abstract_data_manager import AbstractDataManager
+from autopipeline.manager.abstract_data_manager import AbstractDataManager
 from autopipeline.utils.data import get_task_from_y
 
 

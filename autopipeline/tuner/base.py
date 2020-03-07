@@ -6,12 +6,12 @@ from ConfigSpace.configuration_space import ConfigurationSpace
 from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
-from autopipeline.data.xy_data_manager import XYDataManager
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.pipeline.components.feature_engineer.feature_group import FeatureGroup
 from autopipeline.utils.packages import get_class_of_module
 from autopipeline.utils.pipeline import union_pipeline, concat_pipeline
-from autopipeline.utils.resource_manager import ResourceManager
+from autopipeline.manager.resource_manager import ResourceManager
 
 
 class PipelineTuner():

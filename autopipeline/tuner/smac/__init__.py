@@ -2,7 +2,7 @@ from typing import Dict
 
 import numpy as np
 
-from autopipeline.data.xy_data_manager import XYDataManager
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 from autopipeline.metrics import Scorer

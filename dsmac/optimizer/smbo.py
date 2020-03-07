@@ -17,12 +17,10 @@ from dsmac.epm.rf_with_instances import RandomForestWithInstances
 from dsmac.epm.util_funcs import get_types
 from dsmac.initial_design.initial_design import InitialDesign
 from dsmac.intensification.intensification import Intensifier
-from dsmac.optimizer import pSMAC
 from dsmac.optimizer.acquisition import AbstractAcquisitionFunction, EI, LogEI, \
     LCB, PI
 from dsmac.optimizer.ei_optimization import AcquisitionFunctionMaximizer, \
     RandomSearch
-from dsmac.optimizer.pSMAC import RUNHISTORY_FILEPATTERN
 from dsmac.optimizer.random_configuration_chooser import ChooserNoCoolDown, \
     ChooserLinearCoolDown
 from dsmac.runhistory.runhistory import RunHistory
@@ -39,7 +37,6 @@ __license__ = "3-clause BSD"
 
 
 class SMBO(object):
-
     """Interface that contains the main Bayesian optimization loop
 
     Attributes
@@ -75,10 +72,10 @@ class SMBO(object):
                  acq_optimizer: AcquisitionFunctionMaximizer,
                  acquisition_func: AbstractAcquisitionFunction,
                  rng: np.random.RandomState,
-                 restore_incumbent: Configuration=None,
+                 restore_incumbent: Configuration = None,
                  random_configuration_chooser: typing.Union[
-                     ChooserNoCoolDown, ChooserLinearCoolDown]=ChooserNoCoolDown(2.0),
-                 predict_incumbent: bool=True):
+                     ChooserNoCoolDown, ChooserLinearCoolDown] = ChooserNoCoolDown(2.0),
+                 predict_incumbent: bool = True):
         """
         Interface that contains the main Bayesian optimization loop
 
@@ -154,9 +151,8 @@ class SMBO(object):
         """
         self.stats.start_timing()
         # Initialization, depends on input
-        if self.stats.ta_runs == 0 and self.incumbent is None and self.scenario.initial_runs>0:
+        if self.stats.ta_runs == 0 and self.incumbent is None and self.scenario.initial_runs > 0:
             self.incumbent = self.initial_design.run()
-
 
         # To be on the safe side -> never return "None" as incumbent
         if not self.incumbent:
@@ -176,39 +172,39 @@ class SMBO(object):
         #     new_runhistory.load_json(file, self.config_space)
         #     self.runhistory=new_runhistory
         self.runhistory.db.fetch_new_runhistory(True)
-        all_configs=self.runhistory.get_all_configs()
+        all_configs = self.runhistory.get_all_configs()
         if len(all_configs):
             # 根据runhistory选出最优
-            incumbent=all_configs[0]
-            min_cost=np.inf
+            incumbent = all_configs[0]
+            min_cost = np.inf
             for config in all_configs[1:]:
-                cost=self.runhistory.get_cost(config)
+                cost = self.runhistory.get_cost(config)
                 if cost < min_cost:
-                    min_cost=cost
-                    incumbent=config
-            self.incumbent=incumbent
+                    min_cost = cost
+                    incumbent = config
+            self.incumbent = incumbent
             print(min_cost)
         self.start()
 
         # Main BO loop
-        if hasattr(self.scenario,'ta_run_limit') and isinstance(self.scenario.ta_run_limit,(int,float)):
-            run_limit=int(self.scenario.ta_run_limit)
+        if hasattr(self.scenario, 'ta_run_limit') and isinstance(self.scenario.ta_run_limit, (int, float)):
+            run_limit = int(self.scenario.ta_run_limit)
         else:
             run_limit = 100
-        if run_limit<=0:
-            run_limit=np.inf
-        iter=0
+        if run_limit <= 0:
+            run_limit = np.inf
+        iter = 0
 
-        while run_limit>0:
-            iter+=1
-            run_limit-=1
+        while run_limit > 0:
+            iter += 1
+            run_limit -= 1
             start_time = time.time()
-            cur_cost=self.runhistory.get_cost(self.incumbent)
-            config_cost=self.runhistory.db.fetch_new_runhistory(False)
-            for config,cost in config_cost:
-                if cost<cur_cost:
-                    self.incumbent=config
-                    cur_cost=cost
+            cur_cost = self.runhistory.get_cost(self.incumbent)
+            config_cost = self.runhistory.db.fetch_new_runhistory(False)
+            for config, cost in config_cost:
+                if cost < cur_cost:
+                    self.incumbent = config
+                    cur_cost = cost
             X, Y = self.rh2EPM.transform(self.runhistory)
 
             self.logger.debug("Search for next configuration")
@@ -240,13 +236,17 @@ class SMBO(object):
             #     break
 
             if self.scenario.after_run_callback:
-                self.scenario.after_run_callback()
+                status = self.scenario.after_run_callback()
+                if not status:
+                    print("info:break")
+                    break
+
             self.stats.print_stats(debug_out=True)
 
         return self.incumbent
 
     def choose_next(self, X: np.ndarray, Y: np.ndarray,
-                    incumbent_value: float=None):
+                    incumbent_value: float = None):
         """Choose next candidate solution with Bayesian optimization. The
         suggested configurations depend on the argument ``acq_optimizer`` to
         the ``SMBO`` class.
@@ -307,7 +307,7 @@ class SMBO(object):
             configs = convert_configurations_to_array(self.runhistory.get_all_configs())
             costs = list(map(
                 lambda config:
-                    self.model.predict_marginalized_over_instances(config.reshape((1, -1)))[0][0][0],
+                self.model.predict_marginalized_over_instances(config.reshape((1, -1)))[0][0][0],
                 configs,
             ))
             incumbent_value = np.min(costs)
@@ -378,7 +378,7 @@ class SMBO(object):
                                         output_fn=new_rh_path)
         return new_rh
 
-    def _get_timebound_for_intensification(self, time_spent:float):
+    def _get_timebound_for_intensification(self, time_spent: float):
         """Calculate time left for intensify from the time spent on
         choosing challengers using the fraction of time intended for
         intensification (which is specified in
@@ -405,8 +405,8 @@ class SMBO(object):
                           (total_time, time_spent, (1 - frac_intensify), time_left, frac_intensify))
         return time_left
 
-    def _component_builder(self, conf:typing.Union[Configuration, dict]) \
-        -> typing.Tuple[AbstractAcquisitionFunction, AbstractEPM]:
+    def _component_builder(self, conf: typing.Union[Configuration, dict]) \
+            -> typing.Tuple[AbstractAcquisitionFunction, AbstractEPM]:
         """
             builds new Acquisition function object
             and EPM object and returns these
@@ -505,7 +505,7 @@ class SMBO(object):
                      par=conf.get("par_ei", 0))
         elif conf["acq_func"] == "LCB":
             acq = LCB(model=model,
-                par=conf.get("par_lcb", 0))
+                      par=conf.get("par_lcb", 0))
         elif conf["acq_func"] == "PI":
             acq = PI(model=model,
                      par=conf.get("par_pi", 0))
@@ -527,7 +527,7 @@ class SMBO(object):
         """
 
         cs = ConfigurationSpace()
-        cs.seed(self.rng.randint(0,2**20))
+        cs.seed(self.rng.randint(0, 2 ** 20))
 
         if 'gp' in dsmac.extras_installed:
             model = CategoricalHyperparameter("model", choices=("RF", "GP"))
@@ -550,7 +550,7 @@ class SMBO(object):
 
         cs.add_conditions([inc_num_trees, inc_bootstrap, inc_ratio_features, inc_min_split, inc_min_leavs])
 
-        acq  = CategoricalHyperparameter("acq_func", choices=("EI", "LCB", "PI", "LogEI"))
+        acq = CategoricalHyperparameter("acq_func", choices=("EI", "LCB", "PI", "LogEI"))
         par_ei = UniformFloatHyperparameter("par_ei", lower=-10, upper=10)
         par_pi = UniformFloatHyperparameter("par_pi", lower=-10, upper=10)
         par_logei = UniformFloatHyperparameter("par_logei", lower=0.001, upper=100, log=True)

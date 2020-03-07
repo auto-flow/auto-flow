@@ -1,23 +1,24 @@
 import math
 import os
 from copy import deepcopy
+from multiprocessing import Manager
 from typing import Union, List, Optional, Dict
 
 import joblib
-import drill
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
-from autopipeline.data.xy_data_manager import XYDataManager
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.ensemble.stack.builder import StackEnsembleBuilder
 from autopipeline.hdl.default_hp import add_public_info_to_default_hp
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.metrics import r2, accuracy
 from autopipeline.tuner.smac import SmacPipelineTuner
+from autopipeline.utils.concurrence import parse_n_jobs
 from autopipeline.utils.config_space import get_default_initial_configs
 from autopipeline.utils.data import get_chunks
-from autopipeline.utils.resource_manager import ResourceManager
+from autopipeline.manager.resource_manager import ResourceManager
 
 
 class AutoPipelineEstimator(BaseEstimator):
@@ -35,7 +36,7 @@ class AutoPipelineEstimator(BaseEstimator):
         elif ensemble_builder == False:
             print("info: 不使用集成学习")
         else:
-            ensemble_builder=StackEnsembleBuilder(set_model=ensemble_builder)
+            ensemble_builder = StackEnsembleBuilder(set_model=ensemble_builder)
         self.ensemble_builder = ensemble_builder
         if not tuner:
             tuner = SmacPipelineTuner()
@@ -66,8 +67,12 @@ class AutoPipelineEstimator(BaseEstimator):
             all_scoring_functions=False,
             splitter=KFold(5, True, 42),
             n_jobs=1,
+            exit_processes=None
     ):
-        self.n_jobs = n_jobs
+        self.n_jobs = parse_n_jobs(n_jobs)
+        if exit_processes is None:
+            exit_processes = max(self.n_jobs // 3, 1)
+        self.exit_processes = exit_processes
         # resource_manager
         self.resource_manager.init_dataset_path(dataset_name)
         # data_manager
@@ -118,20 +123,28 @@ class AutoPipelineEstimator(BaseEstimator):
             initial_runs = [math.ceil(self.tuner.initial_runs / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
         is_master_list[0] = True
-        initial_configs_list=get_chunks(get_default_initial_configs(self.tuner.phps,n_jobs),n_jobs)
-        random_states=np.arange(n_jobs)+self.random_state
+        initial_configs_list = get_chunks(get_default_initial_configs(self.tuner.phps, n_jobs), n_jobs)
+        random_states = np.arange(n_jobs) + self.random_state
+        if n_jobs > 1:
+            sync_dict = Manager().dict()
+            sync_dict["exit_processes"] = self.exit_processes
+        else:
+            sync_dict = None
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
-                joblib.delayed(self.run)(runcount_limit, initial_run,initial_configs,is_master,random_state)
-                for runcount_limit, initial_run,initial_configs,is_master,random_state in
-                zip(runcount_limits, initial_runs,initial_configs_list,is_master_list,random_states)
+                joblib.delayed(self.run)(runcount_limit, initial_run, initial_configs, is_master, random_state,
+                                         sync_dict)
+                for runcount_limit, initial_run, initial_configs, is_master, random_state in
+                zip(runcount_limits, initial_runs, initial_configs_list, is_master_list, random_states)
             )
 
-
-    def run(self, runcount_limit, initial_run, initial_configs, is_master, random_state):
+    def run(self, runcount_limit, initial_run, initial_configs, is_master, random_state, sync_dict=None):
+        sync_dict[os.getpid()] = 0
         tuner = deepcopy(self.tuner)
         resource_manager = deepcopy(self.resource_manager)
         # resource_manager
+        if sync_dict:
+            resource_manager.sync_dict = sync_dict
         resource_manager.set_is_master(is_master)
         resource_manager.smac_output_dir += (f"/{os.getpid()}")
         # random_state: 1. set_hdl中传给phps 2. 传给所有配置
@@ -155,6 +168,7 @@ class AutoPipelineEstimator(BaseEstimator):
             self.splitter,
             initial_configs
         )
+        sync_dict[os.getpid()] = 1
 
     def fit_ensemble(
             self,

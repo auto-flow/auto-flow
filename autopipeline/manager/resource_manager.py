@@ -135,7 +135,7 @@ class ResourceManager():
                 estimator_list.append(loads_pickle(record.models_bit))
             y_true_indexes_list.append(loads_pickle(record.y_true_indexes))
             y_preds_list.append(loads_pickle(record.y_preds))
-        return estimator_list,y_true_indexes_list,y_preds_list
+        return estimator_list, y_true_indexes_list, y_preds_list
 
     def set_is_master(self, is_master):
         self._is_master = is_master
@@ -215,8 +215,18 @@ class ResourceManager():
 
     def delete_models(self):
         # 更新记录各模型基本表现的csv，并删除表现差的模型
+
+        if hasattr(self, "sync_dict"):
+            exit_processes = self.sync_dict.get("exit_processes", 3)
+            records = 0
+            for key, value in self.sync_dict.items():
+                if isinstance(key, int):
+                    records += value
+            if records >= exit_processes:
+                return False
+        # master segment
         if not self.is_master:
-            return
+            return True
         self.init_db()
         estimators = []
         for record in self.Model.select().group_by(self.Model.estimator):
@@ -231,6 +241,7 @@ class ResourceManager():
                         print("delete:" + models_path)
                         self.file_system.delete(models_path)
                 self.Model.delete().where(self.Model.trial_id.in_(should_delete.select(self.Model.trial_id))).execute()
+        return True
 
     def dump_db_to_csv(self):
         # todo: 做成一个分析工具，而不是每次都运行

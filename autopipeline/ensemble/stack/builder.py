@@ -1,15 +1,12 @@
 from copy import deepcopy
 from typing import List, Union, Dict
 
-import numpy as np
-import pandas as pd
-from joblib import load
 from pandas import DataFrame
 from sklearn.linear_model import LogisticRegression, Lasso
 
-from autopipeline.data.xy_data_manager import XYDataManager
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.ensemble.stack.classifier import StackingClassifier
-from autopipeline.utils.resource_manager import ResourceManager
+from autopipeline.manager.resource_manager import ResourceManager
 from general_fs import LocalFS
 
 

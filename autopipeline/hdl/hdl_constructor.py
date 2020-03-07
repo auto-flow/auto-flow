@@ -2,7 +2,7 @@ from importlib import import_module
 from typing import List, Dict
 
 from autopipeline.constants import Task
-from autopipeline.data.xy_data_manager import XYDataManager
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.hdl.default_hp import extract_pure_hdl_db_from_hdl_db, extract_default_hp_from_hdl_db
 from autopipeline.hdl.utils import get_hdl_db, get_default_hdl_db
 from autopipeline.utils.packages import get_class_of_module
