@@ -209,10 +209,7 @@ f1 = make_scorer('f1',
                  sklearn.metrics.f1_score)
 
 # Score functions that need decision values
-roc_auc = make_scorer('roc_auc',
-                      sklearn.metrics.roc_auc_score,
-                      greater_is_better=True,
-                      needs_threshold=True)
+
 average_precision = make_scorer('average_precision',
                                 sklearn.metrics.average_precision_score,
                                 needs_threshold=True)
@@ -231,7 +228,7 @@ pac_score = make_scorer('pac_score',
                         classification_metrics.pac_score,
                         greater_is_better=True,
                         needs_proba=True)
-# TODO what about mathews correlation coefficient etc?
+# TODO cohen_kappa
 
 
 REGRESSION_METRICS = dict()
@@ -241,34 +238,38 @@ for scorer in [r2, mean_squared_error, mean_absolute_error,
 
 CLASSIFICATION_METRICS = dict()
 
-for scorer in [accuracy, roc_auc, average_precision, log_loss,
+for scorer in [accuracy,  average_precision, log_loss,
                balanced_accuracy, pac_score, mcc
                ]:
     CLASSIFICATION_METRICS[scorer.name] = scorer
 
-for name, metric in [('precision', sklearn.metrics.precision_score),
-                     ('recall', sklearn.metrics.recall_score),
-                     ('f1', sklearn.metrics.f1_score),
-                     ('roc_auc', sklearn.metrics.roc_auc_score)
-                     ]:
-    if name == "roc_auc":
-        for multi_class in ["ovo", "ovr"]:
-            for average in ['macro', 'micro', 'samples', 'weighted']:
-                qualified_name = '{0}_{1}_{2}'.format(name, multi_class,average)
-                globals()[qualified_name] = make_scorer(qualified_name,
-                                                        partial(metric,
-                                                                multi_class=multi_class,
-                                                                average=average),needs_proba=True)
-                CLASSIFICATION_METRICS[qualified_name] = globals()[qualified_name]
-        continue
+for multi_class in ["ovo", "ovr"]:
+    for average in ['macro', 'micro', 'samples', 'weighted']:
+        qualified_name = '{0}_{1}_{2}'.format("roc_auc", multi_class, average)
+        globals()[qualified_name] = make_scorer(qualified_name,
+                                                partial(sklearn.metrics.roc_auc_score,
+                                                        multi_class=multi_class,
+                                                        average=average), needs_proba=True)
+        CLASSIFICATION_METRICS[qualified_name] = globals()[qualified_name]
+
+for name, metric in [
+    ('precision', sklearn.metrics.precision_score),
+    ('recall', sklearn.metrics.recall_score),
+    ('f1', sklearn.metrics.f1_score),
+    ('roc_auc', sklearn.metrics.roc_auc_score)
+]:
     globals()[name] = make_scorer(name, metric)
     CLASSIFICATION_METRICS[name] = globals()[name]
     for average in ['macro', 'micro', 'samples', 'weighted']:
         qualified_name = '{0}_{1}'.format(name, average)
-        globals()[qualified_name] = make_scorer(qualified_name,
-                                                partial(metric,
-                                                        pos_label=None,
-                                                        average=average))
+        if name == "roc_auc":
+            globals()[qualified_name] = make_scorer(qualified_name,
+                                                    partial(metric, average=average),
+                                                    needs_threshold=True)
+        else:
+            globals()[qualified_name] = make_scorer(qualified_name,
+                                                    partial(metric,
+                                                            average=average))
         CLASSIFICATION_METRICS[qualified_name] = globals()[qualified_name]
 
 

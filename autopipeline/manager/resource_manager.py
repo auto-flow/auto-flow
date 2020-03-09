@@ -162,7 +162,7 @@ class ResourceManager():
             y_test_pred = pw.BitField(default=0)
             program_hyper_param = pw.BitField(default=0)
             dict_hyper_param = pw.TextField(default="")  # todo: json field
-            cost_time = pw.FloatField(default=0)
+            cost_time = pw.FloatField(default=65535)
             status = pw.CharField(default="success")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
