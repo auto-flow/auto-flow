@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.db
+run
 .idea/
 # C extensions
 *.so
@@ -125,7 +126,6 @@ dmypy.json
 
 # vime file
 *.swp
-test
 # qsar
 predict/
 test_smac

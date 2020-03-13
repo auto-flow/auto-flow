@@ -7,7 +7,7 @@ class OneHotEncoder(AutoPLPreprocessingAlgorithm):
     class__ = "OneHotEncoder"
     module__ = "sklearn.preprocessing"
 
-    def after_trans_X(self,X):
+    def after_pred_X(self, X):
         # todo: 考虑在后续模型中支持系数矩阵
         # todo: 增加encoding方法
         if issparse(X):

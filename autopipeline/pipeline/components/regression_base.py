@@ -10,15 +10,8 @@ class AutoPLRegressionAlgorithm(AutoPLComponent):
     `autosklearn/pipeline/components/regression` to make it available."""
 
 
-    def after_process_pred_y(self,y):
-        return y
+    def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
+        return self.estimator.predict(X_train)
 
     def predict(self, X):
-        X=densify(X)
-        if not self.estimator:
-            raise NotImplementedError()
-        pred_y= self.estimator.predict(X)
-        return self.after_process_pred_y(pred_y)
-
-    def score(self,X,y):
-        return self.estimator.score(X,y)
+        return self.pred_or_trans(X)

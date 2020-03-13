@@ -1,29 +1,24 @@
-from copy import deepcopy
-from typing import Dict
-
 from autopipeline.pipeline.components.base import AutoPLComponent
-from autopipeline.utils.data import densify
 
 
 class AutoPLPreprocessingAlgorithm(AutoPLComponent):
-    """Provide an abstract interface for preprocessing algorithms in
-    auto-sklearn.
 
-    See :ref:`extending` for more information."""
-    def before_trans_X(self, X):
-        return X
+    # def transform(self, X):
+    #     X=densify(X)
+    #     if not self.estimator or (not hasattr(self.estimator, "transform")):
+    #         raise NotImplementedError()
+    #     X=self.before_pred_X(X)
+    #     return self.after_pred_X(self.estimator.transform(X))
 
-    def after_trans_X(self,X):
-        return X
+    def fit_transform(self, X_train=None, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None,
+                      is_train=True):
+        self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+        return self.transform(X_train, X_valid, X_test, is_train)
 
-    def transform(self, X):
-        X=densify(X)
-        if not self.estimator or (not hasattr(self.estimator, "transform")):
-            raise NotImplementedError()
-        X=self.before_trans_X(X)
-        return self.after_trans_X(self.estimator.transform(X))
+    def transform(self, X_train=None, X_valid=None, X_test=None, is_train=False):
+        return self.pred_or_trans(X_train, X_valid, X_test, is_train)
 
-    def fit_transform(self, X, y=None):
-        self.fit(X, y)
-        return self.transform(X)
-
+    def _pred_or_trans(self, X_train, X_valid=None, X_test=None, is_train=False):
+        X_train = self.estimator.transform(X_train)
+        X_valid = self.estimator.transform(X_valid)
+        X_test = self.estimator.transform(X_test)

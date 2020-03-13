@@ -35,7 +35,7 @@ class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
             X[X < 0] = 0.0
         return X
 
-    def before_trans_X(self, X):
+    def before_pred_X(self, X):
         X = deepcopy(X)
         if self.score_func == sklearn.feature_selection.chi2:
             X[X < 0] = 0.0

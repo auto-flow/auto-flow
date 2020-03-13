@@ -19,10 +19,8 @@ def _fit_transform_one(transformer,
         if hasattr(transformer, 'fit_transform'):
             res = transformer.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test, is_train)
         else:
-            res = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, y_train,
-                                                                                                X_valid, y_valid,
-                                                                                                X_test, y_test,
-                                                                                                is_train)
+            res = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test). \
+                transform(X_train,X_valid,X_test,is_train)
 
     return res, transformer
 
@@ -94,7 +92,7 @@ class GeneralPipeline(Pipeline):
     def transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False,
                   with_final=True):
         for _, _, transform in self._iter(with_final=with_final):
-            ret = transform.transform(X_train, y_train, X_valid, y_valid, X_test, y_test, is_train)  # predict procedure
+            ret = transform.transform(X_train,  X_valid,  X_test,  is_train)  # predict procedure
             X_train = ret["X_train"]
             X_valid = ret.get("X_valid")
             X_test = ret.get("X_test")

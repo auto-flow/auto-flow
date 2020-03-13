@@ -1,24 +1,46 @@
 from collections import Counter
 from copy import deepcopy
+from typing import List, Union, Optional
 
+import numpy as np
 import pandas as pd
 
 
-class GeneralDataFram(pd.DataFrame):
+class GeneralDataFrame(pd.DataFrame):
     def __init__(self, *args, **kwargs):
         if "feat_grp" in kwargs:
-            self.feat_grp = kwargs.pop("feat_grp")
+            feat_grp = kwargs.pop("feat_grp")
         else:
-            self.feat_grp = None
-        super(GeneralDataFram, self).__init__(*args, **kwargs)
-        if self.feat_grp is None:
-            self.feat_grp = ["cat"] * self.shape[1]
-        assert (len(self.feat_grp) == self.shape[1])
-        self.feat_grp = pd.Series(self.feat_grp)
-        self.origin_grp = deepcopy(self.feat_grp)
+            feat_grp = None
+        if "origin_grp" in kwargs:
+            origin_grp = kwargs.pop("origin_grp")
+        else:
+            origin_grp = None
+        super(GeneralDataFrame, self).__init__(*args, **kwargs)
+        if feat_grp is None:
+            feat_grp = ["cat"] * self.shape[1]
+        assert (len(feat_grp) == self.shape[1])
+        self.set_feat_grp(pd.Series(feat_grp))
+        if origin_grp is None:
+            origin_grp = deepcopy(feat_grp)
+        self.set_origin_grp(pd.Series(origin_grp))
+
+    @property
+    def feat_grp(self):
+        return self.__dict__["feat_grp"]
+
+    @property
+    def origin_grp(self):
+        return self.__dict__["origin_grp"]
+
+    def set_feat_grp(self, feat_grp):
+        self.__dict__["feat_grp"] = feat_grp
+
+    def set_origin_grp(self, origin_grp):
+        self.__dict__["origin_grp"] = origin_grp
 
     def __repr__(self):
-        return super(GeneralDataFram, self).__repr__() + "\n" + repr(Counter(self.feat_grp))
+        return super(GeneralDataFrame, self).__repr__() + "\n" + repr(Counter(self.feat_grp))
 
     def drop(
             self,
@@ -36,7 +58,7 @@ class GeneralDataFram(pd.DataFrame):
             assert columns_ is not None
             feat_grp = self.feat_grp[~self.columns.isin(columns_)]
             origin_grp = self.origin_grp[~self.columns.isin(columns_)]
-        ret = super(GeneralDataFram, self).drop(
+        ret = super(GeneralDataFrame, self).drop(
             labels=labels,
             axis=axis,
             index=index,
@@ -50,6 +72,62 @@ class GeneralDataFram(pd.DataFrame):
                 self.feat_grp = feat_grp
                 self.origin_grp = origin_grp
             else:
-                ret.feat_grp=feat_grp
-                ret.origin_grp=origin_grp
+                ret.feat_grp = feat_grp
+                ret.origin_grp = origin_grp
         return ret
+
+    def filter_feat_grp(self, feat_grp: Union[List, str], copy=False, isin=True):  # , inplace=False
+        # 用于过滤feat_grp
+        if isinstance(feat_grp, str):
+            feat_grp = [feat_grp]
+        if copy:
+            ret = deepcopy(self)
+            ret = GeneralDataFrame(ret, feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+        else:
+            ret = self
+        loc = ret.feat_grp.isin(feat_grp)
+        if not isin:
+            loc = (~loc)
+        ret.set_feat_grp(ret.feat_grp[loc])
+        ret.set_origin_grp(ret.origin_grp[loc])
+        loc_df = ret.loc[:, ret.columns[loc]]
+        return GeneralDataFrame(loc_df, feat_grp=ret.feat_grp, origin_grp=ret.origin_grp)
+
+    def concat_two(self, df1, df2):
+        assert isinstance(df1, GeneralDataFrame)
+        assert isinstance(df2, GeneralDataFrame)
+        new_df = pd.concat([df1, df2])
+        new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp])
+        new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp])
+        return GeneralDataFrame(new_df, feat_grp=new_feat_grp, origin_grp=new_origin_grp)
+
+    def replace_feat_grp(self, old_feat_grp: Union[List, str], values: np.ndarray, new_feat_grp: str,
+                         new_origin_grp: Optional[str] = None):
+        if isinstance(old_feat_grp, str):
+            old_feat_grp = [old_feat_grp]
+        if new_origin_grp is None:
+            selected_origin_grp = self.origin_grp[self.feat_grp.isin(old_feat_grp)]
+            unique = pd.unique(selected_origin_grp)
+            new_origin_grp = unique[0]
+        replaced_columns = self.columns[self.feat_grp.isin(old_feat_grp)]
+        if len(replaced_columns) == values.shape[1]:
+            columns = replaced_columns
+        else:
+            columns = list(map(lambda x: f"{new_feat_grp}_{x}", range(len(new_feat_grp))))
+        deleted_df = self.filter_feat_grp(old_feat_grp, True, False)
+        new_df = GeneralDataFrame(pd.DataFrame(values, columns=columns), feat_grp=new_feat_grp,
+                                  origin_grp=new_origin_grp)
+        return self.concat_two(deleted_df, new_df)
+
+import unittest
+
+class TestGeneralDataFrame(unittest.TestCase):
+    def test_filter_feat_grp(self):
+        pass
+
+
+if __name__ == '__main__':
+    df = pd.read_csv("/home/tqc/PycharmProjects/auto-pipeline/examples/classification/train_classification.csv")
+    df2 = GeneralDataFrame(df, feat_grp=["id"] + ["num"] * 2 + ["cat"] * 9)
+    df3 = df2.filter_feat_grp(["num", "id"])
+    print(df3)

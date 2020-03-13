@@ -9,5 +9,5 @@ class LibLinear_SVR(AutoPLRegressionAlgorithm):
         self.scaler=StandardScaler(copy=True)
         return self.scaler.fit(y.reshape((-1,1))).ravel()
 
-    def after_process_pred_y(self,y):
+    def after_pred(self, y):
         return self.scaler.inverse_transform(y)

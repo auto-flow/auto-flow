@@ -120,6 +120,8 @@ def softmax(df):
 
 
 def densify(X):
+    if X is None:
+        return X
     if issparse(X):
         return X.todense().getA()
     else:

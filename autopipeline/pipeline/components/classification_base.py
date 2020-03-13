@@ -15,23 +15,21 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
     def isOVR(self):
         return self.OVR__
 
-    def after_process_estimator(self, estimator, X, y):
-        if self.isOVR() and get_task_from_y(y).subTask != "binary":
+    def after_process_estimator(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
+                                y_test=None):
+        # def after_process_estimator(self, estimator, X, y):
+        if self.isOVR() and get_task_from_y(y_train).subTask != "binary":
             estimator = OneVsRestClassifier(estimator, n_jobs=1)
         return estimator
 
-    def after_process_pred_y(self, y):
-        return y
+    def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
+        return self.estimator.predict(X_train)
 
     def predict(self, X):
-        X = densify(X)
-        if not self.estimator:
-            raise NotImplementedError()
-        pred_y = self.estimator.predict(X)
-        return self.after_process_pred_y(pred_y)
+        return self.pred_or_trans(X)
 
     def predict_proba(self, X):
-        X = densify(X)
+        X = self.preprocess_data(X)
         if not self.estimator:
             raise NotImplementedError()
         if not hasattr(self, "predict_proba"):
