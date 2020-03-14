@@ -30,6 +30,8 @@ class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
         return hyperparams
 
     def before_fit_X(self, X):
+        if X is None:
+            return None
         X = deepcopy(X)
         if self.score_func == sklearn.feature_selection.chi2:
             X[X < 0] = 0.0

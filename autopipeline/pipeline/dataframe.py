@@ -76,7 +76,7 @@ class GeneralDataFrame(pd.DataFrame):
                 ret.origin_grp = origin_grp
         return ret
 
-    def filter_feat_grp(self, feat_grp: Union[List, str], copy=False, isin=True):  # , inplace=False
+    def filter_feat_grp(self, feat_grp: Union[List, str], copy=True, isin=True):  # , inplace=False
         # 用于过滤feat_grp
         if isinstance(feat_grp, str):
             feat_grp = [feat_grp]
@@ -96,38 +96,62 @@ class GeneralDataFrame(pd.DataFrame):
     def concat_two(self, df1, df2):
         assert isinstance(df1, GeneralDataFrame)
         assert isinstance(df2, GeneralDataFrame)
-        new_df = pd.concat([df1, df2])
-        new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp])
-        new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp])
+        new_df = pd.concat([df1, df2],axis=1)
+        # todo: 杜绝重复列
+        new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp],ignore_index=True)
+        new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp],ignore_index=True)
         return GeneralDataFrame(new_df, feat_grp=new_feat_grp, origin_grp=new_origin_grp)
 
     def replace_feat_grp(self, old_feat_grp: Union[List, str], values: np.ndarray, new_feat_grp: str,
                          new_origin_grp: Optional[str] = None):
         if isinstance(old_feat_grp, str):
             old_feat_grp = [old_feat_grp]
+        # 如果参数new_origin_grp为None，根据长度是否改变对new_origin_grp进行赋值
         if new_origin_grp is None:
             selected_origin_grp = self.origin_grp[self.feat_grp.isin(old_feat_grp)]
-            unique = pd.unique(selected_origin_grp)
-            new_origin_grp = unique[0]
+            if len(selected_origin_grp) == values.shape[1]:
+                new_origin_grp = list(selected_origin_grp)
+            else:
+                unique = pd.unique(selected_origin_grp)
+                new_origin_grp = str(unique[0])
+        # 将new_origin_grp从str表达为list
+        if isinstance(new_origin_grp, list):
+            assert len(new_origin_grp) == values.shape[1]
+        elif isinstance(new_origin_grp,str):
+            # assert isinstance(new_origin_grp, str)
+            new_origin_grp = [new_origin_grp] * values.shape[1]
+        # 将 new_feat_grp 从str表达为list
+        new_feat_grps = [new_feat_grp] * values.shape[1]
+        # new_df 的 columns
         replaced_columns = self.columns[self.feat_grp.isin(old_feat_grp)]
         if len(replaced_columns) == values.shape[1]:
             columns = replaced_columns
         else:
-            columns = list(map(lambda x: f"{new_feat_grp}_{x}", range(len(new_feat_grp))))
+            columns = list(map(lambda x: f"{new_feat_grp}_{x}", range(len(new_feat_grps))))
+        # 开始构造df
         deleted_df = self.filter_feat_grp(old_feat_grp, True, False)
-        new_df = GeneralDataFrame(pd.DataFrame(values, columns=columns), feat_grp=new_feat_grp,
+        new_df = GeneralDataFrame(pd.DataFrame(values, columns=columns), feat_grp=new_feat_grps,
                                   origin_grp=new_origin_grp)
         return self.concat_two(deleted_df, new_df)
-
-import unittest
-
-class TestGeneralDataFrame(unittest.TestCase):
-    def test_filter_feat_grp(self):
-        pass
 
 
 if __name__ == '__main__':
     df = pd.read_csv("/home/tqc/PycharmProjects/auto-pipeline/examples/classification/train_classification.csv")
-    df2 = GeneralDataFrame(df, feat_grp=["id"] + ["num"] * 2 + ["cat"] * 9)
-    df3 = df2.filter_feat_grp(["num", "id"])
+    suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
+    feat_grp = ["id"] + suffix
+
+    df2 = GeneralDataFrame(df, feat_grp=feat_grp)
+    # 测试1->2
+    selected = df2.filter_feat_grp("id").values
+    selected = np.hstack([selected, selected])
+    df3 = df2.replace_feat_grp("id", selected, "id2")
+    print(df3)
+    # 测试1->1
+    selected = df2.filter_feat_grp("id").values
+    selected = np.hstack([selected])
+    df3 = df2.replace_feat_grp("id", selected, "id2")
+    print(df3)
+    selected = df2.filter_feat_grp("id").values
+    selected = np.zeros([selected.shape[0], 0])
+    df3 = df2.replace_feat_grp("id", selected, "id2")
     print(df3)

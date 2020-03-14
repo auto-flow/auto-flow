@@ -22,8 +22,10 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
             estimator = OneVsRestClassifier(estimator, n_jobs=1)
         return estimator
 
-    def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
-        return self.estimator.predict(X_train)
+    # def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
+    def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
+                       is_train=False):
+        return self.estimator.predict(X_train_)
 
     def predict(self, X):
         return self.pred_or_trans(X)

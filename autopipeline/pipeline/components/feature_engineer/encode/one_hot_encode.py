@@ -1,16 +1,14 @@
 from scipy.sparse import issparse
 
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
+from autopipeline.pipeline.components.utils import stack_Xs
 
-__all__=["OneHotEncoder"]
+__all__ = ["OneHotEncoder"]
+
+
 class OneHotEncoder(AutoPLPreprocessingAlgorithm):
     class__ = "OneHotEncoder"
     module__ = "sklearn.preprocessing"
 
-    def after_pred_X(self, X):
-        # todo: 考虑在后续模型中支持系数矩阵
-        # todo: 增加encoding方法
-        if issparse(X):
-            return X.todense().getA()
-        else:
-            return X
+    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
+        return stack_Xs(X_train, X_valid, X_test)

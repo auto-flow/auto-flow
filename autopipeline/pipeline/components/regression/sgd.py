@@ -10,6 +10,8 @@ class SGD(
     class__ = "SGDRegressor"
 
     def before_fit_y(self, y):
+        if y is None:
+            return None
         self.scaler = StandardScaler(copy=True)
         return self.scaler.fit(y.reshape((-1, 1))).ravel()
 

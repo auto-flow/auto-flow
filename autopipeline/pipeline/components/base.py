@@ -78,16 +78,17 @@ class AutoPLComponent(BaseEstimator):
     def after_pred(self, y):
         return y
 
-    def _pred_or_trans(self, X_train, X_valid=None, X_test=None, is_train=False):
+    def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
+                       is_train=False):
         raise NotImplementedError
 
     def pred_or_trans(self, X_train, X_valid=None, X_test=None, is_train=False):
-        X_train = self.preprocess_data(X_train)
-        X_valid = self.preprocess_data(X_valid)
-        X_test = self.preprocess_data(X_test)
+        X_train_ = self.preprocess_data(X_train)
+        X_valid_ = self.preprocess_data(X_valid)
+        X_test_ = self.preprocess_data(X_test)
         if not self.estimator:
             raise NotImplementedError()
-        return self._pred_or_trans(X_train, X_valid, X_test, is_train)
+        return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, is_train)
 
     def filter_invalid(self, cls, hyperparams: Dict) -> Dict:
         validated = {}
@@ -151,10 +152,13 @@ class AutoPLComponent(BaseEstimator):
 
         return self
 
+    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
+        return X_train
+
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None):
         # 保留其他数据集的参数，方便模型拓展
-        estimator.fit(X_train, y_train)
+        estimator.fit(self.prepare_X_to_fit(X_train, X_valid, X_test), y_train)
 
     def set_addition_info(self, dict_: dict):
         for key, value in dict_.items():
