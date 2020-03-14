@@ -103,12 +103,16 @@ class AutoPLComponent(BaseEstimator):
     def get_properties():
         raise NotImplementedError()
 
-    def preprocess_data(self, X: Optional[GeneralDataFrame]):
+    def preprocess_data(self, X: Optional[GeneralDataFrame], extract_info=False):
         # todo 考虑在这里多densify
         if X is None:
             return None
         elif isinstance(X, GeneralDataFrame):
-            return X.filter_feat_grp(self.in_feat_grp).values
+            df = X.filter_feat_grp(self.in_feat_grp)
+            if extract_info:
+                return df.values, df.feat_grp, df.origin_grp
+            else:
+                return df.values
         elif isinstance(X, pd.DataFrame):
             return X.values
         elif isinstance(X, np.ndarray):
@@ -119,8 +123,10 @@ class AutoPLComponent(BaseEstimator):
     def fit(self, X_train, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
+        # todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？
         # 只选择当前需要的feat_grp
-        X_train_ = self.preprocess_data(X_train)
+        assert isinstance(X_train, GeneralDataFrame)
+        X_train_, feat_grp, origin_grp = self.preprocess_data(X_train,True)
         X_valid_ = self.preprocess_data(X_valid)
         X_test_ = self.preprocess_data(X_test)
         # 通过以上步骤，保证所有的X都是np.ndarray 形式
@@ -148,7 +154,7 @@ class AutoPLComponent(BaseEstimator):
         X_valid_ = densify(X_valid_)
         X_test_ = densify(X_test_)
         self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
-                  y_test)
+                  y_test,feat_grp,origin_grp)
 
         return self
 
@@ -156,7 +162,7 @@ class AutoPLComponent(BaseEstimator):
         return X_train
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
-             y_test=None):
+             y_test=None,feat_grp=None,origin_grp=None):
         # 保留其他数据集的参数，方便模型拓展
         estimator.fit(self.prepare_X_to_fit(X_train, X_valid, X_test), y_train)
 

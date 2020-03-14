@@ -4,6 +4,8 @@ from sklearn.utils import _print_elapsed_time
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
+from autopipeline.constants import Task
+
 
 def _fit_transform_one(transformer,
                        X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False,
@@ -20,7 +22,7 @@ def _fit_transform_one(transformer,
             res = transformer.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test, is_train)
         else:
             res = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test). \
-                transform(X_train,X_valid,X_test,is_train)
+                transform(X_train, X_valid, X_test, is_train)
 
     return res, transformer
 
@@ -83,16 +85,34 @@ class GeneralPipeline(Pipeline):
         X_train = ret["X_train"]
         X_valid = ret.get("X_valid")
         X_test = ret.get("X_test")
+        self.last_data = ret
         with _print_elapsed_time('Pipeline',
                                  self._log_message(len(self.steps) - 1)):
             if self._final_estimator != 'passthrough':
                 self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         return self
 
-    def transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False,
+    def procedure(self, task: Task, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
+        self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+        X_train = self.last_data["X_train"]
+        X_valid = self.last_data.get("X_valid")
+        X_test = self.last_data.get("X_test")
+        self.last_data = None  # GC
+        if task.mainTask == "classification":
+            pred_valid = self._final_estimator.predict_proba(X_valid)
+            pred_test = self._final_estimator.predict_proba(X_test) if X_test is not None else None
+        else:
+            pred_valid = self._final_estimator.predict(X_valid)
+            pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
+        return {
+            "pred_valid":pred_valid,
+            "pred_test":pred_test,
+        }
+
+    def transform(self, X_train, X_valid=None, X_test=None, is_train=False,
                   with_final=True):
         for _, _, transform in self._iter(with_final=with_final):
-            ret = transform.transform(X_train,  X_valid,  X_test,  is_train)  # predict procedure
+            ret = transform.transform(X_train, X_valid, X_test, is_train)  # predict procedure
             X_train = ret["X_train"]
             X_valid = ret.get("X_valid")
             X_test = ret.get("X_test")

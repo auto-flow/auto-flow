@@ -96,10 +96,11 @@ class GeneralDataFrame(pd.DataFrame):
     def concat_two(self, df1, df2):
         assert isinstance(df1, GeneralDataFrame)
         assert isinstance(df2, GeneralDataFrame)
-        new_df = pd.concat([df1, df2],axis=1)
+
+        new_df = pd.concat([df1, df2], axis=1)
         # todo: 杜绝重复列
-        new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp],ignore_index=True)
-        new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp],ignore_index=True)
+        new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp], ignore_index=True)
+        new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp], ignore_index=True)
         return GeneralDataFrame(new_df, feat_grp=new_feat_grp, origin_grp=new_origin_grp)
 
     def replace_feat_grp(self, old_feat_grp: Union[List, str], values: np.ndarray, new_feat_grp: str,
@@ -117,7 +118,7 @@ class GeneralDataFrame(pd.DataFrame):
         # 将new_origin_grp从str表达为list
         if isinstance(new_origin_grp, list):
             assert len(new_origin_grp) == values.shape[1]
-        elif isinstance(new_origin_grp,str):
+        elif isinstance(new_origin_grp, str):
             # assert isinstance(new_origin_grp, str)
             new_origin_grp = [new_origin_grp] * values.shape[1]
         # 将 new_feat_grp 从str表达为list
@@ -132,7 +133,12 @@ class GeneralDataFrame(pd.DataFrame):
         deleted_df = self.filter_feat_grp(old_feat_grp, True, False)
         new_df = GeneralDataFrame(pd.DataFrame(values, columns=columns), feat_grp=new_feat_grps,
                                   origin_grp=new_origin_grp)
+        new_df.index=deleted_df.index
         return self.concat_two(deleted_df, new_df)
+
+    def split(self, indexes):
+        for index in indexes:
+            yield GeneralDataFrame(self.iloc[index, :], feat_grp=self.feat_grp, origin_grp=self.origin_grp)
 
 
 if __name__ == '__main__':

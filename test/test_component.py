@@ -1,19 +1,31 @@
 import unittest
+
 import pandas as pd
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold, train_test_split
 
 from autopipeline.pipeline.components.classification.sgd import SGD
 from autopipeline.pipeline.components.feature_engineer.encode.one_hot_encode import OneHotEncoder
 from autopipeline.pipeline.components.feature_engineer.impute.fill_cat import FillCat
 from autopipeline.pipeline.components.feature_engineer.impute.fill_num import FillNum
 from autopipeline.pipeline.dataframe import GeneralDataFrame
-from sklearn.metrics import accuracy_score
+
 
 class TestComponent(unittest.TestCase):
     def test_procedure(self):
         df = pd.read_csv("../examples/classification/train_classification.csv")
         y = df.pop("Survived").values
         df = df.loc[:, ["Sex", "Cabin", "Age"]]
-        df2 = GeneralDataFrame(df, feat_grp=["cat_nan", "cat_nan", "num_nan"])
+        feat_grp = ["cat_nan", "cat_nan", "num_nan"]
+        df_train, df_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=10)
+        df_train = GeneralDataFrame(df_train, feat_grp=feat_grp)
+        df_test = GeneralDataFrame(df_test, feat_grp=feat_grp)
+        cv = KFold(n_splits=5, random_state=10, shuffle=True)
+        train_ix, valid_ix = next(cv.split(df_train))
+
+        df_train, df_valid = df_train.split([train_ix, valid_ix])
+        y_valid = y_train[valid_ix]
+        y_train = y_train[train_ix]
 
         fill_cat = FillCat()
         fill_cat.in_feat_grp = "cat_nan"
@@ -31,14 +43,21 @@ class TestComponent(unittest.TestCase):
 
         sgd = SGD()
         sgd.in_feat_grp = "num"
-        sgd.update_hyperparams({"loss": "log"})
+        sgd.update_hyperparams({"loss": "log", "random_state": 10})
 
-        ret1 = fill_cat.fit_transform(df2)
+        ret1 = fill_cat.fit_transform(df_train, y_train, df_valid, y_valid, df_test)
         ret2 = fill_num.fit_transform(**ret1)
         ret3 = ohe.fit_transform(**ret2)
-        sgd.fit(**ret3, y_train=y)
+        sgd.fit(**ret3, y_train=y_train)
+
+        y_pred = sgd.predict(ret3["X_valid"])
+        acc_valid = accuracy_score(y_valid, y_pred)
+        print(acc_valid)
 
         y_pred = sgd.predict(ret3["X_train"])
-        y_score = sgd.predict_proba(ret3["X_train"])
-        self.assertEqual(len(y_pred),len(y))
-        self.assertGreater(accuracy_score(y,y_pred),0.5)
+        acc_train = accuracy_score(y_train, y_pred)
+        print(acc_train)
+
+        y_pred = sgd.predict(ret3["X_test"])
+        acc_test = accuracy_score(y_test, y_pred)
+        print(acc_test)
