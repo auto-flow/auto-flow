@@ -33,6 +33,7 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
             return None
         X_ = self._transform_proc(X_)
         X_ = densify(X_)  # todo: 改为判断的形式？
+        X_ = self.before_trans_X(X_)
         return X.replace_feat_grp(self.in_feat_grp, X_, self.out_feat_grp)
 
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
@@ -45,3 +46,6 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
             "X_valid": X_valid,
             "X_test": X_test,
         }
+
+    def before_trans_X(self, X):
+        return X

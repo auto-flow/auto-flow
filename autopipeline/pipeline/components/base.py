@@ -69,15 +69,6 @@ class AutoPLComponent(BaseEstimator):
     def before_fit_y(self, y):
         return y
 
-    def before_pred_X(self, X):
-        return X
-
-    def after_pred_X(self, X):
-        return X
-
-    def after_pred(self, y):
-        return y
-
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
                        is_train=False):
         raise NotImplementedError
@@ -104,7 +95,7 @@ class AutoPLComponent(BaseEstimator):
         raise NotImplementedError()
 
     def preprocess_data(self, X: Optional[GeneralDataFrame], extract_info=False):
-        # todo 考虑在这里多densify
+        # todo 考虑在这                                                                                                                                                                                                   里多densify
         if X is None:
             return None
         elif isinstance(X, GeneralDataFrame):
@@ -126,7 +117,7 @@ class AutoPLComponent(BaseEstimator):
         # todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？
         # 只选择当前需要的feat_grp
         assert isinstance(X_train, GeneralDataFrame)
-        X_train_, feat_grp, origin_grp = self.preprocess_data(X_train,True)
+        X_train_, feat_grp, origin_grp = self.preprocess_data(X_train, True)
         X_valid_ = self.preprocess_data(X_valid)
         X_test_ = self.preprocess_data(X_test)
         # 通过以上步骤，保证所有的X都是np.ndarray 形式
@@ -153,16 +144,17 @@ class AutoPLComponent(BaseEstimator):
         X_train_ = densify(X_train_)
         X_valid_ = densify(X_valid_)
         X_test_ = densify(X_test_)
-        self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
-                  y_test,feat_grp,origin_grp)
-
+        # todo: 测试特征全部删除的情况
+        if len(X_train_.shape) > 1 and X_train_.shape[1] > 0:
+            self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
+                      y_test, feat_grp, origin_grp)
         return self
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
         return X_train
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
-             y_test=None,feat_grp=None,origin_grp=None):
+             y_test=None, feat_grp=None, origin_grp=None):
         # 保留其他数据集的参数，方便模型拓展
         estimator.fit(self.prepare_X_to_fit(X_train, X_valid, X_test), y_train)
 

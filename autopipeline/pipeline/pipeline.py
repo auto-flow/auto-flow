@@ -130,7 +130,7 @@ class GeneralPipeline(Pipeline):
         X = ret["X_train"]
         return self.steps[-1][-1].predict_proba(X)
 
-    def fit_transform(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False):
+    def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False):
         last_step = self._final_estimator
         ret = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         X_train = ret["X_train"]
