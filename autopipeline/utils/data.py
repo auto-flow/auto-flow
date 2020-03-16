@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import math
 
+import pandas as pd
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
@@ -150,6 +151,15 @@ def get_chunks(iterable, chunks=1):
     # This is from http://stackoverflow.com/a/2136090/2073595
     lst = list(iterable)
     return [lst[i::chunks] for i in range(chunks)]
+
+
+def is_cat(s:pd.Series):
+    for elem in s:
+        if isinstance(elem,(float,int)):
+            continue
+        else:
+            return True
+    return False
 
 
 

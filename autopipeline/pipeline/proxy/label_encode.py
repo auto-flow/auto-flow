@@ -1,39 +1,41 @@
 import numpy as np
+import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.preprocessing import LabelEncoder as SklearnLabelEncoder
-import pandas as pd
+
+from autopipeline.pipeline.components.utils import arraylize
 
 __all__ = ["LabelEncoder"]
 
 
 class LabelEncoder(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None):
-        if isinstance(X,pd.DataFrame):
-            X=X.values
+        X=arraylize(X)
         encoders = []
         for i in range(X.shape[1]):
-            encoder = SklearnLabelEncoder().fit(X[:, i].ravel())
+            cur = X[:, i]
+            encoder = SklearnLabelEncoder().fit(cur[cur != -999])
             encoders.append(encoder)
         self.encoders = encoders
         return self
 
     def transform(self, X, y=None):
-        if isinstance(X,pd.DataFrame):
-            X=X.values
+        X=arraylize(X)
         arrs = []
         assert X.shape[1] == len(self.encoders)
         for i in range(X.shape[1]):
+            cur = X[:, i]
+            arr = np.zeros_like(cur)
             encoder = self.encoders[i]
-            arr = encoder.transform(X[:, i].ravel())
+            arr[cur != -999] = encoder.transform(cur[cur != -999])
+            arr[cur == -999] = -999
             arrs.append(arr)
         return np.vstack(arrs).T
 
-    # def fit_transform(self, X, y=None, **fit_params):
-    #     self.fit(X,y)
-    #     return self.transform(X,y)
 
 if __name__ == '__main__':
     import pandas as pd
+
     df = pd.read_csv("/home/tqc/PycharmProjects/auto-pipeline/examples/classification/train_classification.csv")
-    encoded=LabelEncoder().fit_transform(df[["Sex","Cabin"]].fillna("nan"))
+    encoded = LabelEncoder().fit_transform(df[["Sex", "Cabin"]].fillna("nan"))
     print(encoded)

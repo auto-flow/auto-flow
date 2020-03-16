@@ -7,7 +7,7 @@ __all__ = ["SplitCat"]
 
 class SplitCat(BaseSplit):
     def calc_R(self, col, rows):
-        return np.unique(col).size / rows
+        return np.unique(col.astype("str")).size / rows
 
     key1_hp_name = "highR_cat_name"
     key2_hp_name = "lowR_cat_name"

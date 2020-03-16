@@ -13,5 +13,6 @@ class KNearestNeighborsClassifier(AutoPLClassificationAlgorithm):
 
     def after_process_hyperparams(self, hyperparams) -> Dict:
         hyperparams = super(KNearestNeighborsClassifier, self).after_process_hyperparams(hyperparams)
-        hyperparams["n_neighbors"] = min(self.shape[0] - 1, hyperparams["n_neighbors"])
+        if "n_neighbors" in self.hyperparams:
+            hyperparams["n_neighbors"] = min(self.shape[0] - 1, hyperparams["n_neighbors"])
         return hyperparams

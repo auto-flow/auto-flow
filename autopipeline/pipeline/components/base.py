@@ -101,11 +101,11 @@ class AutoPLComponent(BaseEstimator):
         elif isinstance(X, GeneralDataFrame):
             df = X.filter_feat_grp(self.in_feat_grp)
             if extract_info:
-                return df.values, df.feat_grp, df.origin_grp
+                return df, df.feat_grp, df.origin_grp
             else:
-                return df.values
+                return df
         elif isinstance(X, pd.DataFrame):
-            return X.values
+            return X
         elif isinstance(X, np.ndarray):
             return X
         else:
@@ -186,3 +186,6 @@ class AutoPLComponent(BaseEstimator):
             return n_components
         else:
             raise NotImplementedError()
+
+    def before_pred_X(self,X):
+        return X

@@ -1,10 +1,10 @@
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 from autopipeline.pipeline.components.utils import stack_Xs
 
-__all__ = ["OneHotEncoder"]
+__all__ = ["LabelEncoder"]
 
 
-class OneHotEncoder(AutoPLPreprocessingAlgorithm):
+class LabelEncoder(AutoPLPreprocessingAlgorithm):
     class__ = "LabelEncoder"
     module__ = "autopipeline.pipeline.proxy.label_encode"
 

@@ -25,7 +25,7 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
     # def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
                        is_train=False):
-        return self.estimator.predict(X_train_)
+        return self.estimator.predict(self.before_pred_X(X_train_))
 
     def predict(self, X):
         return self.pred_or_trans(X)
@@ -36,11 +36,11 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
             raise NotImplementedError()
         if not hasattr(self, "predict_proba"):
             if hasattr(self, "decision_function"):
-                df = self.estimator.decision_function(X)
+                df = self.estimator.decision_function(self.before_pred_X(X))
                 return softmax(df)
             else:
                 raise NotImplementedError()
-        return self.estimator.predict_proba(X)
+        return self.estimator.predict_proba(self.before_pred_X(X))
 
     def score(self, X, y):
         X = densify(X)

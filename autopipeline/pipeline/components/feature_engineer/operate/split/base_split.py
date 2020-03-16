@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Optional
 
 import numpy as np
-
+import pandas as pd
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 from autopipeline.pipeline.dataframe import GeneralDataFrame
 
@@ -75,11 +75,11 @@ class BaseSplit(AutoPLPreprocessingAlgorithm):
             feat_grp = [feat_grp_name] * len(origin_grp)
             if X.shape == (0,):
                 X = np.zeros([X_origin.shape[0], 0])
-            df = GeneralDataFrame(X, feat_grp=feat_grp, origin_grp=origin_grp)
+            df = GeneralDataFrame(pd.DataFrame(X,columns= dict_["col_name"]), feat_grp=feat_grp, origin_grp=origin_grp)
             dfs.append(df)
         assert len(dfs) == 2
         df = dfs[0].concat_two(dfs[0], dfs[1])
-        return X_origin.replace_feat_grp(self.in_feat_grp, df.values, df.feat_grp, df.origin_grp)
+        return X_origin.replace_feat_grp(self.in_feat_grp, df, df.feat_grp, df.origin_grp)
 
     def transform(self, X_train=None, X_valid=None, X_test=None, is_train=False):
         return {

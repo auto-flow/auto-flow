@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from autopipeline.pipeline.components.feature_engineer.operate.split.base_split import BaseSplit
+from autopipeline.utils.data import is_cat
 
 __all__ = ["SplitCatNum"]
 
@@ -18,7 +19,7 @@ class SplitCatNum(BaseSplit):
     key2 = "num"
 
     def judge_keyname(self, col: pd.Series, rows):
-        if col.dtype == object:
+        if is_cat(col):
             keyname = self.key1
         else:
             keyname = self.key2

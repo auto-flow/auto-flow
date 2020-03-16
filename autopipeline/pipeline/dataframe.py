@@ -1,4 +1,3 @@
-from collections import Counter
 from copy import deepcopy
 from typing import List, Union
 
@@ -40,41 +39,7 @@ class GeneralDataFrame(pd.DataFrame):
         self.__dict__["origin_grp"] = origin_grp
 
     def __repr__(self):
-        return super(GeneralDataFrame, self).__repr__() + "\n" + repr(Counter(self.feat_grp))
-
-    def drop(
-            self,
-            labels=None,
-            axis=0,
-            index=None,
-            columns=None,
-            level=None,
-            inplace=False,
-            errors="raise",
-    ):
-
-        if axis == 1:
-            columns_ = labels or columns
-            assert columns_ is not None
-            feat_grp = self.feat_grp[~self.columns.isin(columns_)]
-            origin_grp = self.origin_grp[~self.columns.isin(columns_)]
-        ret = super(GeneralDataFrame, self).drop(
-            labels=labels,
-            axis=axis,
-            index=index,
-            columns=columns,
-            level=level,
-            inplace=inplace,
-            errors=errors,
-        )
-        if axis == 1:
-            if inplace:
-                self.feat_grp = feat_grp
-                self.origin_grp = origin_grp
-            else:
-                ret.feat_grp = feat_grp
-                ret.origin_grp = origin_grp
-        return ret
+        return super(GeneralDataFrame, self).__repr__() + "\n" + repr((self.feat_grp))
 
     def filter_feat_grp(self, feat_grp: Union[List, str], copy=True, isin=True):  # , inplace=False
         # 用于过滤feat_grp
@@ -125,17 +90,19 @@ class GeneralDataFrame(pd.DataFrame):
             assert len(new_origin_grp) == values.shape[1]
 
         # 将 new_feat_grp 从str表达为list
-        if isinstance(new_feat_grp,str):
+        if isinstance(new_feat_grp, str):
             new_feat_grp = [new_feat_grp] * values.shape[1]
         # new_df 的 columns
         replaced_columns = self.columns[self.feat_grp.isin(old_feat_grp)]
         if len(replaced_columns) == values.shape[1]:
             columns = replaced_columns
         else:
-            columns = list(map(lambda i,x: f"{x}_{i}", enumerate(new_feat_grp)))
+            columns = [f"{x}_{i}" for i, x in enumerate(new_feat_grp)]
         # 开始构造df
+        if isinstance(values, np.ndarray):
+            values = pd.DataFrame(values, columns=columns)
         deleted_df = self.filter_feat_grp(old_feat_grp, True, False)
-        new_df = GeneralDataFrame(pd.DataFrame(values, columns=columns), feat_grp=new_feat_grp,
+        new_df = GeneralDataFrame(values, feat_grp=new_feat_grp,
                                   origin_grp=new_origin_grp)
         new_df.index = deleted_df.index
         return self.concat_two(deleted_df, new_df)
