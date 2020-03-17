@@ -2,9 +2,9 @@ from typing import Dict
 
 import numpy as np
 
-from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
 from autopipeline.tuner.base import PipelineTuner
@@ -64,7 +64,7 @@ class SmacPipelineTuner(PipelineTuner):
             },
             # distributer=self.distributer,
             initial_runs=self.initial_runs,
-            # after_run_callback=self.evaluator.resource_manager.delete_models,
+            after_run_callback=self.evaluator.resource_manager.delete_models,
             db_type=self.resource_manager.db_type,
             db_args=self.resource_manager.rh_db_args,
             db_kwargs=self.resource_manager.rh_db_kwargs,
@@ -76,15 +76,7 @@ class SmacPipelineTuner(PipelineTuner):
             tae_runner=self.evaluator,
             initial_configurations=initial_configs
         )
-        # 这个函数中用了一个异常捕获，如果有键盘中断的现象，仍然可以做完后处理然后退出
-        # self.incumbent = smac.optimize()
-        smac.solver.start_()
-        for i in range(self.runcount_limit):
-            smac.solver.run_()
-            status=self.resource_manager.delete_models()
-            if not status:
-                print("break")
-                break
+        self.incumbent = smac.optimize()
 
     def php2model(self, php):
         php2dhp = SmacPHP2DHP()
