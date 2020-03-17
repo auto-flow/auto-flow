@@ -52,18 +52,18 @@ class BaseSplit(AutoPLPreprocessingAlgorithm):
         if X_origin is None:
             return None
         X = X_origin.filter_feat_grp(self.in_feat_grp)
-        highR_cat_name = self.hyperparams.get(self.key1_hp_name, self.key1_default_name)
-        lowR_cat_name = self.hyperparams.get(self.key2_hp_name, self.key2_default_name)
+        highR = self.hyperparams.get(self.key1_hp_name, self.key1_default_name)
+        lowR = self.hyperparams.get(self.key2_hp_name, self.key2_default_name)
         collection = {
-            highR_cat_name: defaultdict(list),
-            lowR_cat_name: defaultdict(list),
+            highR: defaultdict(list),
+            lowR: defaultdict(list),
         }
         for i, (col_name, feat_grp, origin_grp) in enumerate(zip(X.columns, X.feat_grp, X.origin_grp)):
             col = X.iloc[:, i]
             if col_name in self.info[self.key1]["col_name"]:
-                keyname = highR_cat_name
+                keyname = highR
             else:
-                keyname = lowR_cat_name
+                keyname = lowR
             collection[keyname]["X"].append(col)
             collection[keyname]["col_name"].append(col_name)
             collection[keyname]["feat_grp"].append(feat_grp)

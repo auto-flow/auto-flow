@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from autopipeline.pipeline.components.feature_engineer.operate.split.base_split import BaseSplit
+from autopipeline.pipeline.components.feature_engineer.operate.split.base import BaseSplit
 from autopipeline.utils.data import is_cat
 
 __all__ = ["SplitCatNum"]

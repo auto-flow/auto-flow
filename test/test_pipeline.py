@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split, KFold
 
 from autopipeline import constants
 from autopipeline.pipeline.components.classification.sgd import SGD
-from autopipeline.pipeline.components.feature_engineer.encode.one_hot_encode import OneHotEncoder
+from autopipeline.pipeline.components.feature_engineer.encode.one_hot import OneHotEncoder
 from autopipeline.pipeline.components.feature_engineer.impute.fill_cat import FillCat
 from autopipeline.pipeline.components.feature_engineer.impute.fill_num import FillNum
 from autopipeline.pipeline.dataframe import GeneralDataFrame
