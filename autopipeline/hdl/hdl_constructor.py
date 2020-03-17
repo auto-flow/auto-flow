@@ -194,7 +194,7 @@ if __name__ == '__main__':
     # -----------
     from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
     from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
-    from autopipeline.tuner.smac import SmacPipelineTuner
+    from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 
     hdl2phps = SmacHDL2PHPS()
     phps = hdl2phps(hdl)

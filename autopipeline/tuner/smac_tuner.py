@@ -2,9 +2,9 @@ from typing import Dict
 
 import numpy as np
 
-from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
 from autopipeline.tuner.base import PipelineTuner

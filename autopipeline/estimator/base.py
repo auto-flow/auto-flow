@@ -14,7 +14,7 @@ from autopipeline.ensemble.stack.builder import StackEnsembleBuilder
 from autopipeline.hdl.default_hp import add_public_info_to_default_hp
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.metrics import r2, accuracy
-from autopipeline.tuner.smac import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.concurrence import parse_n_jobs
 from autopipeline.utils.config_space import get_default_initial_configs
 from autopipeline.utils.data import get_chunks
