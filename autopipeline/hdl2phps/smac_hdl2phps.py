@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from copy import deepcopy
+from importlib import import_module
 from typing import Dict, List
 
 from ConfigSpace.conditions import InCondition, EqualsCondition
@@ -9,14 +10,47 @@ from ConfigSpace.forbidden import ForbiddenInClause, ForbiddenEqualsClause, Forb
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, Constant
 
 import autopipeline.hdl.smac as smac_hdl
+from autopipeline.constants import Task
 from autopipeline.hdl.utils import is_hdl_bottom
 from autopipeline.hdl2phps.base import HDL2PHPS
+from autopipeline.utils.packages import get_class_of_module
+
+
+class RelyModels:
+    info = []
 
 
 class SmacHDL2PHPS(HDL2PHPS):
+    @property
+    def task(self):
+        return self._task
+
+    def set_task(self, task: Task):
+        self._task = task
 
     def __call__(self, hdl: Dict):
-        return self.recursion(hdl)
+        RelyModels.info = []
+        cs = self.recursion(hdl)
+        models = list(hdl["MHP(choice)"].keys())
+        for rely_model, path in RelyModels.info:
+            forbid_eq_value = path[-1]
+            path = path[:-1]
+            forbid_eq_key = ":".join(path + ["__choice__"])
+            forbid_in_key="MHP:__choice__"
+            forbid_in_value=[]
+            for model in models:
+                module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{model}"
+                _class = get_class_of_module(module_path)
+                M = import_module(module_path)
+                cls = getattr(M, _class)
+                hit = getattr(cls, rely_model, False)
+                if not hit:
+                    forbid_in_value.append(model)
+            cs.add_forbidden_clause(ForbiddenAndConjunction(
+                ForbiddenEqualsClause(cs.get_hyperparameter(forbid_eq_key),forbid_eq_value),
+                ForbiddenInClause(cs.get_hyperparameter(forbid_in_key),forbid_in_value),
+            ))
+        return cs
 
     def __condition(self, item: Dict, store: Dict):
         child = item["_child"]
@@ -88,7 +122,7 @@ class SmacHDL2PHPS(HDL2PHPS):
                 }, store)
                 cs.add_condition(cond)
 
-    def recursion(self, hdl: Dict) -> ConfigurationSpace:
+    def recursion(self, hdl: Dict, path=()) -> ConfigurationSpace:
         cs = ConfigurationSpace()
         # 检测一下这个dict是否在直接描述超参
         key_list = list(hdl.keys())
@@ -105,7 +139,7 @@ class SmacHDL2PHPS(HDL2PHPS):
                     if key.startswith("__"):
                         conditions_dict[key] = value
                     else:
-                        assert isinstance(value, dict)
+                        # assert isinstance(value, dict)  # fixme ： 可以对常量进行编码
                         hp = self.__parse_dict_to_config(key, value)
                         # hp.name = key
                         cs.add_hyperparameter(hp)
@@ -120,6 +154,11 @@ class SmacHDL2PHPS(HDL2PHPS):
                         self.__activate(value, store, cs)
                     elif key == "__forbidden":
                         self.__forbidden(value, store, cs)
+                    elif key == "__rely_model":
+                        RelyModels.info.append([
+                            value,
+                            deepcopy(path)
+                        ])
 
                 return cs
         pattern = re.compile(r"(.*)\((.*)\)")
@@ -145,28 +184,28 @@ class SmacHDL2PHPS(HDL2PHPS):
                 cur_cs.add_hyperparameter(option_param)
                 for sub_key, sub_value in value.items():
                     assert isinstance(sub_value, dict)
-                    sub_cs = self.recursion(sub_value)
+                    sub_cs = self.recursion(sub_value, path=list(path) + [prefix_name, sub_key])
                     parent_hyperparameter = {'parent': option_param, 'value': sub_key}
                     cur_cs.add_configuration_space(sub_key, sub_cs, parent_hyperparameter=parent_hyperparameter)
                 cs.add_configuration_space(prefix_name, cur_cs)
             elif isinstance(value, dict):
-                sub_cs = self.recursion(value)
+                sub_cs = self.recursion(value, path=list(path) + [key])
                 cs.add_configuration_space(key, sub_cs)
             else:
                 raise NotImplementedError()
 
         return cs
 
-    def __parse_dict_to_config(self, key, dict_: dict):
-        _type = dict_.get("_type")
-        _value = dict_.get("_value")
-        _default = dict_.get("_default")
-        assert _value is not None
-        if _type == "choice":
-            return smac_hdl.choice(key, _value, _default)
+    def __parse_dict_to_config(self, key, value):
+        if isinstance(value, dict):
+            _type = value.get("_type")
+            _value = value.get("_value")
+            _default = value.get("_default")
+            assert _value is not None
+            if _type == "choice":
+                return smac_hdl.choice(key, _value, _default)
+            else:
+                return eval(f'''smac_hdl.{_type}("{key}",*_value,default=_default)''')
         else:
-            return eval(f'''smac_hdl.{_type}("{key}",*_value,default=_default)''')
+            return Constant(key, smac_hdl._encode(value))
 
-
-if __name__ == '__main__':
-    pass

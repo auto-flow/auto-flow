@@ -8,9 +8,12 @@ class LGBMClassifier(AutoPLClassificationAlgorithm):
     class__ = "LGBMClassifier"
     module__ = "lightgbm"
 
+    boost_model = True
+    tree_model = True
+
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None, feat_grp=None, origin_grp=None):
-        categorical_features_indices = get_categorical_features_indices(X_train,origin_grp)
+        categorical_features_indices = get_categorical_features_indices(X_train, origin_grp)
         X_train = arraylize(X_train)
         X_valid = arraylize(X_valid)
         if (X_valid is not None) and (y_valid is not None):
@@ -22,5 +25,5 @@ class LGBMClassifier(AutoPLClassificationAlgorithm):
             eval_set=eval_set, verbose=False
         )
 
-    def before_pred_X(self,X):
+    def before_pred_X(self, X):
         return arraylize(X)

@@ -17,6 +17,8 @@ class AutoPLComponent(BaseEstimator):
     class__ = None
     classification_only = False
     regression_only = False
+    boost_model = False
+    tree_model = False
 
     def __init__(self):
         self.estimator = None
@@ -187,5 +189,5 @@ class AutoPLComponent(BaseEstimator):
         else:
             raise NotImplementedError()
 
-    def before_pred_X(self,X):
+    def before_pred_X(self, X):
         return X

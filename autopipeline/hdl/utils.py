@@ -11,11 +11,13 @@ def is_hdl_bottom(key, value):
         return True
     if isinstance(value, dict) and "_type" in value:
         return True
+    if not isinstance(value, dict):
+        return True
     return False
 
 
-def get_hdl_db(path:str)->Dict:
-    path=Path(path)
+def get_hdl_db(path: str) -> Dict:
+    path = Path(path)
     if path.exists():
         return json.loads(path.read_text())
     else:
@@ -23,5 +25,5 @@ def get_hdl_db(path:str)->Dict:
         return get_default_hdl_db()
 
 
-def get_default_hdl_db()->Dict:
+def get_default_hdl_db() -> Dict:
     return json.loads((Path(init_data.__file__).parent / f"hdl_db.json").read_text())

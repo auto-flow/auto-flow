@@ -8,6 +8,9 @@ class CatBoostRegressor(AutoPLClassificationAlgorithm):
     class__ = "CatBoostRegressor"
     module__ = "catboost"
 
+    boost_model = True
+    tree_model = True
+
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None, feat_grp=None, origin_grp=None):
         categorical_features_indices = get_categorical_features_indices(X_train,origin_grp)
