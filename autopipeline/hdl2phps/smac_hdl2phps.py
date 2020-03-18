@@ -4,6 +4,7 @@ from copy import deepcopy
 from importlib import import_module
 from typing import Dict, List
 
+import numpy as np
 from ConfigSpace.conditions import InCondition, EqualsCondition
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.forbidden import ForbiddenInClause, ForbiddenEqualsClause, ForbiddenAndConjunction
@@ -32,12 +33,17 @@ class SmacHDL2PHPS(HDL2PHPS):
         RelyModels.info = []
         cs = self.recursion(hdl)
         models = list(hdl["MHP(choice)"].keys())
+        L0 = len(RelyModels.info)
+        P = 1
+        # fixme : 复杂情况
+        hitted_set = set()
         for rely_model, path in RelyModels.info:
             forbid_eq_value = path[-1]
             path = path[:-1]
             forbid_eq_key = ":".join(path + ["__choice__"])
-            forbid_in_key="MHP:__choice__"
-            forbid_in_value=[]
+            forbid_in_key = "MHP:__choice__"
+            forbid_in_value = []
+            hitted = []
             for model in models:
                 module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{model}"
                 _class = get_class_of_module(module_path)
@@ -46,10 +52,35 @@ class SmacHDL2PHPS(HDL2PHPS):
                 hit = getattr(cls, rely_model, False)
                 if not hit:
                     forbid_in_value.append(model)
+                else:
+                    hitted.append(model)
+            hitted_set |= set(hitted)
+            forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
+            choices = forbid_eq_key_hp.choices
+            L1 = len(choices)
+            L2 = len(hitted + forbid_in_value)
+            p0 = len(hitted) / L2
+            p1 = p0
+            P *= p0
+            p_rest = (1 - p1) / (L1 - 1)
+            probabilities = [p1] + [p_rest] * (L1 - 1)
+            default_value = choices[np.argmax(probabilities)]
+            forbid_eq_key_hp.probabilities = probabilities
+            forbid_eq_key_hp.default_value = default_value
             cs.add_forbidden_clause(ForbiddenAndConjunction(
-                ForbiddenEqualsClause(cs.get_hyperparameter(forbid_eq_key),forbid_eq_value),
-                ForbiddenInClause(cs.get_hyperparameter(forbid_in_key),forbid_in_value),
+                ForbiddenEqualsClause(forbid_eq_key_hp, forbid_eq_value),
+                ForbiddenInClause(cs.get_hyperparameter(forbid_in_key), forbid_in_value),
             ))
+        MHP = cs.get_hyperparameter("MHP:__choice__")
+        p = P
+        p_rest = (1 - p * (len(hitted_set))) / (len(MHP.choices) - len(hitted_set))
+        probabilities = []
+        for model in MHP.choices:
+            if model in hitted_set:
+                probabilities.append(p)
+            else:
+                probabilities.append(p_rest)
+        MHP.probabilities = probabilities
         return cs
 
     def __condition(self, item: Dict, store: Dict):
@@ -208,4 +239,3 @@ class SmacHDL2PHPS(HDL2PHPS):
                 return eval(f'''smac_hdl.{_type}("{key}",*_value,default=_default)''')
         else:
             return Constant(key, smac_hdl._encode(value))
-

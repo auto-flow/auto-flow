@@ -67,13 +67,13 @@ def get_params_in_dict(dict_, package):
     return ans
 
 
-for key, values in DAG.items():
+for i, (key, values) in enumerate(DAG.items()):
     if not isinstance(values, (list, tuple)):
         values = [values]
     if None in values:
-        used_key = key + "(optional-choice)"
+        formed_key = f"{i}{key}(optional-choice)"
     else:
-        used_key = key + "(choice)"
+        formed_key = f"{i}{key}(choice)"
     sub_dict = {}
     for value in values:
         if isinstance(value, dict):
@@ -86,7 +86,7 @@ for key, values in DAG.items():
             raise TypeError
         sub_dict[name] = get_params_in_dict(FE_hdl_db, name)
         sub_dict[name].update(addition_dict)
-    FE_dict[used_key] = sub_dict
+    FE_dict[formed_key] = sub_dict
 
 MHP_dict = {}
 
@@ -99,4 +99,3 @@ final_dict = {
 }
 
 pprint(final_dict)
-
