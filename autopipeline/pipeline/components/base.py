@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 
+import autopipeline
 from autopipeline.pipeline.dataframe import GeneralDataFrame
 from autopipeline.utils.data import densify
 
@@ -101,7 +102,11 @@ class AutoPLComponent(BaseEstimator):
         if X is None:
             return None
         elif isinstance(X, GeneralDataFrame):
-            df = X.filter_feat_grp(self.in_feat_grp)
+            from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
+            if issubclass(self.__class__,AutoPLPreprocessingAlgorithm):
+                df = X.filter_feat_grp(self.in_feat_grp)
+            else:
+                df=X
             if extract_info:
                 return df, df.feat_grp, df.origin_grp
             else:

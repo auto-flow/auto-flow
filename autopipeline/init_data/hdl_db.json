@@ -251,7 +251,8 @@
   },
   "feature_engineer": {
     "encode": {
-      "one_hot_encode": {}
+      "label": {},
+      "one_hot": {}
     },
     "expand": {
       "kitchen_sinks": {
@@ -276,6 +277,15 @@
         "degree": {"_type": "choice", "_value": ["poly","rbf", "sigmoid", "cosine"],"_default": "rbf"},
         "interaction_only":  {"_type": "choice", "_value": [true,false],"_default": true},
         "include_bias":false
+      }
+    },
+    "impute": {
+      "fill_abnormal": {},
+      "fill_cat": {
+        "strategy": {"_type": "choice","_value": ["<NULL>","most_frequent"],"_default": "<NULL>"},
+      },
+      "fill_num": {
+        "strategy": {"_type": "choice","_value": ["median","mean"],"_default": "mean"},
       }
     },
     "reduce": {
