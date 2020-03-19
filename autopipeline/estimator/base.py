@@ -14,7 +14,7 @@ from autopipeline.ensemble.stack.builder import StackEnsembleBuilder
 from autopipeline.hdl.default_hp import add_public_info_to_default_hp
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.metrics import r2, accuracy
-from autopipeline.tuner.smac import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.concurrence import parse_n_jobs
 from autopipeline.utils.config_space import get_default_initial_configs
 from autopipeline.utils.data import get_chunks
@@ -76,7 +76,7 @@ class AutoPipelineEstimator(BaseEstimator):
         # resource_manager
         self.resource_manager.init_dataset_path(dataset_name)
         # data_manager
-        self.data_manager = XYDataManager(
+        self.data_manager = XYDataManager( # todo: 在这里进行设计？
             X, y, X_test, y_test, dataset_name, feature_groups
         )
         self.resource_manager.dump_object("data_manager", self.data_manager)
@@ -85,7 +85,8 @@ class AutoPipelineEstimator(BaseEstimator):
         self.hdl_constructor.run()
         self.resource_manager.dump_hdl(self.hdl_constructor)
         self.hdl = self.hdl_constructor.get_hdl()
-        self.default_hp = self.hdl_constructor.get_default_hp()
+        # fixme
+        self.default_hp ={}# self.hdl_constructor.get_default_hp()
         # evaluate_info
         self.task = self.data_manager.task
         if metric is None:
@@ -105,6 +106,7 @@ class AutoPipelineEstimator(BaseEstimator):
         }
         self.resource_manager.dump_object("evaluate_info", self.evaluate_info)
         # fine tune
+        self.tuner.set_task(self.data_manager.task)
         self.start_tunner()
         if self.ensemble_builder:
             self.estimator = self.fit_ensemble()
@@ -139,11 +141,11 @@ class AutoPipelineEstimator(BaseEstimator):
             )
 
     def run(self, runcount_limit, initial_run, initial_configs, is_master, random_state, sync_dict=None):
-        sync_dict[os.getpid()] = 0
         tuner = deepcopy(self.tuner)
         resource_manager = deepcopy(self.resource_manager)
         # resource_manager
         if sync_dict:
+            sync_dict[os.getpid()] = 0
             resource_manager.sync_dict = sync_dict
         resource_manager.set_is_master(is_master)
         resource_manager.smac_output_dir += (f"/{os.getpid()}")

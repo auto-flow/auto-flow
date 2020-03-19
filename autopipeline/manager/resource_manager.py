@@ -83,7 +83,7 @@ class ResourceManager():
     def dump_hdl(self, hdl_construct: HDL_Constructor):
         persistent_data = {
             "hdl_db": hdl_construct.hdl_db,
-            "default_hp": hdl_construct.default_hp,
+            # "default_hp": hdl_construct.default_hp,
             "hdl": hdl_construct.hdl,
             "params": hdl_construct.params,
         }

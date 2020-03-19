@@ -89,4 +89,5 @@ class SmacPipelineTuner(PipelineTuner):
 
     def hdl2phps(self, hdl: Dict):
         hdl2phps = SmacHDL2PHPS()
+        hdl2phps.set_task(self.task)
         return hdl2phps(hdl)

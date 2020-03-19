@@ -5,6 +5,7 @@ import numpy as np
 from autopipeline.constants import Task, binary_classification_task, multiclass_classification_task, \
     multilabel_classification_task, regression_task
 from autopipeline.manager.abstract_data_manager import AbstractDataManager
+from autopipeline.pipeline.dataframe import GeneralDataFrame
 from autopipeline.utils.data import get_task_from_y
 
 
@@ -36,7 +37,7 @@ class XYDataManager(AbstractDataManager):
         super(XYDataManager, self).__init__(dataset_name)
         self.task: Task = get_task_from_y(y)
         self.feature_groups = None
-        self.info['has_missing'] = np.all(np.isfinite(X))
+        # self.info['has_missing'] = np.all(np.isfinite(X))
 
         label_num = {
             regression_task: 1,
@@ -47,10 +48,10 @@ class XYDataManager(AbstractDataManager):
 
         self.info['label_num'] = label_num[self.task]
         # todo: valid
-        self.data['X_train'] = X
+        self.data['X_train'] = GeneralDataFrame(X, feat_grp=feature_groups)
         self.data['y_train'] = y
         if X_test is not None:
-            self.data['X_test'] = X_test
+            self.data['X_test'] = GeneralDataFrame(X_test, feat_grp=feature_groups)
         if y_test is not None:
             self.data['y_test'] = y_test
 
@@ -69,4 +70,3 @@ class XYDataManager(AbstractDataManager):
             raise ValueError('X and y must have the same number of '
                              'datapoints, but have %d and %d.' % (X.shape[0],
                                                                   y.shape[0]))
-

@@ -1,5 +1,5 @@
 import re
-from collections import defaultdict
+from collections import defaultdict, Counter
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, List
@@ -9,6 +9,7 @@ from ConfigSpace.conditions import InCondition, EqualsCondition
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.forbidden import ForbiddenInClause, ForbiddenEqualsClause, ForbiddenAndConjunction
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, Constant
+from hyperopt import fmin, tpe, hp
 
 import autopipeline.hdl.smac as smac_hdl
 from autopipeline.constants import Task
@@ -29,59 +30,118 @@ class SmacHDL2PHPS(HDL2PHPS):
     def set_task(self, task: Task):
         self._task = task
 
-    def __call__(self, hdl: Dict):
+    def get(self, models, rely_model="boost_model"):
+        forbid_in_value = []
+        hitted = []
+        for model in models:
+            module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{model}"
+            _class = get_class_of_module(module_path)
+            M = import_module(module_path)
+            cls = getattr(M, _class)
+            hit = getattr(cls, rely_model, False)
+            if not hit:
+                forbid_in_value.append(model)
+            else:
+                hitted.append(model)
+        return forbid_in_value, hitted
+
+    def get_p(self, len_hitted, len_forbid, len_choices_list: list):
+        def objective(p, debug=False):
+            cs = ConfigurationSpace()
+            for i, len_choices in enumerate(len_choices_list):
+                cs.add_hyperparameter(CategoricalHyperparameter(f"P{i}", list(map(str, range(len_choices))),
+                                                                weights=[p] + [(1 - p) / (len_choices - 1)] * (
+                                                                        len_choices - 1)),
+                                      )
+            cs.add_hyperparameter(CategoricalHyperparameter(
+                "E",
+                [f"H{i}" for i in range(len_hitted)] + [f"F{i}" for i in
+                                                        range(len_forbid)],
+                weights=[p / len_hitted] * len_hitted + [(1 - p) / len_forbid] * len_forbid))
+            for i, len_choices in enumerate(len_choices_list):
+                cs.add_forbidden_clause(ForbiddenAndConjunction(
+                    ForbiddenEqualsClause(cs.get_hyperparameter(f"P{i}"), "0"),
+                    ForbiddenInClause(cs.get_hyperparameter("E"), [f"F{i}" for i in range(len_forbid)])
+                ))
+            cs.seed(42)
+            try:
+                counter = Counter([hp.get("E") for hp in cs.sample_configuration((len_hitted + len_forbid) * 15)])
+
+                if debug:
+                    print(counter)
+            except Exception:
+                return np.inf
+            vl = list(counter.values())
+            return np.var(vl) + 100 * (len_hitted + len_forbid - len(vl))
+
+        best = fmin(
+            fn=objective,
+            space=hp.uniform('p', 0.001, 0.999),
+            algo=tpe.suggest,
+            max_evals=100,
+            rstate=np.random.RandomState(42),
+            show_progressbar=False,
+
+        )
+        print("best =",best)
+        objective(best["p"], debug=True)
+        return best["p"]
+
+    def __call__(self, hdl: Dict,p=None):
         RelyModels.info = []
         cs = self.recursion(hdl)
         models = list(hdl["MHP(choice)"].keys())
-        L0 = len(RelyModels.info)
-        P = 1
+        # 在进入主循环之前，就计算好概率
+        len_choices_list = []
+        for rely_model, path in RelyModels.info:
+            path = path[:-1]
+            forbid_eq_key = ":".join(path + ["__choice__"])
+            forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
+            choices = forbid_eq_key_hp.choices
+            len_choices_list.append(len(choices))
+        forbid_in_value, hitted = self.get(models)
+        len_hitted=len(hitted)
+        len_forbid=len(forbid_in_value)
+        if p is None:
+            p = self.get_p(len_hitted, len_forbid, len_choices_list)
         # fixme : 复杂情况
-        hitted_set = set()
         for rely_model, path in RelyModels.info:
             forbid_eq_value = path[-1]
             path = path[:-1]
             forbid_eq_key = ":".join(path + ["__choice__"])
             forbid_in_key = "MHP:__choice__"
-            forbid_in_value = []
-            hitted = []
-            for model in models:
-                module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{model}"
-                _class = get_class_of_module(module_path)
-                M = import_module(module_path)
-                cls = getattr(M, _class)
-                hit = getattr(cls, rely_model, False)
-                if not hit:
-                    forbid_in_value.append(model)
-                else:
-                    hitted.append(model)
-            hitted_set |= set(hitted)
+            forbid_in_value, hitted = self.get(models, rely_model)
             forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
             choices = forbid_eq_key_hp.choices
-            L1 = len(choices)
-            L2 = len(hitted + forbid_in_value)
-            p0 = len(hitted) / L2
-            p1 = p0
-            P *= p0
-            p_rest = (1 - p1) / (L1 - 1)
-            probabilities = [p1] + [p_rest] * (L1 - 1)
-            default_value = choices[np.argmax(probabilities)]
+            probabilities = []
+            p_rest = (1 - p) * (len(choices) - 1)
+            for choice in choices:
+                if choice == forbid_eq_value:
+                    probabilities.append(p)
+                else:
+                    probabilities.append(p_rest)
             forbid_eq_key_hp.probabilities = probabilities
-            forbid_eq_key_hp.default_value = default_value
             cs.add_forbidden_clause(ForbiddenAndConjunction(
                 ForbiddenEqualsClause(forbid_eq_key_hp, forbid_eq_value),
                 ForbiddenInClause(cs.get_hyperparameter(forbid_in_key), forbid_in_value),
             ))
         MHP = cs.get_hyperparameter("MHP:__choice__")
-        p = P
-        p_rest = (1 - p * (len(hitted_set))) / (len(MHP.choices) - len(hitted_set))
+        p_hitted = p / len_hitted
+        p_forbid=(1 - p) / len_forbid
         probabilities = []
         for model in MHP.choices:
-            if model in hitted_set:
-                probabilities.append(p)
+            if model in hitted:
+                probabilities.append(p_hitted)
             else:
-                probabilities.append(p_rest)
+                probabilities.append(p_forbid)
         MHP.probabilities = probabilities
+        # todo: 将MLP的默认模型设为boost
+        # todo: 超参空间中没有boost的情况
         return cs
+        # return {
+        #     "phps":cs,
+        #     "p":p
+        # }
 
     def __condition(self, item: Dict, store: Dict):
         child = item["_child"]
