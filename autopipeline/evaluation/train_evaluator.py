@@ -29,10 +29,10 @@ class TrainEvaluator():
     ):
         self.splitter = splitter
         self.data_manager = data_manager
-        self.X_train = self.data_manager.data['X_train']
-        self.y_train = self.data_manager.data['y_train']
-        self.X_test = self.data_manager.data.get('X_test')
-        self.y_test = self.data_manager.data.get('y_test')
+        self.X_train = self.data_manager.X_train
+        self.y_train = self.data_manager.y_train
+        self.X_test = self.data_manager.X_train
+        self.y_test = self.data_manager.y_train
 
         self.metric = metric
         self.task: Task = self.data_manager.task

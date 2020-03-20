@@ -1,5 +1,6 @@
 from autopipeline.pipeline.components.classification_base import AutoPLClassificationAlgorithm
-from autopipeline.pipeline.components.utils import get_categorical_features_indices, arraylize
+from autopipeline.pipeline.components.utils import get_categorical_features_indices
+from autopipeline.utils.data import arraylize
 
 __all__ = ["LGBMClassifier"]
 

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.preprocessing import LabelEncoder as SklearnLabelEncoder
 
-from autopipeline.pipeline.components.utils import arraylize
+from autopipeline.utils.data import arraylize
 
 __all__ = ["LabelEncoder"]
 

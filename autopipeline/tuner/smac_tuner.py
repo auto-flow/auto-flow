@@ -3,6 +3,7 @@ from typing import Dict
 import numpy as np
 
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
+from autopipeline.hdl.smac import _encode
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer
@@ -27,7 +28,6 @@ class SmacPipelineTuner(PipelineTuner):
             random_state,
             evaluator,
         )
-
 
         self.evaluator.set_php2model(self.php2model)
 
@@ -85,9 +85,14 @@ class SmacPipelineTuner(PipelineTuner):
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
         print(pipeline, pipeline[-1].hyperparams)
-        return dhp,pipeline
+        return dhp, pipeline
 
     def hdl2phps(self, hdl: Dict):
         hdl2phps = SmacHDL2PHPS()
         hdl2phps.set_task(self.task)
         return hdl2phps(hdl)
+
+    def replace_phps(self, key, value):
+        for hp in self.phps.get_hyperparameters():
+            if hp.__class__.__name__=="Constant" and hp.name.endswith(key):
+                hp.value=_encode(value)

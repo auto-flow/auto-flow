@@ -25,7 +25,3 @@ def get_categorical_features_indices(X, origin_grp):
                 categorical_features_indices.append(i)
     return categorical_features_indices
 
-def arraylize(X):
-    if isinstance(X,(pd.DataFrame,pd.Series)):
-        return X.values
-    return X

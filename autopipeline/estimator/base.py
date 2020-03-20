@@ -2,23 +2,24 @@ import math
 import os
 from copy import deepcopy
 from multiprocessing import Manager
-from typing import Union, List, Optional, Dict
+from typing import Union, Optional, Dict
 
 import joblib
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
-from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.ensemble.stack.builder import StackEnsembleBuilder
-from autopipeline.hdl.default_hp import add_public_info_to_default_hp
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
+from autopipeline.manager.resource_manager import ResourceManager
+from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import r2, accuracy
+from autopipeline.pipeline.dataframe import GeneralDataFrame
 from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.concurrence import parse_n_jobs
 from autopipeline.utils.config_space import get_default_initial_configs
 from autopipeline.utils.data import get_chunks
-from autopipeline.manager.resource_manager import ResourceManager
 
 
 class AutoPipelineEstimator(BaseEstimator):
@@ -57,11 +58,11 @@ class AutoPipelineEstimator(BaseEstimator):
 
     def fit(
             self,
-            X: np.ndarray,
-            y,
+            X: Union[np.ndarray, pd.DataFrame, GeneralDataFrame],
+            y=None,
             X_test=None,
             y_test=None,
-            feature_groups: Union[None, str, List] = None,
+            column_descriptions: Optional[Dict] = None,
             dataset_name="default_dataset_name",
             metric=None,
             all_scoring_functions=False,
@@ -76,8 +77,8 @@ class AutoPipelineEstimator(BaseEstimator):
         # resource_manager
         self.resource_manager.init_dataset_path(dataset_name)
         # data_manager
-        self.data_manager = XYDataManager( # todo: 在这里进行设计？
-            X, y, X_test, y_test, dataset_name, feature_groups
+        self.data_manager = XYDataManager(
+            X, y, X_test, y_test, dataset_name, column_descriptions
         )
         self.resource_manager.dump_object("data_manager", self.data_manager)
         # hdl default_hp
@@ -86,7 +87,7 @@ class AutoPipelineEstimator(BaseEstimator):
         self.resource_manager.dump_hdl(self.hdl_constructor)
         self.hdl = self.hdl_constructor.get_hdl()
         # fixme
-        self.default_hp ={}# self.hdl_constructor.get_default_hp()
+        self.default_hp = {}  # self.hdl_constructor.get_default_hp()
         # evaluate_info
         self.task = self.data_manager.task
         if metric is None:
@@ -155,14 +156,11 @@ class AutoPipelineEstimator(BaseEstimator):
         tuner.initial_runs = initial_run
         tuner.set_resource_manager(resource_manager)
         tuner.set_data_manager(self.data_manager)
-        tuner.set_hdl(self.hdl)
+        tuner.replace_phps("random_state", int(random_state))
+        tuner.phps.seed(random_state)
         tuner.set_addition_info({})  # {"shape": X.shape}
         tuner.evaluator.set_resource_manager(resource_manager)
         # todo : 增加 n_jobs ? 调研默认值
-        add_public_info_to_default_hp(
-            self.default_hp, {"random_state": random_state}
-        )
-        tuner.set_default_hp(self.default_hp)
         tuner.run(
             self.data_manager,
             self.metric,
