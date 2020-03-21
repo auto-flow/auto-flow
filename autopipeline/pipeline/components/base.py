@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 
-import autopipeline
 from autopipeline.pipeline.dataframe import GeneralDataFrame
 from autopipeline.utils.data import densify
 
@@ -85,6 +84,7 @@ class AutoPLComponent(BaseEstimator):
         return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, is_train)
 
     def filter_invalid(self, cls, hyperparams: Dict) -> Dict:
+        hyperparams = deepcopy(hyperparams)
         validated = {}
         for key, value in hyperparams.items():
             if key in inspect.signature(cls.__init__).parameters.keys():
@@ -103,10 +103,10 @@ class AutoPLComponent(BaseEstimator):
             return None
         elif isinstance(X, GeneralDataFrame):
             from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
-            if issubclass(self.__class__,AutoPLPreprocessingAlgorithm):
+            if issubclass(self.__class__, AutoPLPreprocessingAlgorithm):
                 df = X.filter_feat_grp(self.in_feat_grp)
             else:
-                df=X
+                df = X
             if extract_info:
                 return df, df.feat_grp, df.origin_grp
             else:

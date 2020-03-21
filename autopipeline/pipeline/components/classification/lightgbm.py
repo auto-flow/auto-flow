@@ -23,7 +23,8 @@ class LGBMClassifier(AutoPLClassificationAlgorithm):
             eval_set = None
         self.estimator.fit(
             X_train, y_train, categorical_feature=categorical_features_indices,
-            eval_set=eval_set, verbose=False
+            eval_set=eval_set, verbose=False,
+            early_stopping_rounds=self.hyperparams.get("early_stopping_rounds")
         )
 
     def before_pred_X(self, X):

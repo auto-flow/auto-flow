@@ -30,14 +30,17 @@ class HDL_Constructor():
                 "cat->{highR=highR_cat,lowR=lowR_cat}": "operate.split.cat",
                 "highR_cat->num": [
                     "operate.drop",
-                    {"_name": "encode.label", "__rely_model": "tree_model"}  # 迁移到hdl_db
+                    "encode.label"
                 ],
                 "lowR_cat->num": [
                     "encode.one_hot",
-                    {"_name": "encode.label", "__rely_model": "tree_model"}
+                    "encode.label"
                 ],
                 "num->target": [
-                    "decision_tree", "libsvm_svc", "k_nearest_neighbors", "catboost", "lightgbm"
+                    # "decision_tree", "libsvm_svc",
+                    "k_nearest_neighbors",
+                    "catboost",
+                    "lightgbm"
                 ]
             }
         self.DAG_describe = DAG_describe

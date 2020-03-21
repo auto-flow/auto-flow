@@ -11,8 +11,8 @@ df_train = df.iloc[train_ix, :]
 df_test = df.iloc[test_ix, :]
 
 tuner = SmacPipelineTuner(
-    random_state=50,
-    initial_runs=12,
+    random_state=42,
+    initial_runs=5,
     runcount_limit=12,
 )
 auto_pipeline = AutoPipelineEstimator(tuner)

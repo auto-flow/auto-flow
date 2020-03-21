@@ -9,6 +9,18 @@
       "alpha": {"_type": "loguniform", "_value": [1e-2,100],"_default": 1},
       "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
     },
+    "catboost": {
+//      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
+      "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
+//      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
+      "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
+      "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
+      "border_count": {"_type": "int_loguniform","_value": [1,1000], "_default": 0},
+      "early_stopping_rounds": 500,
+      "thread_count": 1
+    },
     "decision_tree": {
       "criterion": {"_type": "choice","_value": ["gini","entropy"],"_default": "gini"},
 //      "max_depth_factor": {"_type": "quniform", "_value": [0,2],"_default": 0.5},
@@ -37,7 +49,7 @@
     "gradient_boosting": {
       "loss": "deviance", // ""exponential" make it performs like adaboost
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
       "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
@@ -85,6 +97,21 @@
         }
       }
     },
+    "lightgbm": {
+      "boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"],"_default": "gbdt"},
+      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
+      "max_depth": {"_type": "int_quniform", "_value": [1,100],"_default": 31},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
+      "subsample_for_bin": {"_type": "int_quniform","_value": [2e4, 3e5, 2e4],"_default": 2e5},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
+      "feature_fraction": {"_type": "quniform","_value": [0.5,1,0.05],"_default": 1},
+      "bagging_fraction": {"_type": "quniform","_value": [0.5,1,0.05],"_default": 1},  //alias "subsample" todo
+      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},
+      "lambda_l1": {"_type": "loguniform","_value": [1e-7,10], "_default": 0},
+      "lambda_l2": {"_type": "loguniform","_value": [1e-7,10], "_default": 0},
+      "min_child_weight": {"_type": "loguniform","_value": [1e-7,10], "_default": 1e-3},
+      "early_stopping_rounds": 500
+    },
     "multinomial_nb": {
       "alpha": {"_type": "loguniform", "_value": [1e-2, 100],"_default": 1.0},
       "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
@@ -127,7 +154,7 @@
     "adaboost": {
       "loss": {"_type": "choice", "_value": ["linear", "square", "exponential"],"_default": "linear"},
       "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
-      "learning_rate": {"_type": "loguniform", "_value": [0.0001,1],"_default": 0.1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3}
     },
     "ard_regression": {
@@ -172,9 +199,9 @@
       "thetaU": {"_type": "loguniform", "_value": [1,100000],"_default": 100000},
     },
     "gradient_boosting": {
-      "loss": ["ls","lad","huber","quantile"],
+      "loss": {"_type": "choice", "_value":["ls","lad","huber","quantile"],"_default": "ls"},
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-4,1],"_default": 0.1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
       "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},

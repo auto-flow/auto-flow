@@ -168,7 +168,8 @@ class AutoPipelineEstimator(BaseEstimator):
             self.splitter,
             initial_configs
         )
-        sync_dict[os.getpid()] = 1
+        if sync_dict:
+            sync_dict[os.getpid()] = 1
 
     def fit_ensemble(
             self,

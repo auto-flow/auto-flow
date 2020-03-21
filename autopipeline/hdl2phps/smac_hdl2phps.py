@@ -30,90 +30,68 @@ class SmacHDL2PHPS(HDL2PHPS):
     def set_task(self, task: Task):
         self._task = task
 
-    def get(self, models, rely_model="boost_model"):
+    def get_forbid_hit_in_models_by_rely(self, models, rely_model="boost_model"):
         forbid_in_value = []
-        hitted = []
+        hit = []
         for model in models:
             module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{model}"
             _class = get_class_of_module(module_path)
             M = import_module(module_path)
             cls = getattr(M, _class)
-            hit = getattr(cls, rely_model, False)
-            if not hit:
+            is_hit = getattr(cls, rely_model, False)
+            if not is_hit:
                 forbid_in_value.append(model)
             else:
-                hitted.append(model)
-        return forbid_in_value, hitted
+                hit.append(model)
+        return forbid_in_value, hit
 
-    def get_p(self, len_hitted, len_forbid, len_choices_list: list):
-        def objective(p, debug=False):
-            cs = ConfigurationSpace()
-            for i, len_choices in enumerate(len_choices_list):
-                cs.add_hyperparameter(CategoricalHyperparameter(f"P{i}", list(map(str, range(len_choices))),
-                                                                weights=[p] + [(1 - p) / (len_choices - 1)] * (
-                                                                        len_choices - 1)),
-                                      )
-            cs.add_hyperparameter(CategoricalHyperparameter(
-                "E",
-                [f"H{i}" for i in range(len_hitted)] + [f"F{i}" for i in
-                                                        range(len_forbid)],
-                weights=[p / len_hitted] * len_hitted + [(1 - p) / len_forbid] * len_forbid))
-            for i, len_choices in enumerate(len_choices_list):
-                cs.add_forbidden_clause(ForbiddenAndConjunction(
-                    ForbiddenEqualsClause(cs.get_hyperparameter(f"P{i}"), "0"),
-                    ForbiddenInClause(cs.get_hyperparameter("E"), [f"F{i}" for i in range(len_forbid)])
-                ))
-            cs.seed(42)
-            try:
-                counter = Counter([hp.get("E") for hp in cs.sample_configuration((len_hitted + len_forbid) * 15)])
-
-                if debug:
-                    print(counter)
-            except Exception:
-                return np.inf
-            vl = list(counter.values())
-            return np.var(vl) + 100 * (len_hitted + len_forbid - len(vl))
-
-        best = fmin(
-            fn=objective,
-            space=hp.uniform('p', 0.001, 0.999),
-            algo=tpe.suggest,
-            max_evals=100,
-            rstate=np.random.RandomState(42),
-            show_progressbar=False,
-
-        )
-        print("best =",best)
-        objective(best["p"], debug=True)
-        return best["p"]
-
-    def __call__(self, hdl: Dict,p=None):
-        RelyModels.info = []
-        cs = self.recursion(hdl)
-        models = list(hdl["MHP(choice)"].keys())
-        # 在进入主循环之前，就计算好概率
-        len_choices_list = []
-        for rely_model, path in RelyModels.info:
-            path = path[:-1]
-            forbid_eq_key = ":".join(path + ["__choice__"])
-            forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
-            choices = forbid_eq_key_hp.choices
-            len_choices_list.append(len(choices))
-        forbid_in_value, hitted = self.get(models)
-        len_hitted=len(hitted)
-        len_forbid=len(forbid_in_value)
-        if p is None:
-            p = self.get_p(len_hitted, len_forbid, len_choices_list)
-        # fixme : 复杂情况
+    def set_probabilities_in_cs(
+            self, cs: ConfigurationSpace,
+            relied2models: Dict[str, List[str]],
+            relied2AllModels: Dict[str, List[str]],
+            all_models: List[str],
+            **kwargs
+    ):
+        MHP = cs.get_hyperparameter("MHP:__choice__")
+        probabilities = []
+        model2prob = {}
+        L = 0
+        for rely_model in relied2models:
+            cur_models = relied2models[rely_model]
+            L += len(cur_models)
+            for model in cur_models:
+                model2prob[model] = kwargs[rely_model] / len(cur_models)
+        p_rest = (1 - sum(model2prob.values())) / (len(all_models) - L)
+        for model in MHP.choices:
+            probabilities.append(model2prob.get(model, p_rest))
+        MHP.probabilities = probabilities
+        default_MHP_choice = None
+        for models in relied2models.values():
+            if models:
+                default_MHP_choice = models[0]
+        MHP.default_value = default_MHP_choice
         for rely_model, path in RelyModels.info:
             forbid_eq_value = path[-1]
             path = path[:-1]
             forbid_eq_key = ":".join(path + ["__choice__"])
-            forbid_in_key = "MHP:__choice__"
-            forbid_in_value, hitted = self.get(models, rely_model)
             forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
+            forbid_in_key = "MHP:__choice__"
+            hit = relied2AllModels.get(rely_model)
+            if not hit:
+                choices = list(forbid_eq_key_hp.choices)
+                choices.remove(forbid_eq_value)
+                forbid_eq_key_hp.choices = tuple(choices)
+                forbid_eq_key_hp.default_value = choices[0]
+                forbid_eq_key_hp.probabilities = [1 / len(choices)] * len(choices)
+                # fixme  最后我放弃了在这上面进行修改，在hdl部分就做了预处理
+                continue
+            forbid_in_value = list(set(all_models) - set(hit))
+            # 只选择了boost模型
+            if not forbid_in_value:
+                continue
             choices = forbid_eq_key_hp.choices
             probabilities = []
+            p: float = kwargs[rely_model]
             p_rest = (1 - p) * (len(choices) - 1)
             for choice in choices:
                 if choice == forbid_eq_value:
@@ -125,18 +103,124 @@ class SmacHDL2PHPS(HDL2PHPS):
                 ForbiddenEqualsClause(forbid_eq_key_hp, forbid_eq_value),
                 ForbiddenInClause(cs.get_hyperparameter(forbid_in_key), forbid_in_value),
             ))
-        MHP = cs.get_hyperparameter("MHP:__choice__")
-        p_hitted = p / len_hitted
-        p_forbid=(1 - p) / len_forbid
-        probabilities = []
-        for model in MHP.choices:
-            if model in hitted:
-                probabilities.append(p_hitted)
-            else:
-                probabilities.append(p_forbid)
-        MHP.probabilities = probabilities
-        # todo: 将MLP的默认模型设为boost
-        # todo: 超参空间中没有boost的情况
+
+    def __rely_model(self, cs: ConfigurationSpace):
+        if not RelyModels.info:
+            return
+        all_models = list(cs.get_hyperparameter("MHP:__choice__").choices)
+        rely_model_counter = Counter([x[0] for x in RelyModels.info])
+        # 依赖模式->所有相应模型
+        relied2AllModels = {}
+        # 依赖模式->无交集相应模型
+        relied2models = {}
+        for rely_model in rely_model_counter.keys():
+            _, hit = self.get_forbid_hit_in_models_by_rely(all_models, rely_model)
+            relied2AllModels[rely_model] = hit
+        # 如果某依赖模式不对应任何模型，删除
+        for k, v in list(relied2AllModels.items()):
+            if not v:
+                relied2AllModels.pop(k)
+                rely_model_counter.pop(k)
+        has_any_hit = any(relied2AllModels.values())
+        if not has_any_hit:
+            return
+        # 按照规则计算  relied2models  ：  无交集相应模型
+        relied_cnts_tuples = [(k, v) for k, v in rely_model_counter.items()]
+        relied_cnts_tuples.sort(key=lambda x: x[-1])
+        visited = set()
+        for rely_model, _ in relied_cnts_tuples:
+            models = relied2AllModels[rely_model]
+            for other in set(rely_model_counter.keys()) - {rely_model}:
+                if (rely_model, other) in visited:
+                    continue
+                other_models = relied2AllModels[other]
+                if len(other_models) <= len(models):
+                    models = list(set(models) - set(other_models))
+                    visited.add((rely_model, other))
+                    visited.add((other, rely_model))
+            relied2models[rely_model] = models
+
+        # 键的顺序遵循rely_model_counter.keys()
+        def objective(relyModel2prob, debug=False):
+            # relyModel2prob = {rely_model: prob for rely_model, prob in zip(list(rely_model_counter.keys()), args)}
+            cur_cs = deepcopy(cs)
+            self.set_probabilities_in_cs(cur_cs, relied2models, relied2AllModels, all_models, **relyModel2prob)
+
+            cur_cs.seed(42)
+            try:
+                counter = Counter([_hp.get("MHP:__choice__") for _hp in
+                                   cur_cs.sample_configuration(len(all_models) * 15)])
+
+                if debug:
+                    print(counter)
+            except Exception:
+                return np.inf
+            vl = list(counter.values())
+            return np.var(vl) + 100 * (len(models) - len(vl))
+
+        space = {}
+        eps = 0.001
+        N_rely_model = len(rely_model_counter.keys())
+        for rely_model in rely_model_counter.keys():
+            space[rely_model] = hp.uniform(rely_model, eps, (1 / N_rely_model) - eps)
+
+        best = fmin(
+            fn=objective,
+            space=space,
+            algo=tpe.suggest,
+            max_evals=100,
+            rstate=np.random.RandomState(42),
+            show_progressbar=False,
+
+        )
+        print("best =", best)
+        objective(best, debug=True)
+        self.set_probabilities_in_cs(cs, relied2models, relied2AllModels, all_models, **best)
+        # todo: 将计算的概率缓存
+
+    def purify_isolate_rely_in_hdl(self, hdl: Dict, models: List[str]):
+        # 为了应对MHP中全为boost的情况
+        # 做法： 删除 __rely_model键
+        for key, value in hdl.items():
+            if isinstance(value, dict):
+                ok = False
+                for k, v in value.items():
+                    if isinstance(v, dict) and "__rely_model" in v:
+                        ok = True
+                        rely_model = v["__rely_model"]
+                        _, hit = self.get_forbid_hit_in_models_by_rely(models, rely_model)
+                        if set(hit) == set(models):
+                            v.pop("__rely_model")
+                if not ok:
+                    self.purify_isolate_rely_in_hdl(value, models)
+
+    def drop_invalid_rely_in_hdl(self, hdl: Dict, models: List[str]):
+        # 为了应对MHP中没有boost，但是特征工程序列中却有依赖boost的特征工程的情况
+        # 做法：将这样的特征工程删除
+        for key, value in hdl.items():
+            if isinstance(value, dict):
+                ok = False
+                deleted_keys = []
+                for k, v in value.items():
+                    if isinstance(v, dict) and "__rely_model" in v:
+                        ok = True
+                        rely_model = v["__rely_model"]
+                        _, hit = self.get_forbid_hit_in_models_by_rely(models, rely_model)
+                        if not hit:
+                            deleted_keys.append(k)
+                for deleted_key in deleted_keys:
+                    value.pop(deleted_key)
+                if not ok:
+                    self.drop_invalid_rely_in_hdl(value, models)
+
+    def __call__(self, hdl: Dict):
+        # 对HDL进行处理
+        models = hdl["MHP(choice)"]
+        self.drop_invalid_rely_in_hdl(hdl, models)
+        self.purify_isolate_rely_in_hdl(hdl, models)
+        RelyModels.info = []
+        cs = self.recursion(hdl)
+        self.__rely_model(cs)
         return cs
         # return {
         #     "phps":cs,

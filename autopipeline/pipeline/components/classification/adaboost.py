@@ -6,6 +6,7 @@ __all__ = ["AdaboostClassifier"]
 class AdaboostClassifier(AutoPLClassificationAlgorithm):
     class__ = "AdaBoostClassifier"
     module__ = "sklearn.ensemble"
+    tree_model = True
 
     def after_process_hyperparams(self, hyperparams):
         import sklearn.tree

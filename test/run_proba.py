@@ -1,4 +1,5 @@
 from collections import Counter
+from pprint import pprint
 
 from autopipeline import constants
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
@@ -19,9 +20,9 @@ HDL = {'FE': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.n
                                                                          '_value': ['<NULL>',
                                                                                     'most_frequent']}}},
               '5cat->{highR=highR_cat,lowR=lowR_cat}(choice)': {'operate.split.cat': {}},
-              '6highR_cat->num(choice)': {'encode.label': {'__rely_model': 'tree_model'},
+              '6highR_cat->num(choice)': {'encode.label': {},
                                           'operate.drop': {}},
-              '7lowR_cat->num(choice)': {'encode.label': {'__rely_model': 'tree_model'},
+              '7lowR_cat->num(choice)': {'encode.label': {},
                                          'encode.one_hot': {}}},
        'MHP(choice)': {
 
@@ -81,7 +82,9 @@ HDL = {'FE': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.n
                           'shrinking': {'_default': True,
                                         '_type': 'choice',
                                         '_value': [True, False]}},
-           'lightgbm': {}}}
+           'lightgbm': {}
+       }
+    }
 
 i = 0
 estimators = []
@@ -97,6 +100,6 @@ for i in range(300):
     dhp = php2dhp(php)
     # i+=1
     estimators.append(list(dhp["MHP"].keys())[0])
-    # pprint(dhp)
-    # break
+    pprint(dhp)
+    break
 print(Counter(estimators))
