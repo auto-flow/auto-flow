@@ -1,10 +1,9 @@
+from time import time
 from typing import Union
 
 import joblib
 import numpy as np
 import pandas as pd
-from time import time
-
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -28,6 +27,7 @@ def get_start_end_tuples(threads, L):
     print(start_end_tuples)
     return start_end_tuples
 
+
 class SimilarityBase(TransformerMixin, BaseEstimator):
     def __init__(self, threshold, n_jobs=1, max_delete=1):
         self.max_delete = max_delete
@@ -45,7 +45,6 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
             self._type = "ndarray"
-        col_before = X.shape[1]
         start = time()
         self.X_ = X.values  # X is DataFrame
         L = self.X_.shape[1]
@@ -63,13 +62,9 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         for p, ix in to_del:
             self.to_delete.append(X.columns[ix])
         self.to_delete = self.to_delete[:int(X.shape[1] * self.max_delete)]
-        new_X = X.drop(self.to_delete, axis=1)
-        col_after = new_X.shape[1]
         end = time()
-        print("features before", col_before, ", after", col_after, ",",
-              col_before - col_after, f"were deleted by {self.name}",
-              "use time:", end - start)
-        return new_X
+        print("use time:", end - start)
+        return self
 
     def transform(self, X, y=None):
         _type = "DataFrame"
@@ -77,6 +72,9 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
             X = pd.DataFrame(X)
             _type = "ndarray"
         assert self._type == _type
+        col_before = X.shape[1]
         X = X.drop(self.to_delete, axis=1)
-        print(len(self.to_delete), f"features were deleted by {self.name}")
+        col_after = X.shape[1]
+        print(f"features were deleted by {self.name}")
+        print(f"features before {col_before} , after {col_after}, {col_before - col_after} were deleted")
         return X
