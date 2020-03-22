@@ -112,6 +112,12 @@
       "min_child_weight": {"_type": "loguniform","_value": [1e-7,10], "_default": 1e-3},
       "early_stopping_rounds": 500
     },
+    "logistic_regression": {
+      "penalty":"elasticnet",
+      "solver":"saga",
+      "l1_ratio": {"_type": "quniform", "_value": [0,1,0.05],"_default": 0.5},
+      "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0}
+    },
     "multinomial_nb": {
       "alpha": {"_type": "loguniform", "_value": [1e-2, 100],"_default": 1.0},
       "fit_prior": {"_type": "choice", "_value": [true,false],"_default": true}
@@ -157,6 +163,15 @@
       "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3}
     },
+    "bayesian_ridge": {
+      "n_iter": 300,
+      "alpha_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "alpha_2": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "lambda_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "lambda_2": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
+      "normalize": {"_type": "choice", "_value": [true,false],"_default": true},
+      "fit_intercept": true
+    },
     "ard_regression": {
       "n_iter": 300,
       "alpha_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
@@ -176,6 +191,15 @@
       "min_weight_fraction_leaf": 0,
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0
+    },
+    "elasticnet": {
+      "max_iter": 300,
+      "alpha": {"_type": "loguniform", "_value": [1e-2,10],"_default": 1.0},
+      "l1_ratio": {"_type": "quniform", "_value": [0,1,0.05],"_default": 0.5},
+      "normalize": {"_type": "choice", "_value": [true,false],"_default": true},
+      "positive": {"_type": "choice", "_value": [true,false],"_default": false},
+      "selection": {"_type": "choice", "_value": ["cyclic","random"],"_default": "cyclic"},
+      "fit_intercept": true
     },
     "extra_trees": {
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},//delete "mae"
@@ -212,6 +236,19 @@
       "n_neighbors": {"_type": "int_loguniform", "_value": [1,100],"_default": 3},
       "weights" : {"_type": "choice", "_value": ["uniform", "distance"],"_default": "uniform"},
       "p": {"_type": "choice", "_value": [1, 2],"_default": 2}
+    },
+    "kernel_ridge": {
+      "kernel":{"_type": "choice", "_value": ["rbf","poly","sigmoid"],"_default": "rbf"},
+      "degree": {"_type": "int_uniform", "_value": [2,5],"_default": 3},
+      "gamma":{"_type": "loguniform", "_value": [1e-05, 8],"_default": 0.1},
+      "coef0":{"_type": "quniform", "_value": [-1,1],"_default": 0},
+      "__activate":{
+        "kernel":{
+          "rbf":["gamma"],
+          "sigmoid":["gamma","coef0"],
+          "poly":["degree","gamma","coef0"]
+        }
+      }
     },
     "liblinear_svr": {
       "loss":  {"_type": "choice", "_value": ["epsilon_insensitive", "squared_epsilon_insensitive"],"_default": "squared_epsilon_insensitive"},
@@ -250,12 +287,6 @@
       "max_leaf_nodes": null,
       "min_impurity_decrease": 0.0,
       "bootstrap": {"_type": "choice","_value": [true,false],"_default": true}
-    },
-    "ridge_regression": {
-      "alpha":{"_type": "loguniform", "_value": [1e-05, 10],"_default": 1},
-      "fit_intercept":true,
-      "copy_X":true,
-      "normalize":false,
     },
     "sgd": {
       "loss":  {"_type": "choice", "_value": ["squared_loss", "huber","epsilon_insensitive","squared_hinge","squared_epsilon_insensitive"],"_default": "squared_loss"},
