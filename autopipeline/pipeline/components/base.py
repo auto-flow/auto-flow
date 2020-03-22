@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.utils.data import densify
 
 
@@ -97,11 +97,11 @@ class AutoPLComponent(BaseEstimator):
     def get_properties():
         raise NotImplementedError()
 
-    def preprocess_data(self, X: Optional[GeneralDataFrame], extract_info=False):
+    def preprocess_data(self, X: Optional[GenericDataFrame], extract_info=False):
         # todo 考虑在这                                                                                                                                                                                                   里多densify
         if X is None:
             return None
-        elif isinstance(X, GeneralDataFrame):
+        elif isinstance(X, GenericDataFrame):
             from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
             if issubclass(self.__class__, AutoPLPreprocessingAlgorithm):
                 df = X.filter_feat_grp(self.in_feat_grp)
@@ -123,7 +123,7 @@ class AutoPLComponent(BaseEstimator):
             X_test=None, y_test=None):
         # todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？
         # 只选择当前需要的feat_grp
-        assert isinstance(X_train, GeneralDataFrame)
+        assert isinstance(X_train, GenericDataFrame)
         X_train_, feat_grp, origin_grp = self.preprocess_data(X_train, True)
         X_valid_ = self.preprocess_data(X_valid)
         X_test_ = self.preprocess_data(X_test)
@@ -185,6 +185,16 @@ class AutoPLComponent(BaseEstimator):
             if hasattr(self, "shape"):
                 n_components = max(
                     int(self.shape[1] * value),
+                    1
+                )
+            else:
+                print("warn")
+                n_components = 100
+            return n_components
+        elif indicator == "sp1_percent":
+            if hasattr(self, "shape"):
+                n_components = max(
+                    int(self.shape[1] * (value / 100)),
                     1
                 )
             else:

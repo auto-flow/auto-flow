@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-class GeneralDataFrame(pd.DataFrame):
+class GenericDataFrame(pd.DataFrame):
     def __init__(self, *args, **kwargs):
         if "feat_grp" in kwargs:
             feat_grp = kwargs.pop("feat_grp")
@@ -15,7 +15,7 @@ class GeneralDataFrame(pd.DataFrame):
             origin_grp = kwargs.pop("origin_grp")
         else:
             origin_grp = None
-        super(GeneralDataFrame, self).__init__(*args, **kwargs)
+        super(GenericDataFrame, self).__init__(*args, **kwargs)
         if feat_grp is None:
             feat_grp = ["cat"] * self.shape[1]
         assert (len(feat_grp) == self.shape[1])
@@ -39,7 +39,7 @@ class GeneralDataFrame(pd.DataFrame):
         self.__dict__["origin_grp"] = origin_grp
 
     def __repr__(self):
-        return super(GeneralDataFrame, self).__repr__() + "\n" + repr((self.feat_grp))
+        return super(GenericDataFrame, self).__repr__() + "\n" + repr((self.feat_grp))
 
     def filter_feat_grp(self, feat_grp: Union[List, str], copy=True, isin=True):  # , inplace=False
         # 用于过滤feat_grp
@@ -47,7 +47,7 @@ class GeneralDataFrame(pd.DataFrame):
             feat_grp = [feat_grp]
         if copy:
             ret = deepcopy(self)
-            ret = GeneralDataFrame(ret, feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            ret = GenericDataFrame(ret, feat_grp=self.feat_grp, origin_grp=self.origin_grp)
         else:
             ret = self
         loc = ret.feat_grp.isin(feat_grp)
@@ -56,17 +56,17 @@ class GeneralDataFrame(pd.DataFrame):
         ret.set_feat_grp(ret.feat_grp[loc])
         ret.set_origin_grp(ret.origin_grp[loc])
         loc_df = ret.loc[:, ret.columns[loc]]
-        return GeneralDataFrame(loc_df, feat_grp=ret.feat_grp, origin_grp=ret.origin_grp)
+        return GenericDataFrame(loc_df, feat_grp=ret.feat_grp, origin_grp=ret.origin_grp)
 
     def concat_two(self, df1, df2):
-        assert isinstance(df1, GeneralDataFrame)
-        assert isinstance(df2, GeneralDataFrame)
+        assert isinstance(df1, GenericDataFrame)
+        assert isinstance(df2, GenericDataFrame)
 
         new_df = pd.concat([df1, df2], axis=1)
         # todo: 杜绝重复列
         new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp], ignore_index=True)
         new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp], ignore_index=True)
-        return GeneralDataFrame(new_df, feat_grp=new_feat_grp, origin_grp=new_origin_grp)
+        return GenericDataFrame(new_df, feat_grp=new_feat_grp, origin_grp=new_origin_grp)
 
     def replace_feat_grp(self, old_feat_grp: Union[List, str],
                          values: np.ndarray,
@@ -102,14 +102,14 @@ class GeneralDataFrame(pd.DataFrame):
         if isinstance(values, np.ndarray):
             values = pd.DataFrame(values, columns=columns)
         deleted_df = self.filter_feat_grp(old_feat_grp, True, False)
-        new_df = GeneralDataFrame(values, feat_grp=new_feat_grp,
+        new_df = GenericDataFrame(values, feat_grp=new_feat_grp,
                                   origin_grp=new_origin_grp)
         new_df.index = deleted_df.index
         return self.concat_two(deleted_df, new_df)
 
     def split(self, indexes):
         for index in indexes:
-            yield GeneralDataFrame(self.iloc[index, :], feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            yield GenericDataFrame(self.iloc[index, :], feat_grp=self.feat_grp, origin_grp=self.origin_grp)
 
 
 if __name__ == '__main__':
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
     feat_grp = ["id"] + suffix
 
-    df2 = GeneralDataFrame(df, feat_grp=feat_grp)
+    df2 = GenericDataFrame(df, feat_grp=feat_grp)
     # 测试1->2
     selected = df2.filter_feat_grp("id").values
     selected = np.hstack([selected, selected])

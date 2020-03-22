@@ -9,7 +9,7 @@ excludeToken = True
 
 
 class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
-    class__ = "SelectPercentile"
+    class__ = "GenericUnivariateSelect"
     module__ = "sklearn.feature_selection"
 
     def get_name2func(self):

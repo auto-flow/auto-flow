@@ -13,17 +13,16 @@ def _encode(value: Any) -> str:
 
 
 def _decode(str_value: str) -> Any:
-    lst = str_value.split(':')
-    if len(lst) == 2:
-        value_, type_ = lst
-        if type_ in ('NoneType',):
+    ix=str_value.rfind(":")
+    if ix<0:
+        return str_value
+    else:
+        value_=str_value[:ix]
+        type_=str_value[ix+1:]
+        if type_ in ("NoneType","dict"):
             return eval(value_)
         cls = eval(type_)
         return cls(value_)
-    elif len(lst) == 1:
-        return lst[0]
-    else:
-        raise Exception()
 
 
 def choice(label: str, options: List, default=None):

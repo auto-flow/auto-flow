@@ -1,6 +1,6 @@
 import sklearn.feature_selection
 
-from autopipeline.pipeline.components.feature_engineer.select.select_percentile import SelectPercentileBase
+from autopipeline.pipeline.components.feature_engineer.select.univar_base import SelectPercentileBase
 
 __all__ = ["SelectPercentileRegression"]
 

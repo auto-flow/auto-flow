@@ -27,9 +27,9 @@ def _fit_transform_one(transformer,
     return res, transformer
 
 
-class GeneralPipeline(Pipeline):
+class GenericPipeline(Pipeline):
     # 可以当做Transformer，又可以当做estimator！
-
+    # todo: 适配当做普通Pipeline的情况
     def _fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
         # shallow copy of steps - this should really be steps_
         self.steps = list(self.steps)

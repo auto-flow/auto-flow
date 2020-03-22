@@ -15,7 +15,7 @@ from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import r2, accuracy
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.concurrence import parse_n_jobs
 from autopipeline.utils.config_space import get_default_initial_configs
@@ -58,7 +58,7 @@ class AutoPipelineEstimator(BaseEstimator):
 
     def fit(
             self,
-            X: Union[np.ndarray, pd.DataFrame, GeneralDataFrame],
+            X: Union[np.ndarray, pd.DataFrame, GenericDataFrame],
             y=None,
             X_test=None,
             y_test=None,

@@ -13,15 +13,15 @@ from autopipeline.pipeline.components.feature_engineer.operate.drop import DropA
 from autopipeline.pipeline.components.feature_engineer.operate.split.cat import SplitCat
 from autopipeline.pipeline.components.feature_engineer.operate.split.cat_num import SplitCatNum
 from autopipeline.pipeline.components.feature_engineer.operate.split.nan import SplitNan
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values
 df = df.loc[:, ["Pclass", "Name", "Sex", "Age", "SibSp", "Ticket", "Fare", "Cabin", "Embarked"]]
 df_train, df_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=10)
 feat_grp = ["num", "cat", "cat", "nan", "num", "cat", "num", "nan", "nan"]
-df_train = GeneralDataFrame(df_train, feat_grp=feat_grp)
-df_test = GeneralDataFrame(df_test, feat_grp=feat_grp)
+df_train = GenericDataFrame(df_train, feat_grp=feat_grp)
+df_test = GenericDataFrame(df_test, feat_grp=feat_grp)
 cv = KFold(n_splits=5, random_state=10, shuffle=True)
 train_ix, valid_ix = next(cv.split(df_train))
 df_train, df_valid = df_train.split([train_ix, valid_ix])

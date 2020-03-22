@@ -1,12 +1,12 @@
-from autopipeline.pipeline.components.feature_engineer.select.select_percentile import SelectPercentileBase
 import sklearn.feature_selection
 
-__all__=["SelectRates"]
+from autopipeline.pipeline.components.feature_engineer.select.univar_base import SelectPercentileBase
 
-class SelectRates(SelectPercentileBase):
+__all__ = ["SelectPercentileClassification"]
+
+
+class SelectPercentileClassification(SelectPercentileBase):
     classification_only = True
-    class__ = "GenericUnivariateSelect"
-
     def get_default_name(self):
         return "chi2"
 

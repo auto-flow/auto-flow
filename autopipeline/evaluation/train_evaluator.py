@@ -12,8 +12,8 @@ from autopipeline.ensemble.vote.classifier import VoteClassifier
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer, calculate_score
-from autopipeline.pipeline.dataframe import GeneralDataFrame
-from autopipeline.pipeline.pipeline import GeneralPipeline
+from autopipeline.pipeline.dataframe import GenericDataFrame
+from autopipeline.pipeline.pipeline import GenericPipeline
 from autopipeline.utils.logging_ import get_logger
 from dsmac.runhistory.utils import get_id_of_config
 
@@ -106,10 +106,10 @@ class TrainEvaluator():
             y_preds = []
             all_scores = []
             for train_index, valid_index in self.splitter.split(X, y):
-                X:GeneralDataFrame
+                X:GenericDataFrame
                 X_train, X_valid =X.split([train_index, valid_index ])
                 y_train, y_valid = y[train_index], y[valid_index]
-                model:GeneralPipeline
+                model:GenericPipeline
                 # fitted_model = model.fit(X_train, y_train)
                 ret=model.procedure(self.task,X_train,y_train,X_valid,y_valid,X_test,y_test)
                 models.append(model)

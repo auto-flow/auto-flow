@@ -1,19 +1,19 @@
 from typing import Optional
 
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 
 __all__ = ["Merge"]
 
 
 class Merge(AutoPLPreprocessingAlgorithm):
 
-    def fit(self, X_train: GeneralDataFrame, y_train=None,
+    def fit(self, X_train: GenericDataFrame, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
         return self
 
-    def process(self, X_origin: Optional[GeneralDataFrame]) -> Optional[GeneralDataFrame]:
+    def process(self, X_origin: Optional[GenericDataFrame]) -> Optional[GenericDataFrame]:
 
         if X_origin is None:
             return None

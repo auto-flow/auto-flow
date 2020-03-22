@@ -1,7 +1,7 @@
 import numpy as np
 
 from autopipeline.pipeline.components.base import AutoPLComponent
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.utils.data import densify
 
 
@@ -28,7 +28,7 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
         else:
             return self.estimator.transform(X)
 
-    def _transform(self, X_: np.ndarray, X: GeneralDataFrame):
+    def _transform(self, X_: np.ndarray, X: GenericDataFrame):
         if X_ is None:
             return None
         X_ = self._transform_proc(X_)

@@ -8,7 +8,7 @@ from autopipeline.constants import Task
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
-from autopipeline.pipeline.pipeline import GeneralPipeline
+from autopipeline.pipeline.pipeline import GenericPipeline
 from autopipeline.utils.packages import get_class_of_module
 
 
@@ -105,7 +105,7 @@ class PipelineTuner():
             out_feat_grp=_to
         return in_feat_grp, out_feat_grp, outside_edge_info
 
-    def create_preprocessor(self, dhp: Dict) -> Optional[GeneralPipeline]:
+    def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
         FE_dict: dict = dhp["FE"]
         pipeline_list = []
         for key, value in FE_dict.items():
@@ -137,7 +137,7 @@ class PipelineTuner():
                 (name, preprocessor)
             )
         if pipeline_list:
-            return GeneralPipeline(pipeline_list)
+            return GenericPipeline(pipeline_list)
         else:
             return None
 

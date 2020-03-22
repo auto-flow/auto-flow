@@ -6,7 +6,7 @@ import pandas as pd
 from autopipeline.constants import Task, binary_classification_task, multiclass_classification_task, \
     multilabel_classification_task, regression_task
 from autopipeline.manager.abstract_data_manager import AbstractDataManager
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.utils.data import get_task_from_y, is_nan, is_cat
 from autopipeline.utils.dataframe import pop_if_exists
 
@@ -82,9 +82,9 @@ class XYDataManager(AbstractDataManager):
         super(XYDataManager, self).__init__(dataset_name)
         X, y, X_test, y_test, feat_grp = self.parse_column_descriptions(column_descriptions, X, y, X_test, y_test)
         self.task: Task = get_task_from_y(y)
-        self.X_train = GeneralDataFrame(X, feat_grp=feat_grp)
+        self.X_train = GenericDataFrame(X, feat_grp=feat_grp)
         self.y_train = y
-        self.X_test = GeneralDataFrame(X_test, feat_grp=feat_grp)
+        self.X_test = GenericDataFrame(X_test, feat_grp=feat_grp)
         self.y_test = y_test
 
         # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定

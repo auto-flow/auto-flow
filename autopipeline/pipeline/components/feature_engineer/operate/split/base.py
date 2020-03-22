@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 
 __all__ = ["BaseSplit"]
 
@@ -29,7 +29,7 @@ class BaseSplit(AutoPLPreprocessingAlgorithm):
     def calc_R(self, col, rows):
         raise NotImplementedError
 
-    def fit(self, X_train: GeneralDataFrame, y_train=None,
+    def fit(self, X_train: GenericDataFrame, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
         self.threshold = self.hyperparams.get("threshold", self.default_threshold)
@@ -37,7 +37,7 @@ class BaseSplit(AutoPLPreprocessingAlgorithm):
             self.key1: defaultdict(list),
             self.key2: defaultdict(list),
         }
-        X: GeneralDataFrame = X_train.filter_feat_grp(self.in_feat_grp)
+        X: GenericDataFrame = X_train.filter_feat_grp(self.in_feat_grp)
         rows = X.shape[0]
         for i, (col_name, feat_grp, origin_grp) in enumerate(zip(X.columns, X.feat_grp, X.origin_grp)):
             col = X.iloc[:, i]
@@ -48,7 +48,7 @@ class BaseSplit(AutoPLPreprocessingAlgorithm):
         self.info = info
         return self
 
-    def process(self, X_origin: Optional[GeneralDataFrame]) -> Optional[GeneralDataFrame]:
+    def process(self, X_origin: Optional[GenericDataFrame]) -> Optional[GenericDataFrame]:
         if X_origin is None:
             return None
         X = X_origin.filter_feat_grp(self.in_feat_grp)
@@ -75,7 +75,7 @@ class BaseSplit(AutoPLPreprocessingAlgorithm):
             feat_grp = [feat_grp_name] * len(origin_grp)
             if X.shape == (0,):
                 X = np.zeros([X_origin.shape[0], 0])
-            df = GeneralDataFrame(pd.DataFrame(X,columns= dict_["col_name"]), feat_grp=feat_grp, origin_grp=origin_grp)
+            df = GenericDataFrame(pd.DataFrame(X, columns= dict_["col_name"]), feat_grp=feat_grp, origin_grp=origin_grp)
             dfs.append(df)
         assert len(dfs) == 2
         df = dfs[0].concat_two(dfs[0], dfs[1])
