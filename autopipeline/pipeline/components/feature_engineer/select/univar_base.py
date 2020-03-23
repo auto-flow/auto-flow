@@ -3,12 +3,13 @@ from typing import Dict
 
 import sklearn.feature_selection
 
+from autopipeline.pipeline.components.feature_engineer.select.sklearn_select_mixin import SklearnSelectMixin
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 
 excludeToken = True
 
 
-class SelectPercentileBase(AutoPLPreprocessingAlgorithm):
+class SelectPercentileBase(AutoPLPreprocessingAlgorithm, SklearnSelectMixin):
     class__ = "GenericUnivariateSelect"
     module__ = "sklearn.feature_selection"
 

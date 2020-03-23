@@ -1,17 +1,15 @@
 from importlib import import_module
 
-import numpy as np
-
 from autopipeline.pipeline.components.feature_engineer.select.sklearn_select_mixin import SklearnSelectMixin
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
 
 
-class SelectFromModelBase(AutoPLPreprocessingAlgorithm, SklearnSelectMixin):
-    class__ = "SelectFromModel"
+class REF_Base(AutoPLPreprocessingAlgorithm, SklearnSelectMixin):
+    class__ = "RFE"
     module__ = "sklearn.feature_selection"
 
     def after_process_hyperparams(self, hyperparams):
-        hyperparams = super(SelectFromModelBase, self).after_process_hyperparams(hyperparams)
+        hyperparams = super(REF_Base, self).after_process_hyperparams(hyperparams)
         estimator_ = hyperparams["estimator"]
         splitted = estimator_.split(".")
         class_ = splitted[-1]
@@ -23,5 +21,4 @@ class SelectFromModelBase(AutoPLPreprocessingAlgorithm, SklearnSelectMixin):
             base_estimator_hp.pop("max_features")
         base_estimator = cls(**base_estimator_hp)
         hyperparams["estimator"] = base_estimator
-        hyperparams["threshold"] = -np.inf
         return hyperparams

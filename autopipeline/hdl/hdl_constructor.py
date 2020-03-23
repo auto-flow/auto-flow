@@ -9,10 +9,10 @@ class HDL_Constructor():
     def __init__(
             self,
             hdl_db_path=None,
-            DAG_describe=None
+            DAG_descriptions=None
     ):
-        if DAG_describe is None:
-            DAG_describe = {
+        if DAG_descriptions is None:
+            DAG_descriptions = {
                 "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
                 "highR_nan->lowR_nan": [
                     "operate.drop",
@@ -43,7 +43,7 @@ class HDL_Constructor():
                     "lightgbm"
                 ]
             }
-        self.DAG_describe = DAG_describe
+        self.DAG_describe = DAG_descriptions
         if hdl_db_path:
             hdl_db = get_hdl_db(hdl_db_path)
         else:
@@ -51,7 +51,7 @@ class HDL_Constructor():
         self.hdl_db = hdl_db
         self.params = {
             "hdl_db_path": hdl_db_path,
-            "DAG_describe": DAG_describe,
+            "DAG_describe": DAG_descriptions,
         }
 
     def set_task(self, task: Task):
@@ -93,7 +93,7 @@ class HDL_Constructor():
                 target_key = key
         MHP_values = self.DAG_describe.pop(target_key)
         FE_dict = {}
-        mainTask = "classification"
+        mainTask = self.task.mainTask
         FE_package = "autopipeline.pipeline.components.feature_engineer"
         hdl_db = get_default_hdl_db()
         FE_hdl_db = hdl_db["feature_engineer"]
@@ -110,6 +110,7 @@ class HDL_Constructor():
                 values = [values]
             if None in values:
                 formed_key = f"{i}{key}(optional-choice)"
+                values.remove(None)
             else:
                 formed_key = f"{i}{key}(choice)"
             sub_dict = {}

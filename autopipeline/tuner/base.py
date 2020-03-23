@@ -111,7 +111,10 @@ class PipelineTuner():
         for key, value in FE_dict.items():
             name = key
             in_feat_grp, out_feat_grp, outside_edge_info = self.parse(key)
-            _module = list(FE_dict[name].keys())[0]
+            sub_dict=FE_dict[name]
+            if sub_dict is None:
+                continue
+            _module = list(sub_dict.keys())[0]
             if _module is None:  # optional-choice
                 continue
             module_path = f"autopipeline.pipeline.components.feature_engineer.{_module}"

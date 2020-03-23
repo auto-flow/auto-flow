@@ -1,4 +1,5 @@
 import inspect
+import math
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, Optional
@@ -29,10 +30,10 @@ class AutoPLComponent(BaseEstimator):
 
     # @classmethod
     @property
-    def class_(cls):
-        if not cls.class__:
+    def class_(self):
+        if not self.class__:
             raise NotImplementedError()
-        return cls.class__
+        return self.class__
 
     # @classmethod
     @property
@@ -195,6 +196,18 @@ class AutoPLComponent(BaseEstimator):
             if hasattr(self, "shape"):
                 n_components = max(
                     int(self.shape[1] * (value / 100)),
+                    1
+                )
+            else:
+                print("warn")
+                n_components = 100
+            return n_components
+        elif indicator == "sp1_dev":
+            if hasattr(self, "shape"):
+                if value == 0:
+                    value = 1
+                n_components = max(
+                    math.ceil(self.shape[1] / value),
                     1
                 )
             else:
