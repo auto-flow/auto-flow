@@ -119,6 +119,7 @@ class AutoPipelineEstimator(BaseEstimator):
     def start_tunner(self):
         self.tuner.set_hdl(self.hdl)  # just for get phps of tunner
         n_jobs = self.n_jobs
+        runcount_limits = [math.ceil(self.tuner.runcount_limit / n_jobs)] * n_jobs
         # todo: initial_runs 为0 的情况
         if self.tuner.initial_runs == 0:
             initial_runs = [0] * n_jobs
@@ -127,21 +128,12 @@ class AutoPipelineEstimator(BaseEstimator):
         is_master_list = [False] * n_jobs
         is_master_list[0] = True
         initial_configs_list = get_chunks(get_default_initial_configs(self.tuner.phps, n_jobs), n_jobs)
-        random_states = list(np.arange(n_jobs) + self.random_state)
+        random_states = np.arange(n_jobs) + self.random_state
         if n_jobs > 1:
             sync_dict = Manager().dict()
             sync_dict["exit_processes"] = self.exit_processes
         else:
             sync_dict = None
-        self.id2tuner = Manager().dict()
-        self.id_is_used = Manager().dict()
-        is_init_list = self.tuner.runcount_limit * [False]
-        for i in range(n_jobs):
-            is_init_list[i] = True
-        extend_0(initial_runs, self.tuner.runcount_limit)
-        extend_0(initial_configs_list, self.tuner.runcount_limit)
-        extend_0(is_master_list, self.tuner.runcount_limit)
-        extend_0(random_states, self.tuner.runcount_limit)
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
                 joblib.delayed(self.run)
