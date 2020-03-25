@@ -62,25 +62,26 @@ class SmacPipelineTuner(PipelineTuner):
                 "deterministic": "true",
                 "output_dir": self.resource_manager.smac_output_dir,
             },
-            # distributer=self.distributer,
             initial_runs=self.initial_runs,
-            after_run_callback=self.evaluator.resource_manager.delete_models,
+            # after_run_callback=self.evaluator.resource_manager.delete_models,
             db_type=self.resource_manager.db_type,
             db_args=self.resource_manager.rh_db_args,
             db_kwargs=self.resource_manager.rh_db_kwargs,
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
-        self.smac = SMAC4HPO(
+        smac = SMAC4HPO(
             scenario=self.scenario,
             rng=np.random.RandomState(self.random_state),
             tae_runner=self.evaluator,
             initial_configurations=initial_configs
         )
-        self.smac.solver.run_()
-
-    def run(self):
-        self.smac.solver.run_()
-        # smac.solver.run_()
+        smac.solver.start_()
+        for i in range(self.runcount_limit):
+            smac.solver.run_()
+            should_continue = self.evaluator.resource_manager.delete_models()
+            if not should_continue:
+                print("info:exit")
+                break
 
     def php2model(self, php):
         php2dhp = SmacPHP2DHP()
@@ -98,5 +99,5 @@ class SmacPipelineTuner(PipelineTuner):
 
     def replace_phps(self, key, value):
         for hp in self.phps.get_hyperparameters():
-            if hp.__class__.__name__=="Constant" and hp.name.endswith(key):
-                hp.value=_encode(value)
+            if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
+                hp.value = _encode(value)

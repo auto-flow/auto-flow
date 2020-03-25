@@ -144,9 +144,11 @@ class AutoPipelineEstimator(BaseEstimator):
         extend_0(random_states, self.tuner.runcount_limit)
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
-                joblib.delayed(self.run)(is_init, initial_run, initial_configs, is_master, random_state)
-                for is_init, initial_run, initial_configs, is_master, random_state in
-                zip(is_init_list, initial_runs, initial_configs_list, is_master_list, random_states)
+                joblib.delayed(self.run)
+                (runcount_limit, initial_run, initial_configs, is_master,
+                            random_state, sync_dict)
+                for runcount_limit, initial_run, initial_configs, is_master, random_state in
+                zip(runcount_limits, initial_runs, initial_configs_list, is_master_list, random_states)
             )
 
     def run(self, is_init, initial_run, initial_configs, is_master, random_state):

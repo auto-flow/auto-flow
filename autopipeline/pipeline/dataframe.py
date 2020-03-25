@@ -122,16 +122,21 @@ class GenericDataFrame(pd.DataFrame):
                                    origin_grp=self.origin_grp)
 
     def copy(self: FrameOrSeries, deep: bool_t = True) -> FrameOrSeries:
-        return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+        return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feat_grp=self.feat_grp,
+                                origin_grp=self.origin_grp)
 
-    # def __deepcopy__(self, memodict={}):
-    #     return GenericDataFrame(self.copy(deep=True), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
-    # def __reduce__(self):
-    #     return (self.__dict__,)
+    def __reduce__(self):
+        result = super(GenericDataFrame, self).__reduce__()
+        result[2].update({
+            "feat_grp": self.feat_grp,
+            "origin_grp": self.origin_grp
+        })
+        return result
 
     def __setstate__(self, state):
-        pass
-
+        self.set_feat_grp(state.pop("feat_grp"))
+        self.set_origin_grp(state.pop("origin_grp"))
+        super(GenericDataFrame, self).__setstate__(state)
 
 
 if __name__ == '__main__':
