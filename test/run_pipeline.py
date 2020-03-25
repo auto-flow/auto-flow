@@ -5,19 +5,21 @@ from sklearn.model_selection import train_test_split, KFold
 
 from autopipeline import constants
 from autopipeline.pipeline.components.classification.sgd import SGD
-from autopipeline.pipeline.components.feature_engineer.encode.one_hot_encode import OneHotEncoder
+
+from autopipeline.pipeline.components.feature_engineer.encode.one_hot import OneHotEncoder
 from autopipeline.pipeline.components.feature_engineer.impute.fill_cat import FillCat
 from autopipeline.pipeline.components.feature_engineer.impute.fill_num import FillNum
-from autopipeline.pipeline.dataframe import GeneralDataFrame
-from autopipeline.pipeline.pipeline import GeneralPipeline
+from autopipeline.pipeline.dataframe import GenericDataFrame
+from autopipeline.pipeline.pipeline import GenericPipeline
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values
 df = df.loc[:, ["Sex", "Cabin", "Age"]]
 feat_grp = ["cat_nan", "cat_nan", "num_nan"]
 df_train, df_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=10)
-df_train = GeneralDataFrame(df_train, feat_grp=feat_grp)
-df_test = GeneralDataFrame(df_test, feat_grp=feat_grp)
+
+df_train = GenericDataFrame(df_train, feat_grp=feat_grp)
+df_test = GenericDataFrame(df_test, feat_grp=feat_grp)
 cv = KFold(n_splits=5, random_state=10, shuffle=True)
 train_ix, valid_ix = next(cv.split(df_train))
 
@@ -43,7 +45,8 @@ sgd = SGD()
 sgd.in_feat_grp = "num"
 sgd.update_hyperparams({"loss": "log", "random_state": 10})
 
-pipeline = GeneralPipeline([
+
+pipeline = GenericPipeline([
     ("fill_cat", fill_cat),
     ("fill_num", fill_num),
     ("ohe", ohe),
@@ -64,7 +67,8 @@ pred_valid = ret["pred_valid"]
 print(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
 print(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))
 
-pipeline = GeneralPipeline([
+
+pipeline = GenericPipeline([
     ("fill_cat", fill_cat),
     ("fill_num", fill_num),
     ("ohe", ohe),
@@ -76,7 +80,8 @@ ret2 = pipeline.fit_transform(df_train, y_train, df_valid, y_valid, df_test, y_t
 for key in ["X_train","X_valid","X_test"]:
     assert np.all(ret1[key]==ret2[key])
 
-pipeline = GeneralPipeline([
+
+pipeline = GenericPipeline([
     ("sgd", sgd),
 ])
 

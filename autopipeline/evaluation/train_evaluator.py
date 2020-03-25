@@ -12,6 +12,11 @@ from autopipeline.ensemble.vote.classifier import VoteClassifier
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer, calculate_score
+<<<<<<< HEAD
+=======
+from autopipeline.pipeline.dataframe import GenericDataFrame
+from autopipeline.pipeline.pipeline import GenericPipeline
+>>>>>>> refactor
 from autopipeline.utils.logging_ import get_logger
 from dsmac.runhistory.utils import get_id_of_config
 
@@ -27,10 +32,17 @@ class TrainEvaluator():
     ):
         self.splitter = splitter
         self.data_manager = data_manager
+<<<<<<< HEAD
         self.X_train = self.data_manager.data['X_train']
         self.y_train = self.data_manager.data['y_train']
         self.X_test = self.data_manager.data.get('X_test')
         self.y_test = self.data_manager.data.get('y_test')
+=======
+        self.X_train = self.data_manager.X_train
+        self.y_train = self.data_manager.y_train
+        self.X_test = self.data_manager.X_train
+        self.y_test = self.data_manager.y_train
+>>>>>>> refactor
 
         self.metric = metric
         self.task: Task = self.data_manager.task
@@ -104,12 +116,15 @@ class TrainEvaluator():
             y_preds = []
             all_scores = []
             for train_index, valid_index in self.splitter.split(X, y):
-                X_train, X_valid = X[train_index], X[valid_index]
+                X:GenericDataFrame
+                X_train, X_valid =X.split([train_index, valid_index ])
                 y_train, y_valid = y[train_index], y[valid_index]
-                fitted_model = model.fit(X_train, y_train)
-                models.append(fitted_model)
+                model:GenericPipeline
+                # fitted_model = model.fit(X_train, y_train)
+                ret=model.procedure(self.task,X_train,y_train,X_valid,y_valid,X_test,y_test)
+                models.append(model)
                 y_true_indexes.append(valid_index)
-                y_pred = self.predict_function(X_valid, model)
+                y_pred = ret["pred_valid"]
                 y_preds.append(y_pred)
                 loss, all_score = self.loss(y_valid, y_pred)
                 losses.append(float(loss))
@@ -136,6 +151,7 @@ class TrainEvaluator():
                 "y_true_indexes": y_true_indexes,
                 "y_preds": y_preds,
             }
+            # todo
             if y_test is not None:
                 # 验证集训练模型的组合去预测测试集的数据
                 if self.task.mainTask == "classification":

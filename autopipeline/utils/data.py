@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import math
 
+import pandas as pd
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
@@ -120,6 +121,8 @@ def softmax(df):
 
 
 def densify(X):
+    if X is None:
+        return X
     if issparse(X):
         return X.todense().getA()
     else:
@@ -150,8 +153,19 @@ def get_chunks(iterable, chunks=1):
     return [lst[i::chunks] for i in range(chunks)]
 
 
+def is_cat(s:pd.Series):
+    for elem in s:
+        if isinstance(elem,(float,int)):
+            continue
+        else:
+            return True
+    return False
+
+def is_nan(s:pd.Series):
+    return np.any(pd.isna(s))
 
 
-if __name__ == '__main__':
-    ans=float_gcd(0.1,0.999)
-    print(ans)
+def arraylize(X):
+    if isinstance(X,(pd.DataFrame,pd.Series)):
+        return X.values
+    return X

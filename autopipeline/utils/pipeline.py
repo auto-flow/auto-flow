@@ -2,14 +2,16 @@ from typing import Optional, Dict
 
 from sklearn.pipeline import Pipeline, FeatureUnion
 
+from autopipeline.pipeline.pipeline import GenericPipeline
 
-def concat_pipeline(*args) -> Optional[Pipeline]:
+
+def concat_pipeline(*args) -> Optional[GenericPipeline]:
     pipeline_list = []
     for node in args:
         if isinstance(node, Pipeline):
             pipeline_list.extend(node.steps)
     if pipeline_list:
-        return Pipeline(pipeline_list)
+        return GenericPipeline(pipeline_list)
     else:
         return None
 

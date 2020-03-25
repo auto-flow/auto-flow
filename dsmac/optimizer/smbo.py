@@ -158,6 +158,64 @@ class SMBO(object):
         if not self.incumbent:
             self.incumbent = self.scenario.cs.get_default_configuration()
 
+    def start_(self):
+        self.runhistory.db.fetch_new_runhistory(True)
+        all_configs = self.runhistory.get_all_configs()
+        if len(all_configs):
+            # 根据runhistory选出最优
+            incumbent = all_configs[0]
+            min_cost = np.inf
+            for config in all_configs[1:]:
+                cost = self.runhistory.get_cost(config)
+                if cost < min_cost:
+                    min_cost = cost
+                    incumbent = config
+            self.incumbent = incumbent
+        self.start()
+
+    def run_(self):
+        start_time = time.time()
+        cur_cost = self.runhistory.get_cost(self.incumbent)
+        config_cost = self.runhistory.db.fetch_new_runhistory(False)
+        for config, cost in config_cost:
+            if cost < cur_cost:
+                self.incumbent = config
+                cur_cost = cost
+        X, Y = self.rh2EPM.transform(self.runhistory)
+
+        self.logger.debug("Search for next configuration")
+        # get all found configurations sorted according to acq
+        challengers = self.choose_next(X, Y)
+
+        time_spent = time.time() - start_time
+        time_left = self._get_timebound_for_intensification(time_spent)
+
+        self.logger.debug("Intensify")
+
+        self.incumbent, inc_perf = self.intensifier.intensify(
+            challengers=challengers,
+            incumbent=self.incumbent,
+            run_history=self.runhistory,
+            aggregate_func=self.aggregate_func,
+            time_bound=max(self.intensifier._min_time, time_left)
+        )
+
+        logging.debug("Remaining budget: %f (wallclock), %f (ta costs), %f (target runs)" % (
+            self.stats.get_remaing_time_budget(),
+            self.stats.get_remaining_ta_budget(),
+            self.stats.get_remaining_ta_runs()))
+
+        # if self.stats.is_budget_exhausted():
+        #     break
+
+        # if self.scenario.after_run_callback:
+        #     status = self.scenario.after_run_callback()
+        #     if not status:
+        #         print("info:break")
+        #         break
+        self.stats.print_stats(debug_out=True)
+
+
     def run(self):
         """Runs the Bayesian optimization loop
 
@@ -183,7 +241,6 @@ class SMBO(object):
                     min_cost = cost
                     incumbent = config
             self.incumbent = incumbent
-            print(min_cost)
         self.start()
 
         # Main BO loop

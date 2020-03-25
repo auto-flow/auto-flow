@@ -8,3 +8,4 @@ class ExtraTreesClassifier(
 ):
     class__ = "ExtraTreesClassifier"
     module__ = "sklearn.ensemble"
+    tree_model = True

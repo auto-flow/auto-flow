@@ -1,8 +1,5 @@
-from typing import Union
-
-
 class PHP2DHP():
-    def convert(self,php):
+    def convert(self, php):
         raise NotImplementedError()
 
     def __call__(self, php):

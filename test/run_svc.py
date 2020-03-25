@@ -6,22 +6,24 @@ from autopipeline.pipeline.components.classification.catboost import CatBoostCla
 from autopipeline.pipeline.components.classification.k_nearest_neighbors import KNearestNeighborsClassifier
 from autopipeline.pipeline.components.classification.libsvm_svc import LibSVM_SVC
 from autopipeline.pipeline.components.classification.lightgbm import LGBMClassifier
-from autopipeline.pipeline.components.feature_engineer.encode.one_hot_encode import OneHotEncoder
+
+from autopipeline.pipeline.components.feature_engineer.encode.one_hot import OneHotEncoder
 from autopipeline.pipeline.components.feature_engineer.impute.fill_cat import FillCat
 from autopipeline.pipeline.components.feature_engineer.impute.fill_num import FillNum
-from autopipeline.pipeline.components.feature_engineer.operate.drop_all import DropAll
-from autopipeline.pipeline.components.feature_engineer.operate.split.split_cat import SplitCat
-from autopipeline.pipeline.components.feature_engineer.operate.split.split_cat_num import SplitCatNum
-from autopipeline.pipeline.components.feature_engineer.operate.split.split_nan import SplitNan
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.components.feature_engineer.operate.drop import DropAll
+from autopipeline.pipeline.components.feature_engineer.operate.split.cat import SplitCat
+from autopipeline.pipeline.components.feature_engineer.operate.split.cat_num import SplitCatNum
+from autopipeline.pipeline.components.feature_engineer.operate.split.nan import SplitNan
+from autopipeline.pipeline.dataframe import GenericDataFrame
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values
 df = df.loc[:, ["Pclass", "Name", "Sex", "Age", "SibSp", "Ticket", "Fare", "Cabin", "Embarked"]]
 df_train, df_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=10)
 feat_grp = ["num", "cat", "cat", "nan", "num", "cat", "num", "nan", "nan"]
-df_train = GeneralDataFrame(df_train, feat_grp=feat_grp)
-df_test = GeneralDataFrame(df_test, feat_grp=feat_grp)
+
+df_train = GenericDataFrame(df_train, feat_grp=feat_grp)
+df_test = GenericDataFrame(df_test, feat_grp=feat_grp)
 cv = KFold(n_splits=5, random_state=10, shuffle=True)
 train_ix, valid_ix = next(cv.split(df_train))
 df_train, df_valid = df_train.split([train_ix, valid_ix])
@@ -30,8 +32,8 @@ y_train = y_train[train_ix]
 # 1. 将nan划分为highR_nan与lowR_nan
 split_nan = SplitNan()
 split_nan.update_hyperparams({
-    "highR_nan_name": "highR_nan",
-    "lowR_nan_name": "lowR_nan"
+    "highR": "highR_nan",
+    "lowR": "lowR_nan"
 })
 split_nan.in_feat_grp = "nan"
 ret1 = split_nan.fit_transform(X_train=df_train, X_valid=df_valid, X_test=df_test)
@@ -64,8 +66,9 @@ ret5 = fill_cat.fit_transform(**ret4)
 split_cat = SplitCat()
 split_cat.in_feat_grp = "cat"
 split_cat.update_hyperparams({
-    "highR_cat_name": "highR_cat",
-    "lowR_cat_name": "lowR_cat"
+
+    "highR": "highR_cat",
+    "lowR": "lowR_cat"
 })
 ret6 = split_cat.fit_transform(**ret5)
 # 7. 删除highR
@@ -74,7 +77,7 @@ drop2.in_feat_grp = "highR_cat"
 drop2.out_feat_grp = "drop"
 ret7 = drop2.fit_transform(**ret6)
 # 8. 对lowR_cat做label_encode 变成 num
-# fixme: 此操作与所有(非lightgbm模型)互斥
+
 ohe = OneHotEncoder()
 ohe.in_feat_grp = "lowR_cat"
 ohe.out_feat_grp = "num"

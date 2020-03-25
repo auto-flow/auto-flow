@@ -45,19 +45,13 @@ class SmacPHP2DHP(PHP2DHP):
             if isinstance(v, str):
                 v = _decode(v)
             key_path = k.split(":")
-            if key_path[-1]=="__choice__" :
-                # fixme
-                if v is None:
-                    key_path=key_path[:-1]
-                else:
-                    continue
+            if key_path[-1] == "__choice__":
+                # fixme  测试 optional-choice ，即有None的情况
+                key_path = key_path[:-1]
+                if v is not None:
+                    key_path+=[v]
+                    v={}
 
             self.set_kv(ret, key_path, v)  # self.split_key(k)
         return ret
 
-
-if __name__ == '__main__':
-    d = {1: {2: {4: 6}}}
-    SmacPHP2DHP().set_kv(d, [1, 2, 3], 4)
-    print(d)
-    print(SmacPHP2DHP().split_key("[1/2]/3/4"))

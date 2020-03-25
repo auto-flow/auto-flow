@@ -13,17 +13,16 @@ def _encode(value: Any) -> str:
 
 
 def _decode(str_value: str) -> Any:
-    lst = str_value.split(':')
-    if len(lst) == 2:
-        value_, type_ = lst
-        if type_ in ('NoneType',):
+    ix = str_value.rfind(":")
+    if ix < 0:
+        return str_value
+    else:
+        value_ = str_value[:ix]
+        type_ = str_value[ix + 1:]
+        if type_ in ("NoneType", "dict", "bool"):   # todo:
             return eval(value_)
         cls = eval(type_)
         return cls(value_)
-    elif len(lst) == 1:
-        return lst[0]
-    else:
-        raise Exception()
 
 
 def choice(label: str, options: List, default=None):
@@ -35,9 +34,9 @@ def choice(label: str, options: List, default=None):
     return CategoricalHyperparameter(label, [_encode(option) for option in options], **kwargs)
 
 
-def int_quniform(label: str, low: int, high: int, q: int=None, default=None):
+def int_quniform(label: str, low: int, high: int, q: int = None, default=None):
     if not q:
-        q=min(low,1)
+        q = min(low, 1)
     kwargs = {}
     if default:
         kwargs.update({'default_value': default})
@@ -51,9 +50,9 @@ def int_uniform(label: str, low: int, high: int, default=None):
     return UniformIntegerHyperparameter(label, low, high, **kwargs)
 
 
-def quniform(label: str, low: float, high: float, q: float=None, default=None):
+def quniform(label: str, low: float, high: float, q: float = None, default=None):
     if not q:
-        q=float_gcd(low,high)
+        q = float_gcd(low, high)
     kwargs = {}
     if default:
         kwargs.update({'default_value': default})
@@ -67,9 +66,9 @@ def uniform(label: str, low: float, high: float, default=None):
     return UniformFloatHyperparameter(label, low, high, **kwargs)
 
 
-def qloguniform(label: str, low: float, high: float, q: float=None, default=None):
+def qloguniform(label: str, low: float, high: float, q: float = None, default=None):
     if not q:
-        q=float_gcd(low,high)
+        q = float_gcd(low, high)
     kwargs = {'log': True}
     if default:
         kwargs.update({'default_value': default})
@@ -83,9 +82,9 @@ def loguniform(label: str, low: float, high: float, default=None):
     return UniformFloatHyperparameter(label, low, high, **kwargs)
 
 
-def int_qloguniform(label: str, low: int, high: int, q: int=None, default=None):
+def int_qloguniform(label: str, low: int, high: int, q: int = None, default=None):
     if not q:
-        q=min(low,1)
+        q = min(low, 1)
     kwargs = {'log': True}
     if default:
         kwargs.update({'default_value': default})

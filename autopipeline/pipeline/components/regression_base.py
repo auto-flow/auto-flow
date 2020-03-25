@@ -1,5 +1,4 @@
 from autopipeline.pipeline.components.base import AutoPLComponent
-from autopipeline.utils.data import densify
 
 
 class AutoPLRegressionAlgorithm(AutoPLComponent):
@@ -9,16 +8,13 @@ class AutoPLRegressionAlgorithm(AutoPLComponent):
     Make a subclass of this and put it into the directory
     `autosklearn/pipeline/components/regression` to make it available."""
 
-
-    def after_process_pred_y(self,y):
-        return y
+    # def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
+    def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
+                       is_train=False):
+        return self.after_pred_y(self.estimator.predict(self.before_pred_X(X_train_)))
 
     def predict(self, X):
-        X=densify(X)
-        if not self.estimator:
-            raise NotImplementedError()
-        pred_y= self.estimator.predict(X)
-        return self.after_process_pred_y(pred_y)
+        return self.pred_or_trans(X)
 
-    def score(self,X,y):
-        return self.estimator.score(X,y)
+    def after_pred_y(self, y):
+        return y

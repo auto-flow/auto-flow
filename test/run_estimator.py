@@ -3,18 +3,19 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, KFold
 
 from autopipeline.pipeline.components.classification.sgd import SGD
-from autopipeline.pipeline.components.feature_engineer.encode.one_hot_encode import OneHotEncoder
+from autopipeline.pipeline.components.feature_engineer.encode.one_hot import OneHotEncoder
 from autopipeline.pipeline.components.feature_engineer.impute.fill_cat import FillCat
 from autopipeline.pipeline.components.feature_engineer.impute.fill_num import FillNum
-from autopipeline.pipeline.dataframe import GeneralDataFrame
+from autopipeline.pipeline.dataframe import GenericDataFrame
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values
 df = df.loc[:, ["Sex", "Cabin", "Age"]]
 feat_grp = ["cat_nan", "cat_nan", "num_nan"]
 df_train, df_test, y_train, y_test = train_test_split(df, y, test_size=0.2,random_state=10)
-df_train = GeneralDataFrame(df_train, feat_grp=feat_grp)
-df_test = GeneralDataFrame(df_test, feat_grp=feat_grp)
+
+df_train = GenericDataFrame(df_train, feat_grp=feat_grp)
+df_test = GenericDataFrame(df_test, feat_grp=feat_grp)
 cv = KFold(n_splits=5,random_state=10,shuffle=True)
 train_ix, valid_ix = next(cv.split(df_train))
 
