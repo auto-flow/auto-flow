@@ -10,7 +10,7 @@ def stack_Xs(X_train, X_valid=None, X_test=None):
     if X_test is not None:
         Xs.append(X_test)
     if isinstance(Xs[0],pd.DataFrame):
-        return pd.concat(Xs,axis=0)
+        return pd.concat(Xs,axis=0).reset_index(drop=True)
     elif isinstance(Xs[0],np.ndarray):
         return np.vstack(Xs)
 

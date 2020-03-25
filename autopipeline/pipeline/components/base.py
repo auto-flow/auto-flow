@@ -214,8 +214,21 @@ class AutoPLComponent(BaseEstimator):
                 print("warn")
                 n_components = 100
             return n_components
+        elif indicator == "card_ratio":
+            if hasattr(self, "cardinality"):
+                n_components = max(
+                    math.ceil(self.cardinality * value),
+                    2
+                )
+            else:
+                print("warn")
+                n_components = 6
+            return n_components
         else:
             raise NotImplementedError()
 
     def before_pred_X(self, X):
+        if isinstance(X,pd.DataFrame):
+            return X.reset_index(drop=True)
         return X
+

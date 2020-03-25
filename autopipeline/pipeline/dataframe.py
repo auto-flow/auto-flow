@@ -109,7 +109,7 @@ class GenericDataFrame(pd.DataFrame):
 
     def split(self, indexes):
         for index in indexes:
-            yield GenericDataFrame(self.iloc[index, :], feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            yield GenericDataFrame(self.iloc[index, :].reset_index(drop=True), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
 
 
 if __name__ == '__main__':

@@ -1,8 +1,9 @@
 from autopipeline.pipeline.components.feature_engineer.encode.base import BaseEncoder
 
-__all__ = ["OneHotEncoder"]
+__all__ = ["CatBoostEncoder"]
 
 
-class OneHotEncoder(BaseEncoder):
-    class__ = "OneHotEncoder"
+class CatBoostEncoder(BaseEncoder):
+    class__ = "CatBoostEncoder"
     module__ = "category_encoders"
+    need_y = True

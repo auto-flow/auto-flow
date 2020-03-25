@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Union
 
 from autopipeline.constants import Task
 from autopipeline.hdl.utils import get_hdl_db, get_default_hdl_db
@@ -83,6 +84,22 @@ class HDL_Constructor():
             raise NotImplementedError()
         return self._data_manager
 
+    def parse_item(self, value: Union[dict, str]):
+        if isinstance(value, dict):
+            name = value.pop("_name")
+            if "_vanilla" in value:
+                is_vanilla = value.pop("_vanilla")
+            else:
+                is_vanilla = False
+            addition_dict = value
+        elif isinstance(value, str):
+            name = value
+            addition_dict = {}
+            is_vanilla = False
+        else:
+            raise TypeError
+        return name, addition_dict, is_vanilla
+
     def run(self):
         # make sure:
         # set_task
@@ -92,6 +109,8 @@ class HDL_Constructor():
             if key.split("->")[-1] == "target":
                 target_key = key
         MHP_values = self.DAG_describe.pop(target_key)
+        if not isinstance(MHP_values, (list, tuple)):
+            MHP_values = [MHP_values]
         FE_dict = {}
         mainTask = self.task.mainTask
         FE_package = "autopipeline.pipeline.components.feature_engineer"
@@ -105,6 +124,7 @@ class HDL_Constructor():
                 ans = ans.get(path, {})
             return ans
 
+        # 遍历DAG_describe，构造FE
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
                 values = [values]
@@ -115,24 +135,19 @@ class HDL_Constructor():
                 formed_key = f"{i}{key}(choice)"
             sub_dict = {}
             for value in values:
-                if isinstance(value, dict):
-                    name = value.pop("_name")
-                    addition_dict = value
-                elif isinstance(value, str):
-                    name = value
-                    addition_dict = {}
-                else:
-                    raise TypeError
+                name, addition_dict, is_vanilla = self.parse_item(value)
                 addition_dict.update({"random_state": self.random_state})  # fixme
-                sub_dict[name] = get_params_in_dict(FE_hdl_db, name)
+                params = {} if is_vanilla else get_params_in_dict(FE_hdl_db, name)
+                sub_dict[name] = params
                 sub_dict[name].update(addition_dict)
             FE_dict[formed_key] = sub_dict
-
+        # 构造MHP
         MHP_dict = {}
-
         for MHP_value in MHP_values:
-            name = MHP_value
-            MHP_dict[name] = get_params_in_dict(MHP_hdl_db, name)
+            name, addition_dict, is_vanilla = self.parse_item(MHP_value)
+            params = {} if is_vanilla else get_params_in_dict(MHP_hdl_db, name)
+            MHP_dict[name] = params
+            MHP_dict[name].update(addition_dict)
         final_dict = {
             "FE": FE_dict,
             "MHP(choice)": MHP_dict
