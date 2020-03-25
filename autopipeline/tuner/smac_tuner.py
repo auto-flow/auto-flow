@@ -62,9 +62,8 @@ class SmacPipelineTuner(PipelineTuner):
                 "deterministic": "true",
                 "output_dir": self.resource_manager.smac_output_dir,
             },
-            # distributer=self.distributer,
             initial_runs=self.initial_runs,
-            after_run_callback=self.evaluator.resource_manager.delete_models,
+            # after_run_callback=self.evaluator.resource_manager.delete_models,
             db_type=self.resource_manager.db_type,
             db_args=self.resource_manager.rh_db_args,
             db_kwargs=self.resource_manager.rh_db_kwargs,
@@ -76,7 +75,13 @@ class SmacPipelineTuner(PipelineTuner):
             tae_runner=self.evaluator,
             initial_configurations=initial_configs
         )
-        self.incumbent = smac.optimize()
+        smac.solver.start_()
+        for i in range(self.runcount_limit):
+            smac.solver.run_()
+            should_continue = self.evaluator.resource_manager.delete_models()
+            if not should_continue:
+                print("info:exit")
+                break
 
     def php2model(self, php):
         php2dhp = SmacPHP2DHP()
@@ -94,5 +99,5 @@ class SmacPipelineTuner(PipelineTuner):
 
     def replace_phps(self, key, value):
         for hp in self.phps.get_hyperparameters():
-            if hp.__class__.__name__=="Constant" and hp.name.endswith(key):
-                hp.value=_encode(value)
+            if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
+                hp.value = _encode(value)

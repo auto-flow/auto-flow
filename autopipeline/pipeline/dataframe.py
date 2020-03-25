@@ -3,6 +3,8 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
+from pandas._typing import FrameOrSeries
+from pandas.core.generic import bool_t
 
 
 class GenericDataFrame(pd.DataFrame):
@@ -109,7 +111,25 @@ class GenericDataFrame(pd.DataFrame):
 
     def split(self, indexes):
         for index in indexes:
-            yield GenericDataFrame(self.iloc[index, :].reset_index(drop=True), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            yield GenericDataFrame(self.iloc[index, :].reset_index(drop=True), feat_grp=self.feat_grp,
+                                   origin_grp=self.origin_grp)
+
+    def copy(self: FrameOrSeries, deep: bool_t = True) -> FrameOrSeries:
+        return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feat_grp=self.feat_grp,
+                                origin_grp=self.origin_grp)
+
+    def __reduce__(self):
+        result = super(GenericDataFrame, self).__reduce__()
+        result[2].update({
+            "feat_grp": self.feat_grp,
+            "origin_grp": self.origin_grp
+        })
+        return result
+
+    def __setstate__(self, state):
+        self.set_feat_grp(state.pop("feat_grp"))
+        self.set_origin_grp(state.pop("origin_grp"))
+        super(GenericDataFrame, self).__setstate__(state)
 
 
 if __name__ == '__main__':

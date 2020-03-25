@@ -135,8 +135,9 @@ class AutoPipelineEstimator(BaseEstimator):
             sync_dict = None
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
-                joblib.delayed(self.run)(runcount_limit, initial_run, initial_configs, is_master, random_state,
-                                         sync_dict)
+                joblib.delayed(self.run)
+                (runcount_limit, initial_run, initial_configs, is_master,
+                            random_state, sync_dict)
                 for runcount_limit, initial_run, initial_configs, is_master, random_state in
                 zip(runcount_limits, initial_runs, initial_configs_list, is_master_list, random_states)
             )
