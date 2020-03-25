@@ -28,23 +28,16 @@ class GenericDataFrame(pd.DataFrame):
 
     @property
     def feat_grp(self):
-        # return self.feat_grp_
         return self.__dict__["feat_grp"]
 
     @property
     def origin_grp(self):
-        # return self.origin_grp_
         return self.__dict__["origin_grp"]
 
     def set_feat_grp(self, feat_grp):
-        dict_={"feat_grp":feat_grp}
-        if not self._metadata:
-            self._metadata.append(dict_)
-        else:
-            se
+        self.__dict__["feat_grp"] = feat_grp
 
     def set_origin_grp(self, origin_grp):
-        # self.origin_grp_ = origin_grp
         self.__dict__["origin_grp"] = origin_grp
 
     def __repr__(self):
@@ -140,15 +133,11 @@ class GenericDataFrame(pd.DataFrame):
 
 
 if __name__ == '__main__':
-    import pickle
     df = pd.read_csv("/home/tqc/PycharmProjects/auto-pipeline/examples/classification/train_classification.csv")
     suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
     feat_grp = ["id"] + suffix
 
     df2 = GenericDataFrame(df, feat_grp=feat_grp)
-    df=deepcopy(df2)
-    print(df)
-    print(pickle.loads(pickle.dumps(df)))
     # 测试1->2
     selected = df2.filter_feat_grp("id").values
     selected = np.hstack([selected, selected])
