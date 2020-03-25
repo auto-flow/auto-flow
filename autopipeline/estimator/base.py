@@ -1,5 +1,6 @@
 import math
 import os
+import time
 from copy import deepcopy
 from multiprocessing import Manager
 from typing import Union, Optional, Dict
@@ -19,7 +20,7 @@ from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.concurrence import parse_n_jobs
 from autopipeline.utils.config_space import get_default_initial_configs
-from autopipeline.utils.data import get_chunks
+from autopipeline.utils.data import get_chunks, extend_0
 
 
 class AutoPipelineEstimator(BaseEstimator):
@@ -118,7 +119,6 @@ class AutoPipelineEstimator(BaseEstimator):
     def start_tunner(self):
         self.tuner.set_hdl(self.hdl)  # just for get phps of tunner
         n_jobs = self.n_jobs
-        runcount_limits = [math.ceil(self.tuner.runcount_limit / n_jobs)] * n_jobs
         # todo: initial_runs 为0 的情况
         if self.tuner.initial_runs == 0:
             initial_runs = [0] * n_jobs
@@ -127,49 +127,67 @@ class AutoPipelineEstimator(BaseEstimator):
         is_master_list = [False] * n_jobs
         is_master_list[0] = True
         initial_configs_list = get_chunks(get_default_initial_configs(self.tuner.phps, n_jobs), n_jobs)
-        random_states = np.arange(n_jobs) + self.random_state
+        random_states = list(np.arange(n_jobs) + self.random_state)
         if n_jobs > 1:
             sync_dict = Manager().dict()
             sync_dict["exit_processes"] = self.exit_processes
         else:
             sync_dict = None
+        self.id2tuner = Manager().dict()
+        self.id_is_used = Manager().dict()
+        is_init_list = self.tuner.runcount_limit * [False]
+        for i in range(n_jobs):
+            is_init_list[i] = True
+        extend_0(initial_runs, self.tuner.runcount_limit)
+        extend_0(initial_configs_list, self.tuner.runcount_limit)
+        extend_0(is_master_list, self.tuner.runcount_limit)
+        extend_0(random_states, self.tuner.runcount_limit)
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
-                joblib.delayed(self.run)(runcount_limit, initial_run, initial_configs, is_master, random_state,
-                                         sync_dict)
-                for runcount_limit, initial_run, initial_configs, is_master, random_state in
-                zip(runcount_limits, initial_runs, initial_configs_list, is_master_list, random_states)
+                joblib.delayed(self.run)(is_init, initial_run, initial_configs, is_master, random_state)
+                for is_init, initial_run, initial_configs, is_master, random_state in
+                zip(is_init_list, initial_runs, initial_configs_list, is_master_list, random_states)
             )
 
-    def run(self, runcount_limit, initial_run, initial_configs, is_master, random_state, sync_dict=None):
-        tuner = deepcopy(self.tuner)
-        resource_manager = deepcopy(self.resource_manager)
-        # resource_manager
-        if sync_dict:
-            sync_dict[os.getpid()] = 0
-            resource_manager.sync_dict = sync_dict
-        resource_manager.set_is_master(is_master)
-        resource_manager.smac_output_dir += (f"/{os.getpid()}")
-        # random_state: 1. set_hdl中传给phps 2. 传给所有配置
-        tuner.random_state = random_state
-        tuner.runcount_limit = runcount_limit
-        tuner.initial_runs = initial_run
-        tuner.set_resource_manager(resource_manager)
-        tuner.set_data_manager(self.data_manager)
-        tuner.replace_phps("random_state", int(random_state))
-        tuner.phps.seed(random_state)
-        tuner.set_addition_info({})  # {"shape": X.shape}
-        tuner.evaluator.set_resource_manager(resource_manager)
-        # todo : 增加 n_jobs ? 调研默认值
-        tuner.run(
-            self.data_manager,
-            self.metric,
-            self.all_scoring_functions,
-            self.splitter,
-            initial_configs
-        )
-        if sync_dict:
-            sync_dict[os.getpid()] = 1
+    def run(self, is_init, initial_run, initial_configs, is_master, random_state):
+        if is_init:
+            tuner = deepcopy(self.tuner)
+            resource_manager = deepcopy(self.resource_manager)
+            # resource_manager
+            resource_manager.set_is_master(is_master)
+            resource_manager.smac_output_dir += (f"/{os.getpid()}")
+            # random_state: 1. set_hdl中传给phps 2. 传给所有配置
+            tuner.random_state = random_state
+            tuner.initial_runs = initial_run
+            tuner.set_resource_manager(resource_manager)
+            tuner.set_data_manager(self.data_manager)
+            print(self.data_manager.X_train.feat_grp)
+            tuner.replace_phps("random_state", int(random_state))
+            tuner.phps.seed(random_state)
+            tuner.set_addition_info({})  # {"shape": X.shape}
+            tuner.evaluator.set_resource_manager(resource_manager)
+            tuner_id = id(tuner)
+            self.id2tuner[tuner_id] = tuner
+            self.id_is_used[tuner_id] = True
+            tuner.init_run(
+                self.data_manager,
+                self.metric,
+                self.all_scoring_functions,
+                self.splitter,
+                initial_configs
+            )
+            self.id_is_used[tuner_id] = False
+        else:
+            while True:
+                for tuner_id, is_used in self.id_is_used.items():
+                    if not is_used:
+                        tuner = self.id2tuner[tuner_id]
+                        self.id_is_used[tuner_id] = True
+                        tuner.run()
+                        self.id_is_used[tuner_id] = False
+                        break
+                print("warn:wait")
+                time.sleep(1)
 
     def fit_ensemble(
             self,

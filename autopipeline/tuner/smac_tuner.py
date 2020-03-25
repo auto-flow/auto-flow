@@ -35,7 +35,7 @@ class SmacPipelineTuner(PipelineTuner):
         # 与训练任务有关的一些参数（如分类回归任务，数据集（用于初始化所有算法模型的默认超参））
         # 思考不同的优化策略？
 
-    def run(
+    def init_run(
             self,
             datamanager: XYDataManager,
             metric: Scorer,
@@ -57,7 +57,7 @@ class SmacPipelineTuner(PipelineTuner):
         self.scenario = Scenario(
             {
                 "run_obj": "quality",
-                "runcount-limit": self.runcount_limit,
+                "runcount-limit": 100,#self.runcount_limit,
                 "cs": self.phps,  # configuration space
                 "deterministic": "true",
                 "output_dir": self.resource_manager.smac_output_dir,
@@ -70,13 +70,17 @@ class SmacPipelineTuner(PipelineTuner):
             db_kwargs=self.resource_manager.rh_db_kwargs,
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
-        smac = SMAC4HPO(
+        self.smac = SMAC4HPO(
             scenario=self.scenario,
             rng=np.random.RandomState(self.random_state),
             tae_runner=self.evaluator,
             initial_configurations=initial_configs
         )
-        self.incumbent = smac.optimize()
+        self.smac.solver.run_()
+
+    def run(self):
+        self.smac.solver.run_()
+        # smac.solver.run_()
 
     def php2model(self, php):
         php2dhp = SmacPHP2DHP()

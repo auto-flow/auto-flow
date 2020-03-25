@@ -144,6 +144,7 @@ class SMBO(object):
         )
 
         self.predict_incumbent = predict_incumbent
+        self.is_start = False
 
     def start(self):
         """Starts the Bayesian Optimization loop.
@@ -174,6 +175,10 @@ class SMBO(object):
         self.start()
 
     def run_(self):
+        if not self.is_start:
+            self.start_()
+            self.is_start = True
+            return
         start_time = time.time()
         cur_cost = self.runhistory.get_cost(self.incumbent)
         config_cost = self.runhistory.db.fetch_new_runhistory(False)

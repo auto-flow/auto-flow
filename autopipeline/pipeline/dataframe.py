@@ -3,6 +3,8 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
+from pandas._typing import FrameOrSeries
+from pandas.core.generic import bool_t
 
 
 class GenericDataFrame(pd.DataFrame):
@@ -26,16 +28,23 @@ class GenericDataFrame(pd.DataFrame):
 
     @property
     def feat_grp(self):
+        # return self.feat_grp_
         return self.__dict__["feat_grp"]
 
     @property
     def origin_grp(self):
+        # return self.origin_grp_
         return self.__dict__["origin_grp"]
 
     def set_feat_grp(self, feat_grp):
-        self.__dict__["feat_grp"] = feat_grp
+        dict_={"feat_grp":feat_grp}
+        if not self._metadata:
+            self._metadata.append(dict_)
+        else:
+            se
 
     def set_origin_grp(self, origin_grp):
+        # self.origin_grp_ = origin_grp
         self.__dict__["origin_grp"] = origin_grp
 
     def __repr__(self):
@@ -109,15 +118,32 @@ class GenericDataFrame(pd.DataFrame):
 
     def split(self, indexes):
         for index in indexes:
-            yield GenericDataFrame(self.iloc[index, :].reset_index(drop=True), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            yield GenericDataFrame(self.iloc[index, :].reset_index(drop=True), feat_grp=self.feat_grp,
+                                   origin_grp=self.origin_grp)
+
+    def copy(self: FrameOrSeries, deep: bool_t = True) -> FrameOrSeries:
+        return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+
+    # def __deepcopy__(self, memodict={}):
+    #     return GenericDataFrame(self.copy(deep=True), feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+    # def __reduce__(self):
+    #     return (self.__dict__,)
+
+    def __setstate__(self, state):
+        pass
+
 
 
 if __name__ == '__main__':
+    import pickle
     df = pd.read_csv("/home/tqc/PycharmProjects/auto-pipeline/examples/classification/train_classification.csv")
     suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
     feat_grp = ["id"] + suffix
 
     df2 = GenericDataFrame(df, feat_grp=feat_grp)
+    df=deepcopy(df2)
+    print(df)
+    print(pickle.loads(pickle.dumps(df)))
     # 测试1->2
     selected = df2.filter_feat_grp("id").values
     selected = np.hstack([selected, selected])

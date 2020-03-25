@@ -56,6 +56,13 @@ def mean_predicts(predicts: List[np.ndarray]):
     return proba
 
 
+def extend_0(lst: List, length: int):
+    assert isinstance(lst, list)
+    if len(lst) >= length:
+        return
+    lst += [0] * (length - len(lst))
+
+
 def binarization(array):
     # Takes a binary-class datafile and turn the max value (positive class)
     # into 1 and the min into 0
