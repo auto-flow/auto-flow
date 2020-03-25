@@ -9,9 +9,9 @@ def stack_Xs(X_train, X_valid=None, X_test=None):
         Xs.append(X_valid)
     if X_test is not None:
         Xs.append(X_test)
-    if isinstance(Xs[0],pd.DataFrame):
-        return pd.concat(Xs,axis=0).reset_index(drop=True)
-    elif isinstance(Xs[0],np.ndarray):
+    if isinstance(Xs[0], pd.DataFrame):
+        return pd.concat(Xs, axis=0).reset_index(drop=True)
+    elif isinstance(Xs[0], np.ndarray):
         return np.vstack(Xs)
 
 
@@ -21,7 +21,11 @@ def get_categorical_features_indices(X, origin_grp):
     categorical_features_indices = []
     for i, elem in enumerate(origin_grp):
         if "cat" in elem:
-            if type_of_target(X[:, i]) not in ("binary","continues"):
+            col = X[:, i]
+            try:
+                col = col.astype("float")
+            except Exception:
+                pass
+            if type_of_target(col) not in ("binary", "continuous"):  # todo: debug
                 categorical_features_indices.append(i)
     return categorical_features_indices
-

@@ -347,15 +347,33 @@ class SmacHDL2PHPS(HDL2PHPS):
                 assert len(value_list) >= 1
                 if method == "choice":
                     pass
-                elif method == "optional-choice":
-                    value_list.append(None)
                 else:
                     raise NotImplementedError()
                 cur_cs = ConfigurationSpace()
                 assert isinstance(value, dict)
                 # 不能用constant，会报错
-                value_list = list(map(smac_hdl._encode, value_list))
-                option_param = CategoricalHyperparameter('__choice__', value_list)  # todo : default
+                choice2proba = {}
+                not_specific_proba_choices = []
+                sum_proba = 0
+                for k in value_list:
+                    v = value[k]
+                    if isinstance(v, dict) and "__proba" in v:
+                        proba = v.pop("__proba")
+                        choice2proba[k] = proba
+                        sum_proba += proba
+                    else:
+                        not_specific_proba_choices.append(k)
+                if sum_proba <= 1:
+                    if len(not_specific_proba_choices) > 0:
+                        p_rest = (1 - sum_proba) / len(not_specific_proba_choices)
+                        for not_specific_proba_choice in not_specific_proba_choices:
+                            choice2proba[not_specific_proba_choice]=p_rest
+                else:
+                    choice2proba={k:1/len(value_list) for k in value_list}
+                proba_list=[choice2proba[k] for k in value_list]
+                value_list = list(map(smac_hdl._encode, value_list))  # choices必须为str
+
+                option_param = CategoricalHyperparameter('__choice__', value_list,weights=proba_list)  # todo : default
                 cur_cs.add_hyperparameter(option_param)
                 for sub_key, sub_value in value.items():
                     assert isinstance(sub_value, dict)

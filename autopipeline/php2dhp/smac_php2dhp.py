@@ -46,12 +46,11 @@ class SmacPHP2DHP(PHP2DHP):
                 v = _decode(v)
             key_path = k.split(":")
             if key_path[-1] == "__choice__":
-                # fixme  测试 optional-choice ，即有None的情况
                 key_path = key_path[:-1]
                 if v is not None:
-                    key_path+=[v]
-                    v={}
-
+                    key_path += [v]
+                    v = {}
+            if "None" in key_path:
+                continue
             self.set_kv(ret, key_path, v)  # self.split_key(k)
         return ret
-

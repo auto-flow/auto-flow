@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Union
+from typing import Union, Tuple
 
 from autopipeline.constants import Task
 from autopipeline.hdl.utils import get_hdl_db, get_default_hdl_db
@@ -84,7 +84,7 @@ class HDL_Constructor():
             raise NotImplementedError()
         return self._data_manager
 
-    def parse_item(self, value: Union[dict, str]):
+    def parse_item(self, value: Union[dict, str]) -> Tuple[str, dict, bool]:
         if isinstance(value, dict):
             name = value.pop("_name")
             if "_vanilla" in value:
@@ -94,6 +94,10 @@ class HDL_Constructor():
             addition_dict = value
         elif isinstance(value, str):
             name = value
+            addition_dict = {}
+            is_vanilla = False
+        elif value is None:
+            name = "None"
             addition_dict = {}
             is_vanilla = False
         else:
@@ -134,11 +138,7 @@ class HDL_Constructor():
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
                 values = [values]
-            if None in values:
-                formed_key = f"{i}{key}(optional-choice)"
-                values.remove(None)
-            else:
-                formed_key = f"{i}{key}(choice)"
+            formed_key = f"{i}{key}(choice)"
             sub_dict = {}
             for value in values:
                 name, addition_dict, is_vanilla = self.parse_item(value)

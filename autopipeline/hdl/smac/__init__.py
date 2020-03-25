@@ -13,12 +13,15 @@ def _encode(value: Any) -> str:
 
 
 def _decode(str_value: str) -> Any:
+    if str_value=="None":
+        return None
     ix = str_value.rfind(":")
     if ix < 0:
         return str_value
     else:
         value_ = str_value[:ix]
         type_ = str_value[ix + 1:]
+        return eval(value_)
         if type_ in ("NoneType", "dict", "bool"):   # todo:
             return eval(value_)
         cls = eval(type_)
