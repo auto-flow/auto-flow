@@ -100,11 +100,17 @@ class HDL_Constructor():
             raise TypeError
         return name, addition_dict, is_vanilla
 
+    def purify_DAG_describe(self):
+        DAG_describe = {}
+        for k, v in self.DAG_describe.items():
+            DAG_describe[k.replace(" ", "").replace("\n", "").replace("\t", "")] = v
+        self.DAG_describe = DAG_describe
+
     def run(self):
         # make sure:
         # set_task
         target_key = ""
-
+        self.purify_DAG_describe()
         for key in self.DAG_describe.keys():
             if key.split("->")[-1] == "target":
                 target_key = key

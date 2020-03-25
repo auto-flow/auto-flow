@@ -7,16 +7,12 @@ import numpy as np
 from ConfigSpace.configuration_space import Configuration
 
 from autopipeline.constants import Task
-from autopipeline.ensemble.mean.regressor import MeanRegressor
-from autopipeline.ensemble.vote.classifier import VoteClassifier
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer, calculate_score
-<<<<<<< HEAD
-=======
 from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.pipeline.pipeline import GenericPipeline
->>>>>>> refactor
+from autopipeline.utils.data import mean_predicts, vote_predicts
 from autopipeline.utils.logging_ import get_logger
 from dsmac.runhistory.utils import get_id_of_config
 
@@ -32,17 +28,10 @@ class TrainEvaluator():
     ):
         self.splitter = splitter
         self.data_manager = data_manager
-<<<<<<< HEAD
-        self.X_train = self.data_manager.data['X_train']
-        self.y_train = self.data_manager.data['y_train']
-        self.X_test = self.data_manager.data.get('X_test')
-        self.y_test = self.data_manager.data.get('y_test')
-=======
         self.X_train = self.data_manager.X_train
         self.y_train = self.data_manager.y_train
         self.X_test = self.data_manager.X_train
         self.y_test = self.data_manager.y_train
->>>>>>> refactor
 
         self.metric = metric
         self.task: Task = self.data_manager.task
@@ -103,6 +92,7 @@ class TrainEvaluator():
         if len(Y_pred.shape) == 1:
             Y_pred = Y_pred.reshape((-1, 1))
         return Y_pred
+
     def get_Xy(self):
         return self.X_train, self.y_train, self.X_test, self.y_test
 
@@ -114,18 +104,21 @@ class TrainEvaluator():
             models = []
             y_true_indexes = []
             y_preds = []
+            y_test_preds = []
             all_scores = []
             for train_index, valid_index in self.splitter.split(X, y):
-                X:GenericDataFrame
-                X_train, X_valid =X.split([train_index, valid_index ])
+                X: GenericDataFrame
+                X_train, X_valid = X.split([train_index, valid_index])
                 y_train, y_valid = y[train_index], y[valid_index]
-                model:GenericPipeline
+                model: GenericPipeline
                 # fitted_model = model.fit(X_train, y_train)
-                ret=model.procedure(self.task,X_train,y_train,X_valid,y_valid,X_test,y_test)
+                procedure_result = model.procedure(self.task, X_train, y_train, X_valid, y_valid, X_test, y_test)
                 models.append(model)
                 y_true_indexes.append(valid_index)
-                y_pred = ret["pred_valid"]
+                y_pred = procedure_result["pred_valid"]
+                y_test_pred = procedure_result["pred_test"]
                 y_preds.append(y_pred)
+                y_test_preds.append(y_test_pred)
                 loss, all_score = self.loss(y_valid, y_pred)
                 losses.append(float(loss))
                 all_scores.append(all_score)
@@ -155,11 +148,9 @@ class TrainEvaluator():
             if y_test is not None:
                 # 验证集训练模型的组合去预测测试集的数据
                 if self.task.mainTask == "classification":
-                    trainset_estimator = VoteClassifier(models)
-                    y_test_pred = trainset_estimator.predict_proba(X_test)
+                    y_test_pred = vote_predicts(y_test_preds)
                 else:
-                    trainset_estimator = MeanRegressor(models)
-                    y_test_pred = trainset_estimator.predict(X_test)
+                    y_test_pred = mean_predicts(y_test_preds)
                 test_loss, test_all_score = self.loss(y_test, y_test_pred)
                 info.update({
                     "test_loss": test_loss,
@@ -170,7 +161,6 @@ class TrainEvaluator():
         info["warning_info"] = warning_info.getvalue()
         return final_loss, info
 
-
     def set_php2model(self, php2model):
         self.php2model = php2model
 
@@ -180,9 +170,9 @@ class TrainEvaluator():
         start = time()
         dhp, model = self.php2model(php)
         # 2. 获取数据
-        X_train, y_train,X_test,y_test = self.get_Xy()
+        X_train, y_train, X_test, y_test = self.get_Xy()
         # 3. 进行评价
-        loss, info = self.evaluate(model, X_train, y_train,X_test,y_test)  # todo : 考虑失败的情况
+        loss, info = self.evaluate(model, X_train, y_train, X_test, y_test)  # todo : 考虑失败的情况
         # 4. 持久化
         cost_time = time() - start
         info["trial_id"] = trial_id

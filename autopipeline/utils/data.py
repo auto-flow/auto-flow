@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 import math
+from typing import Dict, List
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
-from typing import Dict
 
 from autopipeline.constants import binary_classification_task, multiclass_classification_task, \
     multilabel_classification_task, regression_task
@@ -42,6 +42,18 @@ def get_task_from_y(y):
     else:
         raise NotImplementedError()
     return task
+
+
+def vote_predicts(predicts: List[np.ndarray]):
+    probas_arr = np.array(predicts)
+    proba = np.average(probas_arr, axis=0)
+    return proba
+
+
+def mean_predicts(predicts: List[np.ndarray]):
+    probas_arr = np.array(predicts)
+    proba = np.average(probas_arr, axis=0)
+    return proba
 
 
 def binarization(array):
@@ -134,18 +146,20 @@ def float_gcd(a, b):
         return not bool(int(x) - x)
 
     base = 1
-    while not(is_int(a) and is_int(b)):
+    while not (is_int(a) and is_int(b)):
         a *= 10
         b *= 10
         base *= 10
     return math.gcd(int(a), int(b)) / base
 
-def replace_kv(dict_:Dict,rk,rv):
-    for k,v in dict_.items():
-        if isinstance(v,dict):
-            replace_kv(v,rk,rv)
-        elif k==rk:
-            dict_[k]=rv
+
+def replace_kv(dict_: Dict, rk, rv):
+    for k, v in dict_.items():
+        if isinstance(v, dict):
+            replace_kv(v, rk, rv)
+        elif k == rk:
+            dict_[k] = rv
+
 
 def get_chunks(iterable, chunks=1):
     # This is from http://stackoverflow.com/a/2136090/2073595
@@ -153,19 +167,20 @@ def get_chunks(iterable, chunks=1):
     return [lst[i::chunks] for i in range(chunks)]
 
 
-def is_cat(s:pd.Series):
+def is_cat(s: pd.Series):
     for elem in s:
-        if isinstance(elem,(float,int)):
+        if isinstance(elem, (float, int)):
             continue
         else:
             return True
     return False
 
-def is_nan(s:pd.Series):
+
+def is_nan(s: pd.Series):
     return np.any(pd.isna(s))
 
 
 def arraylize(X):
-    if isinstance(X,(pd.DataFrame,pd.Series)):
+    if isinstance(X, (pd.DataFrame, pd.Series)):
         return X.values
     return X
