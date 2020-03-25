@@ -35,7 +35,7 @@ class SmacPipelineTuner(PipelineTuner):
         # 与训练任务有关的一些参数（如分类回归任务，数据集（用于初始化所有算法模型的默认超参））
         # 思考不同的优化策略？
 
-    def init_run(
+    def run(
             self,
             datamanager: XYDataManager,
             metric: Scorer,
@@ -57,7 +57,7 @@ class SmacPipelineTuner(PipelineTuner):
         self.scenario = Scenario(
             {
                 "run_obj": "quality",
-                "runcount-limit": 100,#self.runcount_limit,
+                "runcount-limit": self.runcount_limit,
                 "cs": self.phps,  # configuration space
                 "deterministic": "true",
                 "output_dir": self.resource_manager.smac_output_dir,
