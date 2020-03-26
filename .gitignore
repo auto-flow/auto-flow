@@ -6,6 +6,7 @@ __pycache__/
 run
 data
 .idea/
+venv*
 # C extensions
 *.so
 data_test/
