@@ -84,8 +84,8 @@ class XYDataManager(AbstractDataManager):
         self.task: Task = get_task_from_y(y)
         self.X_train = GenericDataFrame(X, feat_grp=feat_grp)
         self.y_train = y
-        self.X_test = GenericDataFrame(X_test, feat_grp=feat_grp)
-        self.y_test = y_test
+        self.X_test = GenericDataFrame(X_test, feat_grp=feat_grp) if X_test is not None else None
+        self.y_test = y_test if y_test is not None else None
 
         # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定
         # fixme: 不支持multilabel
