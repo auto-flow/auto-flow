@@ -1,5 +1,6 @@
 import os
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -59,8 +60,8 @@ x_train, y_train, y_range = data_preprocessing()
 
 tuner = SmacPipelineTuner(
     random_state=42,
-    initial_runs=5,
-    runcount_limit=12,
+    initial_runs=12,
+    runcount_limit=120,
 )
 hdl_constructor = HDL_Constructor(
     DAG_descriptions={
@@ -68,8 +69,9 @@ hdl_constructor = HDL_Constructor(
     }
 )
 resource_manager = ResourceManager(os.getcwd() + "/for_hxw_result")
-auto_pipeline = AutoPipelineEstimator(tuner, hdl_constructor)
+auto_pipeline = AutoPipelineEstimator(tuner, hdl_constructor, ensemble_builder=False)
 
 auto_pipeline.fit(
-    X=x_train, y=y_train, n_jobs=2
+    X=x_train, y=y_train, n_jobs=3
 )
+joblib.dump(auto_pipeline, "auto_pipeline_for_hxw.bz")

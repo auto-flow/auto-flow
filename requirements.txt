@@ -19,3 +19,7 @@ sobol_seq
 lazy_import
 pyDOE
 emcee
+json5
+peewee
+pyyaml
+dill
