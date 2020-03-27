@@ -242,6 +242,6 @@ class AutoPipelineEstimator(BaseEstimator):
     def predict_proba(self, X):
         return self.estimator.predict_proba(X)
 
-    def set_dict_to_self(self, evaluate_info):
-        for key, value in evaluate_info.items():
+    def set_dict_to_self(self, dict_):
+        for key, value in dict_.items():
             setattr(self, key, value)

@@ -1,18 +1,13 @@
 import numpy as np
 
 from autopipeline.pipeline.components.base import AutoPLComponent
+from autopipeline.pipeline.components.utils import stack_Xs
 from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.utils.data import densify
 
 
 class AutoPLPreprocessingAlgorithm(AutoPLComponent):
-
-    # def transform(self, X):
-    #     X=densify(X)
-    #     if not self.estimator or (not hasattr(self.estimator, "transform")):
-    #         raise NotImplementedError()
-    #     X=self.before_pred_X(X)
-    #     return self.after_pred_X(self.estimator.transform(X))
+    need_y = False
 
     def fit_transform(self, X_train=None, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None,
                       is_train=True):
@@ -49,3 +44,9 @@ class AutoPLPreprocessingAlgorithm(AutoPLComponent):
 
     def before_trans_X(self, X):
         return X
+
+    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
+        if not self.need_y:
+            return stack_Xs(X_train, X_valid, X_test)
+        else:
+            return X_train

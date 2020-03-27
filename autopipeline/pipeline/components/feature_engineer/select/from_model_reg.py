@@ -1,4 +1,4 @@
-from autopipeline.pipeline.components.feature_engineer.select.from_model_base import SelectFromModelBase
+from autopipeline.pipeline.components.feature_engineer.select.base import SelectFromModelBase
 
 __all__ = ["SelectFromModelReg"]
 
