@@ -2,7 +2,7 @@ import os
 from glob import glob
 from pathlib import Path
 
-from general_fs import FileSystem
+from generic_fs import FileSystem
 
 
 class LocalFS(FileSystem):

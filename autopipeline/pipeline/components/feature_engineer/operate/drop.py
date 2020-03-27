@@ -5,4 +5,4 @@ __all__ = ["DropAll"]
 
 class DropAll(AutoPLPreprocessingAlgorithm):
     class__ = "DropAll"
-    module__ = "autopipeline.pipeline.proxy.drop_all"
+    module__ = "autopipeline_fe.operate.drop_all"

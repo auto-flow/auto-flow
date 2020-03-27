@@ -3,7 +3,7 @@ import logging
 import json
 
 from dsmac.scenario.scenario import Scenario
-from general_fs import LocalFS
+from generic_fs import LocalFS
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2016, ML4AAD"

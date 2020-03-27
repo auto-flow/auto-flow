@@ -2,7 +2,7 @@ import shutil
 import typing
 
 from dsmac.configspace import pcs_new, json, ConfigurationSpace
-from general_fs import LocalFS
+from generic_fs import LocalFS
 from dsmac.utils.logging import PickableLoggerAdapter
 
 

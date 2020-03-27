@@ -13,7 +13,7 @@ from dsmac.configspace import Configuration, ConfigurationSpace
 from dsmac.runhistory.utils import get_id_of_config
 from dsmac.tae.execute_ta_run import StatusType
 from dsmac.utils.logging import PickableLoggerAdapter
-from general_fs import LocalFS
+from generic_fs import LocalFS
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2015, ML4AAD"

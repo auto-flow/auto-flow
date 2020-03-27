@@ -5,7 +5,7 @@ import typing
 import numpy as np
 
 from dsmac.utils.io.cmd_reader import CMDReader
-from general_fs import HDFS, LocalFS
+from generic_fs import HDFS, LocalFS
 from dsmac.utils.io.input_reader import InputReader
 from dsmac.utils.io.output_writer import OutputWriter
 

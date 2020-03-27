@@ -12,8 +12,8 @@ from autopipeline.constants import Task
 from autopipeline.ensemble.mean.regressor import MeanRegressor
 from autopipeline.ensemble.vote.classifier import VoteClassifier
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
-from general_fs import LocalFS
-from general_fs.utils import dumps_pickle, loads_pickle
+from generic_fs import LocalFS
+from generic_fs.utils import dumps_pickle, loads_pickle
 
 
 class ResourceManager():

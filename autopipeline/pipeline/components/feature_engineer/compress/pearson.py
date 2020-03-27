@@ -4,4 +4,4 @@ __all__ = ["Pearson"]
 
 class Pearson(AutoPLPreprocessingAlgorithm):
     class__ = "Pearson"
-    module__ = "autopipeline.pipeline.proxy.pearson"
+    module__ = "autopipeline_fe.compress.variance"

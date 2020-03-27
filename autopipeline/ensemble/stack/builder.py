@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression, Lasso
 from autopipeline.ensemble.stack.classifier import StackingClassifier
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
-from general_fs import LocalFS
+from generic_fs import LocalFS
 
 
 def get_model_path_list_of_df(models: DataFrame, df: DataFrame):

@@ -1,6 +1,6 @@
 from scipy.stats import pearsonr
 
-from autopipeline.pipeline.proxy.similarity_base import SimilarityBase
+from autopipeline_fe.compress.similarity_base import SimilarityBase
 
 class Pearson(SimilarityBase):
     name = "pearson and f1_score"

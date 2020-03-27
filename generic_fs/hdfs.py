@@ -2,7 +2,7 @@ from fnmatch import fnmatchcase
 
 import hdfs
 
-from general_fs import FileSystem
+from generic_fs import FileSystem
 
 
 class HDFS(FileSystem):
