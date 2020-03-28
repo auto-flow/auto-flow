@@ -15,7 +15,7 @@ import autopipeline.hdl.smac as smac_hdl
 from autopipeline.constants import Task
 from autopipeline.hdl.utils import is_hdl_bottom
 from autopipeline.hdl2phps.base import HDL2PHPS
-from autopipeline.utils.packages import get_class_of_module
+from autopipeline.utils.packages import get_class_name_of_module
 
 
 class RelyModels:
@@ -35,7 +35,7 @@ class SmacHDL2PHPS(HDL2PHPS):
         hit = []
         for model in models:
             module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{model}"
-            _class = get_class_of_module(module_path)
+            _class = get_class_name_of_module(module_path)
             M = import_module(module_path)
             cls = getattr(M, _class)
             is_hit = getattr(cls, rely_model, False)

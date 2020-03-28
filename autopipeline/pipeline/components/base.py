@@ -28,14 +28,12 @@ class AutoPLComponent(BaseEstimator):
         self.in_feat_grp = None
         self.out_feat_grp = None
 
-    # @classmethod
     @property
     def class_(self):
         if not self.class__:
             raise NotImplementedError()
         return self.class__
 
-    # @classmethod
     @property
     def module_(self):
         if not self.module__:
@@ -104,7 +102,7 @@ class AutoPLComponent(BaseEstimator):
             return None
         elif isinstance(X, GenericDataFrame):
             from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
-            if issubclass(self.__class__, AutoPLPreprocessingAlgorithm):
+            if issubclass(self.__class__, AutoPLPreprocessingAlgorithm) and self.in_feat_grp != "all":
                 df = X.filter_feat_grp(self.in_feat_grp)
             else:
                 df = X

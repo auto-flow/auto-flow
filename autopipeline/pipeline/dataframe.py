@@ -74,6 +74,8 @@ class GenericDataFrame(pd.DataFrame):
                          values: np.ndarray,
                          new_feat_grp: Union[str, List, pd.Series],
                          new_origin_grp: Union[str, List, None, pd.Series] = None):
+        if old_feat_grp == "all":
+            old_feat_grp = np.unique(self.feat_grp).tolist()
         if isinstance(old_feat_grp, str):
             old_feat_grp = [old_feat_grp]
         # 如果参数new_origin_grp为None，根据长度是否改变对new_origin_grp进行赋值

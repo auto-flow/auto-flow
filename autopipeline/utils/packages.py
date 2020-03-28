@@ -6,7 +6,7 @@ from collections import OrderedDict
 from importlib import import_module
 
 
-def get_class_of_module(input_module):
+def get_class_name_of_module(input_module):
     if isinstance(input_module,str):
         _module=import_module(input_module)
     else:
@@ -15,6 +15,17 @@ def get_class_of_module(input_module):
         return _module.__all__[0]
     else:
         return inspect.getmembers(_module,inspect.isclass)[-1][0]
+
+def get_class_object_in_pipeline_components(key1, key2):
+    module_path = f"autopipeline.pipeline.components.{key1}.{key2}"
+    _class = get_class_name_of_module(module_path)
+    M = import_module(
+        module_path
+    )
+    assert hasattr(M, _class)
+    cls = getattr(M, _class)
+    return cls
+
 
 def find_components(package, directory, base_class):
     components = OrderedDict()

@@ -1,9 +1,10 @@
 from copy import deepcopy
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 from autopipeline.constants import Task
 from autopipeline.hdl.utils import get_hdl_db, get_default_hdl_db
 from autopipeline.manager.xy_data_manager import XYDataManager
+from autopipeline.utils.data import add_prefix_in_dict_keys
 
 
 class HDL_Constructor():
@@ -86,29 +87,52 @@ class HDL_Constructor():
 
     def parse_item(self, value: Union[dict, str]) -> Tuple[str, dict, bool]:
         if isinstance(value, dict):
-            name = value.pop("_name")
+            packages = value.pop("_name")
             if "_vanilla" in value:
                 is_vanilla = value.pop("_vanilla")
             else:
                 is_vanilla = False
             addition_dict = value
         elif isinstance(value, str):
-            name = value
+            packages = value
             addition_dict = {}
             is_vanilla = False
         elif value is None:
-            name = "None"
+            packages = "None"
             addition_dict = {}
             is_vanilla = False
         else:
             raise TypeError
-        return name, addition_dict, is_vanilla
+        return packages, addition_dict, is_vanilla
 
     def purify_DAG_describe(self):
         DAG_describe = {}
         for k, v in self.DAG_describe.items():
             DAG_describe[k.replace(" ", "").replace("\n", "").replace("\t", "")] = v
         self.DAG_describe = DAG_describe
+
+    def _get_params_in_dict(self, dict_: dict, package: str) -> dict:
+        ans = deepcopy(dict_)
+        for path in package.split("."):
+            ans = ans.get(path, {})
+        return ans
+
+    def get_params_in_dict(self, hdl_db: dict, packages: str, phase: str, mainTask):
+        assert phase in ("FE", "MHP")
+        packages: list = packages.split("|")
+        params_list: List[dict] = [self._get_params_in_dict(hdl_db["feature_engineer"], package) for package in
+                                   packages[:-1]]
+        last_phase_key = "feature_engineer" if phase == "FE" else mainTask
+        params_list += [self._get_params_in_dict(hdl_db[last_phase_key], packages[-1])]
+        if len(params_list) == 0:
+            raise AttributeError
+        elif len(params_list) == 1:
+            return params_list[0]
+        else:
+            result = {}
+            for params, package in zip(params_list, packages):
+                result.update(add_prefix_in_dict_keys(params, package + "."))
+            return result
 
     def run(self):
         # make sure:
@@ -125,15 +149,6 @@ class HDL_Constructor():
         mainTask = self.task.mainTask
         FE_package = "autopipeline.pipeline.components.feature_engineer"
         hdl_db = get_default_hdl_db()
-        FE_hdl_db = hdl_db["feature_engineer"]
-        MHP_hdl_db = hdl_db[mainTask]
-
-        def get_params_in_dict(dict_, package):
-            ans = deepcopy(dict_)
-            for path in package.split("."):
-                ans = ans.get(path, {})
-            return ans
-
         # 遍历DAG_describe，构造FE
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
@@ -141,19 +156,19 @@ class HDL_Constructor():
             formed_key = f"{i}{key}(choice)"
             sub_dict = {}
             for value in values:
-                name, addition_dict, is_vanilla = self.parse_item(value)
+                packages, addition_dict, is_vanilla = self.parse_item(value)
                 addition_dict.update({"random_state": self.random_state})  # fixme
-                params = {} if is_vanilla else get_params_in_dict(FE_hdl_db, name)
-                sub_dict[name] = params
-                sub_dict[name].update(addition_dict)
+                params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "FE", mainTask)
+                sub_dict[packages] = params
+                sub_dict[packages].update(addition_dict)
             FE_dict[formed_key] = sub_dict
         # 构造MHP
         MHP_dict = {}
         for MHP_value in MHP_values:
-            name, addition_dict, is_vanilla = self.parse_item(MHP_value)
-            params = {} if is_vanilla else get_params_in_dict(MHP_hdl_db, name)
-            MHP_dict[name] = params
-            MHP_dict[name].update(addition_dict)
+            packages, addition_dict, is_vanilla = self.parse_item(MHP_value)
+            params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "MHP", mainTask)
+            MHP_dict[packages] = params
+            MHP_dict[packages].update(addition_dict)
         final_dict = {
             "FE": FE_dict,
             "MHP(choice)": MHP_dict

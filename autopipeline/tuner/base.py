@@ -1,15 +1,14 @@
-from importlib import import_module
 from typing import Dict, Optional
 
 from ConfigSpace.configuration_space import ConfigurationSpace
-from sklearn.pipeline import Pipeline
 
 from autopipeline.constants import Task
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.pipeline.pipeline import GenericPipeline
-from autopipeline.utils.packages import get_class_of_module
+from autopipeline.utils.data import group_dict_items_before_first_dot
+from autopipeline.utils.packages import get_class_object_in_pipeline_components
 
 
 class PipelineTuner():
@@ -92,7 +91,7 @@ class PipelineTuner():
         cnt = int(cnt)
         key = key[ix:]
         _from, _to = key.split("->")
-        outside_edge_info = {}
+        outsideEdge_info = {}
         in_feat_grp = _from
         out_feat_grp = None
         if _to.startswith("{") and _to.endswith("}"):
@@ -100,72 +99,63 @@ class PipelineTuner():
             param_kvs = _to.split(",")
             for param_kv in param_kvs:
                 k, v = param_kv.split("=")
-                outside_edge_info[k] = v
+                outsideEdge_info[k] = v
         else:
-            out_feat_grp=_to
-        return in_feat_grp, out_feat_grp, outside_edge_info
+            out_feat_grp = _to
+        return in_feat_grp, out_feat_grp, outsideEdge_info
 
     def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
         FE_dict: dict = dhp["FE"]
         pipeline_list = []
         for key, value in FE_dict.items():
-            name = key
-            in_feat_grp, out_feat_grp, outside_edge_info = self.parse(key)
-            sub_dict=FE_dict[name]
+            name = key  # like: "cat->num"
+            in_feat_grp, out_feat_grp, outsideEdge_info = self.parse(key)
+            sub_dict = FE_dict[name]
             if sub_dict is None:
                 continue
-            _module = list(sub_dict.keys())[0]
-            if _module is None:  # optional-choice
-                continue
-            module_path = f"autopipeline.pipeline.components.feature_engineer.{_module}"
-            _class = get_class_of_module(module_path)
-            M = import_module(
-                module_path
-            )
-            assert hasattr(M, _class)
-            cls = getattr(M, _class)
-            param = FE_dict[name][_module]
-            preprocessor = cls()
-            preprocessor.in_feat_grp = in_feat_grp
-            preprocessor.out_feat_grp = out_feat_grp
-
-            # todo: default_hp
-            # default_hp = self.default_hp.get("feature_engineer", {}) \
-            #     .get(phase, {}).get(_module, {})
-            # default_hp.update(param)
-            param.update(outside_edge_info)
-            preprocessor.update_hyperparams(param)  # param
-            preprocessor.set_addition_info(self.addition_info)
-            pipeline_list.append(
-                (name, preprocessor)
-            )
+            pipeline_list.extend(self.create_component(sub_dict, "FE", name, in_feat_grp, out_feat_grp))
         if pipeline_list:
             return GenericPipeline(pipeline_list)
         else:
             return None
 
-    def create_estimator(self, dhp: Dict) -> Pipeline:
+    def create_estimator(self, dhp: Dict) -> GenericPipeline:
         # 根据超参构造一个估计器
-        _module = list(dhp["MHP"].keys())[0]
-        param = dhp["MHP"][_module]
-        module_path = f"autopipeline.pipeline.components.{self.task.mainTask}.{_module}"
-        _class = get_class_of_module(module_path)
-        M = import_module(
-            module_path
-        )
-        assert hasattr(M, _class)
-        cls = getattr(M, _class)
-        # default_hp = self.default_hp.get(self.task.mainTask, {}) \
-        #     .get(f"{_module}", {})
-        default_hp = {}
-        default_hp.update(param)
-        estimator = cls()
-        estimator.set_addition_info(self.addition_info)
-        estimator.update_hyperparams(default_hp)
-        return Pipeline([(
-            self.task.role,
-            estimator
-        )])
+        return GenericPipeline(self.create_component(dhp["MHP"], "MHP", self.task.role))
+
+    def _create_component(self, key1, key2, params):
+        cls = get_class_object_in_pipeline_components(key1, key2)
+        component = cls()
+        component.set_addition_info(self.addition_info)
+        component.update_hyperparams(params)
+        return component
+
+    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feat_grp="all", out_feat_grp="all"):
+        pipeline_list = []
+        assert phase in ("FE", "MHP")
+        packages = list(sub_dhp.keys())[0]
+        params = sub_dhp[packages]
+        packages = packages.split("|")
+        grouped_params = group_dict_items_before_first_dot(params)
+        if len(packages) == 1:
+            grouped_params[packages[0]] = grouped_params.pop("single")
+        for package in packages[:-1]:
+            preprocessor = self._create_component("feature_engineer", package, grouped_params[package])
+            preprocessor.in_feat_grp = in_feat_grp
+            preprocessor.out_feat_grp = in_feat_grp
+            pipeline_list.append([
+                package,
+                preprocessor
+            ])
+        key1 = "feature_engineer" if phase == "FE" else self.task.mainTask
+        component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
+        component.in_feat_grp = in_feat_grp
+        component.out_feat_grp = out_feat_grp
+        pipeline_list.append([
+            step_name,
+            component
+        ])
+        return pipeline_list
 
     def run(self, *args):
         raise NotImplementedError()

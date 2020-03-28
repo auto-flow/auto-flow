@@ -31,9 +31,6 @@ class SmacPipelineTuner(PipelineTuner):
 
         self.evaluator.set_php2model(self.php2model)
 
-        # 将smac中的参数迁移过来
-        # 与训练任务有关的一些参数（如分类回归任务，数据集（用于初始化所有算法模型的默认超参））
-        # 思考不同的优化策略？
 
     def run(
             self,
@@ -63,7 +60,6 @@ class SmacPipelineTuner(PipelineTuner):
                 "output_dir": self.resource_manager.smac_output_dir,
             },
             initial_runs=self.initial_runs,
-            # after_run_callback=self.evaluator.resource_manager.delete_models,
             db_type=self.resource_manager.db_type,
             db_args=self.resource_manager.rh_db_args,
             db_kwargs=self.resource_manager.rh_db_kwargs,
@@ -96,8 +92,3 @@ class SmacPipelineTuner(PipelineTuner):
         hdl2phps = SmacHDL2PHPS()
         hdl2phps.set_task(self.task)
         return hdl2phps(hdl)
-
-    def replace_phps(self, key, value):
-        for hp in self.phps.get_hyperparameters():
-            if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
-                hp.value = _encode(value)

@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import math
-from typing import Dict, List
+from collections import defaultdict
+from typing import Dict, List, Any
 
 import numpy as np
 import pandas as pd
@@ -9,6 +10,27 @@ from sklearn.utils.multiclass import type_of_target
 
 from autopipeline.constants import binary_classification_task, multiclass_classification_task, \
     multilabel_classification_task, regression_task
+
+
+def add_prefix_in_dict_keys(dict_: Dict[str, Any], prefix: str) -> Dict[str, Any]:
+    result = {}
+    for key, value in dict_.items():
+        result[f"{prefix}{key}"] = value
+    return result
+
+
+def group_dict_items_before_first_dot(dict_: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    result = defaultdict(dict)
+    for packages, value in dict_.items():
+        if "." in packages:
+            split_list = packages.split(".")
+            key1 = ".".join(split_list[:-1])
+            key2 = split_list[-1]
+        else:
+            key1 = "single"
+            key2 = packages
+        result[key1][key2] = value
+    return result
 
 
 def sanitize_array(array):

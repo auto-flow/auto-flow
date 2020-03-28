@@ -18,7 +18,7 @@ from autopipeline.metrics import r2, accuracy
 from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.concurrence import parse_n_jobs
-from autopipeline.utils.config_space import get_default_initial_configs
+from autopipeline.utils.config_space import get_default_initial_configs, replace_phps
 from autopipeline.utils.data import get_chunks
 
 
@@ -83,6 +83,7 @@ class AutoPipelineEstimator(BaseEstimator):
         self.resource_manager.dump_object("data_manager", self.data_manager)
         # hdl default_hp
         self.hdl_constructor.set_data_manager(self.data_manager)
+        self.hdl_constructor.set_random_state(self.tuner.random_state)
         self.hdl_constructor.run()
         self.resource_manager.dump_hdl(self.hdl_constructor)
         self.hdl = self.hdl_constructor.get_hdl()
@@ -157,7 +158,7 @@ class AutoPipelineEstimator(BaseEstimator):
         tuner.initial_runs = initial_run
         tuner.set_resource_manager(resource_manager)
         tuner.set_data_manager(self.data_manager)
-        tuner.replace_phps("random_state", int(random_state))
+        replace_phps(tuner.phps,"random_state", int(random_state))
         tuner.phps.seed(random_state)
         tuner.set_addition_info({})  # {"shape": X.shape}
         tuner.evaluator.set_resource_manager(resource_manager)

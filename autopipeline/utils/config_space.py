@@ -3,6 +3,8 @@ from typing import List
 
 from ConfigSpace.configuration_space import ConfigurationSpace, Configuration
 
+from autopipeline.hdl.smac import _encode
+
 
 def get_default_initial_configs(phps: ConfigurationSpace, n_configs) -> List[Configuration]:
     None_name = "None:NoneType"
@@ -22,3 +24,8 @@ def get_default_initial_configs(phps: ConfigurationSpace, n_configs) -> List[Con
     if len(ans) < n_configs:
         ans.extend(phps.sample_configuration(n_configs - len(ans)))
     return ans
+
+def replace_phps(phps:ConfigurationSpace, key, value):
+    for hp in phps.get_hyperparameters():
+        if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
+            hp.value = _encode(value)
