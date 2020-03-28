@@ -113,7 +113,9 @@ class PipelineTuner():
             sub_dict = feature_engineer_dict[name]
             if sub_dict is None:
                 continue
-            pipeline_list.extend(self.create_component(sub_dict, "feature_engineer", name, in_feat_grp, out_feat_grp))
+            preprocessor = self.create_component(sub_dict, "feature_engineer", name, in_feat_grp, out_feat_grp,
+                                                 outsideEdge_info)
+            pipeline_list.extend(preprocessor)
         if pipeline_list:
             return GenericPipeline(pipeline_list)
         else:
@@ -130,7 +132,8 @@ class PipelineTuner():
         component.update_hyperparams(params)
         return component
 
-    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feat_grp="all", out_feat_grp="all"):
+    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feat_grp="all", out_feat_grp="all",
+                         outsideEdge_info=None):
         pipeline_list = []
         assert phase in ("feature_engineer", "estimator")
         packages = list(sub_dhp.keys())[0]
@@ -151,6 +154,8 @@ class PipelineTuner():
         component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
         component.in_feat_grp = in_feat_grp
         component.out_feat_grp = out_feat_grp
+        if outsideEdge_info:
+            component.update_hyperparams(outsideEdge_info)
         pipeline_list.append([
             step_name,
             component
