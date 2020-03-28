@@ -4,4 +4,4 @@ __all__ = ["F1Score"]
 
 class F1Score(AutoPLPreprocessingAlgorithm):
     class__ = "F1Score"
-    module__ = "autopipeline_fe.compress.variance"
+    module__ = "autopipeline.feature_engineer.compress.variance"

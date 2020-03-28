@@ -118,11 +118,11 @@ class HDL_Constructor():
         return ans
 
     def get_params_in_dict(self, hdl_db: dict, packages: str, phase: str, mainTask):
-        assert phase in ("FE", "MHP")
+        assert phase in ("feature_engineer", "estimator")
         packages: list = packages.split("|")
         params_list: List[dict] = [self._get_params_in_dict(hdl_db["feature_engineer"], package) for package in
                                    packages[:-1]]
-        last_phase_key = "feature_engineer" if phase == "FE" else mainTask
+        last_phase_key = "feature_engineer" if phase == "feature_engineer" else mainTask
         params_list += [self._get_params_in_dict(hdl_db[last_phase_key], packages[-1])]
         if len(params_list) == 0:
             raise AttributeError
@@ -142,14 +142,14 @@ class HDL_Constructor():
         for key in self.DAG_describe.keys():
             if key.split("->")[-1] == "target":
                 target_key = key
-        MHP_values = self.DAG_describe.pop(target_key)
-        if not isinstance(MHP_values, (list, tuple)):
-            MHP_values = [MHP_values]
-        FE_dict = {}
+        estimator_values = self.DAG_describe.pop(target_key)
+        if not isinstance(estimator_values, (list, tuple)):
+            estimator_values = [estimator_values]
+        feature_engineer_dict = {}
         mainTask = self.task.mainTask
-        FE_package = "autopipeline.pipeline.components.feature_engineer"
+        feature_engineer_package = "autopipeline.pipeline.components.feature_engineer"
         hdl_db = get_default_hdl_db()
-        # 遍历DAG_describe，构造FE
+        # 遍历DAG_describe，构造feature_engineer
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
                 values = [values]
@@ -158,20 +158,20 @@ class HDL_Constructor():
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
                 addition_dict.update({"random_state": self.random_state})  # fixme
-                params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "FE", mainTask)
+                params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "feature_engineer", mainTask)
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)
-            FE_dict[formed_key] = sub_dict
-        # 构造MHP
-        MHP_dict = {}
-        for MHP_value in MHP_values:
-            packages, addition_dict, is_vanilla = self.parse_item(MHP_value)
-            params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "MHP", mainTask)
-            MHP_dict[packages] = params
-            MHP_dict[packages].update(addition_dict)
+            feature_engineer_dict[formed_key] = sub_dict
+        # 构造estimator
+        estimator_dict = {}
+        for estimator_value in estimator_values:
+            packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
+            params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "estimator", mainTask)
+            estimator_dict[packages] = params
+            estimator_dict[packages].update(addition_dict)
         final_dict = {
-            "FE": FE_dict,
-            "MHP(choice)": MHP_dict
+            "feature_engineer": feature_engineer_dict,
+            "estimator(choice)": estimator_dict
         }
         self.hdl = final_dict
 

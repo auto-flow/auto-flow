@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from autopipeline_fe.compress.similarity_base import SimilarityBase
+from autopipeline.feature_engineer import SimilarityBase
 
 
 class Variance(SimilarityBase):

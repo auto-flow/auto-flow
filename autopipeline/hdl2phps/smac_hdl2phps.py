@@ -52,7 +52,7 @@ class SmacHDL2PHPS(HDL2PHPS):
             all_models: List[str],
             **kwargs
     ):
-        MHP = cs.get_hyperparameter("MHP:__choice__")
+        estimator = cs.get_hyperparameter("estimator:__choice__")
         probabilities = []
         model2prob = {}
         L = 0
@@ -62,20 +62,20 @@ class SmacHDL2PHPS(HDL2PHPS):
             for model in cur_models:
                 model2prob[model] = kwargs[rely_model] / len(cur_models)
         p_rest = (1 - sum(model2prob.values())) / (len(all_models) - L)
-        for model in MHP.choices:
+        for model in estimator.choices:
             probabilities.append(model2prob.get(model, p_rest))
-        MHP.probabilities = probabilities
-        default_MHP_choice = None
+        estimator.probabilities = probabilities
+        default_estimator_choice = None
         for models in relied2models.values():
             if models:
-                default_MHP_choice = models[0]
-        MHP.default_value = default_MHP_choice
+                default_estimator_choice = models[0]
+        estimator.default_value = default_estimator_choice
         for rely_model, path in RelyModels.info:
             forbid_eq_value = path[-1]
             path = path[:-1]
             forbid_eq_key = ":".join(path + ["__choice__"])
             forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
-            forbid_in_key = "MHP:__choice__"
+            forbid_in_key = "estimator:__choice__"
             hit = relied2AllModels.get(rely_model)
             if not hit:
                 choices = list(forbid_eq_key_hp.choices)
@@ -107,7 +107,7 @@ class SmacHDL2PHPS(HDL2PHPS):
     def __rely_model(self, cs: ConfigurationSpace):
         if not RelyModels.info:
             return
-        all_models = list(cs.get_hyperparameter("MHP:__choice__").choices)
+        all_models = list(cs.get_hyperparameter("estimator:__choice__").choices)
         rely_model_counter = Counter([x[0] for x in RelyModels.info])
         # 依赖模式->所有相应模型
         relied2AllModels = {}
@@ -148,7 +148,7 @@ class SmacHDL2PHPS(HDL2PHPS):
 
             cur_cs.seed(42)
             try:
-                counter = Counter([_hp.get("MHP:__choice__") for _hp in
+                counter = Counter([_hp.get("estimator:__choice__") for _hp in
                                    cur_cs.sample_configuration(len(all_models) * 15)])
 
                 if debug:
@@ -179,7 +179,7 @@ class SmacHDL2PHPS(HDL2PHPS):
         # todo: 将计算的概率缓存
 
     def purify_isolate_rely_in_hdl(self, hdl: Dict, models: List[str]):
-        # 为了应对MHP中全为boost的情况
+        # 为了应对estimator中全为boost的情况
         # 做法： 删除 __rely_model键
         for key, value in hdl.items():
             if isinstance(value, dict):
@@ -195,7 +195,7 @@ class SmacHDL2PHPS(HDL2PHPS):
                     self.purify_isolate_rely_in_hdl(value, models)
 
     def drop_invalid_rely_in_hdl(self, hdl: Dict, models: List[str]):
-        # 为了应对MHP中没有boost，但是特征工程序列中却有依赖boost的特征工程的情况
+        # 为了应对estimator中没有boost，但是特征工程序列中却有依赖boost的特征工程的情况
         # 做法：将这样的特征工程删除
         for key, value in hdl.items():
             if isinstance(value, dict):
@@ -215,7 +215,7 @@ class SmacHDL2PHPS(HDL2PHPS):
 
     def __call__(self, hdl: Dict):
         # 对HDL进行处理
-        models = hdl["MHP(choice)"]
+        models = hdl["estimator(choice)"]
         self.drop_invalid_rely_in_hdl(hdl, models)
         self.purify_isolate_rely_in_hdl(hdl, models)
         RelyModels.info = []

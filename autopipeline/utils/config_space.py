@@ -11,14 +11,14 @@ def get_default_initial_configs(phps: ConfigurationSpace, n_configs) -> List[Con
     phps = deepcopy(phps)
     for config in phps.get_hyperparameters():
         name: str = config.name
-        if name.startswith("FE") and name.endswith("__choice__") and (None_name in config.choices):
+        if name.startswith("feature_engineer") and name.endswith("__choice__") and (None_name in config.choices):
             config.default_value = None_name
 
-    model_choice = phps.get_hyperparameter("MHP:__choice__")
+    model_choice = phps.get_hyperparameter("estimator:__choice__")
     ans = []
     for choice in model_choice.choices:
         cur_phps = deepcopy(phps)
-        cur_phps.get_hyperparameter("MHP:__choice__").default_value = choice
+        cur_phps.get_hyperparameter("estimator:__choice__").default_value = choice
         default = cur_phps.get_default_configuration()
         ans.append(default)
     if len(ans) < n_configs:

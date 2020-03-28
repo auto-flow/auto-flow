@@ -173,7 +173,7 @@ class TrainEvaluator():
         info["status"] = "success"
         info["program_hyper_param"] = php
         info["dict_hyper_param"] = dhp
-        estimator = list(dhp.get("MHP", {"unk": ""}).keys())[0]
+        estimator = list(dhp.get("estimator", {"unk": ""}).keys())[0]
         info["estimator"] = estimator
         info["trial_id"] = trial_id
         info["cost_time"] = cost_time

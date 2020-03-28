@@ -10,7 +10,7 @@ from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.pipeline import concat_pipeline
 
-HDL = {'FE': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
+HDL = {'feature_engineer': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
               '1highR_nan->lowR_nan(choice)': {'operate.drop': {},
                                                'operate.merge': {'__rely_model': 'boost_model'}},
               '2lowR_nan->{cat_name=cat_nan,num_name=num_nan}(choice)': {'operate.split.cat_num': {}},
@@ -29,7 +29,7 @@ HDL = {'FE': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.n
                                           'operate.drop': {}},
               '7lowR_cat->num(choice)': {'encode.label': {'__rely_model': 'tree_model'},
                                          'encode.one_hot': {}}},
-       'MHP(choice)': {'catboost': {},
+       'estimator(choice)': {'catboost': {},
                        'decision_tree': {'criterion': {'_default': 'gini',
                                                        '_type': 'choice',
                                                        '_value': ['gini', 'entropy']},
@@ -95,7 +95,7 @@ for i in range(100):
     php2dhp = SmacPHP2DHP()
     dhp = php2dhp(php)
     # i+=1
-    estimators.append(list(dhp["MHP"].keys())[0])
+    estimators.append(list(dhp["estimator"].keys())[0])
     pprint(dhp)
     break
 # print(Counter(estimators))
