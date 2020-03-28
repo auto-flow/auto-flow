@@ -1,5 +1,4 @@
 from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
-from autopipeline.pipeline.components.utils import stack_Xs
 
 
 class BaseEncoder(AutoPLPreprocessingAlgorithm):

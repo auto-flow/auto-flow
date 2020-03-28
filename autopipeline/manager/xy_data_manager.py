@@ -74,6 +74,10 @@ class XYDataManager(AbstractDataManager):
                 feat_grp = self.parse_feat_grp(X[column])
                 column2featGrp[column] = feat_grp
         feat_grp = [column2featGrp[column] for column in X.columns]
+        L1 = X.shape[0]
+        L2 = X_test.shape[0]
+        X.index = range(L1)
+        X_test.index = range(L1, L1 + L2)
         return X, y, X_test, y_test, feat_grp
 
     def __init__(

@@ -30,23 +30,18 @@ class TrainEvaluator():
         self.data_manager = data_manager
         self.X_train = self.data_manager.X_train
         self.y_train = self.data_manager.y_train
-        self.X_test = self.data_manager.X_train
-        self.y_test = self.data_manager.y_train
+        self.X_test = self.data_manager.X_test
+        self.y_test = self.data_manager.y_test
 
         self.metric = metric
         self.task: Task = self.data_manager.task
-        # self.seed = seed
 
-        # self.output_y_hat_optimization = output_y_hat_optimization
         self.all_scoring_functions = all_scoring_functions
-        # self.disable_file_output = disable_file_output
 
         if self.task.mainTask == "regression":
             self.predict_function = self._predict_regression
         else:
             self.predict_function = self._predict_proba
-
-        # self.subsample = subsample
 
         logger_name = self.__class__.__name__
         self.logger = get_logger(logger_name)
@@ -111,7 +106,6 @@ class TrainEvaluator():
                 X_train, X_valid = X.split([train_index, valid_index])
                 y_train, y_valid = y[train_index], y[valid_index]
                 model: GenericPipeline
-                # fitted_model = model.fit(X_train, y_train)
                 procedure_result = model.procedure(self.task, X_train, y_train, X_valid, y_valid, X_test, y_test)
                 models.append(model)
                 y_true_indexes.append(valid_index)

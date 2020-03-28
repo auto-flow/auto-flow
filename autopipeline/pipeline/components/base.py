@@ -229,6 +229,6 @@ class AutoPLComponent(BaseEstimator):
 
     def before_pred_X(self, X):
         if isinstance(X,pd.DataFrame):
-            return X.reset_index(drop=True)
+            return X
         return X
 
