@@ -367,13 +367,13 @@ class SmacHDL2PHPS(HDL2PHPS):
                     if len(not_specific_proba_choices) > 0:
                         p_rest = (1 - sum_proba) / len(not_specific_proba_choices)
                         for not_specific_proba_choice in not_specific_proba_choices:
-                            choice2proba[not_specific_proba_choice]=p_rest
+                            choice2proba[not_specific_proba_choice] = p_rest
                 else:
-                    choice2proba={k:1/len(value_list) for k in value_list}
-                proba_list=[choice2proba[k] for k in value_list]
-                value_list = list(map(smac_hdl._encode, value_list))  # choices必须为str
+                    choice2proba = {k: 1 / len(value_list) for k in value_list}
+                proba_list = [choice2proba[k] for k in value_list]
+                value_list = list(map(smac_hdl._encode, value_list))  # choices must be str
 
-                option_param = CategoricalHyperparameter('__choice__', value_list,weights=proba_list)  # todo : default
+                option_param = CategoricalHyperparameter('__choice__', value_list, weights=proba_list)  # todo : default
                 cur_cs.add_hyperparameter(option_param)
                 for sub_key, sub_value in value.items():
                     assert isinstance(sub_value, dict)
