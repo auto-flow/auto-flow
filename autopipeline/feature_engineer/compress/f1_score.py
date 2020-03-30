@@ -1,6 +1,6 @@
 import numpy as np
 
-from autopipeline.feature_engineer import SimilarityBase
+from autopipeline.feature_engineer.compress.similarity_base import SimilarityBase
 
 
 def valid(arr):

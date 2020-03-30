@@ -118,11 +118,11 @@ class HDL_Constructor():
         return ans
 
     def get_params_in_dict(self, hdl_db: dict, packages: str, phase: str, mainTask):
-        assert phase in ("feature_engineer", "estimator")
+        assert phase in ("preprocessing", "estimator")
         packages: list = packages.split("|")
-        params_list: List[dict] = [self._get_params_in_dict(hdl_db["feature_engineer"], package) for package in
+        params_list: List[dict] = [self._get_params_in_dict(hdl_db["preprocessing"], package) for package in
                                    packages[:-1]]
-        last_phase_key = "feature_engineer" if phase == "feature_engineer" else mainTask
+        last_phase_key = "preprocessing" if phase == "preprocessing" else mainTask
         params_list += [self._get_params_in_dict(hdl_db[last_phase_key], packages[-1])]
         if len(params_list) == 0:
             raise AttributeError
@@ -145,11 +145,11 @@ class HDL_Constructor():
         estimator_values = self.DAG_describe.pop(target_key)
         if not isinstance(estimator_values, (list, tuple)):
             estimator_values = [estimator_values]
-        feature_engineer_dict = {}
+        preprocessing_dict = {}
         mainTask = self.task.mainTask
-        feature_engineer_package = "autopipeline.pipeline.components.feature_engineer"
+        preprocessing_package = "autopipeline.pipeline.components.preprocessing"
         hdl_db = get_default_hdl_db()
-        # 遍历DAG_describe，构造feature_engineer
+        # 遍历DAG_describe，构造preprocessing
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
                 values = [values]
@@ -158,10 +158,10 @@ class HDL_Constructor():
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
                 addition_dict.update({"random_state": self.random_state})  # fixme
-                params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "feature_engineer", mainTask)
+                params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "preprocessing", mainTask)
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)
-            feature_engineer_dict[formed_key] = sub_dict
+            preprocessing_dict[formed_key] = sub_dict
         # 构造estimator
         estimator_dict = {}
         for estimator_value in estimator_values:
@@ -170,7 +170,7 @@ class HDL_Constructor():
             estimator_dict[packages] = params
             estimator_dict[packages].update(addition_dict)
         final_dict = {
-            "feature_engineer": feature_engineer_dict,
+            "preprocessing": preprocessing_dict,
             "estimator(choice)": estimator_dict
         }
         self.hdl = final_dict

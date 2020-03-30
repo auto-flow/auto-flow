@@ -71,16 +71,16 @@ class AutoPLComponent(BaseEstimator):
         return y
 
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
-                       is_train=False):
+                       y_train=None):
         raise NotImplementedError
 
-    def pred_or_trans(self, X_train, X_valid=None, X_test=None, is_train=False):
+    def pred_or_trans(self, X_train, X_valid=None, X_test=None, y_train=None):
         X_train_ = self.preprocess_data(X_train)
         X_valid_ = self.preprocess_data(X_valid)
         X_test_ = self.preprocess_data(X_test)
         if not self.estimator:
             raise NotImplementedError()
-        return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, is_train)
+        return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, y_train)
 
     def filter_invalid(self, cls, hyperparams: Dict) -> Dict:
         hyperparams = deepcopy(hyperparams)
@@ -101,8 +101,8 @@ class AutoPLComponent(BaseEstimator):
         if X is None:
             return None
         elif isinstance(X, GenericDataFrame):
-            from autopipeline.pipeline.components.preprocess_base import AutoPLPreprocessingAlgorithm
-            if issubclass(self.__class__, AutoPLPreprocessingAlgorithm) and self.in_feat_grp != "all":
+            from autopipeline.pipeline.components.feature_engineer_base import AutoPLFeatureEngineerAlgorithm
+            if issubclass(self.__class__, AutoPLFeatureEngineerAlgorithm) and self.in_feat_grp != "all":
                 df = X.filter_feat_grp(self.in_feat_grp)
             else:
                 df = X
@@ -117,6 +117,16 @@ class AutoPLComponent(BaseEstimator):
         else:
             raise NotImplementedError
 
+    def build_proxy_estimator(self):
+        # 默认采用代理模式（但可以颠覆这种模式，完全重写这个类）
+        cls = self.get_estimator_class()
+        # 根据构造函数构造代理估计器
+        self.estimator = cls(
+            **self.filter_invalid(
+                cls, self.after_process_hyperparams(self.hyperparams)
+            )
+        )
+
     def fit(self, X_train, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
@@ -128,14 +138,7 @@ class AutoPLComponent(BaseEstimator):
         X_test_ = self.preprocess_data(X_test)
         # 通过以上步骤，保证所有的X都是np.ndarray 形式
         self.shape = X_train_.shape
-        # 默认采用代理模式（但可以颠覆这种模式，完全重写这个类）
-        cls = self.get_estimator_class()
-        # 根据构造函数构造代理估计器
-        self.estimator = cls(
-            **self.filter_invalid(
-                cls, self.after_process_hyperparams(self.hyperparams)
-            )
-        )
+        self.build_proxy_estimator()
         # 对数据进行预处理（比如有的preprocessor只能处理X>0的数据）
         X_train_ = self.before_fit_X(X_train_)
         y_train = self.before_fit_y(y_train)

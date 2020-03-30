@@ -24,7 +24,7 @@ class AutoPLClassificationAlgorithm(AutoPLComponent):
 
     # def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
-                       is_train=False):
+                       y_train=None):
         return self.estimator.predict(self.before_pred_X(X_train_))
 
     def predict(self, X):

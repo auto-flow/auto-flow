@@ -1,7 +1,7 @@
 from autopipeline import constants
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 
-HDL = {'feature_engineer': {'cat->{highR=highR_cat,lowR=lowR_cat}(choice)': {'operate.split.cat': {}},
+HDL = {'preprocessing': {'cat->{highR=highR_cat,lowR=lowR_cat}(choice)': {'operate.split.cat': {}},
               'cat_nan->cat(choice)': {'impute.fill_abnormal': {'__rely_model': 'boost_model'},
                                        'impute.fill_cat': {}},
               'highR_cat->num(choice)': {'encode.label': {'__rely_model': 'tree_model'},

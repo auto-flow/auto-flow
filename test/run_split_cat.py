@@ -1,8 +1,8 @@
 import pandas as pd
 
 
-from autopipeline.pipeline.components.feature_engineer.operate.drop import DropAll
-from autopipeline.pipeline.components.feature_engineer.operate.split.cat import SplitCat
+from autopipeline.pipeline.components.preprocessing.operate.drop import DropAll
+from autopipeline.pipeline.components.preprocessing.operate.split.cat import SplitCat
 from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.pipeline.pipeline import GenericPipeline
 

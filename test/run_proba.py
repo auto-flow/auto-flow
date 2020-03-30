@@ -5,7 +5,7 @@ from autopipeline import constants
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
 
-HDL = {'feature_engineer': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
+HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
               '1highR_nan->lowR_nan(choice)': {'operate.drop': {},
                                                'operate.merge': {'__rely_model': 'boost_model'}},
               '2lowR_nan->{cat_name=cat_nan,num_name=num_nan}(choice)': {'operate.split.cat_num': {}},

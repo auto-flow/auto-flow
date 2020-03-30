@@ -7,13 +7,13 @@ from autopipeline.pipeline.components.classification.k_nearest_neighbors import 
 from autopipeline.pipeline.components.classification.libsvm_svc import LibSVM_SVC
 from autopipeline.pipeline.components.classification.lightgbm import LGBMClassifier
 
-from autopipeline.pipeline.components.feature_engineer.encode.one_hot import OneHotEncoder
-from autopipeline.pipeline.components.feature_engineer.impute.fill_cat import FillCat
-from autopipeline.pipeline.components.feature_engineer.impute.fill_num import FillNum
-from autopipeline.pipeline.components.feature_engineer.operate.drop import DropAll
-from autopipeline.pipeline.components.feature_engineer.operate.split.cat import SplitCat
-from autopipeline.pipeline.components.feature_engineer.operate.split.cat_num import SplitCatNum
-from autopipeline.pipeline.components.feature_engineer.operate.split.nan import SplitNan
+from autopipeline.pipeline.components.preprocessing.encode.one_hot import OneHotEncoder
+from autopipeline.pipeline.components.preprocessing.impute.fill_cat import FillCat
+from autopipeline.pipeline.components.preprocessing.impute.fill_num import FillNum
+from autopipeline.pipeline.components.preprocessing.operate.drop import DropAll
+from autopipeline.pipeline.components.preprocessing.operate.split.cat import SplitCat
+from autopipeline.pipeline.components.preprocessing.operate.split.cat_num import SplitCatNum
+from autopipeline.pipeline.components.preprocessing.operate.split.nan import SplitNan
 from autopipeline.pipeline.dataframe import GenericDataFrame
 
 df = pd.read_csv("../examples/classification/train_classification.csv")

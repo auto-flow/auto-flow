@@ -10,7 +10,7 @@ from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.tuner.smac_tuner import SmacPipelineTuner
 from autopipeline.utils.pipeline import concat_pipeline
 
-HDL = {'feature_engineer': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
+HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
               '1highR_nan->lowR_nan(choice)': {'operate.drop': {},
                                                'operate.merge': {'__rely_model': 'boost_model'}},
               '2lowR_nan->{cat_name=cat_nan,num_name=num_nan}(choice)': {'operate.split.cat_num': {}},

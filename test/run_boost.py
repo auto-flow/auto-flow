@@ -5,12 +5,12 @@ from sklearn.model_selection import KFold, train_test_split
 from autopipeline.pipeline.components.classification.catboost import CatBoostClassifier
 from autopipeline.pipeline.components.classification.lightgbm import LGBMClassifier
 
-from autopipeline.pipeline.components.feature_engineer.encode.label import LabelEncoder
-from autopipeline.pipeline.components.feature_engineer.impute.fill_abnormal import FillAbnormal
-from autopipeline.pipeline.components.feature_engineer.operate.merge import Merge
-from autopipeline.pipeline.components.feature_engineer.operate.split.cat import SplitCat
-from autopipeline.pipeline.components.feature_engineer.operate.split.cat_num import SplitCatNum
-from autopipeline.pipeline.components.feature_engineer.operate.split.nan import SplitNan
+from autopipeline.pipeline.components.preprocessing.encode.label import LabelEncoder
+from autopipeline.pipeline.components.preprocessing.impute.fill_abnormal import FillAbnormal
+from autopipeline.pipeline.components.preprocessing.operate.merge import Merge
+from autopipeline.pipeline.components.preprocessing.operate.split.cat import SplitCat
+from autopipeline.pipeline.components.preprocessing.operate.split.cat_num import SplitCatNum
+from autopipeline.pipeline.components.preprocessing.operate.split.nan import SplitNan
 from autopipeline.pipeline.dataframe import GenericDataFrame
 
 df = pd.read_csv("../examples/classification/train_classification.csv")

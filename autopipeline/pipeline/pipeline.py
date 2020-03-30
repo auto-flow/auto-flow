@@ -8,10 +8,9 @@ from autopipeline.constants import Task
 
 
 def _fit_transform_one(transformer,
-                       X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False,
+                       X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None,
                        message_clsname='',
-                       message=None,
-                       **fit_params):
+                       message=None):
     """
     Fits ``transformer`` to ``X`` and ``y``. The transformed result is returned
     with the fitted transformer. If ``weight`` is not ``None``, the result will
@@ -19,10 +18,10 @@ def _fit_transform_one(transformer,
     """
     with _print_elapsed_time(message_clsname, message):
         if hasattr(transformer, 'fit_transform'):
-            res = transformer.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test, is_train)
+            res = transformer.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test)
         else:
             res = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test). \
-                transform(X_train, X_valid, X_test, is_train)
+                transform(X_train, X_valid, X_test, y_train)
 
     return res, transformer
 
@@ -66,25 +65,27 @@ class GenericPipeline(Pipeline):
             # Fit or load from cache the current transformer
 
             ret, fitted_transformer = fit_transform_one_cached(
-                cloned_transformer, X_train, y_train, X_valid, y_valid, X_test, y_test, True,
+                cloned_transformer, X_train, y_train, X_valid, y_valid, X_test, y_test,
                 message_clsname='Pipeline',
                 message=self._log_message(step_idx))
             X_train = ret["X_train"]
             X_valid = ret.get("X_valid")
             X_test = ret.get("X_test")
+            y_train = ret.get("y_train")
             # Replace the transformer of the step with the fitted
             # transformer. This is necessary when loading the transformer
             # from the cache.
             self.steps[step_idx] = (name, fitted_transformer)
         if self._final_estimator == 'passthrough':
             return X_train
-        return {"X_train": X_train, "X_valid": X_valid, "X_test": X_test}
+        return {"X_train": X_train, "X_valid": X_valid, "X_test": X_test, "y_train": y_train}
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
         ret = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         X_train = ret["X_train"]
         X_valid = ret.get("X_valid")
         X_test = ret.get("X_test")
+        y_train = ret.get("y_train")
         self.last_data = ret
         with _print_elapsed_time('Pipeline',
                                  self._log_message(len(self.steps) - 1)):
@@ -92,9 +93,28 @@ class GenericPipeline(Pipeline):
                 self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         return self
 
+    def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
+        return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
+        # last_step = self._final_estimator
+        # ret = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+        # X_train = ret["X_train"]
+        # X_valid = ret.get("X_valid")
+        # X_test = ret.get("X_test")
+        # with _print_elapsed_time('Pipeline',
+        #                          self._log_message(len(self.steps) - 1)):
+        #     if last_step == 'passthrough':
+        #         return ret["X_train"]
+        #     if hasattr(last_step, 'fit_transform'):
+        #         return last_step.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test)
+        #     else:
+        #         return last_step.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, y_train,
+        #                                                                                            X_valid, y_valid,
+        #                                                                                            X_test, y_test, True)
+
     def procedure(self, task: Task, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
         self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         X_train = self.last_data["X_train"]
+        y_train = self.last_data["y_train"]
         X_valid = self.last_data.get("X_valid")
         X_test = self.last_data.get("X_test")
         self.last_data = None  # GC
@@ -105,44 +125,29 @@ class GenericPipeline(Pipeline):
             pred_valid = self._final_estimator.predict(X_valid)
             pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
         return {
-            "pred_valid":pred_valid,
-            "pred_test":pred_test,
+            "pred_valid": pred_valid,
+            "pred_test": pred_test,
+            "y_train": y_train  # todo: evaluator 中做相应的改变
         }
 
-    def transform(self, X_train, X_valid=None, X_test=None, is_train=False,
+    def transform(self, X_train, X_valid=None, X_test=None, y_train=None,
                   with_final=True):
-        for _, _, transform in self._iter(with_final=with_final):
-            ret = transform.transform(X_train, X_valid, X_test, is_train)  # predict procedure
+        for _, _, transformer in self._iter(with_final=with_final):
+            ret = transformer.transform(X_train, X_valid, X_test, y_train)  # predict procedure
             X_train = ret["X_train"]
             X_valid = ret.get("X_valid")
             X_test = ret.get("X_test")
-        return {"X_train": X_train, "X_valid": X_valid, "X_test": X_test}
+            y_train = ret.get("y_train")
+        return {"X_train": X_train, "X_valid": X_valid, "X_test": X_test, "y_train": y_train}
 
     @if_delegate_has_method(delegate='_final_estimator')
     def predict(self, X):
-        ret = self.transform(X, is_train=False, with_final=False)
+        ret = self.transform(X, with_final=False)
         X = ret["X_train"]
         return self.steps[-1][-1].predict(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def predict_proba(self, X):
-        ret = self.transform(X, is_train=False, with_final=False)
+        ret = self.transform(X, with_final=False)
         X = ret["X_train"]
         return self.steps[-1][-1].predict_proba(X)
-
-    def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None, is_train=False):
-        last_step = self._final_estimator
-        ret = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
-        X_train = ret["X_train"]
-        X_valid = ret.get("X_valid")
-        X_test = ret.get("X_test")
-        with _print_elapsed_time('Pipeline',
-                                 self._log_message(len(self.steps) - 1)):
-            if last_step == 'passthrough':
-                return ret["X_train"]
-            if hasattr(last_step, 'fit_transform'):
-                return last_step.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test)
-            else:
-                return last_step.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, y_train,
-                                                                                                   X_valid, y_valid,
-                                                                                                   X_test, y_test, True)

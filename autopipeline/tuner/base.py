@@ -48,7 +48,7 @@ class PipelineTuner():
 
     def set_hdl(self, hdl: Dict):
         self.hdl = hdl
-        # todo: 泛化ML管线后，可能存在多个feature_engineer
+        # todo: 泛化ML管线后，可能存在多个preprocessing
         self.phps: ConfigurationSpace = self.hdl2phps(hdl)
         self.phps.seed(self.random_state)
 
@@ -90,30 +90,33 @@ class PipelineTuner():
                 break
         cnt = int(cnt)
         key = key[ix:]
-        _from, _to = key.split("->")
-        outsideEdge_info = {}
-        in_feat_grp = _from
-        out_feat_grp = None
-        if _to.startswith("{") and _to.endswith("}"):
-            _to = _to[1:-1]
-            param_kvs = _to.split(",")
-            for param_kv in param_kvs:
-                k, v = param_kv.split("=")
-                outsideEdge_info[k] = v
+        if "->" in key:
+            _from, _to = key.split("->")
+            outsideEdge_info = {}
+            in_feat_grp = _from
+            out_feat_grp = None
+            if _to.startswith("{") and _to.endswith("}"):
+                _to = _to[1:-1]
+                param_kvs = _to.split(",")
+                for param_kv in param_kvs:
+                    k, v = param_kv.split("=")
+                    outsideEdge_info[k] = v
+            else:
+                out_feat_grp = _to
         else:
-            out_feat_grp = _to
+            in_feat_grp, out_feat_grp, outsideEdge_info = None, None, None
         return in_feat_grp, out_feat_grp, outsideEdge_info
 
     def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
-        feature_engineer_dict: dict = dhp["feature_engineer"]
+        preprocessing_dict: dict = dhp["preprocessing"]
         pipeline_list = []
-        for key, value in feature_engineer_dict.items():
+        for key, value in preprocessing_dict.items():
             name = key  # like: "cat->num"
             in_feat_grp, out_feat_grp, outsideEdge_info = self.parse(key)
-            sub_dict = feature_engineer_dict[name]
+            sub_dict = preprocessing_dict[name]
             if sub_dict is None:
                 continue
-            preprocessor = self.create_component(sub_dict, "feature_engineer", name, in_feat_grp, out_feat_grp,
+            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feat_grp, out_feat_grp,
                                                  outsideEdge_info)
             pipeline_list.extend(preprocessor)
         if pipeline_list:
@@ -135,22 +138,25 @@ class PipelineTuner():
     def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feat_grp="all", out_feat_grp="all",
                          outsideEdge_info=None):
         pipeline_list = []
-        assert phase in ("feature_engineer", "estimator")
+        assert phase in ("preprocessing", "estimator")
         packages = list(sub_dhp.keys())[0]
         params = sub_dhp[packages]
         packages = packages.split("|")
         grouped_params = group_dict_items_before_first_dot(params)
         if len(packages) == 1:
-            grouped_params[packages[0]] = grouped_params.pop("single")
+            if bool(grouped_params):
+                grouped_params[packages[0]] = grouped_params.pop("single")
+            else:
+                grouped_params[packages[0]] = {}
         for package in packages[:-1]:
-            preprocessor = self._create_component("feature_engineer", package, grouped_params[package])
+            preprocessor = self._create_component("preprocessing", package, grouped_params[package])
             preprocessor.in_feat_grp = in_feat_grp
             preprocessor.out_feat_grp = in_feat_grp
             pipeline_list.append([
                 package,
                 preprocessor
             ])
-        key1 = "feature_engineer" if phase == "feature_engineer" else self.task.mainTask
+        key1 = "preprocessing" if phase == "preprocessing" else self.task.mainTask
         component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
         component.in_feat_grp = in_feat_grp
         component.out_feat_grp = out_feat_grp
