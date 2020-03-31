@@ -95,21 +95,6 @@ class GenericPipeline(Pipeline):
 
     def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
         return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
-        # last_step = self._final_estimator
-        # ret = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
-        # X_train = ret["X_train"]
-        # X_valid = ret.get("X_valid")
-        # X_test = ret.get("X_test")
-        # with _print_elapsed_time('Pipeline',
-        #                          self._log_message(len(self.steps) - 1)):
-        #     if last_step == 'passthrough':
-        #         return ret["X_train"]
-        #     if hasattr(last_step, 'fit_transform'):
-        #         return last_step.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test)
-        #     else:
-        #         return last_step.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, y_train,
-        #                                                                                            X_valid, y_valid,
-        #                                                                                            X_test, y_test, True)
 
     def procedure(self, task: Task, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
         self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)

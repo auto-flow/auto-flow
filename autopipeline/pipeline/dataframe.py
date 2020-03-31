@@ -44,6 +44,8 @@ class GenericDataFrame(pd.DataFrame):
         return super(GenericDataFrame, self).__repr__() + "\n" + repr((self.feat_grp))
 
     def filter_feat_grp(self, feat_grp: Union[List, str], copy=True, isin=True):  # , inplace=False
+        if feat_grp == "all":
+            feat_grp = np.unique(self.feat_grp).tolist()
         # 用于过滤feat_grp
         if isinstance(feat_grp, str):
             feat_grp = [feat_grp]
@@ -111,10 +113,15 @@ class GenericDataFrame(pd.DataFrame):
         new_df.index = deleted_df.index
         return self.concat_two(deleted_df, new_df)
 
-    def split(self, indexes):
+    def split(self, indexes, type="iloc"):
+        assert type in ("loc","iloc")
         for index in indexes:
-            yield GenericDataFrame(self.iloc[index, :], feat_grp=self.feat_grp,
-                                   origin_grp=self.origin_grp)
+            if type=="iloc":
+                yield GenericDataFrame(self.iloc[index, :], feat_grp=self.feat_grp,
+                                       origin_grp=self.origin_grp)
+            elif type=="loc":
+                yield GenericDataFrame(self.loc[index, :], feat_grp=self.feat_grp,
+                                       origin_grp=self.origin_grp)
 
     def copy(self: FrameOrSeries, deep: bool_t = True) -> FrameOrSeries:
         return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feat_grp=self.feat_grp,

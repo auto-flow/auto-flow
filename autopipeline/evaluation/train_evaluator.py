@@ -91,7 +91,7 @@ class TrainEvaluator():
     def get_Xy(self):
         return self.X_train, self.y_train, self.X_test, self.y_test
 
-    def evaluate(self, model, X, y, X_test, y_test):
+    def evaluate(self, model: GenericPipeline, X, y, X_test, y_test):
         warning_info = StringIO()
         with redirect_stderr(warning_info):
             # splitter 必须存在
@@ -105,7 +105,6 @@ class TrainEvaluator():
                 X: GenericDataFrame
                 X_train, X_valid = X.split([train_index, valid_index])
                 y_train, y_valid = y[train_index], y[valid_index]
-                model: GenericPipeline
                 procedure_result = model.procedure(self.task, X_train, y_train, X_valid, y_valid, X_test, y_test)
                 models.append(model)
                 y_true_indexes.append(valid_index)

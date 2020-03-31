@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Optional
 
 from ConfigSpace.configuration_space import ConfigurationSpace
@@ -79,7 +80,7 @@ class PipelineTuner():
             raise NotImplementedError()
         return self._data_manager
 
-    def parse(self, key: str):
+    def parse_key(self, key: str):
         cnt = ""
         ix = 0
         for i, c in enumerate(key):
@@ -90,29 +91,35 @@ class PipelineTuner():
                 break
         cnt = int(cnt)
         key = key[ix:]
+        pattern = re.compile(r"(\{.*\})")
+        match = pattern.search(key)
+        additional_info = {}
+        if match:
+            braces_content = match.group(1)
+            _to = braces_content[1:-1]
+            param_kvs = _to.split(",")
+            for param_kv in param_kvs:
+                k, v = param_kv.split("=")
+                additional_info[k] = v
+            key = pattern.sub("", key)
         if "->" in key:
             _from, _to = key.split("->")
-            outsideEdge_info = {}
             in_feat_grp = _from
-            out_feat_grp = None
-            if _to.startswith("{") and _to.endswith("}"):
-                _to = _to[1:-1]
-                param_kvs = _to.split(",")
-                for param_kv in param_kvs:
-                    k, v = param_kv.split("=")
-                    outsideEdge_info[k] = v
-            else:
-                out_feat_grp = _to
+            out_feat_grp = _to
         else:
-            in_feat_grp, out_feat_grp, outsideEdge_info = None, None, None
-        return in_feat_grp, out_feat_grp, outsideEdge_info
+            in_feat_grp, out_feat_grp = None, None
+        if not in_feat_grp:
+            in_feat_grp = None
+        if not out_feat_grp:
+            out_feat_grp = None
+        return in_feat_grp, out_feat_grp, additional_info
 
     def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
         preprocessing_dict: dict = dhp["preprocessing"]
         pipeline_list = []
         for key, value in preprocessing_dict.items():
             name = key  # like: "cat->num"
-            in_feat_grp, out_feat_grp, outsideEdge_info = self.parse(key)
+            in_feat_grp, out_feat_grp, outsideEdge_info = self.parse_key(key)
             sub_dict = preprocessing_dict[name]
             if sub_dict is None:
                 continue

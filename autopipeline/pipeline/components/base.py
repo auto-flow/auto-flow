@@ -102,7 +102,7 @@ class AutoPLComponent(BaseEstimator):
             return None
         elif isinstance(X, GenericDataFrame):
             from autopipeline.pipeline.components.feature_engineer_base import AutoPLFeatureEngineerAlgorithm
-            if issubclass(self.__class__, AutoPLFeatureEngineerAlgorithm) and self.in_feat_grp != "all":
+            if issubclass(self.__class__, AutoPLFeatureEngineerAlgorithm):
                 df = X.filter_feat_grp(self.in_feat_grp)
             else:
                 df = X
