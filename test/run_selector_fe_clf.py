@@ -5,7 +5,7 @@ from sklearn.model_selection import ShuffleSplit
 
 from autopipeline.estimator.base import AutoPipelineEstimator
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
-from autopipeline.tuner.smac_tuner import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import Tuner
 
 digits = load_digits()
 data = digits.data
@@ -18,10 +18,9 @@ train_ix, test_ix = next(ss.split(df))
 df_train = df.iloc[train_ix, :]
 df_test = df.iloc[test_ix, :]
 
-tuner = SmacPipelineTuner(
-    random_state=42,
+tuner = Tuner(
     initial_runs=5,
-    runcount_limit=12,
+    run_limit=12,
 )
 auto_pipeline = AutoPipelineEstimator(tuner,HDL_Constructor(
     DAG_descriptions={

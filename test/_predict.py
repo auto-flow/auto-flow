@@ -9,7 +9,7 @@ from autopipeline.ensemble.mean.regressor import MeanRegressor
 from autopipeline.estimator.base import AutoPipelineEstimator
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.manager.resource_manager import ResourceManager
-from autopipeline.tuner.smac_tuner import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import Tuner
 
 path = ("../data/Molecule_prediction_20200312/test_noLabel_0312.csv")
 

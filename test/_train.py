@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from autopipeline.estimator.base import AutoPipelineEstimator
 from autopipeline.hdl.hdl_constructor import HDL_Constructor
 from autopipeline.manager.resource_manager import ResourceManager
-from autopipeline.tuner.smac_tuner import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import Tuner
 
 path = ("../data/train_0312.csv")
 
@@ -58,10 +58,10 @@ def data_preprocessing():
 
 x_train, y_train, y_range = data_preprocessing()
 
-tuner = SmacPipelineTuner(
+tuner = Tuner(
     random_state=42,
     initial_runs=12,
-    runcount_limit=120,
+    run_limit=120,
 )
 hdl_constructor = HDL_Constructor(
     DAG_descriptions={

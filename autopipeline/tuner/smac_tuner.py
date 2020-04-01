@@ -1,36 +1,93 @@
-from typing import Dict
+import re
+from typing import Dict, Optional
 
 import numpy as np
+from ConfigSpace import ConfigurationSpace
 
+from autopipeline.constants import Task
 from autopipeline.evaluation.train_evaluator import TrainEvaluator
-from autopipeline.hdl.smac import _encode
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import Scorer
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
-from autopipeline.tuner.base import PipelineTuner
+from autopipeline.pipeline.pipeline import GenericPipeline
+from autopipeline.utils.config_space import get_random_initial_configs, get_grid_initial_configs
+from autopipeline.utils.data import group_dict_items_before_first_dot
+from autopipeline.utils.packages import get_class_object_in_pipeline_components
 from autopipeline.utils.pipeline import concat_pipeline
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
 
 
-class SmacPipelineTuner(PipelineTuner):
+class Tuner():
     def __init__(
             self,
-            runcount_limit: int = 50,
+            run_limit: int = 100,
             initial_runs: int = 20,
-            random_state: int = 42,
-            evaluator: TrainEvaluator = None,
+            search_method: str = "smac"
     ):
-        super(SmacPipelineTuner, self).__init__(
-            runcount_limit,
-            initial_runs,
-            random_state,
-            evaluator,
-        )
-
+        self.initial_runs = initial_runs
+        self.run_limit = run_limit
+        self.evaluator = TrainEvaluator()
+        assert search_method in ("smac", "grid", "random")
+        self.search_method = search_method
         self.evaluator.set_php2model(self.php2model)
+        self.random_state = 0
+        self.addition_info = {}
 
+    def set_random_state(self, random_state):
+        self.random_state = random_state
+
+    def set_addition_info(self, addition_info):
+        self._addition_info = addition_info
+
+    def set_hdl(self, hdl: Dict):
+        self.hdl = hdl
+        # todo: 泛化ML管线后，可能存在多个preprocessing
+        self.phps: ConfigurationSpace = self.hdl2phps(hdl)
+        self.phps.seed(self.random_state)
+
+    def set_resource_manager(self, resource_manager: ResourceManager):
+        self._resource_manager = resource_manager
+
+    def set_task(self, task: Task):
+        self._task = task
+
+    @property
+    def task(self):
+        if not hasattr(self, "_task"):
+            raise NotImplementedError()
+        return self._task
+
+    @property
+    def resource_manager(self):
+        return self._resource_manager
+
+    def set_data_manager(self, data_manager: XYDataManager):
+        self._data_manager = data_manager
+
+    @property
+    def data_manager(self):
+        if not hasattr(self, "_data_manager"):
+            raise NotImplementedError()
+        return self._data_manager
+
+    def design_initial_configs(self):
+        if self.search_method == "smac":
+            return get_random_initial_configs(self.phps, self.initial_runs, self.random_state)
+        elif self.search_method == "grid":
+            return get_grid_initial_configs(self.phps, self.run_limit, self.random_state)
+        elif self.search_method == "random":
+            return get_random_initial_configs(self.phps, self.run_limit, self.random_state)
+        else:
+            raise NotImplementedError
+
+    def get_run_limit(self):
+        if self.search_method == "smac":
+            return self.run_limit
+        else:
+            return 0
 
     def run(
             self,
@@ -49,17 +106,16 @@ class SmacPipelineTuner(PipelineTuner):
             all_scoring_functions,
             splitter,
         )
-        # todo: metalearn
 
         self.scenario = Scenario(
             {
                 "run_obj": "quality",
-                "runcount-limit": self.runcount_limit,
+                "runcount-limit": 1000,
                 "cs": self.phps,  # configuration space
                 "deterministic": "true",
                 "output_dir": self.resource_manager.smac_output_dir,
             },
-            initial_runs=self.initial_runs,
+            initial_runs=0,
             db_type=self.resource_manager.db_type,
             db_args=self.resource_manager.rh_db_args,
             db_kwargs=self.resource_manager.rh_db_kwargs,
@@ -71,8 +127,10 @@ class SmacPipelineTuner(PipelineTuner):
             tae_runner=self.evaluator,
             initial_configurations=initial_configs
         )
+        smac.solver.initial_configurations = initial_configs
         smac.solver.start_()
-        for i in range(self.runcount_limit):
+        run_limit = self.get_run_limit()
+        for i in range(run_limit):
             smac.solver.run_()
             should_continue = self.evaluator.resource_manager.delete_models()
             if not should_continue:
@@ -92,3 +150,98 @@ class SmacPipelineTuner(PipelineTuner):
         hdl2phps = SmacHDL2PHPS()
         hdl2phps.set_task(self.task)
         return hdl2phps(hdl)
+
+    def parse_key(self, key: str):
+        cnt = ""
+        ix = 0
+        for i, c in enumerate(key):
+            if c.isdigit():
+                cnt += c
+            else:
+                ix = i
+                break
+        cnt = int(cnt)
+        key = key[ix:]
+        pattern = re.compile(r"(\{.*\})")
+        match = pattern.search(key)
+        additional_info = {}
+        if match:
+            braces_content = match.group(1)
+            _to = braces_content[1:-1]
+            param_kvs = _to.split(",")
+            for param_kv in param_kvs:
+                k, v = param_kv.split("=")
+                additional_info[k] = v
+            key = pattern.sub("", key)
+        if "->" in key:
+            _from, _to = key.split("->")
+            in_feat_grp = _from
+            out_feat_grp = _to
+        else:
+            in_feat_grp, out_feat_grp = None, None
+        if not in_feat_grp:
+            in_feat_grp = None
+        if not out_feat_grp:
+            out_feat_grp = None
+        return in_feat_grp, out_feat_grp, additional_info
+
+    def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
+        preprocessing_dict: dict = dhp["preprocessing"]
+        pipeline_list = []
+        for key, value in preprocessing_dict.items():
+            name = key  # like: "cat->num"
+            in_feat_grp, out_feat_grp, outsideEdge_info = self.parse_key(key)
+            sub_dict = preprocessing_dict[name]
+            if sub_dict is None:
+                continue
+            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feat_grp, out_feat_grp,
+                                                 outsideEdge_info)
+            pipeline_list.extend(preprocessor)
+        if pipeline_list:
+            return GenericPipeline(pipeline_list)
+        else:
+            return None
+
+    def create_estimator(self, dhp: Dict) -> GenericPipeline:
+        # 根据超参构造一个估计器
+        return GenericPipeline(self.create_component(dhp["estimator"], "estimator", self.task.role))
+
+    def _create_component(self, key1, key2, params):
+        cls = get_class_object_in_pipeline_components(key1, key2)
+        component = cls()
+        component.set_addition_info(self.addition_info)
+        component.update_hyperparams(params)
+        return component
+
+    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feat_grp="all", out_feat_grp="all",
+                         outsideEdge_info=None):
+        pipeline_list = []
+        assert phase in ("preprocessing", "estimator")
+        packages = list(sub_dhp.keys())[0]
+        params = sub_dhp[packages]
+        packages = packages.split("|")
+        grouped_params = group_dict_items_before_first_dot(params)
+        if len(packages) == 1:
+            if bool(grouped_params):
+                grouped_params[packages[0]] = grouped_params.pop("single")
+            else:
+                grouped_params[packages[0]] = {}
+        for package in packages[:-1]:
+            preprocessor = self._create_component("preprocessing", package, grouped_params[package])
+            preprocessor.in_feat_grp = in_feat_grp
+            preprocessor.out_feat_grp = in_feat_grp
+            pipeline_list.append([
+                package,
+                preprocessor
+            ])
+        key1 = "preprocessing" if phase == "preprocessing" else self.task.mainTask
+        component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
+        component.in_feat_grp = in_feat_grp
+        component.out_feat_grp = out_feat_grp
+        if outsideEdge_info:
+            component.update_hyperparams(outsideEdge_info)
+        pipeline_list.append([
+            step_name,
+            component
+        ])
+        return pipeline_list

@@ -7,7 +7,7 @@ from autopipeline import constants
 from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
 from autopipeline.pipeline.dataframe import GenericDataFrame
-from autopipeline.tuner.smac_tuner import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import Tuner
 from autopipeline.utils.pipeline import concat_pipeline
 
 HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
@@ -99,7 +99,7 @@ for i in range(100):
     pprint(dhp)
     break
 # print(Counter(estimators))
-tuner = SmacPipelineTuner()
+tuner = Tuner()
 tuner.set_task(constants.binary_classification_task)
 preprocessor = tuner.create_preprocessor(dhp)
 estimators = tuner.create_estimator(dhp)

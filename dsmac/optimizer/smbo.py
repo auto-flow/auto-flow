@@ -119,7 +119,7 @@ class SMBO(object):
         predict_incumbent: bool
             Use predicted performance of incumbent instead of observed performance
         """
-
+        self.initial_configurations=None
         self.logger = logging.getLogger(
             self.__module__ + "." + self.__class__.__name__)
         self.incumbent = restore_incumbent
@@ -151,8 +151,10 @@ class SMBO(object):
         """
         self.stats.start_timing()
         # Initialization, depends on input
-        if self.stats.ta_runs == 0 and self.incumbent is None and self.scenario.initial_runs > 0:
-            self.incumbent = self.initial_design.run()
+        if self.initial_configurations is not None:
+            self.initial_design.configs=self.initial_configurations
+        # if self.stats.ta_runs == 0 and self.incumbent is None and self.scenario.initial_runs > 0:
+        self.incumbent = self.initial_design.run()
 
         # To be on the safe side -> never return "None" as incumbent
         if not self.incumbent:

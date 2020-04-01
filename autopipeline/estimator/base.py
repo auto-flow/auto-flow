@@ -2,7 +2,7 @@ import math
 import os
 from copy import deepcopy
 from multiprocessing import Manager
-from typing import Union, Optional, Dict
+from typing import Union, Optional, Dict, List
 
 import joblib
 import numpy as np
@@ -16,9 +16,9 @@ from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import r2, accuracy
 from autopipeline.pipeline.dataframe import GenericDataFrame
-from autopipeline.tuner.smac_tuner import SmacPipelineTuner
+from autopipeline.tuner.smac_tuner import Tuner
 from autopipeline.utils.concurrence import parse_n_jobs
-from autopipeline.utils.config_space import get_default_initial_configs, replace_phps
+from autopipeline.utils.config_space import replace_phps
 from autopipeline.utils.data import get_chunks
 
 
@@ -26,11 +26,13 @@ class AutoPipelineEstimator(BaseEstimator):
 
     def __init__(
             self,
-            tuner: Optional[SmacPipelineTuner] = None,  # 抽象化的优化的全过程
-            hdl_constructor: Optional[HDL_Constructor] = None,  # 用户自定义初始超参
+            tuner: Union[Tuner, List[Tuner], None, dict] = None,
+            hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
-            ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None
+            ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None,
+            random_state=42
     ):
+        self.random_state = random_state
         if ensemble_builder is None:
             print("info: 使用默认的stack集成学习器")
             ensemble_builder = StackEnsembleBuilder()
@@ -39,9 +41,12 @@ class AutoPipelineEstimator(BaseEstimator):
         else:
             ensemble_builder = StackEnsembleBuilder(set_model=ensemble_builder)
         self.ensemble_builder = ensemble_builder
+        # todo: 将tuner的参数提到上面来
         if not tuner:
-            tuner = SmacPipelineTuner()
-        self.tuner: SmacPipelineTuner = tuner
+            tuner = Tuner()
+        # if not isinstance(tuner,(list,tuple)):
+        #     tuner=[tuner]
+        self.tuner: List[Tuner] = tuner
         if not hdl_constructor:
             hdl_constructor = HDL_Constructor()
         if isinstance(hdl_constructor, dict):
@@ -109,25 +114,23 @@ class AutoPipelineEstimator(BaseEstimator):
         self.resource_manager.dump_object("evaluate_info", self.evaluate_info)
         # fine tune
         self.tuner.set_task(self.data_manager.task)
-        self.start_tunner()
+        self.tuner.set_random_state(self.random_state)
+        self.start_tuner()
         if self.ensemble_builder:
             self.estimator = self.fit_ensemble()
         else:
             self.estimator = self.resource_manager.load_best_estimator(self.task)
         return self
 
-    def start_tunner(self):
+    def start_tuner(self):
         self.tuner.set_hdl(self.hdl)  # just for get phps of tunner
         n_jobs = self.n_jobs
-        runcount_limits = [math.ceil(self.tuner.runcount_limit / n_jobs)] * n_jobs
-        # todo: initial_runs 为0 的情况
-        if self.tuner.initial_runs == 0:
-            initial_runs = [0] * n_jobs
-        else:
-            initial_runs = [math.ceil(self.tuner.initial_runs / n_jobs)] * n_jobs
+        run_limits = [math.ceil(self.tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
         is_master_list[0] = True
-        initial_configs_list = get_chunks(get_default_initial_configs(self.tuner.phps, n_jobs), n_jobs)
+        initial_configs_list = get_chunks(
+            self.tuner.design_initial_configs(),
+            n_jobs)
         random_states = np.arange(n_jobs) + self.random_state
         if n_jobs > 1:
             sync_dict = Manager().dict()
@@ -137,13 +140,12 @@ class AutoPipelineEstimator(BaseEstimator):
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
                 joblib.delayed(self.run)
-                (runcount_limit, initial_run, initial_configs, is_master,
-                            random_state, sync_dict)
-                for runcount_limit, initial_run, initial_configs, is_master, random_state in
-                zip(runcount_limits, initial_runs, initial_configs_list, is_master_list, random_states)
+                (run_limit, initial_configs, is_master, random_state, sync_dict)
+                for run_limit, initial_configs, is_master, random_state in
+                zip(run_limits, initial_configs_list, is_master_list, random_states)
             )
 
-    def run(self, runcount_limit, initial_run, initial_configs, is_master, random_state, sync_dict=None):
+    def run(self, run_limit, initial_configs, is_master, random_state, sync_dict=None):
         tuner = deepcopy(self.tuner)
         resource_manager = deepcopy(self.resource_manager)
         # resource_manager
@@ -154,11 +156,10 @@ class AutoPipelineEstimator(BaseEstimator):
         resource_manager.smac_output_dir += (f"/{os.getpid()}")
         # random_state: 1. set_hdl中传给phps 2. 传给所有配置
         tuner.random_state = random_state
-        tuner.runcount_limit = runcount_limit
-        tuner.initial_runs = initial_run
+        tuner.run_limit = run_limit
         tuner.set_resource_manager(resource_manager)
         tuner.set_data_manager(self.data_manager)
-        replace_phps(tuner.phps,"random_state", int(random_state))
+        replace_phps(tuner.phps, "random_state", int(random_state))
         tuner.phps.seed(random_state)
         tuner.set_addition_info({})  # {"shape": X.shape}
         tuner.evaluator.set_resource_manager(resource_manager)
