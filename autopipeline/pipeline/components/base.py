@@ -46,6 +46,7 @@ class AutoPLComponent(BaseEstimator):
 
     def after_process_hyperparams(self, hyperparams) -> Dict:
         hyperparams = deepcopy(hyperparams)
+        hyperparams = self.before_parse_escape_hyperparameters(hyperparams)
         should_pop = []
         updated = {}
         for key, value in hyperparams.items():
@@ -54,7 +55,7 @@ class AutoPLComponent(BaseEstimator):
                 should_pop.append(key)
                 key = key[1:]
                 new_key, indicator = key.split("-")
-                updated[new_key] = self.do_process(indicator, hyperparams, value)
+                updated[new_key] = self.parse_escape_hyperparameters(indicator, hyperparams, value)
         for key in should_pop:
             hyperparams.pop(key)
         hyperparams.update(updated)
@@ -179,7 +180,10 @@ class AutoPLComponent(BaseEstimator):
     def get_estimator(self):
         return self.estimator
 
-    def do_process(self, indicator, hyperparams, value):
+    def before_parse_escape_hyperparameters(self, hyperparams):
+        return hyperparams
+
+    def parse_escape_hyperparameters(self, indicator, hyperparams, value):
         if indicator == "lr_ratio":
             lr = hyperparams["learning_rate"]
             return max(int(value * (1 / lr)), 10)
@@ -229,7 +233,6 @@ class AutoPLComponent(BaseEstimator):
             raise NotImplementedError()
 
     def before_pred_X(self, X):
-        if isinstance(X,pd.DataFrame):
+        if isinstance(X, pd.DataFrame):
             return X
         return X
-

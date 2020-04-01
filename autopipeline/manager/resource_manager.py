@@ -114,6 +114,11 @@ class ResourceManager():
             estimator = MeanRegressor(models)
         return estimator
 
+    def load_best_dhp(self):
+        trial_id=self.get_best_k_trials(1)[0]
+        record = self.Model.select().where(self.Model.trial_id ==trial_id)[0]
+        return record.dict_hyper_param
+
     def get_best_k_trials(self, k):
         self.init_db()
         trial_ids = []
@@ -180,6 +185,11 @@ class ResourceManager():
         # todo: 其他数据库的实现
         self.db: pw.Database = pw.SqliteDatabase(self.db_path)
         self.Model = self.get_model()
+
+    def close_db(self):
+        self.is_init_db=False
+        self.db=None
+        self.Model=None
 
     def insert_to_db(self, info: Dict):
         self.init_db()

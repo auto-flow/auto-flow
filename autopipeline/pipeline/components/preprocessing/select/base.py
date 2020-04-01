@@ -10,20 +10,32 @@ from autopipeline.pipeline.components.feature_engineer_base import AutoPLFeature
 
 
 class SklearnSelectMixin():
+    max_feature_name = "_max_features-sp1_percent"
+
     def _transform_proc(self, X):
         if X is None:
             return None
         else:
             trans = self.estimator.transform(X)
             mask = self.estimator.get_support()
-            columns=X.columns[mask]
-            return pd.DataFrame(trans,columns=columns)
+            columns = X.columns[mask]
+            return pd.DataFrame(trans, columns=columns)
+
+    def before_parse_escape_hyperparameters(self, hyperparams):
+        hyperparams = deepcopy(hyperparams)
+        if "_select_percent" in hyperparams:
+            _select_percent = hyperparams.pop("_select_percent")
+            hyperparams[self.max_feature_name] = _select_percent
+
+        return hyperparams
 
 
-class SelectFromModelBase(AutoPLFeatureEngineerAlgorithm, SklearnSelectMixin):
+# class SelectFromModelBase(AutoPLFeatureEngineerAlgorithm, SklearnSelectMixin):
+class SelectFromModelBase(SklearnSelectMixin, AutoPLFeatureEngineerAlgorithm):
     class__ = "SelectFromModel"
     module__ = "sklearn.feature_selection"
     need_y = True
+    max_feature_name = "_max_features-sp1_percent"
 
     def after_process_hyperparams(self, hyperparams):
         hyperparams = super(SelectFromModelBase, self).after_process_hyperparams(hyperparams)
@@ -42,10 +54,11 @@ class SelectFromModelBase(AutoPLFeatureEngineerAlgorithm, SklearnSelectMixin):
         return hyperparams
 
 
-class REF_Base(AutoPLFeatureEngineerAlgorithm, SklearnSelectMixin):
+class REF_Base(SklearnSelectMixin, AutoPLFeatureEngineerAlgorithm):
     class__ = "RFE"
     module__ = "sklearn.feature_selection"
     need_y = True
+    max_feature_name = "_n_features_to_select-sp1_percent"
 
     def after_process_hyperparams(self, hyperparams):
         hyperparams = super(REF_Base, self).after_process_hyperparams(hyperparams)
@@ -63,10 +76,11 @@ class REF_Base(AutoPLFeatureEngineerAlgorithm, SklearnSelectMixin):
         return hyperparams
 
 
-class SelectPercentileBase(AutoPLFeatureEngineerAlgorithm, SklearnSelectMixin):
+class SelectPercentileBase(SklearnSelectMixin, AutoPLFeatureEngineerAlgorithm):
     class__ = "GenericUnivariateSelect"
     module__ = "sklearn.feature_selection"
     need_y = True
+    max_feature_name = "param"
 
     def get_name2func(self):
         raise NotImplementedError()

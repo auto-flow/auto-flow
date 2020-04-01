@@ -13,7 +13,7 @@ from autopipeline.metrics import Scorer
 from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
 from autopipeline.pipeline.pipeline import GenericPipeline
 from autopipeline.utils.config_space import get_random_initial_configs, get_grid_initial_configs
-from autopipeline.utils.data import group_dict_items_before_first_dot
+from autopipeline.utils.dict import group_dict_items_before_first_dot
 from autopipeline.utils.packages import get_class_object_in_pipeline_components
 from autopipeline.utils.pipeline import concat_pipeline
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
@@ -23,18 +23,23 @@ from dsmac.scenario.scenario import Scenario
 class Tuner():
     def __init__(
             self,
+            search_method: str = "smac",
             run_limit: int = 100,
             initial_runs: int = 20,
-            search_method: str = "smac"
     ):
+        assert search_method in ("smac", "grid", "random")
+        if search_method in ("grid", "random"):
+            initial_runs = 0
         self.initial_runs = initial_runs
         self.run_limit = run_limit
         self.evaluator = TrainEvaluator()
-        assert search_method in ("smac", "grid", "random")
         self.search_method = search_method
         self.evaluator.set_php2model(self.php2model)
         self.random_state = 0
         self.addition_info = {}
+
+    def __str__(self):
+        return (f"Tuner(search_method={self.search_method}, run_limit={self.run_limit}, initial_runs={self.initial_runs})")
 
     def set_random_state(self, random_state):
         self.random_state = random_state
@@ -73,9 +78,9 @@ class Tuner():
             raise NotImplementedError()
         return self._data_manager
 
-    def design_initial_configs(self):
+    def design_initial_configs(self, n_jobs):
         if self.search_method == "smac":
-            return get_random_initial_configs(self.phps, self.initial_runs, self.random_state)
+            return get_random_initial_configs(self.phps, max(self.initial_runs, n_jobs), self.random_state)
         elif self.search_method == "grid":
             return get_grid_initial_configs(self.phps, self.run_limit, self.random_state)
         elif self.search_method == "random":
@@ -97,6 +102,9 @@ class Tuner():
             splitter,
             initial_configs
     ):
+        if not initial_configs:
+            print("warn:no initial_configs")
+            return
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
         self.set_task(datamanager.task)

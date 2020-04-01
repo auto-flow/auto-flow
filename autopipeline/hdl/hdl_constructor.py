@@ -4,7 +4,7 @@ from typing import Union, Tuple, List
 from autopipeline.constants import Task
 from autopipeline.hdl.utils import get_hdl_db, get_default_hdl_db
 from autopipeline.manager.xy_data_manager import XYDataManager
-from autopipeline.utils.data import add_prefix_in_dict_keys
+from autopipeline.utils.dict import add_prefix_in_dict_keys
 
 
 class HDL_Constructor():

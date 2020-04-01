@@ -474,7 +474,8 @@
             "sklearn.ensemble.ExtraTreesClassifier":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
           }
         },
-        "_max_features-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+//        "_max_features-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+        "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       },
       "from_model_reg": {
         "estimator":{"_type": "choice", "_value": ["sklearn.ensemble.ExtraTreesRegressor", "sklearn.svm.LinearSVR"],"_default": "sklearn.svm.LinearSVR"},
@@ -491,7 +492,8 @@
             "sklearn.ensemble.ExtraTreesRegressor":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
           }
         },
-        "_max_features-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+//        "_max_features-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+        "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       },
       "rfe_clf": {
         "estimator":{"_type": "choice", "_value": ["sklearn.ensemble.ExtraTreesClassifier", "sklearn.linear_model.LogisticRegression"],"_default": "sklearn.ensemble.ExtraTreesClassifier"},
@@ -504,7 +506,8 @@
             "sklearn.ensemble.ExtraTreesClassifier":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
           }
         },
-        "_n_features_to_select-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
+//        "_n_features_to_select-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
+        "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
         "_step-sp1_dev": 20
       },
       "rfe_reg": {
@@ -518,16 +521,19 @@
             "sklearn.ensemble.ExtraTreesRegressor":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
           }
         },
-        "_n_features_to_select-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
+//        "_n_features_to_select-sp1_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
+        "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
         "_step-sp1_dev": 20
       },
       "univar_clf": { //todo:  mode : {'percentile', 'k_best', 'fpr', 'fdr', 'fwe'}
         "score_func": {"_type": "choice", "_value": ["chi2", "f_classif", "mutual_info_classif"],"_default": "chi2"},
-        "param": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+//        "param": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+        "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       },
       "univar_reg": {
         "score_func": {"_type": "choice", "_value": ["f_regression", "mutual_info_regression"],"_default": "f_regression"},
-        "param": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+//        "param": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
+        "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       }
     },
   }

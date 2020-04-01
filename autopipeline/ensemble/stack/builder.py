@@ -51,7 +51,6 @@ class StackEnsembleBuilder():
                                                        random_state=10)
             else:
                 self.meta_learner = Lasso()
-        self.set_model = self.set_model
         if isinstance(self.dataset_paths, str):
             self.dataset_paths = [self.dataset_paths]
 

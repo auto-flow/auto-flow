@@ -1,7 +1,7 @@
 import hashlib
 
 import numpy as np
-from ConfigSpace.configuration_space import Configuration
+from ConfigSpace import Configuration
 
 
 def get_id_of_config(config: Configuration):

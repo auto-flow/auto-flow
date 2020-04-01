@@ -17,9 +17,9 @@ from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.metrics import r2, accuracy
 from autopipeline.pipeline.dataframe import GenericDataFrame
 from autopipeline.tuner.smac_tuner import Tuner
-from autopipeline.utils.concurrence import parse_n_jobs
+from autopipeline.utils.concurrence import parse_n_jobs, get_chunks
 from autopipeline.utils.config_space import replace_phps
-from autopipeline.utils.data import get_chunks
+from autopipeline.utils.dict import get_hash_of_dict, update_placeholder_from_other_dict
 
 
 class AutoPipelineEstimator(BaseEstimator):
@@ -42,18 +42,19 @@ class AutoPipelineEstimator(BaseEstimator):
             ensemble_builder = StackEnsembleBuilder(set_model=ensemble_builder)
         self.ensemble_builder = ensemble_builder
         # todo: 将tuner的参数提到上面来
+        # ---tuners-----------------------------------
         if not tuner:
             tuner = Tuner()
-        # if not isinstance(tuner,(list,tuple)):
-        #     tuner=[tuner]
-        self.tuner: List[Tuner] = tuner
+        if not isinstance(tuner, (list, tuple)):
+            tuner = [tuner]
+        self.tuners: List[Tuner] = tuner
+        # ---hdl_constructors-----------------------------------
         if not hdl_constructor:
             hdl_constructor = HDL_Constructor()
-        if isinstance(hdl_constructor, dict):
-            # todo: 使用用户自定义超参描述语言
-            print("使用用户自定义超参描述语言")
-        self.hdl_constructor = hdl_constructor
-        self.random_state = tuner.random_state
+        if not isinstance(hdl_constructor, (list, tuple)):
+            hdl_constructor = [hdl_constructor]
+        self.hdl_constructors = hdl_constructor
+        # ---resource_manager-----------------------------------
         if isinstance(resource_manager, str):
             resource_manager = ResourceManager(resource_manager)  # todo : 识别不同协议的文件系统，例如hdfs
         elif resource_manager is None:
@@ -80,21 +81,10 @@ class AutoPipelineEstimator(BaseEstimator):
             exit_processes = max(self.n_jobs // 3, 1)
         self.exit_processes = exit_processes
         # resource_manager
-        self.resource_manager.init_dataset_path(dataset_name)
         # data_manager
         self.data_manager = XYDataManager(
             X, y, X_test, y_test, dataset_name, column_descriptions
         )
-        self.resource_manager.dump_object("data_manager", self.data_manager)
-        # hdl default_hp
-        self.hdl_constructor.set_data_manager(self.data_manager)
-        self.hdl_constructor.set_random_state(self.tuner.random_state)
-        self.hdl_constructor.run()
-        self.resource_manager.dump_hdl(self.hdl_constructor)
-        self.hdl = self.hdl_constructor.get_hdl()
-        # fixme
-        self.default_hp = {}  # self.hdl_constructor.get_default_hp()
-        # evaluate_info
         self.task = self.data_manager.task
         if metric is None:
             if self.task.mainTask == "regression":
@@ -111,28 +101,59 @@ class AutoPipelineEstimator(BaseEstimator):
             "all_scoring_functions": self.all_scoring_functions,
             "splitter": self.splitter,
         }
-        self.resource_manager.dump_object("evaluate_info", self.evaluate_info)
-        # fine tune
-        self.tuner.set_task(self.data_manager.task)
-        self.tuner.set_random_state(self.random_state)
-        self.start_tuner()
-        if self.ensemble_builder:
-            self.estimator = self.fit_ensemble()
-        else:
-            self.estimator = self.resource_manager.load_best_estimator(self.task)
+        assert len(self.hdl_constructors) == len(self.tuners)
+        n_step = len(self.hdl_constructors)
+        for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
+            hdl_constructor.set_data_manager(self.data_manager)
+            hdl_constructor.set_random_state(self.random_state)
+            hdl_constructor.run()
+            # todo: self.resource_manager.dump_hdl(self.hdl_constructors)
+            raw_hdl = hdl_constructor.get_hdl()
+            # todo 根据上一个最优dhp的情况填充hdl中的<placeholder>
+            if step != 0:
+                last_best_dhp = self.resource_manager.load_best_dhp()
+                import json5 as json
+                last_best_dhp = json.loads(last_best_dhp)
+                hdl = update_placeholder_from_other_dict(raw_hdl, last_best_dhp)
+                print("info:updated hdl")
+                print(hdl)
+            else:
+                hdl=raw_hdl
+            hdl_id = get_hash_of_dict(hdl)
+            self.resource_manager.init_dataset_path(hdl_id)
+            self.resource_manager.dump_object("data_manager", self.data_manager)
+            self.resource_manager.dump_object("evaluate_info", self.evaluate_info)
+
+            # todo: 在这里
+            # evaluate_info
+            # fine tune
+            tuner.set_task(self.data_manager.task)
+            tuner.set_random_state(self.random_state)
+
+            self.start_tuner(tuner, hdl)
+
+            if step == n_step - 1:
+                if self.ensemble_builder:
+                    self.estimator = self.fit_ensemble()
+                else:
+                    self.estimator = self.resource_manager.load_best_estimator(self.task)
         return self
 
-    def start_tuner(self):
-        self.tuner.set_hdl(self.hdl)  # just for get phps of tunner
+    def start_tuner(self, tuner: Tuner, hdl: dict):
+        print("info:start fine tune in:")
+        print(hdl)
+        print("info:tuner:")
+        print(tuner)
+        tuner.set_hdl(hdl)  # just for get phps of tunner
         n_jobs = self.n_jobs
-        run_limits = [math.ceil(self.tuner.run_limit / n_jobs)] * n_jobs
+        run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
         is_master_list[0] = True
         initial_configs_list = get_chunks(
-            self.tuner.design_initial_configs(),
+            tuner.design_initial_configs(n_jobs),
             n_jobs)
         random_states = np.arange(n_jobs) + self.random_state
-        if n_jobs > 1:
+        if n_jobs > 1 and tuner.search_method != "grid":
             sync_dict = Manager().dict()
             sync_dict["exit_processes"] = self.exit_processes
         else:
@@ -140,13 +161,13 @@ class AutoPipelineEstimator(BaseEstimator):
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
                 joblib.delayed(self.run)
-                (run_limit, initial_configs, is_master, random_state, sync_dict)
+                (tuner, run_limit, initial_configs, is_master, random_state, sync_dict)
                 for run_limit, initial_configs, is_master, random_state in
                 zip(run_limits, initial_configs_list, is_master_list, random_states)
             )
 
-    def run(self, run_limit, initial_configs, is_master, random_state, sync_dict=None):
-        tuner = deepcopy(self.tuner)
+    def run(self, tuner, run_limit, initial_configs, is_master, random_state, sync_dict=None):
+        self.resource_manager.close_db()
         resource_manager = deepcopy(self.resource_manager)
         # resource_manager
         if sync_dict:
@@ -161,7 +182,7 @@ class AutoPipelineEstimator(BaseEstimator):
         tuner.set_data_manager(self.data_manager)
         replace_phps(tuner.phps, "random_state", int(random_state))
         tuner.phps.seed(random_state)
-        tuner.set_addition_info({})  # {"shape": X.shape}
+        tuner.set_addition_info({})
         tuner.evaluator.set_resource_manager(resource_manager)
         # todo : 增加 n_jobs ? 调研默认值
         tuner.run(
@@ -211,7 +232,7 @@ class AutoPipelineEstimator(BaseEstimator):
                 dict_.update({value_name: value})
 
         # 不再初始化
-        self.tuner.initial_runs = 0
+        self.tuners.initial_runs = 0
         # resource_manager
         self.resource_manager.load_dataset_path(dataset_name)
         # data_manager
@@ -247,3 +268,5 @@ class AutoPipelineEstimator(BaseEstimator):
     def set_dict_to_self(self, dict_):
         for key, value in dict_.items():
             setattr(self, key, value)
+
+

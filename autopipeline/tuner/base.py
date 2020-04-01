@@ -8,7 +8,7 @@ from autopipeline.evaluation.train_evaluator import TrainEvaluator
 from autopipeline.manager.resource_manager import ResourceManager
 from autopipeline.manager.xy_data_manager import XYDataManager
 from autopipeline.pipeline.pipeline import GenericPipeline
-from autopipeline.utils.data import group_dict_items_before_first_dot
+from autopipeline.utils.dict import group_dict_items_before_first_dot
 from autopipeline.utils.packages import get_class_object_in_pipeline_components
 
 
