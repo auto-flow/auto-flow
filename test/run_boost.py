@@ -2,16 +2,16 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import KFold, train_test_split
 
-from autopipeline.pipeline.components.classification.catboost import CatBoostClassifier
-from autopipeline.pipeline.components.classification.lightgbm import LGBMClassifier
+from hyperflow.pipeline.components.classification.catboost import CatBoostClassifier
+from hyperflow.pipeline.components.classification.lightgbm import LGBMClassifier
 
-from autopipeline.pipeline.components.preprocessing.encode.label import LabelEncoder
-from autopipeline.pipeline.components.preprocessing.impute.fill_abnormal import FillAbnormal
-from autopipeline.pipeline.components.preprocessing.operate.merge import Merge
-from autopipeline.pipeline.components.preprocessing.operate.split.cat import SplitCat
-from autopipeline.pipeline.components.preprocessing.operate.split.cat_num import SplitCatNum
-from autopipeline.pipeline.components.preprocessing.operate.split.nan import SplitNan
-from autopipeline.pipeline.dataframe import GenericDataFrame
+from hyperflow.pipeline.components.preprocessing.encode.label import LabelEncoder
+from hyperflow.pipeline.components.preprocessing.impute.fill_abnormal import FillAbnormal
+from hyperflow.pipeline.components.preprocessing.operate.merge import Merge
+from hyperflow.pipeline.components.preprocessing.operate.split.cat import SplitCat
+from hyperflow.pipeline.components.preprocessing.operate.split.cat_num import SplitCatNum
+from hyperflow.pipeline.components.preprocessing.operate.split.nan import SplitNan
+from hyperflow.pipeline.dataframe import GenericDataFrame
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values

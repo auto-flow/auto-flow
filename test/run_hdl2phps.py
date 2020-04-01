@@ -1,5 +1,5 @@
-from autopipeline import constants
-from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from hyperflow import constants
+from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 
 HDL = {'preprocessing': {'cat->{highR=highR_cat,lowR=lowR_cat}(choice)': {'operate.split.cat': {}},
               'cat_nan->cat(choice)': {'impute.fill_abnormal': {'__rely_model': 'boost_model'},

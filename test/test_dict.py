@@ -1,6 +1,6 @@
 import unittest
 
-from autopipeline.utils.dict import get_hash_of_dict, update_placeholder_from_other_dict
+from hyperflow.utils.dict import get_hash_of_dict, update_placeholder_from_other_dict
 
 
 class TestDict(unittest.TestCase):

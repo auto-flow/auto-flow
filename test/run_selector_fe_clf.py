@@ -3,9 +3,9 @@ import pandas as pd
 from sklearn.datasets import load_digits
 from sklearn.model_selection import ShuffleSplit
 
-from autopipeline.estimator.base import AutoPipelineEstimator
-from autopipeline.hdl.hdl_constructor import HDL_Constructor
-from autopipeline.tuner.smac_tuner import Tuner
+from hyperflow.estimator.base import AutoPipelineEstimator
+from hyperflow.hdl.hdl_constructor import HDL_Constructor
+from hyperflow.tuner.smac_tuner import Tuner
 
 digits = load_digits()
 data = digits.data
@@ -22,7 +22,7 @@ tuner = Tuner(
     initial_runs=5,
     run_limit=12,
 )
-auto_pipeline = AutoPipelineEstimator(tuner,HDL_Constructor(
+hyperflow_pipeline = AutoPipelineEstimator(tuner,HDL_Constructor(
     DAG_descriptions={
         "num->num": [
             "select.from_model_clf"
@@ -35,6 +35,6 @@ auto_pipeline = AutoPipelineEstimator(tuner,HDL_Constructor(
 column_descriptions = {
     "target": "target"
 }
-auto_pipeline.fit(
+hyperflow_pipeline.fit(
     X=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
 )

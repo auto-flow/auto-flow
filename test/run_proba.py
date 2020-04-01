@@ -1,9 +1,9 @@
 from collections import Counter
 from pprint import pprint
 
-from autopipeline import constants
-from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
-from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
+from hyperflow import constants
+from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from hyperflow.php2dhp.smac_php2dhp import SmacPHP2DHP
 
 HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
               '1highR_nan->lowR_nan(choice)': {'operate.drop': {},

@@ -1,5 +1,5 @@
 import unittest
-from autopipeline.hdl import smac as smac_hdl
+from hyperflow.hdl import smac as smac_hdl
 
 
 before={"name":["tqc","dsy"],"type":{(1,2):{1,2,3}}}

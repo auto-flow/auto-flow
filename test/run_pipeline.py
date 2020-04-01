@@ -3,14 +3,14 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, KFold
 
-from autopipeline import constants
-from autopipeline.pipeline.components.classification.sgd import SGD
+from hyperflow import constants
+from hyperflow.pipeline.components.classification.sgd import SGD
 
-from autopipeline.pipeline.components.preprocessing.encode.one_hot import OneHotEncoder
-from autopipeline.pipeline.components.preprocessing.impute.fill_cat import FillCat
-from autopipeline.pipeline.components.preprocessing.impute.fill_num import FillNum
-from autopipeline.pipeline.dataframe import GenericDataFrame
-from autopipeline.pipeline.pipeline import GenericPipeline
+from hyperflow.pipeline.components.preprocessing.encode.one_hot import OneHotEncoder
+from hyperflow.pipeline.components.preprocessing.impute.fill_cat import FillCat
+from hyperflow.pipeline.components.preprocessing.impute.fill_num import FillNum
+from hyperflow.pipeline.dataframe import GenericDataFrame
+from hyperflow.pipeline.pipeline import GenericPipeline
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values

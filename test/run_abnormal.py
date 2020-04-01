@@ -1,9 +1,9 @@
 import pandas as pd
 from sklearn.model_selection import ShuffleSplit
 
-from autopipeline.estimator.base import AutoPipelineEstimator
-from autopipeline.hdl.hdl_constructor import HDL_Constructor
-from autopipeline.tuner.smac_tuner import Tuner
+from hyperflow.estimator.base import AutoPipelineEstimator
+from hyperflow.hdl.hdl_constructor import HDL_Constructor
+from hyperflow.tuner.smac_tuner import Tuner
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 ss = ShuffleSplit(n_splits=1, random_state=0, test_size=0.25)
@@ -26,13 +26,13 @@ hdl_constructor = HDL_Constructor(
         "num->target": {"_name": "lightgbm", "_vanilla": False}
     }
 )
-auto_pipeline = AutoPipelineEstimator(tuner, hdl_constructor)
+hyperflow_pipeline = AutoPipelineEstimator(tuner, hdl_constructor)
 column_descriptions = {
     "id": "PassengerId",
     "target": "Survived",
     "ignore": "Name"
 }
 
-auto_pipeline.fit(
+hyperflow_pipeline.fit(
     X=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
 )

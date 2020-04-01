@@ -3,12 +3,12 @@ from pprint import pprint
 import pandas as pd
 from sklearn.model_selection import train_test_split, KFold
 
-from autopipeline import constants
-from autopipeline.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
-from autopipeline.php2dhp.smac_php2dhp import SmacPHP2DHP
-from autopipeline.pipeline.dataframe import GenericDataFrame
-from autopipeline.tuner.smac_tuner import Tuner
-from autopipeline.utils.pipeline import concat_pipeline
+from hyperflow import constants
+from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from hyperflow.php2dhp.smac_php2dhp import SmacPHP2DHP
+from hyperflow.pipeline.dataframe import GenericDataFrame
+from hyperflow.tuner.smac_tuner import Tuner
+from hyperflow.utils.pipeline import concat_pipeline
 
 HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
               '1highR_nan->lowR_nan(choice)': {'operate.drop': {},
