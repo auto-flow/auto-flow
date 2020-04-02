@@ -69,17 +69,11 @@ class AutoPipelineEstimator(BaseEstimator):
             X_test=None,
             y_test=None,
             column_descriptions: Optional[Dict] = None,
-            dataset_name="default_dataset_name",
+            dataset_name="default_dataset_name",  # todo 数据集元数据
             metric=None,
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
-            n_jobs=1,
-            exit_processes=None
     ):
-        self.n_jobs = parse_n_jobs(n_jobs)
-        if exit_processes is None:
-            exit_processes = max(self.n_jobs // 3, 1)
-        self.exit_processes = exit_processes
         # resource_manager
         # data_manager
         self.data_manager = XYDataManager(
@@ -145,7 +139,7 @@ class AutoPipelineEstimator(BaseEstimator):
         print("info:tuner:")
         print(tuner)
         tuner.set_hdl(hdl)  # just for get phps of tunner
-        n_jobs = self.n_jobs
+        n_jobs = tuner.n_jobs
         run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
         is_master_list[0] = True
@@ -155,7 +149,7 @@ class AutoPipelineEstimator(BaseEstimator):
         random_states = np.arange(n_jobs) + self.random_state
         if n_jobs > 1 and tuner.search_method != "grid":
             sync_dict = Manager().dict()
-            sync_dict["exit_processes"] = self.exit_processes
+            sync_dict["exit_processes"] = tuner.exit_processes
         else:
             sync_dict = None
         self.resource_manager.close_db()

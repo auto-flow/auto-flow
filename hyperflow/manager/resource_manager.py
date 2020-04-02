@@ -1,10 +1,8 @@
 import os
-import sqlite3
 import time
 from typing import Dict, Tuple, List, Union
 
 import json5 as json
-import pandas as pd
 import peewee as pw
 from joblib import dump, load
 from redis import Redis
@@ -195,7 +193,7 @@ class ResourceManager():
         else:
             return None
 
-    def redis_delete(self,name):
+    def redis_delete(self, name):
         if self.connect_redis():
             self.redis_client.delete(name)
 
@@ -302,24 +300,6 @@ class ResourceManager():
                         self.file_system.delete(models_path)
                 self.Model.delete().where(self.Model.trial_id.in_(should_delete.select(self.Model.trial_id))).execute()
         return True
-
-    def dump_db_to_csv(self):
-        # todo: 做成一个分析工具，而不是每次都运行
-        # db的内容都是随跑随写的，trails中的模型文件也一样。
-        # 但是csv中的内容是运行了一段时间后生成的，如果任务突然中断，就会数据丢失
-        data = []
-        columns = ["trial_id", "estimator", "loss", "cost_time"]
-        conn = sqlite3.connect(self.db_path)
-        cur = conn.cursor()
-
-        fetched = cur.execute(f"select trial_id,estimator,loss,cost_time"
-                              f" from record;")
-        for row in fetched:
-            data.append(row)
-        cur.close()
-        conn.close()
-        df = pd.DataFrame(data, columns=columns)
-        df.to_csv(self.csv_path, index=False)
 
 
 if __name__ == '__main__':

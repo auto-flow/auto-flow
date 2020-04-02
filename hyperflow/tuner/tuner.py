@@ -16,6 +16,7 @@ from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import Scorer
 from hyperflow.php2dhp.smac_php2dhp import SmacPHP2DHP
 from hyperflow.pipeline.pipeline import GenericPipeline
+from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
 from hyperflow.utils.dict import group_dict_items_before_first_dot
 from hyperflow.utils.packages import get_class_object_in_pipeline_components
@@ -28,6 +29,8 @@ class Tuner():
             search_method: str = "smac",
             run_limit: int = 100,
             initial_runs: int = 20,
+            n_jobs=1,
+            exit_processes=None
     ):
         assert search_method in ("smac", "grid", "random")
         if search_method in ("grid", "random"):
@@ -42,6 +45,10 @@ class Tuner():
         self.resource_manager = None
         self.task = None
         self.data_manager = None
+        self.n_jobs = parse_n_jobs(n_jobs)
+        if exit_processes is None:
+            exit_processes = max(self.n_jobs // 3, 1)
+        self.exit_processes = exit_processes
 
     def __str__(self):
         return (
