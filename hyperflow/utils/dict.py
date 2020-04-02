@@ -1,4 +1,3 @@
-import hashlib
 from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, Any, List
@@ -41,15 +40,11 @@ def sort_dict(obj):
             obj[k] = sort_dict(v)
         return dict(sorted(obj.items(), key=lambda x: str(x[0])))
     elif isinstance(obj, list):
+        for i, elem in enumerate(obj):
+            obj[i] = sort_dict(elem)
         return list(sorted(obj, key=str))
     else:
         return obj
-
-
-def get_hash_of_dict(dict_):
-    m = hashlib.md5()
-    m.update(str(sort_dict(deepcopy(dict_))).encode("utf-8"))
-    return m.hexdigest()
 
 
 class GlobalList:

@@ -1,5 +1,6 @@
 import inspect
 import math
+import pickle
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, Optional
@@ -10,6 +11,7 @@ from sklearn.base import BaseEstimator
 
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import densify
+from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
 
 
 class HyperFlowComponent(BaseEstimator):
@@ -20,8 +22,10 @@ class HyperFlowComponent(BaseEstimator):
     regression_only = False
     boost_model = False
     tree_model = False
+    store_intermediate = False
 
     def __init__(self):
+        self.resource_manager = None
         self.estimator = None
         self.hyperparams = deepcopy(self.cls_hyperparams)
         self.set_params(**self.hyperparams)
@@ -122,10 +126,11 @@ class HyperFlowComponent(BaseEstimator):
         # 默认采用代理模式（但可以颠覆这种模式，完全重写这个类）
         cls = self.get_estimator_class()
         # 根据构造函数构造代理估计器
+        self.processed_params = self.filter_invalid(
+            cls, self.after_process_hyperparams(self.hyperparams)
+        )
         self.estimator = cls(
-            **self.filter_invalid(
-                cls, self.after_process_hyperparams(self.hyperparams)
-            )
+            **self.processed_params
         )
 
     def fit(self, X_train, y_train=None,
@@ -156,8 +161,8 @@ class HyperFlowComponent(BaseEstimator):
         X_test_ = densify(X_test_)
         # todo: 测试特征全部删除的情况
         if len(X_train_.shape) > 1 and X_train_.shape[1] > 0:
-            self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
-                      y_test, feat_grp, origin_grp)
+            self.estimator = self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
+                                       y_test, feat_grp, origin_grp)
         return self
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
@@ -166,7 +171,30 @@ class HyperFlowComponent(BaseEstimator):
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None, feat_grp=None, origin_grp=None):
         # 保留其他数据集的参数，方便模型拓展
-        estimator.fit(self.prepare_X_to_fit(X_train, X_valid, X_test), y_train)
+        X = self.prepare_X_to_fit(X_train, X_valid, X_test)
+        if self.store_intermediate:
+            if self.resource_manager is None:
+                print("warn: no resource_manager when store_intermediate is True")
+                return self.__fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, origin_grp)
+            else:
+                # get hash value from X,y,hyperparameters
+                Xy_hash = get_hash_of_Xy(X, y_train)
+                hp_hash = get_hash_of_dict(self.processed_params)
+                hash_value = Xy_hash + "-" + hp_hash
+                result = self.resource_manager.redis_get(hash_value)
+                if result is None:
+                    fitted_estimator = estimator.fit(X, y_train)
+                    self.resource_manager.redis_set(hash_value, pickle.dumps(fitted_estimator))
+                else:
+                    fitted_estimator = pickle.loads(result)
+                self.resource_manager = None
+                return fitted_estimator
+        else:
+            self.resource_manager = None  # avoid can not pickle error
+            return self.__fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, origin_grp)
+
+    def __fit(self, estimator, X, y, X_valid, y_valid, X_test, y_test, origin_grp):
+        return estimator.fit(X, y)
 
     def set_addition_info(self, dict_: dict):
         for key, value in dict_.items():

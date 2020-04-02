@@ -3,8 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from hyperflow.constants import Task, binary_classification_task, multiclass_classification_task, \
-    multilabel_classification_task, regression_task
+from hyperflow.constants import Task
 from hyperflow.manager.abstract_data_manager import AbstractDataManager
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import get_task_from_y, is_nan, is_cat
@@ -39,8 +38,7 @@ class XYDataManager(AbstractDataManager):
             else:
                 raise NotImplementedError
             y = X.pop(target_col).values
-            if target_col in X_test.columns:
-                y_test = X_test.pop(target_col)
+            y_test = pop_if_exists(X_test, target_col)
         # --确定id--
         if "id" in column_descriptions:
             id_col = column_descriptions["id"]
@@ -75,9 +73,10 @@ class XYDataManager(AbstractDataManager):
                 column2featGrp[column] = feat_grp
         feat_grp = [column2featGrp[column] for column in X.columns]
         L1 = X.shape[0]
-        L2 = X_test.shape[0]
+        if X_test is not None:
+            L2 = X_test.shape[0]
+            X_test.index = range(L1, L1 + L2)
         X.index = range(L1)
-        X_test.index = range(L1, L1 + L2)
         return X, y, X_test, y_test, feat_grp
 
     def __init__(

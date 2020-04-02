@@ -19,7 +19,8 @@ from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.concurrence import parse_n_jobs, get_chunks
 from hyperflow.utils.config_space import replace_phps
-from hyperflow.utils.dict import get_hash_of_dict, update_placeholder_from_other_dict
+from hyperflow.utils.dict import update_placeholder_from_other_dict
+from hyperflow.utils.hash import get_hash_of_dict
 
 
 class AutoPipelineEstimator(BaseEstimator):
@@ -158,8 +159,8 @@ class AutoPipelineEstimator(BaseEstimator):
         else:
             sync_dict = None
         self.resource_manager.close_db()
-        self.resource_manager.close_redis()
         self.resource_manager.clear_pid_list()
+        self.resource_manager.close_redis()
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
         tuners = [deepcopy(tuner) for i in range(n_jobs)]
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
@@ -185,7 +186,6 @@ class AutoPipelineEstimator(BaseEstimator):
         replace_phps(tuner.phps, "random_state", int(random_state))
         tuner.phps.seed(random_state)
         tuner.set_addition_info({})
-        tuner.evaluator.set_resource_manager(resource_manager)
         # todo : 增加 n_jobs ? 调研默认值
         tuner.run(
             self.data_manager,

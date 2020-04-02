@@ -1,6 +1,7 @@
 import unittest
 
-from hyperflow.utils.dict import get_hash_of_dict, update_placeholder_from_other_dict
+from hyperflow.utils.dict import update_placeholder_from_other_dict
+from hyperflow.utils.hash import get_hash_of_dict
 
 
 class TestDict(unittest.TestCase):

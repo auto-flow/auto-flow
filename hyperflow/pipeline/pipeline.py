@@ -8,7 +8,7 @@ from hyperflow.constants import Task
 
 
 def _fit_transform_one(transformer,
-                       X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None,
+                       X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, resource_manager=None,
                        message_clsname='',
                        message=None):
     """
@@ -16,6 +16,7 @@ def _fit_transform_one(transformer,
     with the fitted transformer. If ``weight`` is not ``None``, the result will
     be multiplied by ``weight``.
     """
+    transformer.resource_manager = resource_manager
     with _print_elapsed_time(message_clsname, message):
         if hasattr(transformer, 'fit_transform'):
             result = transformer.fit_transform(X_train, y_train, X_valid, y_valid, X_test, y_test)
@@ -28,6 +29,8 @@ def _fit_transform_one(transformer,
 
 class GenericPipeline(Pipeline):
     # 可以当做Transformer，又可以当做estimator！
+    resource_manager = None
+
     # todo: 适配当做普通Pipeline的情况
     def _fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
         # shallow copy of steps - this should really be steps_
@@ -65,7 +68,7 @@ class GenericPipeline(Pipeline):
             # Fit or load from cache the current transformer
 
             result, fitted_transformer = fit_transform_one_cached(
-                cloned_transformer, X_train, y_train, X_valid, y_valid, X_test, y_test,
+                cloned_transformer, X_train, y_train, X_valid, y_valid, X_test, y_test, self.resource_manager,
                 message_clsname='Pipeline',
                 message=self._log_message(step_idx))
             X_train = result["X_train"]
@@ -90,13 +93,16 @@ class GenericPipeline(Pipeline):
         with _print_elapsed_time('Pipeline',
                                  self._log_message(len(self.steps) - 1)):
             if self._final_estimator != 'passthrough':
+                self._final_estimator.resource_manager = self.resource_manager
                 self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         return self
 
     def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
         return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
 
-    def procedure(self, task: Task, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
+    def procedure(self, task: Task, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None,
+                  resource_manager=None):
+        self.resource_manager = resource_manager
         self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         X_train = self.last_data["X_train"]
         y_train = self.last_data["y_train"]

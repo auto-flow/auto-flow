@@ -106,6 +106,8 @@ class ResourceManager():
     def persistent_evaluated_model(self, info: Dict):
         trial_id = info["trial_id"]
         file_name = f"{self.trials_dir}/{trial_id}.bz2"
+        for model in info["models"]:
+            model.resource_manager=None
         dump(info["models"], file_name)
         return file_name
 
@@ -161,7 +163,8 @@ class ResourceManager():
             self.redis_client = Redis(**self.redis_params)
             self.is_init_redis = True
             return True
-        except Exception:
+        except Exception as e:
+            print(f"warn:{e}")
             return False
 
     def close_redis(self):
@@ -172,9 +175,21 @@ class ResourceManager():
         if self.connect_redis():
             self.redis_client.delete("hyperflow_pid_list")
 
+
     def push_pid_list(self):
         if self.connect_redis():
-            self.redis_client.rpush(os.getpid())
+            self.redis_client.rpush("hyperflow_pid_list",os.getpid())
+
+    def redis_set(self,name, value, ex=None, px=None, nx=False, xx=False):
+        if self.connect_redis():
+            self.redis_client.set(name,value,ex,px,nx,xx)
+
+    def redis_get(self,name):
+        if self.connect_redis():
+            return self.redis_client.get(name)
+        else:
+            return None
+
 
     def get_model(self) -> pw.Model:
         class TrialModel(pw.Model):

@@ -37,6 +37,9 @@ class Tuner():
         self.evaluator.set_php2model(self.php2model)
         self.random_state = 0
         self.addition_info = {}
+        self.resource_manager = None
+        self.task = None
+        self.data_manager = None
 
     def __str__(self):
         return (
@@ -55,29 +58,14 @@ class Tuner():
         self.phps.seed(self.random_state)
 
     def set_resource_manager(self, resource_manager: ResourceManager):
-        self._resource_manager = resource_manager
+        self.resource_manager = resource_manager
+        self.evaluator.set_resource_manager(resource_manager)
 
     def set_task(self, task: Task):
-        self._task = task
-
-    @property
-    def task(self):
-        if not hasattr(self, "_task"):
-            raise NotImplementedError()
-        return self._task
-
-    @property
-    def resource_manager(self):
-        return self._resource_manager
+        self.task = task
 
     def set_data_manager(self, data_manager: XYDataManager):
-        self._data_manager = data_manager
-
-    @property
-    def data_manager(self):
-        if not hasattr(self, "_data_manager"):
-            raise NotImplementedError()
-        return self._data_manager
+        self.data_manager = data_manager
 
     def design_initial_configs(self, n_jobs):
         if self.search_method == "smac":

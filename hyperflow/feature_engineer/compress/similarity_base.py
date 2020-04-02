@@ -43,8 +43,8 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
 
     def fit(self, X: Union[pd.DataFrame, np.ndarray], y=None):
         if isinstance(X, np.ndarray):
-            X = pd.DataFrame(X)
             self._type = "ndarray"
+        X = pd.DataFrame(X)
         start = time()
         self.X_ = X.values  # X is DataFrame
         L = self.X_.shape[1]
@@ -69,8 +69,8 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
     def transform(self, X, y=None):
         _type = "DataFrame"
         if isinstance(X, np.ndarray):
-            X = pd.DataFrame(X)
             _type = "ndarray"
+        X = pd.DataFrame(X)
         assert self._type == _type
         col_before = X.shape[1]
         X = X.drop(self.to_delete, axis=1)

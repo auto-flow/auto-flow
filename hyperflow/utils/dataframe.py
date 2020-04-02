@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 
 def pop_if_exists(df:pd.DataFrame,col:str)->Optional[pd.DataFrame]:
+    if df is None:
+        return None
     if col in df.columns:
         return df.pop(col)
     else:

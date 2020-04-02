@@ -4,4 +4,5 @@ __all__ = ["Pearson"]
 
 class Pearson(HyperFlowFeatureEngineerAlgorithm):
     class__ = "Pearson"
-    module__ = "hyperflow.feature_engineer.compress.variance"
+    module__ = "hyperflow.feature_engineer.compress.pearson"
+    store_intermediate = True

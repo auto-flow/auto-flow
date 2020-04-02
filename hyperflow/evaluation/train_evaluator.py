@@ -4,8 +4,9 @@ from io import StringIO
 from time import time
 
 import numpy as np
-from ConfigSpace.configuration_space import Configuration
+from ConfigSpace import Configuration
 
+from dsmac.runhistory.utils import get_id_of_config
 from hyperflow.constants import Task
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.manager.xy_data_manager import XYDataManager
@@ -14,10 +15,12 @@ from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
 from hyperflow.utils.data import mean_predicts, vote_predicts
 from hyperflow.utils.logging_ import get_logger
-from dsmac.runhistory.utils import get_id_of_config
 
 
 class TrainEvaluator():
+    def __init__(self):
+        self.resource_manager = None
+
 
     def init_data(
             self,
@@ -72,11 +75,7 @@ class TrainEvaluator():
         return err, all_score
 
     def set_resource_manager(self, resource_manager: ResourceManager):
-        self._resouce_manager = resource_manager
-
-    @property
-    def resource_manager(self):
-        return self._resouce_manager
+        self.resource_manager = resource_manager
 
     def _predict_proba(self, X, model):
         Y_pred = model.predict_proba(X)
@@ -92,6 +91,7 @@ class TrainEvaluator():
         return self.X_train, self.y_train, self.X_test, self.y_test
 
     def evaluate(self, model: GenericPipeline, X, y, X_test, y_test):
+        assert self.resource_manager is not None
         warning_info = StringIO()
         with redirect_stderr(warning_info):
             # splitter 必须存在
@@ -105,7 +105,8 @@ class TrainEvaluator():
                 X: GenericDataFrame
                 X_train, X_valid = X.split([train_index, valid_index])
                 y_train, y_valid = y[train_index], y[valid_index]
-                procedure_result = model.procedure(self.task, X_train, y_train, X_valid, y_valid, X_test, y_test)
+                procedure_result = model.procedure(self.task, X_train, y_train, X_valid, y_valid, X_test, y_test,
+                                                   self.resource_manager)
                 models.append(model)
                 y_true_indexes.append(valid_index)
                 y_pred = procedure_result["pred_valid"]

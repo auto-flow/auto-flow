@@ -59,7 +59,6 @@ def data_preprocessing():
 x_train, y_train, y_range = data_preprocessing()
 
 tuner = Tuner(
-    random_state=42,
     initial_runs=12,
     run_limit=120,
 )
