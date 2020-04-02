@@ -85,28 +85,28 @@ ret8 = ohe.fit_transform(**ret7)
 # 9.1 lightGBM
 lightgbm = LGBMClassifier()
 lightgbm.in_feat_grp = "num"
-ans = lightgbm.fit(**ret8, y_train=y_train, y_valid=y_valid)
-y_pred = ans.predict(ret8["X_valid"])
+result = lightgbm.fit(**ret8, y_train=y_train, y_valid=y_valid)
+y_pred = result.predict(ret8["X_valid"])
 acc = accuracy_score(y_valid, y_pred)
 print("acc=", acc)
 # 9.2 catboost
 catboost = CatBoostClassifier()
 catboost.in_feat_grp = "num"
-ans = catboost.fit(**ret8, y_train=y_train, y_valid=y_valid)
-y_pred = ans.predict(ret8["X_valid"])
+result = catboost.fit(**ret8, y_train=y_train, y_valid=y_valid)
+y_pred = result.predict(ret8["X_valid"])
 acc = accuracy_score(y_valid, y_pred)
 print("acc=", acc)
 # 9.3 SVC
 svc = LibSVM_SVC()
 svc.in_feat_grp = "num"
-ans = svc.fit(**ret8, y_train=y_train, y_valid=y_valid)
-y_pred = ans.predict(ret8["X_valid"])
+result = svc.fit(**ret8, y_train=y_train, y_valid=y_valid)
+y_pred = result.predict(ret8["X_valid"])
 acc = accuracy_score(y_valid, y_pred)
 print("acc=", acc)
 # 9.4 knn
 knn = KNearestNeighborsClassifier()
 knn.in_feat_grp = "num"
-ans = knn.fit(**ret8, y_train=y_train, y_valid=y_valid)
-y_pred = ans.predict(ret8["X_valid"])
+result = knn.fit(**ret8, y_train=y_train, y_valid=y_valid)
+y_pred = result.predict(ret8["X_valid"])
 acc = accuracy_score(y_valid, y_pred)
 print("acc=", acc)

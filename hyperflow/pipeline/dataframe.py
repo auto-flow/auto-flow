@@ -50,17 +50,17 @@ class GenericDataFrame(pd.DataFrame):
         if isinstance(feat_grp, str):
             feat_grp = [feat_grp]
         if copy:
-            ret = deepcopy(self)
-            ret = GenericDataFrame(ret, feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            result = deepcopy(self)
+            result = GenericDataFrame(result, feat_grp=self.feat_grp, origin_grp=self.origin_grp)
         else:
-            ret = self
-        loc = ret.feat_grp.isin(feat_grp)
+            result = self
+        loc = result.feat_grp.isin(feat_grp)
         if not isin:
             loc = (~loc)
-        ret.set_feat_grp(ret.feat_grp[loc])
-        ret.set_origin_grp(ret.origin_grp[loc])
-        loc_df = ret.loc[:, ret.columns[loc]]
-        return GenericDataFrame(loc_df, feat_grp=ret.feat_grp, origin_grp=ret.origin_grp)
+        result.set_feat_grp(result.feat_grp[loc])
+        result.set_origin_grp(result.origin_grp[loc])
+        loc_df = result.loc[:, result.columns[loc]]
+        return GenericDataFrame(loc_df, feat_grp=result.feat_grp, origin_grp=result.origin_grp)
 
     def concat_two(self, df1, df2):
         assert isinstance(df1, GenericDataFrame)

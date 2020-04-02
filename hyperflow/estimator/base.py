@@ -16,7 +16,7 @@ from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import r2, accuracy
 from hyperflow.pipeline.dataframe import GenericDataFrame
-from hyperflow.tuner.smac_tuner import Tuner
+from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.concurrence import parse_n_jobs, get_chunks
 from hyperflow.utils.config_space import replace_phps
 from hyperflow.utils.dict import get_hash_of_dict, update_placeholder_from_other_dict
@@ -41,7 +41,6 @@ class AutoPipelineEstimator(BaseEstimator):
         else:
             ensemble_builder = StackEnsembleBuilder(set_model=ensemble_builder)
         self.ensemble_builder = ensemble_builder
-        # todo: 将tuner的参数提到上面来
         # ---tuners-----------------------------------
         if not tuner:
             tuner = Tuner()
@@ -71,7 +70,7 @@ class AutoPipelineEstimator(BaseEstimator):
             column_descriptions: Optional[Dict] = None,
             dataset_name="default_dataset_name",
             metric=None,
-            all_scoring_functions=False,
+            all_scoring_functions=True,
             splitter=KFold(5, True, 42),
             n_jobs=1,
             exit_processes=None
@@ -118,7 +117,7 @@ class AutoPipelineEstimator(BaseEstimator):
                 print("info:updated hdl")
                 print(hdl)
             else:
-                hdl=raw_hdl
+                hdl = raw_hdl
             hdl_id = get_hash_of_dict(hdl)
             self.resource_manager.init_dataset_path(hdl_id)
             self.resource_manager.dump_object("data_manager", self.data_manager)
@@ -158,22 +157,25 @@ class AutoPipelineEstimator(BaseEstimator):
             sync_dict["exit_processes"] = self.exit_processes
         else:
             sync_dict = None
+        self.resource_manager.close_db()
+        self.resource_manager.close_redis()
+        self.resource_manager.clear_pid_list()
+        resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
+        tuners = [deepcopy(tuner) for i in range(n_jobs)]
         with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
             joblib.Parallel()(
                 joblib.delayed(self.run)
-                (tuner, run_limit, initial_configs, is_master, random_state, sync_dict)
-                for run_limit, initial_configs, is_master, random_state in
-                zip(run_limits, initial_configs_list, is_master_list, random_states)
+                (tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict)
+                for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in
+                zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states)
             )
 
-    def run(self, tuner, run_limit, initial_configs, is_master, random_state, sync_dict=None):
-        self.resource_manager.close_db()
-        resource_manager = deepcopy(self.resource_manager)
-        # resource_manager
+    def run(self, tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict=None):
         if sync_dict:
             sync_dict[os.getpid()] = 0
             resource_manager.sync_dict = sync_dict
         resource_manager.set_is_master(is_master)
+        resource_manager.push_pid_list()
         resource_manager.smac_output_dir += (f"/{os.getpid()}")
         # random_state: 1. set_hdl中传给phps 2. 传给所有配置
         tuner.random_state = random_state
@@ -268,5 +270,3 @@ class AutoPipelineEstimator(BaseEstimator):
     def set_dict_to_self(self, dict_):
         for key, value in dict_.items():
             setattr(self, key, value)
-
-

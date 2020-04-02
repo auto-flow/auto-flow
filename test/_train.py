@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from hyperflow.estimator.base import AutoPipelineEstimator
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
 from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.tuner.smac_tuner import Tuner
+from hyperflow.tuner.tuner import Tuner
 
 path = ("../data/train_0312.csv")
 

@@ -83,14 +83,14 @@ ret8 = label_encode.fit_transform(**ret7)
 # 9.1 lightGBM
 lightgbm = LGBMClassifier()
 lightgbm.in_feat_grp = "num"
-ans = lightgbm.fit(**ret8,  y_train=y_train,y_valid=y_valid)
-y_pred = ans.predict(ret8["X_test"])
+result = lightgbm.fit(**ret8,  y_train=y_train,y_valid=y_valid)
+y_pred = result.predict(ret8["X_test"])
 acc = accuracy_score(y_test, y_pred)
 print("acc=", acc)
 # 9.1 catboost
 catboost = CatBoostClassifier()
 catboost.in_feat_grp = "num"
-ans = catboost.fit(**ret8, y_train=y_train,y_valid=y_valid)
-y_pred = ans.predict(ret8["X_test"])
+result = catboost.fit(**ret8, y_train=y_train,y_valid=y_valid)
+y_pred = result.predict(ret8["X_test"])
 acc = accuracy_score(y_test, y_pred)
 print("acc=", acc)

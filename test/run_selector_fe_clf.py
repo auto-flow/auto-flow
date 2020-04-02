@@ -5,7 +5,7 @@ from sklearn.model_selection import ShuffleSplit
 
 from hyperflow.estimator.base import AutoPipelineEstimator
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from hyperflow.tuner.smac_tuner import Tuner
+from hyperflow.tuner.tuner import Tuner
 
 digits = load_digits()
 data = digits.data

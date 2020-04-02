@@ -4,6 +4,8 @@ from typing import Dict, Optional
 import numpy as np
 from ConfigSpace import ConfigurationSpace
 
+from dsmac.facade.smac_hpo_facade import SMAC4HPO
+from dsmac.scenario.scenario import Scenario
 from hyperflow.constants import Task
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
 from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
@@ -16,8 +18,6 @@ from hyperflow.utils.config_space import get_random_initial_configs, get_grid_in
 from hyperflow.utils.dict import group_dict_items_before_first_dot
 from hyperflow.utils.packages import get_class_object_in_pipeline_components
 from hyperflow.utils.pipeline import concat_pipeline
-from dsmac.facade.smac_hpo_facade import SMAC4HPO
-from dsmac.scenario.scenario import Scenario
 
 
 class Tuner():
@@ -39,7 +39,8 @@ class Tuner():
         self.addition_info = {}
 
     def __str__(self):
-        return (f"Tuner(search_method={self.search_method}, run_limit={self.run_limit}, initial_runs={self.initial_runs})")
+        return (
+            f"Tuner(search_method={self.search_method}, run_limit={self.run_limit}, initial_runs={self.initial_runs})")
 
     def set_random_state(self, random_state):
         self.random_state = random_state

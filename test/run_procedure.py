@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import ShuffleSplit
 
 from hyperflow.estimator.base import AutoPipelineEstimator
-from hyperflow.tuner.smac_tuner import Tuner
+from hyperflow.tuner.tuner import Tuner
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 ss = ShuffleSplit(n_splits=1, random_state=0, test_size=0.25)

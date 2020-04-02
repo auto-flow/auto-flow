@@ -61,9 +61,9 @@ score_valid = pipeline.predict_proba(df_valid)
 print(accuracy_score(y_train, pred_train))
 print(accuracy_score(y_valid, pred_valid))
 print(accuracy_score(y_test, pred_test))
-ret = pipeline.procedure(constants.binary_classification_task, df_train, y_train, df_valid, y_valid, df_test, y_test)
-pred_test = ret["pred_test"]
-pred_valid = ret["pred_valid"]
+result = pipeline.procedure(constants.binary_classification_task, df_train, y_train, df_valid, y_valid, df_test, y_test)
+pred_test = result["pred_test"]
+pred_valid = result["pred_valid"]
 print(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
 print(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))
 
@@ -85,9 +85,9 @@ pipeline = GenericPipeline([
     ("sgd", sgd),
 ])
 
-ret = pipeline.procedure(constants.binary_classification_task, ret1["X_train"], y_train, ret1["X_valid"], y_valid,
+result = pipeline.procedure(constants.binary_classification_task, ret1["X_train"], y_train, ret1["X_valid"], y_valid,
                          ret1["X_test"], y_test)
-pred_test = ret["pred_test"]
-pred_valid = ret["pred_valid"]
+pred_test = result["pred_test"]
+pred_valid = result["pred_valid"]
 print(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
 print(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))

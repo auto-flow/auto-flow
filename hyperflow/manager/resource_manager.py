@@ -7,13 +7,14 @@ import json5 as json
 import pandas as pd
 import peewee as pw
 from joblib import dump, load
+from redis import Redis
 
+from generic_fs import LocalFS
+from generic_fs.utils import dumps_pickle, loads_pickle
 from hyperflow.constants import Task
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from generic_fs import LocalFS
-from generic_fs.utils import dumps_pickle, loads_pickle
 
 
 class ResourceManager():
@@ -27,8 +28,14 @@ class ResourceManager():
             file_system=None,
             max_persistent_model=50,
             persistent_mode="fs",
-            db_type="sqlite"
+            db_type="sqlite",
+            store_intermediate=True,
+            redis_params=None
     ):
+        self.store_intermediate = store_intermediate
+        if redis_params is None:
+            redis_params = {}
+        self.redis_params = redis_params
         self.persistent_mode = persistent_mode
         assert self.persistent_mode in ("fs", "db")
         self.db_type = db_type
@@ -40,6 +47,9 @@ class ResourceManager():
             project_path = os.getcwd() + f'''/hyperflow-{time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())}'''
         self.project_path = project_path
         self.file_system.mkdir(self.project_path)
+        self.is_init_db = False
+        self.is_init_redis = False
+        self.is_master = False
 
     def load_hdl(self):
         persistent_data = {
@@ -71,7 +81,6 @@ class ResourceManager():
         self.data_manager_path = self.dataset_path + "/data_manager.bz2"
         self.hdl_dir = self.dataset_path + "/hdl_constructor"
         self.file_system.mkdir(self.hdl_dir)
-        self.is_init_db = False
         if self.db_type == "sqlite":
             self.rh_db_args = self.dataset_path + "/runhistory.db"
             self.rh_db_kwargs = None
@@ -102,7 +111,7 @@ class ResourceManager():
 
     def load_best_estimator(self, task: Task):
         # todo: 最后调用分析程序？
-        self.init_db()
+        self.connect_db()
         record = self.Model.select().group_by(self.Model.loss, self.Model.cost_time).limit(1)[0]
         if self.persistent_mode == "fs":
             models = load(record.models_path)
@@ -115,12 +124,12 @@ class ResourceManager():
         return estimator
 
     def load_best_dhp(self):
-        trial_id=self.get_best_k_trials(1)[0]
-        record = self.Model.select().where(self.Model.trial_id ==trial_id)[0]
+        trial_id = self.get_best_k_trials(1)[0]
+        record = self.Model.select().where(self.Model.trial_id == trial_id)[0]
         return record.dict_hyper_param
 
     def get_best_k_trials(self, k):
-        self.init_db()
+        self.connect_db()
         trial_ids = []
         records = self.Model.select().group_by(self.Model.loss, self.Model.cost_time).limit(k)
         for record in records:
@@ -128,7 +137,7 @@ class ResourceManager():
         return trial_ids
 
     def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
-        self.init_db()
+        self.connect_db()
         records = self.Model.select().where(self.Model.trial_id << trials)
         estimator_list = []
         y_true_indexes_list = []
@@ -143,11 +152,29 @@ class ResourceManager():
         return estimator_list, y_true_indexes_list, y_preds_list
 
     def set_is_master(self, is_master):
-        self._is_master = is_master
+        self.is_master = is_master
 
-    @property
-    def is_master(self):
-        return self._is_master
+    def connect_redis(self):
+        if self.is_init_redis:
+            return True
+        try:
+            self.redis_client = Redis(**self.redis_params)
+            self.is_init_redis = True
+            return True
+        except Exception:
+            return False
+
+    def close_redis(self):
+        self.redis_client = None
+        self.is_init_redis = False
+
+    def clear_pid_list(self):
+        if self.connect_redis():
+            self.redis_client.delete("hyperflow_pid_list")
+
+    def push_pid_list(self):
+        if self.connect_redis():
+            self.redis_client.rpush(os.getpid())
 
     def get_model(self) -> pw.Model:
         class TrialModel(pw.Model):
@@ -178,7 +205,7 @@ class ResourceManager():
         self.db.create_tables([TrialModel])
         return TrialModel
 
-    def init_db(self):
+    def connect_db(self):
         if self.is_init_db:
             return
         self.is_init_db = True
@@ -187,12 +214,12 @@ class ResourceManager():
         self.Model = self.get_model()
 
     def close_db(self):
-        self.is_init_db=False
-        self.db=None
-        self.Model=None
+        self.is_init_db = False
+        self.db = None
+        self.Model = None
 
     def insert_to_db(self, info: Dict):
-        self.init_db()
+        self.connect_db()
         if self.persistent_mode == "fs":
             models_path = self.persistent_evaluated_model(info)
             models_bit = 0
@@ -237,7 +264,7 @@ class ResourceManager():
         # master segment
         if not self.is_master:
             return True
-        self.init_db()
+        self.connect_db()
         estimators = []
         for record in self.Model.select().group_by(self.Model.estimator):
             estimators.append(record.estimator)
@@ -275,7 +302,7 @@ class ResourceManager():
 if __name__ == '__main__':
     rm = ResourceManager("/home/tqc/PycharmProjects/hyperflow/test/test_db")
     rm.init_dataset_path("default_dataset_name")
-    rm.init_db()
+    rm.connect_db()
     estimators = []
     for record in rm.Model.select().group_by(rm.Model.estimator):
         estimators.append(record.estimator)

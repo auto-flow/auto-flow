@@ -289,7 +289,7 @@ class Intensifier(object):
                     next_instance = self.rs.choice(list(available_insts))
                     # Line 7
                     self.logger.debug("Add run of incumbent")
-                    status, cost, dur, res = self.tae_runner.start(
+                    status, cost, dur, result = self.tae_runner.start(
                         config=incumbent,
                         instance=next_instance,
                         seed=next_seed,
@@ -386,7 +386,7 @@ class Intensifier(object):
 
                 self.logger.debug("Add run of challenger")
                 try:
-                    status, cost, dur, res = self.tae_runner.start(
+                    status, cost, dur, result = self.tae_runner.start(
                         config=challenger,
                         instance=instance,
                         seed=seed,

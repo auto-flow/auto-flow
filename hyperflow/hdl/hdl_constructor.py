@@ -112,10 +112,10 @@ class HDL_Constructor():
         self.DAG_describe = DAG_describe
 
     def _get_params_in_dict(self, dict_: dict, package: str) -> dict:
-        ans = deepcopy(dict_)
+        result = deepcopy(dict_)
         for path in package.split("."):
-            ans = ans.get(path, {})
-        return ans
+            result = result.get(path, {})
+        return result
 
     def get_params_in_dict(self, hdl_db: dict, packages: str, phase: str, mainTask):
         assert phase in ("preprocessing", "estimator")

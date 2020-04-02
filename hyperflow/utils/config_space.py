@@ -19,15 +19,15 @@ def get_random_initial_configs(phps: ConfigurationSpace, n_configs, random_state
             config.default_value = None_name
 
     model_choice = phps.get_hyperparameter("estimator:__choice__")
-    ans = []
+    result = []
     for choice in model_choice.choices:
         cur_phps = deepcopy(phps)
         cur_phps.get_hyperparameter("estimator:__choice__").default_value = choice
         default = cur_phps.get_default_configuration()
-        ans.append(default)
-    if len(ans) < n_configs:
-        ans.extend(phps.sample_configuration(n_configs - len(ans)))
-    return ans
+        result.append(default)
+    if len(result) < n_configs:
+        result.extend(phps.sample_configuration(n_configs - len(result)))
+    return result
 
 
 def replace_phps(phps: ConfigurationSpace, key, value):

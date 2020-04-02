@@ -23,24 +23,24 @@ class SmacPHP2DHP(PHP2DHP):
     def split_key(self, key, token=":", ignore=("[", "]")) -> List[str]:
         L = len(key)
         stack = 0
-        res = []
+        result = []
         cursor = ""
         for i, e in enumerate(key):
             if e == ignore[0]:
                 stack += 1
             if e == token and stack == 0:
-                res.append(cursor)
+                result.append(cursor)
                 cursor = ""
             else:
                 cursor = cursor + e
             if e == ignore[1]:
                 stack -= 1
-        res.append(cursor)
-        return res
+        result.append(cursor)
+        return result
 
     def convert(self, php: Configuration):
         dict_ = php.get_dictionary()
-        ret = {}
+        result = {}
         for k, v in dict_.items():
             if isinstance(v, str):
                 v = _decode(v)
@@ -52,5 +52,5 @@ class SmacPHP2DHP(PHP2DHP):
                     v = {}
             if "None" in key_path:
                 continue
-            self.set_kv(ret, key_path, v)  # self.split_key(k)
-        return ret
+            self.set_kv(result, key_path, v)  # self.split_key(k)
+        return result

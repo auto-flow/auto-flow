@@ -19,8 +19,8 @@ split_cat.update_hyperparams({
     "lowR": "lowR_cat",
     "threshold": 0.5
 })
-ret = split_cat.fit_transform(df2)
-print(ret)
+result = split_cat.fit_transform(df2)
+print(result)
 
 df2 = GenericDataFrame(df, feat_grp=["cat", "cat", "num"])
 drop_all = DropAll()
@@ -34,8 +34,8 @@ pipeline = GenericPipeline([
     ("drop_all", drop_all),
     ("split_cat", split_cat)
 ])
-ret=pipeline.fit_transform(df2)
-print(ret)
+result=pipeline.fit_transform(df2)
+print(result)
 
 
 

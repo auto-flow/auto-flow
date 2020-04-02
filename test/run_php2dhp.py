@@ -7,7 +7,7 @@ from hyperflow import constants
 from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 from hyperflow.php2dhp.smac_php2dhp import SmacPHP2DHP
 from hyperflow.pipeline.dataframe import GenericDataFrame
-from hyperflow.tuner.smac_tuner import Tuner
+from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.pipeline import concat_pipeline
 
 HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
@@ -117,5 +117,5 @@ train_ix, valid_ix = next(cv.split(df_train))
 df_train, df_valid = df_train.split([train_ix, valid_ix])
 y_valid = y_train[valid_ix]
 y_train = y_train[train_ix]
-ans = pipeline.procedure(constants.binary_classification_task, df_train, y_train, df_valid, y_valid, df_test)
-print(ans)
+result = pipeline.procedure(constants.binary_classification_task, df_train, y_train, df_valid, y_valid, df_test)
+print(result)

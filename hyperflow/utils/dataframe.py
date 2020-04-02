@@ -10,6 +10,6 @@ def pop_if_exists(df:pd.DataFrame,col:str)->Optional[pd.DataFrame]:
 
 if __name__ == '__main__':
     df=pd.DataFrame(np.arange(9).reshape([3,3]),columns=["a","b","c"])
-    ans=pop_if_exists(df,"a")
-    print(ans)
+    result=pop_if_exists(df,"a")
+    print(result)
     print(df)

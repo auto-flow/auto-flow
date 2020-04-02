@@ -13,8 +13,8 @@ def get_start_end_tuples(threads, L):
     start = 0
     span_list = []
     for i in range(threads):
-        ans = ((4 * (start ** 2) - 4 * start + 8 * chunks + 1) ** 0.5 - 2 * start + 1) / 2
-        n_ = round(ans)
+        result = ((4 * (start ** 2) - 4 * start + 8 * chunks + 1) ** 0.5 - 2 * start + 1) / 2
+        n_ = round(result)
         end = min(L, start + n_)
         span_list.append(end - start)
         start = end
@@ -50,12 +50,12 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         L = self.X_.shape[1]
         split_points = get_start_end_tuples(self.n_jobs, L)
         with joblib.parallel_backend('multiprocessing', n_jobs=self.n_jobs):
-            ans = joblib.Parallel()(
+            result = joblib.Parallel()(
                 joblib.delayed(self.core_func)(s, e, L)
                 for s, e in split_points
             )
-        to_del = ans[0]
-        for other in ans[1:]:
+        to_del = result[0]
+        for other in result[1:]:
             to_del.extend(other)
         self.to_delete = []
         to_del.sort(key=lambda x: x[0], reverse=True)
