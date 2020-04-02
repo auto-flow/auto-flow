@@ -9,13 +9,13 @@ df = pd.read_csv("../data/QSAR.csv")
 hdl_constructor = HDL_Constructor(
     DAG_descriptions={
         "num->var": "compress.variance",
-        "var->pea": {"_name":"compress.pearson","n_jobs":6},
-        "pea->target": "lightgbm"
+        "var->pea": {"_name": "compress.pearson", "n_jobs": 6},
+        "pea->target": "logistic_regression"
     }
 )
 tuner = Tuner(
-    run_limit=10,
-    initial_runs=10,
+    run_limit=12,
+    initial_runs=12,
     search_method="smac"
 )
 hyperflow_pipeline = AutoPipelineEstimator(tuner, hdl_constructor)
@@ -25,5 +25,5 @@ column_descriptions = {
 }
 
 hyperflow_pipeline.fit(
-    X=df, column_descriptions=column_descriptions, n_jobs=1
+    X=df, column_descriptions=column_descriptions, n_jobs=3
 )

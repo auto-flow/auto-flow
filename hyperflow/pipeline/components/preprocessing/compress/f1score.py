@@ -8,3 +8,4 @@ class F1Score(HyperFlowFeatureEngineerAlgorithm):
     class__ = "F1Score"
     module__ = "hyperflow.feature_engineer.compress.f1score"
     store_intermediate = True
+    suspend_other_processes = True

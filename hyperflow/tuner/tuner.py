@@ -1,4 +1,6 @@
+import random
 import re
+import time
 from typing import Dict, Optional
 
 import numpy as np
@@ -91,6 +93,7 @@ class Tuner():
             splitter,
             initial_configs
     ):
+        time.sleep(random.random())
         if not initial_configs:
             print("warn:no initial_configs")
             return
