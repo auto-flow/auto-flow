@@ -170,33 +170,17 @@ class HyperFlowComponent(BaseEstimator):
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
         return X_train
 
-    def _suspend_other_processes(self):
-        self.do_suspend = False
-        if self.suspend_other_processes:
-            if self.resource_manager.redis_get("hyperflow_suspend_token") is None:
-                self.resource_manager.redis_set("hyperflow_suspend_token", "set")
-                self.do_suspend = True
-            else:
-                while True:
-                    time.sleep(10)
-                    if self.resource_manager.redis_get("hyperflow_suspend_token") is None:
-                        break
-
-    def _resume_other_processes(self):
-        if self.do_suspend:
-            self.resource_manager.redis_delete("hyperflow_suspend_token")
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None, feat_grp=None, origin_grp=None):
         # 保留其他数据集的参数，方便模型拓展
         X = self.prepare_X_to_fit(X_train, X_valid, X_test)
-        self._suspend_other_processes()
         if self.store_intermediate:
             if self.resource_manager is None:
                 print("warn: no resource_manager when store_intermediate is True")
                 fitted_estimator = self.__fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, origin_grp)
             else:
-                # get hash value from X,y,hyperparameters
+                # get hash value from X, y, hyperparameters
                 Xy_hash = get_hash_of_Xy(X, y_train)
                 hp_hash = get_hash_of_dict(self.processed_params)
                 hash_value = Xy_hash + "-" + hp_hash
@@ -206,10 +190,8 @@ class HyperFlowComponent(BaseEstimator):
                     self.resource_manager.redis_set(hash_value, pickle.dumps(fitted_estimator))
                 else:
                     fitted_estimator = pickle.loads(result)
-                # return fitted_estimator
         else:
             fitted_estimator = self.__fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, origin_grp)
-        self._resume_other_processes()
         self.resource_manager = None  # avoid can not pickle error
         return fitted_estimator
 
