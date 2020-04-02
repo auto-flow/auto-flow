@@ -1,14 +1,13 @@
 import inspect
 import math
-import os
 import pickle
+import time
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
-import psutil
 from sklearn.base import BaseEstimator
 
 from hyperflow.pipeline.dataframe import GenericDataFrame
@@ -172,26 +171,20 @@ class HyperFlowComponent(BaseEstimator):
         return X_train
 
     def _suspend_other_processes(self):
-        if self.suspend_other_processes and self.resource_manager.redis_get("hyperflow_suspend_token") is None:
-            self.resource_manager.redis_set("hyperflow_suspend_token","set")
-            self.do_suspend = True
-            pid_list = self.resource_manager.get_pid_list()
-            print("pid_list:",pid_list)
-            for pid in pid_list:
-                if pid != os.getpid():
-                    proc = psutil.Process(pid)
-                    proc.suspend()
-            self.resource_manager.redis_delete("hyperflow_suspend_token")
-        else:
-            self.do_suspend = False
+        self.do_suspend = False
+        if self.suspend_other_processes:
+            if self.resource_manager.redis_get("hyperflow_suspend_token") is None:
+                self.resource_manager.redis_set("hyperflow_suspend_token", "set")
+                self.do_suspend = True
+            else:
+                while True:
+                    time.sleep(10)
+                    if self.resource_manager.redis_get("hyperflow_suspend_token") is None:
+                        break
 
     def _resume_other_processes(self):
         if self.do_suspend:
-            pid_list = self.resource_manager.get_pid_list()
-            for pid in pid_list:
-                if pid != os.getpid():
-                    proc = psutil.Process(pid)
-                    proc.resume()
+            self.resource_manager.redis_delete("hyperflow_suspend_token")
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None, feat_grp=None, origin_grp=None):
