@@ -8,7 +8,7 @@ from ConfigSpace import ConfigurationSpace
 
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
 from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
 from hyperflow.manager.resource_manager import ResourceManager
@@ -43,7 +43,7 @@ class Tuner():
         self.random_state = 0
         self.addition_info = {}
         self.resource_manager = None
-        self.task = None
+        self.ml_task = None
         self.data_manager = None
         self.n_jobs = parse_n_jobs(n_jobs)
         if exit_processes is None:
@@ -76,8 +76,8 @@ class Tuner():
         self.resource_manager = resource_manager
         self.evaluator.set_resource_manager(resource_manager)
 
-    def set_task(self, task: Task):
-        self.task = task
+    def set_task(self, ml_task: MLTask):
+        self.ml_task = ml_task
 
     def set_data_manager(self, data_manager: XYDataManager):
         self.data_manager = data_manager
@@ -112,7 +112,7 @@ class Tuner():
             return
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
-        self.set_task(datamanager.task)
+        self.set_task(datamanager.ml_task)
         self.evaluator.init_data(
             datamanager,
             metric,
@@ -161,7 +161,7 @@ class Tuner():
 
     def hdl2phps(self, hdl: Dict):
         hdl2phps = SmacHDL2PHPS()
-        hdl2phps.set_task(self.task)
+        hdl2phps.set_task(self.ml_task)
         return hdl2phps(hdl)
 
     def parse_key(self, key: str):
@@ -217,7 +217,7 @@ class Tuner():
 
     def create_estimator(self, dhp: Dict) -> GenericPipeline:
         # 根据超参构造一个估计器
-        return GenericPipeline(self.create_component(dhp["estimator"], "estimator", self.task.role))
+        return GenericPipeline(self.create_component(dhp["estimator"], "estimator", self.ml_task.role))
 
     def _create_component(self, key1, key2, params):
         cls = get_class_object_in_pipeline_components(key1, key2)
@@ -247,7 +247,7 @@ class Tuner():
                 package,
                 preprocessor
             ])
-        key1 = "preprocessing" if phase == "preprocessing" else self.task.mainTask
+        key1 = "preprocessing" if phase == "preprocessing" else self.ml_task.mainTask
         component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
         component.in_feat_grp = in_feat_grp
         component.out_feat_grp = out_feat_grp

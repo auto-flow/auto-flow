@@ -12,7 +12,7 @@ from ConfigSpace.hyperparameters import CategoricalHyperparameter, Constant
 from hyperopt import fmin, tpe, hp
 
 import hyperflow.hdl.smac as smac_hdl
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 from hyperflow.hdl.utils import is_hdl_bottom
 from hyperflow.hdl2phps.base import HDL2PHPS
 from hyperflow.utils.packages import get_class_name_of_module
@@ -24,17 +24,17 @@ class RelyModels:
 
 class SmacHDL2PHPS(HDL2PHPS):
     @property
-    def task(self):
+    def ml_task(self):
         return self._task
 
-    def set_task(self, task: Task):
-        self._task = task
+    def set_task(self, ml_task: MLTask):
+        self._task = ml_task
 
     def get_forbid_hit_in_models_by_rely(self, models, rely_model="boost_model"):
         forbid_in_value = []
         hit = []
         for model in models:
-            module_path = f"hyperflow.pipeline.components.{self.task.mainTask}.{model}"
+            module_path = f"hyperflow.pipeline.components.{self.ml_task.mainTask}.{model}"
             _class = get_class_name_of_module(module_path)
             M = import_module(module_path)
             cls = getattr(M, _class)

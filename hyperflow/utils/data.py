@@ -30,18 +30,18 @@ def sanitize_array(array):
 def get_task_from_y(y):
     y_type = type_of_target(y)
     if y_type == "binary":
-        task = binary_classification_task
+        ml_task = binary_classification_task
     elif y_type == "multiclass":
-        task = multiclass_classification_task
+        ml_task = multiclass_classification_task
     elif y_type == "multilabel-indicator":
-        task = multilabel_classification_task
+        ml_task = multilabel_classification_task
     elif y_type == "multiclass-multioutput":
         raise NotImplementedError()
     elif y_type == "continuous":
-        task = regression_task
+        ml_task = regression_task
     else:
         raise NotImplementedError()
-    return task
+    return ml_task
 
 
 def vote_predicts(predicts: List[np.ndarray]):

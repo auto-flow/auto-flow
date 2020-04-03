@@ -4,7 +4,7 @@ from sklearn.utils import _print_elapsed_time
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 
 
 def _fit_transform_one(transformer,
@@ -100,7 +100,7 @@ class GenericPipeline(Pipeline):
     def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
         return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
 
-    def procedure(self, task: Task, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None,
+    def procedure(self, ml_task: MLTask, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None,
                   resource_manager=None):
         self.resource_manager = resource_manager
         self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
@@ -109,7 +109,7 @@ class GenericPipeline(Pipeline):
         X_valid = self.last_data.get("X_valid")
         X_test = self.last_data.get("X_test")
         self.last_data = None  # GC
-        if task.mainTask == "classification":
+        if ml_task.mainTask == "classification":
             pred_valid = self._final_estimator.predict_proba(X_valid)
             pred_test = self._final_estimator.predict_proba(X_test) if X_test is not None else None
         else:

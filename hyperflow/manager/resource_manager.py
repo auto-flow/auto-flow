@@ -11,7 +11,7 @@ from redis import Redis
 import generic_fs
 from generic_fs import FileSystem
 from generic_fs.utils import dumps_pickle, loads_pickle
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
@@ -66,6 +66,7 @@ class ResourceManager():
         self.file_system.mkdir(self.store_path)
         self.is_init_trials_db = False
         self.is_init_experiments_db = False
+        self.is_init_tasks_db = False
         self.is_init_redis = False
         self.is_master = False
 
@@ -129,7 +130,7 @@ class ResourceManager():
         dump(info["models"], file_name)
         return file_name
 
-    def load_best_estimator(self, task: Task):
+    def load_best_estimator(self, ml_task: MLTask):
         # todo: 最后调用分析程序？
         self.connect_trials_db()
         record = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
@@ -137,7 +138,7 @@ class ResourceManager():
             models = load(record.models_path)
         else:
             models = loads_pickle(record.models_bit)
-        if task.mainTask == "classification":
+        if ml_task.mainTask == "classification":
             estimator = VoteClassifier(models)
         else:
             estimator = MeanRegressor(models)
@@ -222,7 +223,7 @@ class ResourceManager():
     # ----------experiments_model------------------------------------------------------------------
     def get_experiments_model(self) -> pw.Model:
         class Experiments(pw.Model):
-            run_record_id = pw.PrimaryKeyField()
+            experiment_id = pw.PrimaryKeyField()
             general_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             current_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             HDL_list = pw.TextField(default="")
@@ -230,11 +231,11 @@ class ResourceManager():
             HDL_id = pw.CharField(default="")
             Tuner_list = pw.TextField(default="")
             Tuner = pw.TextField(default="")
-            dataset_id = pw.CharField(default="")
-            metric = pw.CharField(default="")
+            task_id = pw.CharField(default="")
+            # metric = pw.CharField(default="")
             all_scoring_functions = pw.BooleanField(default=True)
-            splitter = pw.CharField(default="")
-            column_descriptions = pw.TextField(default="")
+            # splitter = pw.CharField(default="")
+            # column_descriptions = pw.TextField(default="")
 
 
             class Meta:
@@ -254,6 +255,41 @@ class ResourceManager():
         self.is_init_experiments_db = False
         self.experiments_db = None
         self.ExperimentsModel = None
+    # ----------experiments_model------------------------------------------------------------------
+    def get_tasks_model(self) -> pw.Model:
+        class Tasks(pw.Model):
+            run_record_id = pw.PrimaryKeyField()
+            general_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            current_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            HDL_list = pw.TextField(default="")
+            HDL = pw.TextField(default="")
+            HDL_id = pw.CharField(default="")
+            Tuner_list = pw.TextField(default="")
+            Tuner = pw.TextField(default="")
+            task_id = pw.CharField(default="")
+            metric = pw.CharField(default="")
+            all_scoring_functions = pw.BooleanField(default=True)
+            splitter = pw.CharField(default="")
+            column_descriptions = pw.TextField(default="")
+
+
+            class Meta:
+                database = self.tasks_db
+
+        self.tasks_db.create_tables([Tasks])
+        return Tasks
+
+    def connect_tasks_db(self):
+        if self.is_init_tasks_db:
+            return
+        self.is_init_tasks_db = True
+        self.tasks_db: pw.Database = pw.SqliteDatabase(self.db_path)
+        self.TasksModel = self.get_trials_model()
+
+    def close_tasks_db(self):
+        self.is_init_tasks_db = False
+        self.tasks_db = None
+        self.TasksModel = None
 
     # ----------trials_model------------------------------------------------------------------
 

@@ -29,7 +29,7 @@ def balanced_accuracy(solution, prediction):
         solution = solution.toarray()
         prediction = prediction.toarray()
     else:
-        raise NotImplementedError('bac_metric does not support task type %s'
+        raise NotImplementedError('bac_metric does not support ml_task type %s'
                                   % y_type)
 
     fn = np.sum(np.multiply(solution, (1 - prediction)), axis=0,
@@ -66,7 +66,7 @@ def pac_score(solution, prediction):
     Otherwise, run normalize_array.
     :param solution:
     :param prediction:
-    :param task:
+    :param ml_task:
     :return:
     """
 
@@ -107,13 +107,13 @@ def pac_score(solution, prediction):
 
         return [solution, prediction]
 
-    def log_loss(solution, prediction, task):
+    def log_loss(solution, prediction, ml_task):
         """Log loss for binary and multiclass."""
         [sample_num, label_num] = solution.shape
         # Lower gives problems with float32!
         eps = 0.00000003
 
-        if (task == 'multiclass') and (label_num > 1):
+        if (ml_task == 'multiclass') and (label_num > 1):
             # Make sure the lines add up to one for multi-class classification
             norma = np.sum(prediction, axis=1)
             for k in range(sample_num):
@@ -133,7 +133,7 @@ def pac_score(solution, prediction):
         prediction = sp.minimum(1 - eps, sp.maximum(eps, prediction))
         # Compute the log loss
         pos_class_log_loss = -np.mean(solution * np.log(prediction), axis=0)
-        if (task != 'multiclass') or (label_num == 1):
+        if (ml_task != 'multiclass') or (label_num == 1):
             # The multi-label case is a bunch of binary problems.
             # The second class is the negative class for each column.
             neg_class_log_loss = -np.mean(
@@ -153,13 +153,13 @@ def pac_score(solution, prediction):
             # print('multiclass {}'.format(log_loss))
         return log_loss
 
-    def prior_log_loss(frac_pos, task):
+    def prior_log_loss(frac_pos, ml_task):
         """Baseline log loss.
         For multiplr classes ot labels return the volues for each column
         """
         eps = 1e-15
         frac_pos_ = sp.maximum(eps, frac_pos)
-        if task != 'multiclass':  # binary case
+        if ml_task != 'multiclass':  # binary case
             frac_neg = 1 - frac_pos
             frac_neg_ = sp.maximum(eps, frac_neg)
             pos_class_log_loss_ = -frac_pos * np.log(frac_pos_)
@@ -216,7 +216,7 @@ def pac_score(solution, prediction):
         solution = solution.copy()
 
     else:
-        raise NotImplementedError('pac_score does not support task type %s'
+        raise NotImplementedError('pac_score does not support ml_task type %s'
                                   % y_type)
 
     solution, prediction = normalize_array(solution, prediction.copy())

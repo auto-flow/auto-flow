@@ -7,7 +7,7 @@ import numpy as np
 from ConfigSpace import Configuration
 
 from dsmac.runhistory.utils import get_id_of_config
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import Scorer, calculate_score
@@ -37,11 +37,11 @@ class TrainEvaluator():
         self.y_test = self.data_manager.y_test
 
         self.metric = metric
-        self.task: Task = self.data_manager.task
+        self.ml_task: MLTask = self.data_manager.ml_task
 
         self.all_scoring_functions = all_scoring_functions
 
-        if self.task.mainTask == "regression":
+        if self.ml_task.mainTask == "regression":
             self.predict_function = self._predict_regression
         else:
             self.predict_function = self._predict_proba
@@ -60,7 +60,7 @@ class TrainEvaluator():
         )
 
         score = calculate_score(
-            y_true, y_hat, self.task, self.metric,
+            y_true, y_hat, self.ml_task, self.metric,
             all_scoring_functions=all_scoring_functions)
 
         if isinstance(score, dict):
@@ -105,7 +105,7 @@ class TrainEvaluator():
                 X: GenericDataFrame
                 X_train, X_valid = X.split([train_index, valid_index])
                 y_train, y_valid = y[train_index], y[valid_index]
-                procedure_result = model.procedure(self.task, X_train, y_train, X_valid, y_valid, X_test, y_test,
+                procedure_result = model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid, X_test, y_test,
                                                    self.resource_manager)
                 models.append(model)
                 y_true_indexes.append(valid_index)
@@ -141,7 +141,7 @@ class TrainEvaluator():
             # todo
             if y_test is not None:
                 # 验证集训练模型的组合去预测测试集的数据
-                if self.task.mainTask == "classification":
+                if self.ml_task.mainTask == "classification":
                     y_test_pred = vote_predicts(y_test_preds)
                 else:
                     y_test_pred = mean_predicts(y_test_preds)

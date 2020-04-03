@@ -80,11 +80,11 @@ class HyperFlowEstimator(BaseEstimator):
         self.data_manager = XYDataManager(
             X, y, X_test, y_test, dataset_metadata, column_descriptions
         )
-        self.task = self.data_manager.task
+        self.ml_task = self.data_manager.ml_task
         if metric is None:
-            if self.task.mainTask == "regression":
+            if self.ml_task.mainTask == "regression":
                 metric = r2
-            elif self.task.mainTask == "classification":
+            elif self.ml_task.mainTask == "classification":
                 metric = accuracy
             else:
                 raise NotImplementedError()
@@ -121,7 +121,7 @@ class HyperFlowEstimator(BaseEstimator):
             # todo: 在这里
             # evaluate_info
             # fine tune
-            tuner.set_task(self.data_manager.task)
+            tuner.set_task(self.data_manager.ml_task)
             tuner.set_random_state(self.random_state)
 
             self.start_tuner(tuner, hdl)
@@ -130,7 +130,7 @@ class HyperFlowEstimator(BaseEstimator):
                 if self.ensemble_builder:
                     self.estimator = self.fit_ensemble()
                 else:
-                    self.estimator = self.resource_manager.load_best_estimator(self.task)
+                    self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
         return self
 
     def start_tuner(self, tuner: Tuner, hdl: dict):
@@ -243,7 +243,7 @@ class HyperFlowEstimator(BaseEstimator):
         update_if_not_None(evaluate_info, "all_scoring_functions", all_scoring_functions)
         update_if_not_None(evaluate_info, "splitter", splitter)
         self.set_dict_to_self(evaluate_info)
-        self.task = self.data_manager.task
+        self.ml_task = self.data_manager.ml_task
         # other
         self.resource_manager.dump_db_to_csv()
         # fine tune
@@ -251,7 +251,7 @@ class HyperFlowEstimator(BaseEstimator):
         if self.ensemble_builder:
             self.estimator = self.fit_ensemble()
         else:
-            self.estimator = self.resource_manager.load_best_estimator(self.task)
+            self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
 
         return self
 

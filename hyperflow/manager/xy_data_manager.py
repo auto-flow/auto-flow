@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 from hyperflow.manager.abstract_data_manager import AbstractDataManager
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import get_task_from_y, is_nan, is_cat
@@ -84,7 +84,7 @@ class XYDataManager(AbstractDataManager):
     ):
         super(XYDataManager, self).__init__(dataset_metadata.get("dataset_name", "default_dataset_name"))
         X, y, X_test, y_test, feat_grp = self.parse_column_descriptions(column_descriptions, X, y, X_test, y_test)
-        self.task: Task = get_task_from_y(y)
+        self.ml_task: MLTask = get_task_from_y(y)
         self.X_train = GenericDataFrame(X, feat_grp=feat_grp)
         self.y_train = y
         self.X_test = GenericDataFrame(X_test, feat_grp=feat_grp) if X_test is not None else None

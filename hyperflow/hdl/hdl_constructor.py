@@ -56,7 +56,7 @@ class HDL_Constructor():
             "DAG_describe": DAG_descriptions,
         }
         self.random_state = 42
-        self.task = None
+        self.ml_task = None
         self.data_manager = None
 
     def __str__(self):
@@ -69,7 +69,7 @@ class HDL_Constructor():
 
     def set_data_manager(self, data_manager: XYDataManager):
         self.data_manager = data_manager
-        self.task = data_manager.task
+        self.ml_task = data_manager.ml_task
 
     def parse_item(self, value: Union[dict, str]) -> Tuple[str, dict, bool]:
         if isinstance(value, dict):
@@ -132,7 +132,7 @@ class HDL_Constructor():
         if not isinstance(estimator_values, (list, tuple)):
             estimator_values = [estimator_values]
         preprocessing_dict = {}
-        mainTask = self.task.mainTask
+        mainTask = self.ml_task.mainTask
         hdl_db = get_default_hdl_db()
         # 遍历DAG_describe，构造preprocessing
         for i, (key, values) in enumerate(self.DAG_describe.items()):

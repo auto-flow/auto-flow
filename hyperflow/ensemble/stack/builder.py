@@ -44,9 +44,9 @@ class StackEnsembleBuilder():
     def init_data(self):
         if not self.file_system:
             self.file_system = LocalFS()
-        self.task = self.data_manager.task
+        self.ml_task = self.data_manager.ml_task
         if not self.meta_learner:
-            if self.task.mainTask == "classification":
+            if self.ml_task.mainTask == "classification":
                 self.meta_learner = LogisticRegression(penalty='l2', solver="lbfgs", multi_class="auto",
                                                        random_state=10)
             else:
@@ -70,7 +70,7 @@ class StackEnsembleBuilder():
             raise NotImplementedError()
         estimator_list, y_true_indexes, y_preds_list = \
             self.resource_manager.load_estimators_in_trials(trial_ids)
-        if self.task.mainTask == "classification":
+        if self.ml_task.mainTask == "classification":
             stack_estimator_cls = StackingClassifier
         else:
             raise NotImplementedError()

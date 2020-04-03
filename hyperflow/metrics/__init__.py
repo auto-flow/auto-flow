@@ -6,7 +6,7 @@ import numpy as np
 import sklearn.metrics
 from sklearn.utils.multiclass import type_of_target
 
-from hyperflow.constants import Task
+from hyperflow.constants import MLTask
 from hyperflow.metrics import classification_metrics
 from hyperflow.utils.data import sanitize_array
 
@@ -50,7 +50,7 @@ class _PredictScorer(Scorer):
         type_true = type_of_target(y_true)
         if len(y_pred.shape) == 1 or y_pred.shape[1] == 1 or \
                 type_true == 'continuous':
-            # must be regression, all other task types would return at least
+            # must be regression, all other ml_task types would return at least
             # two probabilities
             pass
         elif type_true in ['binary', 'multiclass']:
@@ -273,11 +273,11 @@ for name, metric in [
         CLASSIFICATION_METRICS[qualified_name] = globals()[qualified_name]
 
 
-def calculate_score(solution, prediction, task: Task, metric,
+def calculate_score(solution, prediction, ml_task: MLTask, metric,
                     all_scoring_functions=False):
     if all_scoring_functions:
         score = dict()
-        if task.mainTask == "regression":
+        if ml_task.mainTask == "regression":
             # TODO put this into the regression metric itself
             cprediction = sanitize_array(prediction)
             metric_dict = copy.copy(REGRESSION_METRICS)
@@ -311,7 +311,7 @@ def calculate_score(solution, prediction, task: Task, metric,
                     #     raise e
 
     else:
-        if task.mainTask == "regression":
+        if ml_task.mainTask == "regression":
             # TODO put this into the regression metric itself
             cprediction = sanitize_array(prediction)
             score = metric(solution, cprediction)
