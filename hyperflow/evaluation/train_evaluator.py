@@ -177,5 +177,5 @@ class TrainEvaluator():
         info["estimator"] = estimator
         info["trial_id"] = trial_id
         info["cost_time"] = cost_time
-        self.resource_manager.insert_to_db(info)
+        self.resource_manager.insert_to_trials_db(info)
         return loss

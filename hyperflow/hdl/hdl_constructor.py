@@ -1,7 +1,6 @@
 from copy import deepcopy
 from typing import Union, Tuple, List
 
-from hyperflow.constants import Task
 from hyperflow.hdl.utils import get_hdl_db, get_default_hdl_db
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.utils.dict import add_prefix_in_dict_keys
@@ -45,6 +44,7 @@ class HDL_Constructor():
                     "lightgbm"
                 ]
             }
+        self.hdl_db_path = hdl_db_path
         self.DAG_describe = DAG_descriptions
         if hdl_db_path:
             hdl_db = get_hdl_db(hdl_db_path)
@@ -55,35 +55,21 @@ class HDL_Constructor():
             "hdl_db_path": hdl_db_path,
             "DAG_describe": DAG_descriptions,
         }
+        self.random_state = 42
+        self.task = None
+        self.data_manager = None
 
-    def set_task(self, task: Task):
-        self._task = task
+    def __str__(self):
+        return f"hyperflow.HDL_Constructor(hdl_db_path={repr(self.hdl_db_path)}, DAG_descriptions={self.DAG_describe})"
+
+    __repr__ = __str__
 
     def set_random_state(self, random_state):
-        self._random_state = random_state
-
-    @property
-    def random_state(self):
-        if not hasattr(self, "_random_state"):
-            return 10
-        else:
-            return self._random_state
-
-    @property
-    def task(self):
-        if not hasattr(self, "_task"):
-            raise NotImplementedError()
-        return self._task
+        self.random_state = random_state
 
     def set_data_manager(self, data_manager: XYDataManager):
-        self._data_manager = data_manager
-        self._task = data_manager.task
-
-    @property
-    def data_manager(self):
-        if not hasattr(self, "_data_manager"):
-            raise NotImplementedError()
-        return self._data_manager
+        self.data_manager = data_manager
+        self.task = data_manager.task
 
     def parse_item(self, value: Union[dict, str]) -> Tuple[str, dict, bool]:
         if isinstance(value, dict):
@@ -147,7 +133,6 @@ class HDL_Constructor():
             estimator_values = [estimator_values]
         preprocessing_dict = {}
         mainTask = self.task.mainTask
-        preprocessing_package = "hyperflow.pipeline.components.preprocessing"
         hdl_db = get_default_hdl_db()
         # 遍历DAG_describe，构造preprocessing
         for i, (key, values) in enumerate(self.DAG_describe.items()):

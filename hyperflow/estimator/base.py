@@ -7,6 +7,7 @@ from typing import Union, Optional, Dict, List
 import joblib
 import numpy as np
 import pandas as pd
+import json5 as json
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
@@ -23,7 +24,7 @@ from hyperflow.utils.dict import update_placeholder_from_other_dict
 from hyperflow.utils.hash import get_hash_of_dict
 
 
-class AutoPipelineEstimator(BaseEstimator):
+class HyperFlowEstimator(BaseEstimator):
 
     def __init__(
             self,
@@ -69,7 +70,7 @@ class AutoPipelineEstimator(BaseEstimator):
             X_test=None,
             y_test=None,
             column_descriptions: Optional[Dict] = None,
-            dataset_name="default_dataset_name",  # todo 数据集元数据
+            dataset_metadata=frozenset(),
             metric=None,
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
@@ -77,7 +78,7 @@ class AutoPipelineEstimator(BaseEstimator):
         # resource_manager
         # data_manager
         self.data_manager = XYDataManager(
-            X, y, X_test, y_test, dataset_name, column_descriptions
+            X, y, X_test, y_test, dataset_metadata, column_descriptions
         )
         self.task = self.data_manager.task
         if metric is None:
@@ -106,7 +107,6 @@ class AutoPipelineEstimator(BaseEstimator):
             # todo 根据上一个最优dhp的情况填充hdl中的<placeholder>
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
-                import json5 as json
                 last_best_dhp = json.loads(last_best_dhp)
                 hdl = update_placeholder_from_other_dict(raw_hdl, last_best_dhp)
                 print("info:updated hdl")
@@ -152,7 +152,7 @@ class AutoPipelineEstimator(BaseEstimator):
             sync_dict["exit_processes"] = tuner.exit_processes
         else:
             sync_dict = None
-        self.resource_manager.close_db()
+        self.resource_manager.close_trials_db()
         self.resource_manager.clear_pid_list()
         self.resource_manager.close_redis()
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]

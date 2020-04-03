@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.datasets import load_digits
 from sklearn.model_selection import ShuffleSplit
 
-from hyperflow.estimator.base import AutoPipelineEstimator
+from hyperflow.estimator.base import HyperFlowEstimator
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
 from hyperflow.tuner.tuner import Tuner
 
@@ -22,7 +22,7 @@ tuner = Tuner(
     initial_runs=5,
     run_limit=12,
 )
-hyperflow_pipeline = AutoPipelineEstimator(tuner,HDL_Constructor(
+hyperflow_pipeline = HyperFlowEstimator(tuner, HDL_Constructor(
     DAG_descriptions={
         "num->num": [
             "select.from_model_clf"

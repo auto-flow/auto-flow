@@ -1,51 +1,71 @@
+import datetime
 import os
-import time
 from typing import Dict, Tuple, List, Union
 
 import json5 as json
 import peewee as pw
+from frozendict import frozendict
 from joblib import dump, load
 from redis import Redis
 
-from generic_fs import LocalFS
+import generic_fs
+from generic_fs import FileSystem
 from generic_fs.utils import dumps_pickle, loads_pickle
 from hyperflow.constants import Task
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
+from hyperflow.utils.packages import find_components
 
 
 class ResourceManager():
     '''
-    资源管理： 文件系统与数据库
+    ResourceManager: file_system and data_base
     '''
 
     def __init__(
             self,
-            project_path=None,
-            file_system=None,
-            max_persistent_model=50,
-            persistent_mode="fs",
+            store_path="~",
+            file_system="local",
+            file_system_params=frozendict(),
             db_type="sqlite",
+            db_params=frozendict(),
+            redis_params=frozendict(),
+            max_persistent_estimator=50,
+            persistent_mode="fs",
             store_intermediate=True,
-            redis_params=None
     ):
-        self.store_intermediate = store_intermediate
-        if redis_params is None:
-            redis_params = {}
+        # ---file_system------------
+        directory = os.path.split(generic_fs.__file__)[0]
+        file_system2cls = find_components(generic_fs.__package__, directory, FileSystem)
+        self.file_system_type = file_system
+        if file_system not in file_system2cls:
+            raise Exception(f"Invalid file_system {file_system}")
+        self.file_system = file_system2cls[file_system](**file_system_params)
+        if self.file_system_type == "local":
+            store_path = os.path.expandvars(os.path.expanduser(store_path))
+        self.store_path = store_path
+        # ---data_base------------
+        assert db_type in ("sqlite", "postgresql", "mysql")
+        self.db_type = db_type
+        self.db_params = dict(db_params)
+        if db_type == "sqlite":
+            assert self.file_system_type == "local"
+        # ---redis----------------
         self.redis_params = redis_params
+        # ---max_persistent_model---
+        self.max_persistent_estimator = max_persistent_estimator
+        # ---persistent_mode-------
         self.persistent_mode = persistent_mode
         assert self.persistent_mode in ("fs", "db")
-        self.db_type = db_type
-        self.max_persistent_model = max_persistent_model
-        if not file_system:
-            file_system = LocalFS()
-        self.file_system = file_system
-        if not project_path:
-            project_path = os.getcwd() + f'''/hyperflow-{time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())}'''
-        self.project_path = project_path
-        self.file_system.mkdir(self.project_path)
-        self.is_init_db = False
+        # ---store_intermediate-------
+        self.store_intermediate = store_intermediate
+        # if not store_path:
+        #     store_path = os.getcwd() + f'''/hyperflow-{time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())}'''
+        self.store_path = store_path
+        self.file_system.mkdir(self.store_path)
+        self.is_init_trials_db = False
+        self.is_init_experiments_db = False
         self.is_init_redis = False
         self.is_master = False
 
@@ -61,7 +81,7 @@ class ResourceManager():
 
     def load_dataset_path(self, dataset_name):
         # todo: 对数据做哈希进行检查, 保证前后两次使用的是同一个数据
-        self.dataset_path = self.project_path + "/" + dataset_name
+        self.dataset_path = self.store_path + "/" + dataset_name
         if not self.file_system.isdir(self.dataset_path):
             raise NotADirectoryError()
         self.init_dataset_path(dataset_name)
@@ -69,7 +89,7 @@ class ResourceManager():
     def init_dataset_path(self, dataset_name):
         # 在fit的时候调用
         self.dataset_name = dataset_name
-        self.dataset_path = self.project_path + "/" + dataset_name
+        self.dataset_path = self.store_path + "/" + dataset_name
         self.smac_output_dir = self.dataset_path + "/smac_output"
         self.file_system.mkdir(self.smac_output_dir)
         self.trials_dir = self.dataset_path + f"/trials"
@@ -111,8 +131,8 @@ class ResourceManager():
 
     def load_best_estimator(self, task: Task):
         # todo: 最后调用分析程序？
-        self.connect_db()
-        record = self.Model.select().group_by(self.Model.loss, self.Model.cost_time).limit(1)[0]
+        self.connect_trials_db()
+        record = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
         if self.persistent_mode == "fs":
             models = load(record.models_path)
         else:
@@ -125,20 +145,20 @@ class ResourceManager():
 
     def load_best_dhp(self):
         trial_id = self.get_best_k_trials(1)[0]
-        record = self.Model.select().where(self.Model.trial_id == trial_id)[0]
+        record = self.TrialsModel.select().where(self.TrialsModel.trial_id == trial_id)[0]
         return record.dict_hyper_param
 
     def get_best_k_trials(self, k):
-        self.connect_db()
+        self.connect_trials_db()
         trial_ids = []
-        records = self.Model.select().group_by(self.Model.loss, self.Model.cost_time).limit(k)
+        records = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
         for record in records:
             trial_ids.append(record.trial_id)
         return trial_ids
 
     def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
-        self.connect_db()
-        records = self.Model.select().where(self.Model.trial_id << trials)
+        self.connect_trials_db()
+        records = self.TrialsModel.select().where(self.TrialsModel.trial_id << trials)
         estimator_list = []
         y_true_indexes_list = []
         y_preds_list = []
@@ -153,6 +173,8 @@ class ResourceManager():
 
     def set_is_master(self, is_master):
         self.is_master = is_master
+
+    # ----------redis------------------------------------------------------------------
 
     def connect_redis(self):
         if self.is_init_redis:
@@ -197,8 +219,46 @@ class ResourceManager():
         if self.connect_redis():
             self.redis_client.delete(name)
 
-    def get_model(self) -> pw.Model:
-        class TrialModel(pw.Model):
+    # ----------experiments_model------------------------------------------------------------------
+    def get_experiments_model(self) -> pw.Model:
+        class Experiments(pw.Model):
+            run_record_id = pw.PrimaryKeyField()
+            general_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            current_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            HDL_list = pw.TextField(default="")
+            HDL = pw.TextField(default="")
+            HDL_id = pw.CharField(default="")
+            Tuner_list = pw.TextField(default="")
+            Tuner = pw.TextField(default="")
+            dataset_id = pw.CharField(default="")
+            metric = pw.CharField(default="")
+            all_scoring_functions = pw.BooleanField(default=True)
+            splitter = pw.CharField(default="")
+            column_descriptions = pw.TextField(default="")
+
+
+            class Meta:
+                database = self.experiments_db
+
+        self.experiments_db.create_tables([Experiments])
+        return Experiments
+
+    def connect_experiments_db(self):
+        if self.is_init_experiments_db:
+            return
+        self.is_init_experiments_db = True
+        self.experiments_db: pw.Database = pw.SqliteDatabase(self.db_path)
+        self.ExperimentsModel = self.get_trials_model()
+
+    def close_experiments_db(self):
+        self.is_init_experiments_db = False
+        self.experiments_db = None
+        self.ExperimentsModel = None
+
+    # ----------trials_model------------------------------------------------------------------
+
+    def get_trials_model(self) -> pw.Model:
+        class Trials(pw.Model):
             trial_id = pw.CharField(primary_key=True)
             estimator = pw.CharField(default="")
             loss = pw.FloatField(default=65535)
@@ -219,28 +279,29 @@ class ResourceManager():
             status = pw.CharField(default="success")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
+            timestamp = pw.DateTimeField(default=datetime.datetime.now)
 
             class Meta:
-                database = self.db
+                database = self.trials_db
 
-        self.db.create_tables([TrialModel])
-        return TrialModel
+        self.trials_db.create_tables([Trials])
+        return Trials
 
-    def connect_db(self):
-        if self.is_init_db:
+    def connect_trials_db(self):
+        if self.is_init_trials_db:
             return
-        self.is_init_db = True
+        self.is_init_trials_db = True
         # todo: 其他数据库的实现
-        self.db: pw.Database = pw.SqliteDatabase(self.db_path)
-        self.Model = self.get_model()
+        self.trials_db: pw.Database = pw.SqliteDatabase(self.db_path)
+        self.TrialsModel = self.get_trials_model()
 
-    def close_db(self):
-        self.is_init_db = False
-        self.db = None
-        self.Model = None
+    def close_trials_db(self):
+        self.is_init_trials_db = False
+        self.trials_db = None
+        self.TrialsModel = None
 
-    def insert_to_db(self, info: Dict):
-        self.connect_db()
+    def insert_to_trials_db(self, info: Dict):
+        self.connect_trials_db()
         if self.persistent_mode == "fs":
             models_path = self.persistent_evaluated_model(info)
             models_bit = 0
@@ -248,7 +309,7 @@ class ResourceManager():
             models_path = ""
             models_bit = dumps_pickle(info["models"])
         # TODO: 主键已存在的错误
-        self.Model.create(
+        self.TrialsModel.create(
             trial_id=info["trial_id"],
             estimator=info.get("estimator", ""),
             loss=info.get("loss", 65535),
@@ -268,7 +329,8 @@ class ResourceManager():
             cost_time=info.get("cost_time", 65535),
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),
-            warning_info=info.get("warning_info", "")
+            warning_info=info.get("warning_info", ""),
+            timestamp=datetime.datetime.now()
         )
 
     def delete_models(self):
@@ -285,32 +347,34 @@ class ResourceManager():
         # master segment
         if not self.is_master:
             return True
-        self.connect_db()
+        self.connect_trials_db()
         estimators = []
-        for record in self.Model.select().group_by(self.Model.estimator):
+        for record in self.TrialsModel.select().group_by(self.TrialsModel.estimator):
             estimators.append(record.estimator)
         for estimator in estimators:
-            should_delete = self.Model.select().where(self.Model.estimator == estimator).order_by(
-                self.Model.loss, self.Model.cost_time).offset(50)
+            should_delete = self.TrialsModel.select().where(self.TrialsModel.estimator == estimator).order_by(
+                self.TrialsModel.loss, self.TrialsModel.cost_time).offset(50)
             if should_delete:
                 if self.persistent_mode == "fs":
                     for record in should_delete:
                         models_path = record.models_path
                         print("delete:" + models_path)
                         self.file_system.delete(models_path)
-                self.Model.delete().where(self.Model.trial_id.in_(should_delete.select(self.Model.trial_id))).execute()
+                self.TrialsModel.delete().where(
+                    self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()
         return True
 
 
 if __name__ == '__main__':
     rm = ResourceManager("/home/tqc/PycharmProjects/hyperflow/test/test_db")
     rm.init_dataset_path("default_dataset_name")
-    rm.connect_db()
+    rm.connect_trials_db()
     estimators = []
-    for record in rm.Model.select().group_by(rm.Model.estimator):
+    for record in rm.TrialsModel.select().group_by(rm.TrialsModel.estimator):
         estimators.append(record.estimator)
     for estimator in estimators:
-        should_delete = rm.Model.select(rm.Model.trial_id).where(rm.Model.estimator == estimator).order_by(
-            rm.Model.loss, rm.Model.cost_time).offset(50)
+        should_delete = rm.TrialsModel.select(rm.TrialsModel.trial_id).where(
+            rm.TrialsModel.estimator == estimator).order_by(
+            rm.TrialsModel.loss, rm.TrialsModel.cost_time).offset(50)
         if should_delete:
-            rm.Model.delete().where(rm.Model.trial_id.in_(should_delete)).execute()
+            rm.TrialsModel.delete().where(rm.TrialsModel.trial_id.in_(should_delete)).execute()

@@ -52,7 +52,13 @@ class Tuner():
 
     def __str__(self):
         return (
-            f"Tuner(search_method={self.search_method}, run_limit={self.run_limit}, initial_runs={self.initial_runs})")
+            f"hyperflow.Tuner(search_method={repr(self.search_method)}, "
+            f"run_limit={repr(self.run_limit)}, "
+            f"initial_runs={repr(self.initial_runs)}, "
+            f"n_jobs={repr(self.n_jobs)}, "
+            f"exit_processes={repr(self.exit_processes)})")
+
+    __repr__ = __str__
 
     def set_random_state(self, random_state):
         self.random_state = random_state

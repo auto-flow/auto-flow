@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from hyperflow.estimator.base import AutoPipelineEstimator
+from hyperflow.estimator.base import HyperFlowEstimator
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.tuner.tuner import Tuner
@@ -68,7 +68,7 @@ hdl_constructor = HDL_Constructor(
     }
 )
 resource_manager = ResourceManager(os.getcwd() + "/for_hxw_result")
-hyperflow_pipeline = AutoPipelineEstimator(tuner, hdl_constructor, ensemble_builder=False)
+hyperflow_pipeline = HyperFlowEstimator(tuner, hdl_constructor, ensemble_builder=False)
 
 hyperflow_pipeline.fit(
     X=x_train, y=y_train, n_jobs=3

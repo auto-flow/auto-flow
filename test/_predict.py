@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 
-from hyperflow.estimator.base import AutoPipelineEstimator
+from hyperflow.estimator.base import HyperFlowEstimator
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.tuner.tuner import Tuner

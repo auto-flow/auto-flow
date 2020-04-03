@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import ShuffleSplit
 
-from hyperflow.estimator.base import AutoPipelineEstimator
+from hyperflow.estimator.base import HyperFlowEstimator
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
 from hyperflow.tuner.tuner import Tuner
 
@@ -53,7 +53,7 @@ tuners = [
         search_method="smac"
     ),
 ]
-hyperflow_pipeline = AutoPipelineEstimator(tuners, hdl_constructors)
+hyperflow_pipeline = HyperFlowEstimator(tuners, hdl_constructors)
 column_descriptions = {
     "id": "PassengerId",
     "target": "Survived",

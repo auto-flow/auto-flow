@@ -80,9 +80,9 @@ class XYDataManager(AbstractDataManager):
         return X, y, X_test, y_test, feat_grp
 
     def __init__(
-            self, X, y, X_test, y_test, dataset_name, column_descriptions
+            self, X, y, X_test, y_test, dataset_metadata, column_descriptions
     ):
-        super(XYDataManager, self).__init__(dataset_name)
+        super(XYDataManager, self).__init__(dataset_metadata.get("dataset_name", "default_dataset_name"))
         X, y, X_test, y_test, feat_grp = self.parse_column_descriptions(column_descriptions, X, y, X_test, y_test)
         self.task: Task = get_task_from_y(y)
         self.X_train = GenericDataFrame(X, feat_grp=feat_grp)
