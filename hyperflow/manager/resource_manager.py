@@ -110,7 +110,7 @@ class ResourceManager():
 
     def dump_hdl(self, hdl_construct: HDL_Constructor):
         persistent_data = {
-            "hdl_db": hdl_construct.hdl_db,
+            "hdl_bank": hdl_construct.hdl_bank,
             # "default_hp": hdl_construct.default_hp,
             "hdl": hdl_construct.hdl,
             "params": hdl_construct.params,
@@ -223,20 +223,16 @@ class ResourceManager():
     # ----------experiments_model------------------------------------------------------------------
     def get_experiments_model(self) -> pw.Model:
         class Experiments(pw.Model):
-            experiment_id = pw.PrimaryKeyField()
-            general_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
-            current_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            experiment_id = pw.IntegerField(primary_key=True)
+            general_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            current_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             HDL_list = pw.TextField(default="")
             HDL = pw.TextField(default="")
             HDL_id = pw.CharField(default="")
             Tuner_list = pw.TextField(default="")
             Tuner = pw.TextField(default="")
             task_id = pw.CharField(default="")
-            # metric = pw.CharField(default="")
             all_scoring_functions = pw.BooleanField(default=True)
-            # splitter = pw.CharField(default="")
-            # column_descriptions = pw.TextField(default="")
-
 
             class Meta:
                 database = self.experiments_db
@@ -255,23 +251,32 @@ class ResourceManager():
         self.is_init_experiments_db = False
         self.experiments_db = None
         self.ExperimentsModel = None
-    # ----------experiments_model------------------------------------------------------------------
+
+    # ----------tasks_model------------------------------------------------------------------
     def get_tasks_model(self) -> pw.Model:
         class Tasks(pw.Model):
-            run_record_id = pw.PrimaryKeyField()
-            general_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
-            current_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
-            HDL_list = pw.TextField(default="")
-            HDL = pw.TextField(default="")
-            HDL_id = pw.CharField(default="")
-            Tuner_list = pw.TextField(default="")
-            Tuner = pw.TextField(default="")
-            task_id = pw.CharField(default="")
+            # task_id=md5(X,y,X_test,y_test,splitter,metric)
+            task_id = pw.CharField(primary_key=True)
             metric = pw.CharField(default="")
-            all_scoring_functions = pw.BooleanField(default=True)
             splitter = pw.CharField(default="")
             column_descriptions = pw.TextField(default="")
-
+            dataset_metadata = pw.TextField(default="")
+            # X
+            X_hash = pw.CharField(default="")
+            X_path = pw.TextField(default="")
+            X_bits = pw.BitField(default=0)
+            # y
+            y_hash = pw.CharField(default="")
+            y_path = pw.TextField(default="")
+            y_bits = pw.BitField(default=0)
+            # X_test
+            X_test_hash = pw.CharField(default="")
+            X_test_path = pw.TextField(default="")
+            X_test_bits = pw.BitField(default=0)
+            # y_test
+            y_test_hash = pw.CharField(default="")
+            y_test_path = pw.TextField(default="")
+            y_test_bits = pw.BitField(default=0)
 
             class Meta:
                 database = self.tasks_db
@@ -290,6 +295,41 @@ class ResourceManager():
         self.is_init_tasks_db = False
         self.tasks_db = None
         self.TasksModel = None
+
+    # ----------hdls_model------------------------------------------------------------------
+    def get_hdls_model(self) -> pw.Model:
+        class HDLs(pw.Model):
+            run_record_id = pw.PrimaryKeyField()
+            general_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            current_task_timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            HDL_list = pw.TextField(default="")
+            HDL = pw.TextField(default="")
+            HDL_id = pw.CharField(default="")
+            Tuner_list = pw.TextField(default="")
+            Tuner = pw.TextField(default="")
+            task_id = pw.CharField(default="")
+            metric = pw.CharField(default="")
+            all_scoring_functions = pw.BooleanField(default=True)
+            splitter = pw.CharField(default="")
+            column_descriptions = pw.TextField(default="")
+
+            class Meta:
+                database = self.hdls_db
+
+        self.hdls_db.create_tables([HDLs])
+        return HDLs
+
+    def connect_hdls_db(self):
+        if self.is_init_hdls_db:
+            return
+        self.is_init_hdls_db = True
+        self.hdls_db: pw.Database = pw.SqliteDatabase(self.db_path)
+        self.HDLsModel = self.get_trials_model()
+
+    def close_hdls_db(self):
+        self.is_init_hdls_db = False
+        self.hdls_db = None
+        self.HDLsModel = None
 
     # ----------trials_model------------------------------------------------------------------
 

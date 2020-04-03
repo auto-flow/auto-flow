@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Union, Tuple, List
 
-from hyperflow.hdl.utils import get_hdl_db, get_default_hdl_db
+from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.utils.dict import add_prefix_in_dict_keys
 
@@ -9,8 +9,9 @@ from hyperflow.utils.dict import add_prefix_in_dict_keys
 class HDL_Constructor():
     def __init__(
             self,
-            hdl_db_path=None,
-            DAG_descriptions=None
+            hdl_bank_path=None,
+            DAG_descriptions=None,
+            # DAG_descriptions=None,
     ):
         if DAG_descriptions is None:
             DAG_descriptions = {
@@ -44,15 +45,15 @@ class HDL_Constructor():
                     "lightgbm"
                 ]
             }
-        self.hdl_db_path = hdl_db_path
+        self.hdl_bank_path = hdl_bank_path
         self.DAG_describe = DAG_descriptions
-        if hdl_db_path:
-            hdl_db = get_hdl_db(hdl_db_path)
+        if hdl_bank_path:
+            hdl_bank = get_hdl_bank(hdl_bank_path)
         else:
-            hdl_db = get_default_hdl_db()
-        self.hdl_db = hdl_db
+            hdl_bank = get_default_hdl_bank()
+        self.hdl_bank = hdl_bank
         self.params = {
-            "hdl_db_path": hdl_db_path,
+            "hdl_bank_path": hdl_bank_path,
             "DAG_describe": DAG_descriptions,
         }
         self.random_state = 42
@@ -60,7 +61,7 @@ class HDL_Constructor():
         self.data_manager = None
 
     def __str__(self):
-        return f"hyperflow.HDL_Constructor(hdl_db_path={repr(self.hdl_db_path)}, DAG_descriptions={self.DAG_describe})"
+        return f"hyperflow.HDL_Constructor(hdl_bank_path={repr(self.hdl_bank_path)}, DAG_descriptions={self.DAG_describe})"
 
     __repr__ = __str__
 
@@ -103,13 +104,13 @@ class HDL_Constructor():
             result = result.get(path, {})
         return result
 
-    def get_params_in_dict(self, hdl_db: dict, packages: str, phase: str, mainTask):
+    def get_params_in_dict(self, hdl_bank: dict, packages: str, phase: str, mainTask):
         assert phase in ("preprocessing", "estimator")
         packages: list = packages.split("|")
-        params_list: List[dict] = [self._get_params_in_dict(hdl_db["preprocessing"], package) for package in
+        params_list: List[dict] = [self._get_params_in_dict(hdl_bank["preprocessing"], package) for package in
                                    packages[:-1]]
         last_phase_key = "preprocessing" if phase == "preprocessing" else mainTask
-        params_list += [self._get_params_in_dict(hdl_db[last_phase_key], packages[-1])]
+        params_list += [self._get_params_in_dict(hdl_bank[last_phase_key], packages[-1])]
         if len(params_list) == 0:
             raise AttributeError
         elif len(params_list) == 1:
@@ -133,7 +134,7 @@ class HDL_Constructor():
             estimator_values = [estimator_values]
         preprocessing_dict = {}
         mainTask = self.ml_task.mainTask
-        hdl_db = get_default_hdl_db()
+        hdl_bank = get_default_hdl_bank()
         # 遍历DAG_describe，构造preprocessing
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
@@ -143,7 +144,7 @@ class HDL_Constructor():
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
                 addition_dict.update({"random_state": self.random_state})  # fixme
-                params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "preprocessing", mainTask)
+                params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, "preprocessing", mainTask)
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)
             preprocessing_dict[formed_key] = sub_dict
@@ -151,7 +152,7 @@ class HDL_Constructor():
         estimator_dict = {}
         for estimator_value in estimator_values:
             packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
-            params = {} if is_vanilla else self.get_params_in_dict(hdl_db, packages, "estimator", mainTask)
+            params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, "estimator", mainTask)
             estimator_dict[packages] = params
             estimator_dict[packages].update(addition_dict)
         final_dict = {

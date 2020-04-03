@@ -3,7 +3,7 @@ from typing import Dict
 
 import json5 as json
 
-from hyperflow import init_data
+from hyperflow import hdl
 
 
 def is_hdl_bottom(key, value):
@@ -16,14 +16,14 @@ def is_hdl_bottom(key, value):
     return False
 
 
-def get_hdl_db(path: str) -> Dict:
+def get_hdl_bank(path: str) -> Dict:
     path = Path(path)
     if path.exists():
         return json.loads(path.read_text())
     else:
         print("warn")
-        return get_default_hdl_db()
+        return get_default_hdl_bank()
 
 
-def get_default_hdl_db() -> Dict:
-    return json.loads((Path(init_data.__file__).parent / f"hdl_db.json").read_text())
+def get_default_hdl_bank() -> Dict:
+    return json.loads((Path(hdl.__file__).parent / f"hdl_bank.json").read_text())

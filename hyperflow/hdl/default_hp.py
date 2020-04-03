@@ -23,19 +23,19 @@ def is_bottom_dict_in_default_hp(value):
     return False
 
 
-def extract_default_hp_from_hdl_db(hdl_db: Dict) -> Dict:
-    dict_ = deepcopy(hdl_db)
+def extract_default_hp_from_hdl_bank(hdl_bank: Dict) -> Dict:
+    dict_ = deepcopy(hdl_bank)
     default_hp_recursion(dict_)
     return dict_
 
-def extract_pure_hdl_db_from_hdl_db(hdl_db: Dict) -> Dict:
-    dict_ = deepcopy(hdl_db)
-    pure_hdl_db_recursion(dict_)
+def extract_pure_hdl_bank_from_hdl_bank(hdl_bank: Dict) -> Dict:
+    dict_ = deepcopy(hdl_bank)
+    pure_hdl_bank_recursion(dict_)
     return dict_
 
 
 
-def pure_hdl_db_recursion(dict_:Dict):
+def pure_hdl_bank_recursion(dict_:Dict):
     should_pop = []
     should_recursion = []
     for key, value in dict_.items():
@@ -49,7 +49,7 @@ def pure_hdl_db_recursion(dict_:Dict):
     for key in should_pop:
         dict_.pop(key)
     for sub_dict_ in should_recursion:
-        pure_hdl_db_recursion(sub_dict_)
+        pure_hdl_bank_recursion(sub_dict_)
 
 def default_hp_recursion(dict_: Dict):
     should_pop = []
