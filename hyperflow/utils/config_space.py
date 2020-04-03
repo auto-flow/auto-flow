@@ -9,35 +9,35 @@ from ConfigSpace import ConfigurationSpace, Configuration, CategoricalHyperparam
 from hyperflow.hdl.smac import _encode
 
 
-def get_random_initial_configs(phps: ConfigurationSpace, n_configs, random_state=42) -> List[Configuration]:
+def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state=42) -> List[Configuration]:
     None_name = "None:NoneType"
-    phps = deepcopy(phps)
-    phps.seed(random_state)
-    for config in phps.get_hyperparameters():
+    shps = deepcopy(shps)
+    shps.seed(random_state)
+    for config in shps.get_hyperparameters():
         name: str = config.name
         if name.startswith("preprocessing") and name.endswith("__choice__") and (None_name in config.choices):
             config.default_value = None_name
 
-    model_choice = phps.get_hyperparameter("estimator:__choice__")
+    model_choice = shps.get_hyperparameter("estimator:__choice__")
     result = []
     for choice in model_choice.choices:
-        cur_phps = deepcopy(phps)
+        cur_phps = deepcopy(shps)
         cur_phps.get_hyperparameter("estimator:__choice__").default_value = choice
         default = cur_phps.get_default_configuration()
         result.append(default)
     if len(result) < n_configs:
-        result.extend(phps.sample_configuration(n_configs - len(result)))
+        result.extend(shps.sample_configuration(n_configs - len(result)))
     return result
 
 
-def replace_phps(phps: ConfigurationSpace, key, value):
-    for hp in phps.get_hyperparameters():
+def replace_phps(shps: ConfigurationSpace, key, value):
+    for hp in shps.get_hyperparameters():
         if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
             hp.value = _encode(value)
 
 
-def get_grid_initial_configs(phps: ConfigurationSpace, n_configs=-1, random_state=42):
-    grid_phps = ConfigSpaceGrid(phps)
+def get_grid_initial_configs(shps: ConfigurationSpace, n_configs=-1, random_state=42):
+    grid_phps = ConfigSpaceGrid(shps)
     grid_configs = grid_phps.generate_grid()
     if n_configs > 0:
         random.seed(random_state)

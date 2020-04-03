@@ -1,12 +1,9 @@
 from typing import List
 
-from ConfigSpace.configuration_space import Configuration
-
 from hyperflow.hdl.smac import _decode
-from hyperflow.php2dhp.base import PHP2DHP
 
 
-class SmacPHP2DHP(PHP2DHP):
+class SHP2DHP():
     def set_kv(self, dict_: dict, key_path: list, value):
         tmp = dict_
         for i, key in enumerate(key_path):
@@ -38,8 +35,8 @@ class SmacPHP2DHP(PHP2DHP):
         result.append(cursor)
         return result
 
-    def convert(self, php: Configuration):
-        dict_ = php.get_dictionary()
+    def __call__(self, shp):
+        dict_ = shp.get_dictionary()
         result = {}
         for k, v in dict_.items():
             if isinstance(v, str):

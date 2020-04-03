@@ -158,11 +158,11 @@ class TrainEvaluator():
     def set_php2model(self, php2model):
         self.php2model = php2model
 
-    def __call__(self, php: Configuration):
+    def __call__(self, shp: Configuration):
         # 1. 将php变成model
-        trial_id = get_id_of_config(php)
+        trial_id = get_id_of_config(shp)
         start = time()
-        dhp, model = self.php2model(php)
+        dhp, model = self.php2model(shp)
         # 2. 获取数据
         X_train, y_train, X_test, y_test = self.get_Xy()
         # 3. 进行评价
@@ -171,7 +171,7 @@ class TrainEvaluator():
         cost_time = time() - start
         info["trial_id"] = trial_id
         info["status"] = "success"
-        info["program_hyper_param"] = php
+        info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get("estimator", {"unk": ""}).keys())[0]
         info["estimator"] = estimator

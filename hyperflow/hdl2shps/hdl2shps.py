@@ -5,16 +5,15 @@ from importlib import import_module
 from typing import Dict, List
 
 import numpy as np
-from ConfigSpace.conditions import InCondition, EqualsCondition
-from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.forbidden import ForbiddenInClause, ForbiddenEqualsClause, ForbiddenAndConjunction
-from ConfigSpace.hyperparameters import CategoricalHyperparameter, Constant
+from ConfigSpace import CategoricalHyperparameter, Constant
+from ConfigSpace import ConfigurationSpace
+from ConfigSpace import ForbiddenInClause, ForbiddenEqualsClause, ForbiddenAndConjunction
+from ConfigSpace import InCondition, EqualsCondition
 from hyperopt import fmin, tpe, hp
 
 import hyperflow.hdl.smac as smac_hdl
 from hyperflow.constants import MLTask
 from hyperflow.hdl.utils import is_hdl_bottom
-from hyperflow.hdl2phps.base import HDL2PHPS
 from hyperflow.utils.packages import get_class_name_of_module
 
 
@@ -22,13 +21,12 @@ class RelyModels:
     info = []
 
 
-class SmacHDL2PHPS(HDL2PHPS):
-    @property
-    def ml_task(self):
-        return self._task
+class HDL2SHPS():
+    def __init__(self):
+        self.ml_task=None
 
     def set_task(self, ml_task: MLTask):
-        self._task = ml_task
+        self.ml_task = ml_task
 
     def get_forbid_hit_in_models_by_rely(self, models, rely_model="boost_model"):
         forbid_in_value = []
@@ -223,7 +221,7 @@ class SmacHDL2PHPS(HDL2PHPS):
         self.__rely_model(cs)
         return cs
         # return {
-        #     "phps":cs,
+        #     "shps":cs,
         #     "p":p
         # }
 

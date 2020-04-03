@@ -1,4 +1,4 @@
-from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
 
-phps=SmacHDL2PHPS()
-phps.get_p(2,9,[2]*5)
+shps=HDL2SHPS()
+shps.get_p(2,9,[2]*5)

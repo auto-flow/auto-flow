@@ -32,7 +32,7 @@ def _decode(str_value: str) -> Any:
 def choice(label: str, options: List, default=None):
     if len(options) == 1:
         return Constant(label, _encode(options[0]))  # fixme: if declare probability in here?
-    # fixme: copy from hyperflow/hdl2phps/smac_hdl2phps.py:354
+    # fixme: copy from hyperflow/hdl2shps/hdl2shps.py:354
     choice2proba = {}
     not_specific_proba_choices = []
     sum_proba = 0

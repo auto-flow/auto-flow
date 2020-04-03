@@ -1,5 +1,5 @@
 from hyperflow import constants
-from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
 
 HDL = {'preprocessing': {'cat->{highR=highR_cat,lowR=lowR_cat}(choice)': {'operate.split.cat': {}},
               'cat_nan->cat(choice)': {'impute.fill_abnormal': {'__rely_model': 'boost_model'},
@@ -68,9 +68,9 @@ HDL = {'preprocessing': {'cat->{highR=highR_cat,lowR=lowR_cat}(choice)': {'opera
                                                     '_value': [True, False]}},
                        'lightgbm': {}}}
 
-hdl2phps = SmacHDL2PHPS()
+hdl2phps = HDL2SHPS()
 hdl2phps.set_task(constants.binary_classification_task)
-phps = hdl2phps(HDL)
-print(phps)
-php=phps.sample_configuration()
-print(php)
+shps = hdl2phps(HDL)
+print(shps)
+shp=shps.sample_configuration()
+print(shp)

@@ -9,7 +9,7 @@ if __name__ == '__main__':
     from dsmac.runhistory.runhistory import RunHistory
 
     runhistory = RunHistory(average_cost,db_args="test.db")
-    cs: ConfigurationSpace = joblib.load("/home/tqc/PycharmProjects/hyperflow/test/php.bz2")
+    cs: ConfigurationSpace = joblib.load("/home/tqc/PycharmProjects/hyperflow/test/shp.bz2")
     runhistory.load_json(
         "/home/tqc/PycharmProjects/hyperflow/test/test_runhistory/default_dataset_name/smac_output/runhistory.json",
         cs)

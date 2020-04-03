@@ -2,8 +2,8 @@ from collections import Counter
 from pprint import pprint
 
 from hyperflow import constants
-from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
-from hyperflow.php2dhp.smac_php2dhp import SmacPHP2DHP
+from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
+from hyperflow.shp2dhp.shp2dhp import SHP2DHP
 
 HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {}},
               '1highR_nan->lowR_nan(choice)': {'operate.drop': {},
@@ -89,15 +89,15 @@ HDL = {'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'oper
 i = 0
 estimators = []
 
-hdl2phps = SmacHDL2PHPS()
+hdl2phps = HDL2SHPS()
 hdl2phps.set_task(constants.binary_classification_task)
-phps = hdl2phps(HDL)
+shps = hdl2phps(HDL)
 for i in range(300):
-    # print(phps)
-    php = phps.sample_configuration()
-    # print(php)
-    php2dhp = SmacPHP2DHP()
-    dhp = php2dhp(php)
+    # print(shps)
+    shp = shps.sample_configuration()
+    # print(shp)
+    php2dhp = SHP2DHP()
+    dhp = php2dhp(shp)
     # i+=1
     estimators.append(list(dhp["estimator"].keys())[0])
     pprint(dhp)

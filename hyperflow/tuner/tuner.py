@@ -10,11 +10,11 @@ from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
 from hyperflow.constants import MLTask
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
-from hyperflow.hdl2phps.smac_hdl2phps import SmacHDL2PHPS
+from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import Scorer
-from hyperflow.php2dhp.smac_php2dhp import SmacPHP2DHP
+from hyperflow.shp2dhp.shp2dhp import SHP2DHP
 from hyperflow.pipeline.pipeline import GenericPipeline
 from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
@@ -69,8 +69,8 @@ class Tuner():
     def set_hdl(self, hdl: Dict):
         self.hdl = hdl
         # todo: 泛化ML管线后，可能存在多个preprocessing
-        self.phps: ConfigurationSpace = self.hdl2phps(hdl)
-        self.phps.seed(self.random_state)
+        self.shps: ConfigurationSpace = self.hdl2phps(hdl)
+        self.shps.seed(self.random_state)
 
     def set_resource_manager(self, resource_manager: ResourceManager):
         self.resource_manager = resource_manager
@@ -84,11 +84,11 @@ class Tuner():
 
     def design_initial_configs(self, n_jobs):
         if self.search_method == "smac":
-            return get_random_initial_configs(self.phps, max(self.initial_runs, n_jobs), self.random_state)
+            return get_random_initial_configs(self.shps, max(self.initial_runs, n_jobs), self.random_state)
         elif self.search_method == "grid":
-            return get_grid_initial_configs(self.phps, self.run_limit, self.random_state)
+            return get_grid_initial_configs(self.shps, self.run_limit, self.random_state)
         elif self.search_method == "random":
-            return get_random_initial_configs(self.phps, self.run_limit, self.random_state)
+            return get_random_initial_configs(self.shps, self.run_limit, self.random_state)
         else:
             raise NotImplementedError
 
@@ -124,7 +124,7 @@ class Tuner():
             {
                 "run_obj": "quality",
                 "runcount-limit": 1000,
-                "cs": self.phps,  # configuration space
+                "cs": self.shps,  # configuration space
                 "deterministic": "true",
                 "output_dir": self.resource_manager.smac_output_dir,
             },
@@ -150,9 +150,9 @@ class Tuner():
                 print("info:exit")
                 break
 
-    def php2model(self, php):
-        php2dhp = SmacPHP2DHP()
-        dhp = php2dhp(php)
+    def php2model(self, shp):
+        php2dhp = SHP2DHP()
+        dhp = php2dhp(shp)
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
@@ -160,7 +160,7 @@ class Tuner():
         return dhp, pipeline
 
     def hdl2phps(self, hdl: Dict):
-        hdl2phps = SmacHDL2PHPS()
+        hdl2phps = HDL2SHPS()
         hdl2phps.set_task(self.ml_task)
         return hdl2phps(hdl)
 

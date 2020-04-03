@@ -138,7 +138,7 @@ class HyperFlowEstimator(BaseEstimator):
         print(hdl)
         print("info:tuner:")
         print(tuner)
-        tuner.set_hdl(hdl)  # just for get phps of tunner
+        tuner.set_hdl(hdl)  # just for get shps of tunner
         n_jobs = tuner.n_jobs
         run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
@@ -177,8 +177,8 @@ class HyperFlowEstimator(BaseEstimator):
         tuner.run_limit = run_limit
         tuner.set_resource_manager(resource_manager)
         tuner.set_data_manager(self.data_manager)
-        replace_phps(tuner.phps, "random_state", int(random_state))
-        tuner.phps.seed(random_state)
+        replace_phps(tuner.shps, "random_state", int(random_state))
+        tuner.shps.seed(random_state)
         tuner.set_addition_info({})
         # todo : 增加 n_jobs ? 调研默认值
         tuner.run(
