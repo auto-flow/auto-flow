@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from functools import partial
 
 import numpy as np
+import pandas as pd
 import sklearn.metrics
 from sklearn.utils.multiclass import type_of_target
 
@@ -238,7 +239,7 @@ for scorer in [r2, mean_squared_error, mean_absolute_error,
 
 CLASSIFICATION_METRICS = dict()
 
-for scorer in [accuracy,  average_precision, log_loss,
+for scorer in [accuracy, average_precision, log_loss,
                balanced_accuracy, pac_score, mcc
                ]:
     CLASSIFICATION_METRICS[scorer.name] = scorer
@@ -275,6 +276,8 @@ for name, metric in [
 
 def calculate_score(solution, prediction, ml_task: MLTask, metric,
                     all_scoring_functions=False):
+    if isinstance(solution, (pd.Series, pd.DataFrame)):
+        solution = solution.values
     if all_scoring_functions:
         score = dict()
         if ml_task.mainTask == "regression":

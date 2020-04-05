@@ -9,9 +9,9 @@ from hyperflow.utils.dict import add_prefix_in_dict_keys
 class HDL_Constructor():
     def __init__(
             self,
-            hdl_bank_path=None,
             DAG_descriptions=None,
-            # DAG_descriptions=None,
+            hdl_bank_path=None,
+            hdl_bank=None,
     ):
         if DAG_descriptions is None:
             DAG_descriptions = {
@@ -39,7 +39,7 @@ class HDL_Constructor():
                     "encode.label"
                 ],
                 "num->target": [
-                    # "decision_tree", "libsvm_svc",
+                    "decision_tree", "libsvm_svc",
                     "k_nearest_neighbors",
                     "catboost",
                     "lightgbm"
@@ -47,21 +47,25 @@ class HDL_Constructor():
             }
         self.hdl_bank_path = hdl_bank_path
         self.DAG_describe = DAG_descriptions
-        if hdl_bank_path:
-            hdl_bank = get_hdl_bank(hdl_bank_path)
-        else:
-            hdl_bank = get_default_hdl_bank()
+        if hdl_bank is None:
+            if hdl_bank_path:
+                hdl_bank = get_hdl_bank(hdl_bank_path)
+            else:
+                hdl_bank = get_default_hdl_bank()
+        if hdl_bank is None:
+            hdl_bank={}
+            print("warn:no hdl_bank, will use DAG_descriptions only.")
         self.hdl_bank = hdl_bank
-        self.params = {
-            "hdl_bank_path": hdl_bank_path,
-            "DAG_describe": DAG_descriptions,
-        }
         self.random_state = 42
         self.ml_task = None
         self.data_manager = None
 
     def __str__(self):
-        return f"hyperflow.HDL_Constructor(hdl_bank_path={repr(self.hdl_bank_path)}, DAG_descriptions={self.DAG_describe})"
+        return f"hyperflow.HDL_Constructor(" \
+            f"DAG_descriptions={repr(self.DAG_describe)}, " \
+            f"hdl_bank_path={repr(self.hdl_bank_path)}, " \
+            f"hdl_bank={repr(self.hdl_bank)}" \
+            f")"
 
     __repr__ = __str__
 

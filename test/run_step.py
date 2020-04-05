@@ -22,7 +22,7 @@ hdl_constructors = [
             "num->num": [
                 {"_name": "select.from_model_clf", "_select_percent": 80},
                 {"_name": "select.rfe_clf", "_select_percent": 80},
-                {"_name": "select.univar_clf", "_select_percent": 80},
+                # {"_name": "select.univar_clf", "_select_percent": 80},
             ],
             "num->target": {"_name": "lightgbm", "_vanilla": True}
         }
@@ -45,12 +45,14 @@ hdl_constructors = [
 tuners = [
     Tuner(
         run_limit=-1,
-        search_method="grid"
+        search_method="grid",
+        n_jobs=1
     ),
     Tuner(
         run_limit=50,
         initial_runs=10,
-        search_method="smac"
+        search_method="smac",
+        n_jobs=1
     ),
 ]
 hyperflow_pipeline = HyperFlowEstimator(tuners, hdl_constructors)
@@ -61,5 +63,5 @@ column_descriptions = {
 }
 
 hyperflow_pipeline.fit(
-    X=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
+    X=df_train, X_test=df_test, column_descriptions=column_descriptions
 )

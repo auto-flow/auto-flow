@@ -8,12 +8,14 @@ from enum import Enum
 
 import numpy as np
 import peewee as pw
+from frozendict import frozendict
 
 from dsmac.configspace import Configuration, ConfigurationSpace
 from dsmac.runhistory.utils import get_id_of_config
 from dsmac.tae.execute_ta_run import StatusType
 from dsmac.utils.logging import PickableLoggerAdapter
 from generic_fs import LocalFS
+from generic_fs.utils import get_db_class_by_db_type
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2015, ML4AAD"
@@ -93,10 +95,9 @@ class RunHistory(object):
             aggregate_func: typing.Callable,
             overwrite_existing_runs: bool = False,
             file_system=LocalFS(),
+            config_space=None,
             db_type="sqlite",
-            db_args=None,
-            db_kwargs=None,
-            config_space=None
+            db_params=None,
     ) -> None:
         """Constructor
 
@@ -109,10 +110,7 @@ class RunHistory(object):
             algorithm-instance-seed were measured
             multiple times
         """
-        if db_type == "sqlite":
-            self.db: RunHistoryDB = RunHistoryDB(config_space, self, db_args, db_kwargs)
-        else:
-            raise NotImplementedError()
+        self.db: RunHistoryDB = RunHistoryDB(config_space, self, db_type, db_params)
         self.file_system = file_system
         self.logger = PickableLoggerAdapter(
             self.__module__ + "." + self.__class__.__name__
@@ -476,24 +474,19 @@ class RunHistory(object):
 
 
 class RunHistoryDB():
-    __DB_CLASS__ = pw.SqliteDatabase
 
-    def __init__(self, config_space: ConfigurationSpace, runhistory: RunHistory, db_args=None, db_kwargs=None):
+    def __init__(self, config_space: ConfigurationSpace, runhistory: RunHistory, db_type="sqlite",
+                 db_params=frozendict()):
         self.runhistory = runhistory
-        if not db_kwargs:
-            db_kwargs = {}
-        if not db_args:
-            db_args = []
-        if not isinstance(db_args, (tuple, list)):
-            db_args = [db_args]
-        self.db_args = db_args
-        self.db_kwargs = db_kwargs
-        self.db: pw.Database = self.__DB_CLASS__(*self.db_args, **self.db_kwargs)
+        self.db_type = db_type
+        self.db_params = db_params
+        self.Datebase = get_db_class_by_db_type(self.db_type)
+        self.db: pw.Database = self.Datebase(**self.db_params)
         self.Model: pw.Model = self.get_model()
         self.config_space: ConfigurationSpace = config_space
 
     def get_model(self) -> pw.Model:
-        class RunHistoryModel(pw.Model):
+        class Run_History(pw.Model):
             config_id = pw.CharField(primary_key=True)
             config = pw.TextField(default="")
             config_bit = pw.BitField(0)
@@ -513,8 +506,8 @@ class RunHistoryDB():
                 # indexes=
                 # primary_key=
 
-        self.db.create_tables([RunHistoryModel])
-        return RunHistoryModel
+        self.db.create_tables([Run_History])
+        return Run_History
 
     def appointment_config(self, config) -> bool:
         config_id = get_id_of_config(config)
@@ -577,7 +570,7 @@ class RunHistoryDB():
             query = self.Model.select().where(self.Model.origin >= 0)
         else:
             query = self.Model.select().where(self.Model.pid != os.getpid()).where(self.Model.origin >= 0)
-        config_cost=[]
+        config_cost = []
         for model in query:
             config_id = model.config_id
             config = model.config
@@ -600,9 +593,9 @@ class RunHistoryDB():
             except Exception:
                 pass
             if not self.runhistory.ids_config.get(config_id):
-                config_cost.append([config,cost])
+                config_cost.append([config, cost])
                 self.runhistory.add(config, cost, time, StatusType(status), instance_id, seed, additional_info,
-                                DataOrigin(origin))
+                                    DataOrigin(origin))
         self.timestamp = datetime.datetime.now()
         return config_cost
 

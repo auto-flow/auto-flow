@@ -33,8 +33,7 @@ class Scenario(object):
             filter_callback: typing.Optional[typing.Callable]=None,
             after_run_callback: typing.Optional[typing.Callable]=None,
             db_type = "sqlite",
-            db_args = None,
-            db_kwargs = None,
+            db_params = None,
     ):
         """ Creates a scenario-object. The output_dir will be
         "output_dir/run_id/" and if that exists already, the old folder and its
@@ -51,8 +50,7 @@ class Scenario(object):
         cmd_options : dict
             Options from parsed command line arguments
         """
-        self.db_kwargs = db_kwargs
-        self.db_args = db_args
+        self.db_params = db_params
         self.db_type = db_type
         self.after_run_callback = after_run_callback
         self.filter_callback = filter_callback

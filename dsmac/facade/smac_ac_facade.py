@@ -231,8 +231,7 @@ class SMAC4AC(object):
                 **runhistory_def_kwargs,
                 file_system=scenario.file_system,
                 db_type=scenario.db_type,
-                db_args=scenario.db_args,
-                db_kwargs=scenario.db_kwargs
+                db_params=scenario.db_params,
             )
         elif inspect.isclass(runhistory):
             runhistory = runhistory(**runhistory_def_kwargs)

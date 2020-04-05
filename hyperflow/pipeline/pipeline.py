@@ -23,7 +23,7 @@ def _fit_transform_one(transformer,
         else:
             result = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test). \
                 transform(X_train, X_valid, X_test, y_train)
-
+    transformer.resource_manager = None
     return result, transformer
 
 
@@ -79,8 +79,7 @@ class GenericPipeline(Pipeline):
             # transformer. This is necessary when loading the transformer
             # from the cache.
             self.steps[step_idx] = (name, fitted_transformer)
-        if self._final_estimator == 'passthrough':
-            return X_train
+
         return {"X_train": X_train, "X_valid": X_valid, "X_test": X_test, "y_train": y_train}
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
@@ -95,6 +94,7 @@ class GenericPipeline(Pipeline):
             if self._final_estimator != 'passthrough':
                 self._final_estimator.resource_manager = self.resource_manager
                 self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+                self._final_estimator.resource_manager = None
         return self
 
     def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
@@ -115,6 +115,7 @@ class GenericPipeline(Pipeline):
         else:
             pred_valid = self._final_estimator.predict(X_valid)
             pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
+        self.resource_manager = None
         return {
             "pred_valid": pred_valid,
             "pred_test": pred_test,

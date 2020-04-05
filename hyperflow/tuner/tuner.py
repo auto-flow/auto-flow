@@ -5,6 +5,7 @@ from typing import Dict, Optional
 
 import numpy as np
 from ConfigSpace import ConfigurationSpace
+from frozendict import frozendict
 
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
@@ -14,8 +15,8 @@ from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import Scorer
-from hyperflow.shp2dhp.shp2dhp import SHP2DHP
 from hyperflow.pipeline.pipeline import GenericPipeline
+from hyperflow.shp2dhp.shp2dhp import SHP2DHP
 from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
 from hyperflow.utils.dict import group_dict_items_before_first_dot
@@ -29,9 +30,11 @@ class Tuner():
             search_method: str = "smac",
             run_limit: int = 100,
             initial_runs: int = 20,
-            n_jobs=1,
-            exit_processes=None
+            search_method_params: dict = frozendict(),
+            n_jobs: int = 1,
+            exit_processes: Optional[int] = None
     ):
+        self.search_method_params = search_method_params
         assert search_method in ("smac", "grid", "random")
         if search_method in ("grid", "random"):
             initial_runs = 0
@@ -52,11 +55,14 @@ class Tuner():
 
     def __str__(self):
         return (
-            f"hyperflow.Tuner(search_method={repr(self.search_method)}, "
+            f"hyperflow.Tuner("
+            f"search_method={repr(self.search_method)}, "
             f"run_limit={repr(self.run_limit)}, "
             f"initial_runs={repr(self.initial_runs)}, "
+            f"search_method_params={repr(self.search_method_params)}, "
             f"n_jobs={repr(self.n_jobs)}, "
-            f"exit_processes={repr(self.exit_processes)})")
+            f"exit_processes={repr(self.exit_processes)}"
+            f")")
 
     __repr__ = __str__
 
@@ -64,7 +70,7 @@ class Tuner():
         self.random_state = random_state
 
     def set_addition_info(self, addition_info):
-        self._addition_info = addition_info
+        self.addition_info = addition_info
 
     def set_hdl(self, hdl: Dict):
         self.hdl = hdl
@@ -81,6 +87,7 @@ class Tuner():
 
     def set_data_manager(self, data_manager: XYDataManager):
         self.data_manager = data_manager
+        self.ml_task=data_manager.ml_task
 
     def design_initial_configs(self, n_jobs):
         if self.search_method == "smac":
@@ -112,7 +119,6 @@ class Tuner():
             return
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
-        self.set_task(datamanager.ml_task)
         self.evaluator.init_data(
             datamanager,
             metric,
@@ -126,12 +132,11 @@ class Tuner():
                 "runcount-limit": 1000,
                 "cs": self.shps,  # configuration space
                 "deterministic": "true",
-                "output_dir": self.resource_manager.smac_output_dir,
+                # "output_dir": self.resource_manager.smac_output_dir,
             },
             initial_runs=0,
             db_type=self.resource_manager.db_type,
-            db_args=self.resource_manager.rh_db_args,
-            db_kwargs=self.resource_manager.rh_db_kwargs,
+            db_params=self.resource_manager.get_runhistory_db_params(),
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
         smac = SMAC4HPO(

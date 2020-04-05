@@ -7,6 +7,7 @@ import pandas as pd
 import sklearn.feature_selection
 
 from hyperflow.pipeline.components.feature_engineer_base import HyperFlowFeatureEngineerAlgorithm
+from hyperflow.utils.dataframe import DataFrameValuesWrapper
 
 
 class SklearnSelectMixin():
@@ -100,15 +101,19 @@ class SelectPercentileBase(SklearnSelectMixin, HyperFlowFeatureEngineerAlgorithm
         return hyperparams
 
     def before_fit_X(self, X):
+        wrapper = DataFrameValuesWrapper(X)
+        X = wrapper.array
         if X is None:
             return None
         X = deepcopy(X)
         if self.score_func == sklearn.feature_selection.chi2:
             X[X < 0] = 0.0
-        return X
+        return wrapper.wrap_to_dataframe(X)
 
     def before_trans_X(self, X):
+        wrapper = DataFrameValuesWrapper(X)
+        X = wrapper.array
         X = deepcopy(X)
         if self.score_func == sklearn.feature_selection.chi2:
             X[X < 0] = 0.0
-        return X
+        return wrapper.wrap_to_dataframe(X)

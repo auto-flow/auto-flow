@@ -6,9 +6,6 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import issparse
 
-from hyperflow.utils.dataframe import get_object_columns
-from hyperflow.utils.dict import sort_dict
-
 
 def get_hash_of_array(X, m=None):
     if m is None:
@@ -32,13 +29,6 @@ def get_hash_of_array(X, m=None):
     return hash
 
 
-def get_hash_of_dict(dict_, m=None):
-    if m is None:
-        m = hashlib.md5()
-    m.update(str(sort_dict(deepcopy(dict_))).encode("utf-8"))
-    return m.hexdigest()
-
-
 def get_hash_decimal_of_str(x):
     if isinstance(x, str):
         hash_str = get_hash_of_str(x)
@@ -54,9 +44,9 @@ def get_hash_decimal_of_str(x):
 
 def get_hash_of_dataframe(df: pd.DataFrame, m=None):
     df_ = deepcopy(df)
-    object_columns = get_object_columns(df_)
-    for objest_column in object_columns:
-        df_[objest_column] = df_[objest_column].apply(get_hash_decimal_of_str)  # .astype("float")
+    obj_columns = list(df_.dtypes[df_.dtypes == object].index)
+    for obj_column in obj_columns:
+        df_[obj_column] = df_[obj_column].apply(get_hash_decimal_of_str)  # .astype("float")
     df_.sort_index(axis=0, inplace=True)
     df_.sort_index(axis=1, inplace=True)
     return get_hash_of_array(df_.values, m)
@@ -83,37 +73,20 @@ def get_hash_of_Xy(X: Union[pd.DataFrame, np.ndarray, None],
 
 def get_hash_of_str(s: str, m=None):
     if m is None:
-        m=hashlib.md5()
+        m = hashlib.md5()
     m.update(s.encode("utf-8"))
     return m.hexdigest()
 
+
 if __name__ == '__main__':
-    df = pd.DataFrame(
-        {"a": [1, 2, 3],
-         "b": [1, 2, 3],
-         "c": [1, 2, 3]},
-    )
-    ans = get_hash_of_array(df.values)
-    print(ans)
-    ans = get_hash_of_array(df.values)
-    print(ans)
+    from hyperflow import XYDataManager
+    import pandas as pd
+    df=pd.read_csv("../examples/classification/train_classification.csv")
+    column_descriptions={
+        "id":"PassengerId",
+        "target":"Survived"
+    }
+    data_manager=XYDataManager(X=df,column_descriptions=column_descriptions)
+    hash_value=get_hash_of_Xy(data_manager.X_train,data_manager.y_train)
+    print(hash_value)
 
-    df = pd.DataFrame(
-        {"a": [1, False, 3],
-         "b": ["a", True, 3],
-         "c": [1, np.nan, 3]},
-    )
-    ans = get_hash_of_Xy(df)
-    print(ans)
-    ans = get_hash_of_Xy(df)
-    print(ans)
-
-    df = pd.DataFrame(
-        {"a": [1, 2, 3],
-         "b": [np.nan, 2, 3],
-         "c": [1, 2, 3]},
-    )
-    ans = get_hash_of_Xy(df)
-    print(ans)
-    ans = get_hash_of_Xy(df)
-    print(ans)

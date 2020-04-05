@@ -160,7 +160,7 @@ class TrainEvaluator():
 
     def __call__(self, shp: Configuration):
         # 1. 将php变成model
-        trial_id = get_id_of_config(shp)
+        config_id = get_id_of_config(shp)
         start = time()
         dhp, model = self.php2model(shp)
         # 2. 获取数据
@@ -169,13 +169,12 @@ class TrainEvaluator():
         loss, info = self.evaluate(model, X_train, y_train, X_test, y_test)  # todo : 考虑失败的情况
         # 4. 持久化
         cost_time = time() - start
-        info["trial_id"] = trial_id
+        info["config_id"] = config_id
         info["status"] = "success"
         info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get("estimator", {"unk": ""}).keys())[0]
         info["estimator"] = estimator
-        info["trial_id"] = trial_id
         info["cost_time"] = cost_time
         self.resource_manager.insert_to_trials_db(info)
         return loss

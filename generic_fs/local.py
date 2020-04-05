@@ -2,6 +2,8 @@ import os
 from glob import glob
 from pathlib import Path
 
+from joblib import dump, load
+
 from generic_fs import FileSystem
 
 
@@ -35,10 +37,16 @@ class LocalFS(FileSystem):
     def exists(self, path):
         return os.path.exists(path)
 
-    def delete(self,path):
+    def delete(self, path):
         if self.isfile(path):
             os.remove(path)
         elif self.isdir(path):
             os.rmdir(path)
         else:
             pass
+
+    def dump_pickle(self, data, path):
+        dump(data, path)
+
+    def load_pickle(self, path):
+        load(path)

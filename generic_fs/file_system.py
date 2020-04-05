@@ -1,7 +1,6 @@
 import os
 
 
-
 class FileSystem():
     def listdir(self, parent, **kwargs):
         raise NotImplementedError
@@ -39,5 +38,10 @@ class FileSystem():
     def delete(self, path):
         raise NotImplementedError
 
+    def dump_pickle(self,data,path):
+        raise NotImplementedError
+
+    def load_pickle(self,path):
+        raise NotImplementedError
 
 

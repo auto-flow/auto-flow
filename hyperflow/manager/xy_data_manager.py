@@ -80,8 +80,9 @@ class XYDataManager(AbstractDataManager):
         return X, y, X_test, y_test, feat_grp
 
     def __init__(
-            self, X, y, X_test, y_test, dataset_metadata, column_descriptions
+            self, X, y=None, X_test=None, y_test=None, dataset_metadata=frozenset(), column_descriptions=None
     ):
+        dataset_metadata=dict(dataset_metadata)
         super(XYDataManager, self).__init__(dataset_metadata.get("dataset_name", "default_dataset_name"))
         X, y, X_test, y_test, feat_grp = self.parse_column_descriptions(column_descriptions, X, y, X_test, y_test)
         self.ml_task: MLTask = get_task_from_y(y)

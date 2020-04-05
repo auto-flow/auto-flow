@@ -1,3 +1,4 @@
+import datetime
 import math
 import os
 from copy import deepcopy
@@ -5,9 +6,9 @@ from multiprocessing import Manager
 from typing import Union, Optional, Dict, List
 
 import joblib
+import json5 as json
 import numpy as np
 import pandas as pd
-import json5 as json
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
@@ -18,10 +19,9 @@ from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import r2, accuracy
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.tuner.tuner import Tuner
-from hyperflow.utils.concurrence import parse_n_jobs, get_chunks
+from hyperflow.utils.concurrence import get_chunks
 from hyperflow.utils.config_space import replace_phps
 from hyperflow.utils.dict import update_placeholder_from_other_dict
-from hyperflow.utils.hash import get_hash_of_dict
 
 
 class HyperFlowEstimator(BaseEstimator):
@@ -34,7 +34,9 @@ class HyperFlowEstimator(BaseEstimator):
             ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None,
             random_state=42
     ):
+        # ---random_state-----------------------------------
         self.random_state = random_state
+        # ---ensemble_builder-----------------------------------
         if ensemble_builder is None:
             print("info: 使用默认的stack集成学习器")
             ensemble_builder = StackEnsembleBuilder()
@@ -56,11 +58,10 @@ class HyperFlowEstimator(BaseEstimator):
             hdl_constructor = [hdl_constructor]
         self.hdl_constructors = hdl_constructor
         # ---resource_manager-----------------------------------
-        if isinstance(resource_manager, str):
-            resource_manager = ResourceManager(resource_manager)  # todo : 识别不同协议的文件系统，例如hdfs
-        elif resource_manager is None:
+        if resource_manager is None:
             resource_manager = ResourceManager()
         self.resource_manager = resource_manager
+        # ---member_variable------------------------------------
         self.estimator = None
 
     def fit(
@@ -75,12 +76,13 @@ class HyperFlowEstimator(BaseEstimator):
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
     ):
-        # resource_manager
-        # data_manager
+        dataset_metadata=dict(dataset_metadata)
+        # build data_manager
         self.data_manager = XYDataManager(
             X, y, X_test, y_test, dataset_metadata, column_descriptions
         )
         self.ml_task = self.data_manager.ml_task
+        # parse metric
         if metric is None:
             if self.ml_task.mainTask == "regression":
                 metric = r2
@@ -89,22 +91,21 @@ class HyperFlowEstimator(BaseEstimator):
             else:
                 raise NotImplementedError()
         self.metric = metric
+        # get task_id, and insert record into "tasks.tasks" database
+        self.resource_manager.insert_to_tasks_db(self.data_manager, metric, splitter)
+        self.resource_manager.close_tasks_db()
+        # store other params
         self.all_scoring_functions = all_scoring_functions
         self.splitter = splitter
-        self.evaluate_info = {
-            "metric": self.metric,
-            "all_scoring_functions": self.all_scoring_functions,
-            "splitter": self.splitter,
-        }
         assert len(self.hdl_constructors) == len(self.tuners)
         n_step = len(self.hdl_constructors)
+        general_experiment_timestamp = datetime.datetime.now()
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
+            current_experiment_timestamp = datetime.datetime.now()
             hdl_constructor.set_data_manager(self.data_manager)
             hdl_constructor.set_random_state(self.random_state)
             hdl_constructor.run()
-            # todo: self.resource_manager.dump_hdl(self.hdl_constructors)
             raw_hdl = hdl_constructor.get_hdl()
-            # todo 根据上一个最优dhp的情况填充hdl中的<placeholder>
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
                 last_best_dhp = json.loads(last_best_dhp)
@@ -113,16 +114,15 @@ class HyperFlowEstimator(BaseEstimator):
                 print(hdl)
             else:
                 hdl = raw_hdl
-            hdl_id = get_hash_of_dict(hdl)
-            self.resource_manager.init_dataset_path(hdl_id)
-            self.resource_manager.dump_object("data_manager", self.data_manager)
-            self.resource_manager.dump_object("evaluate_info", self.evaluate_info)
-
-            # todo: 在这里
-            # evaluate_info
-            # fine tune
-            tuner.set_task(self.data_manager.ml_task)
-            tuner.set_random_state(self.random_state)
+            # get hdl_id, and insert record into "{task_id}.hdls" database
+            self.resource_manager.insert_to_hdls_db(hdl)
+            self.resource_manager.close_hdls_db()
+            # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
+            self.resource_manager.insert_to_experiments_db(general_experiment_timestamp, current_experiment_timestamp,
+                                                           self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
+                                                           self.tuners, tuner, all_scoring_functions, self.data_manager,
+                                                           column_descriptions, dataset_metadata, metric, splitter)
+            self.resource_manager.close_experiments_db()
 
             self.start_tuner(tuner, hdl)
 
@@ -138,7 +138,9 @@ class HyperFlowEstimator(BaseEstimator):
         print(hdl)
         print("info:tuner:")
         print(tuner)
-        tuner.set_hdl(hdl)  # just for get shps of tunner
+        tuner.set_data_manager(self.data_manager)
+        tuner.set_random_state(self.random_state)
+        tuner.set_hdl(hdl)  # just for get shps of tuner
         n_jobs = tuner.n_jobs
         run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
@@ -171,12 +173,10 @@ class HyperFlowEstimator(BaseEstimator):
             resource_manager.sync_dict = sync_dict
         resource_manager.set_is_master(is_master)
         resource_manager.push_pid_list()
-        resource_manager.smac_output_dir += (f"/{os.getpid()}")
         # random_state: 1. set_hdl中传给phps 2. 传给所有配置
         tuner.random_state = random_state
         tuner.run_limit = run_limit
         tuner.set_resource_manager(resource_manager)
-        tuner.set_data_manager(self.data_manager)
         replace_phps(tuner.shps, "random_state", int(random_state))
         tuner.shps.seed(random_state)
         tuner.set_addition_info({})
@@ -206,7 +206,7 @@ class HyperFlowEstimator(BaseEstimator):
                     dataset_path = dataset_paths[0]
                 data_manager = joblib.load(dataset_path + "/data_manager.bz2")
         if not dataset_paths:
-            dataset_paths = self.resource_manager.dataset_path
+            dataset_paths = self.resource_manager.datasets_dir
         self.ensemble_builder.set_data(
             data_manager,
             dataset_paths,

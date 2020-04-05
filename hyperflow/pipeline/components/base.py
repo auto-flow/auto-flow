@@ -12,6 +12,7 @@ from sklearn.base import BaseEstimator
 
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import densify
+from hyperflow.utils.dataframe import rectify_dtypes
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
 
 
@@ -113,6 +114,7 @@ class HyperFlowComponent(BaseEstimator):
                 df = X.filter_feat_grp(self.in_feat_grp)
             else:
                 df = X
+            rectify_dtypes(df)
             if extract_info:
                 return df, df.feat_grp, df.origin_grp
             else:
@@ -178,7 +180,7 @@ class HyperFlowComponent(BaseEstimator):
         if self.store_intermediate:
             if self.resource_manager is None:
                 print("warn: no resource_manager when store_intermediate is True")
-                fitted_estimator = self.__fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, origin_grp)
+                fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feat_grp,  origin_grp)
             else:
                 # get hash value from X, y, hyperparameters
                 Xy_hash = get_hash_of_Xy(X, y_train)
@@ -191,11 +193,12 @@ class HyperFlowComponent(BaseEstimator):
                 else:
                     fitted_estimator = pickle.loads(result)
         else:
-            fitted_estimator = self.__fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, origin_grp)
+            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feat_grp,  origin_grp)
         self.resource_manager = None  # avoid can not pickle error
         return fitted_estimator
 
-    def __fit(self, estimator, X, y, X_valid, y_valid, X_test, y_test, origin_grp):
+    def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feat_grp=None, origin_grp=None):
         return estimator.fit(X, y)
 
     def set_addition_info(self, dict_: dict):
