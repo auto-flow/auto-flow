@@ -27,6 +27,8 @@ def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state
         result.append(default)
     if len(result) < n_configs:
         result.extend(shps.sample_configuration(n_configs - len(result)))
+    elif len(result) > n_configs:
+        result = random.sample(result, n_configs)
     return result
 
 
@@ -43,6 +45,13 @@ def get_grid_initial_configs(shps: ConfigurationSpace, n_configs=-1, random_stat
         random.seed(random_state)
         grid_configs = random.sample(grid_configs, n_configs)
     return grid_configs
+
+
+def estimate_config_space_numbers(cs: ConfigurationSpace):
+    result = 1
+    for config in cs.get_hyperparameters():
+        result *= (config.get_num_neighbors() + 1)
+    return result
 
 
 class ConfigSpaceGrid:

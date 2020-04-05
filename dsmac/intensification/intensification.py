@@ -123,7 +123,8 @@ class Intensifier(object):
                   run_history: RunHistory,
                   aggregate_func: typing.Callable,
                   time_bound: float = float(MAXINT),
-                  log_traj: bool = True):
+                  log_traj: bool = True,
+                  anneal_func=None):
         """Running intensification to determine the incumbent configuration.
         *Side effect:* adds runs to run_history
 
@@ -163,14 +164,17 @@ class Intensifier(object):
         # Line 1 + 2
         if isinstance(challengers, ChallengerList):
             challengers = challengers.challengers
-        L1 = 10
-        L2 = 10000
-        r = np.random.uniform()
-        if 0.05 < r < 0.2 and len(challengers) > L1:
-            target = np.random.randint(1, L1)
-            challengers[target], challengers[0] = challengers[0], challengers[target]
-        if r < 0.05 and len(challengers) > L2:
-            target = np.random.randint(L1, L2)
+
+        if anneal_func is not None:
+            # todo: 控制随机种子？
+            r = np.random.uniform()
+            try:
+                target = int(round(anneal_func(r)))
+            except Exception as e:
+                self.logger.error(f"Error occurred in calculate anneal_func({r})\n{e}")
+                target = 0
+            target = min(target, len(challengers) - 1)
+            print(target)
             challengers[target], challengers[0] = challengers[0], challengers[target]
 
         for challenger in challengers:

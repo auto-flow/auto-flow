@@ -137,6 +137,7 @@ class Tuner():
             initial_runs=0,
             db_type=self.resource_manager.db_type,
             db_params=self.resource_manager.get_runhistory_db_params(),
+            anneal_func=self.search_method_params.get("anneal_func")
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
         smac = SMAC4HPO(

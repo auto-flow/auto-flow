@@ -119,7 +119,7 @@ class SMBO(object):
         predict_incumbent: bool
             Use predicted performance of incumbent instead of observed performance
         """
-        self.initial_configurations=None
+        self.initial_configurations = None
         self.logger = logging.getLogger(
             self.__module__ + "." + self.__class__.__name__)
         self.incumbent = restore_incumbent
@@ -145,16 +145,17 @@ class SMBO(object):
 
         self.predict_incumbent = predict_incumbent
 
-    def start(self):
+    def start(self, incumbent=None):
         """Starts the Bayesian Optimization loop.
         Detects whether we the optimization is restored from previous state.
         """
         self.stats.start_timing()
         # Initialization, depends on input
         if self.initial_configurations is not None:
-            self.initial_design.configs=self.initial_configurations
+            self.initial_design.configs = self.initial_configurations
         # if self.stats.ta_runs == 0 and self.incumbent is None and self.scenario.initial_runs > 0:
-        self.incumbent = self.initial_design.run()
+
+        self.incumbent = self.initial_design.run(incumbent)
 
         # To be on the safe side -> never return "None" as incumbent
         if not self.incumbent:
@@ -173,7 +174,9 @@ class SMBO(object):
                     min_cost = cost
                     incumbent = config
             self.incumbent = incumbent
-        self.start()
+        else:
+            incumbent = None
+        self.start(incumbent)
 
     def run_(self):
         start_time = time.time()
@@ -199,7 +202,8 @@ class SMBO(object):
             incumbent=self.incumbent,
             run_history=self.runhistory,
             aggregate_func=self.aggregate_func,
-            time_bound=max(self.intensifier._min_time, time_left)
+            time_bound=max(self.intensifier._min_time, time_left),
+            anneal_func=self.scenario.anneal_func
         )
 
         logging.debug("Remaining budget: %f (wallclock), %f (ta costs), %f (target runs)" % (
@@ -216,7 +220,6 @@ class SMBO(object):
         #         print("info:break")
         #         break
         self.stats.print_stats(debug_out=True)
-
 
     def run(self):
         """Runs the Bayesian optimization loop
@@ -280,7 +283,8 @@ class SMBO(object):
                 incumbent=self.incumbent,
                 run_history=self.runhistory,
                 aggregate_func=self.aggregate_func,
-                time_bound=max(self.intensifier._min_time, time_left)
+                time_bound=max(self.intensifier._min_time, time_left),
+                anneal_func=self.scenario.anneal_func
             )
             # pSMAC.write(run_history=self.runhistory,
             #             output_directory=self.scenario.output_dir,

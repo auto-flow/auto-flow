@@ -46,13 +46,13 @@ tuners = [
     Tuner(
         run_limit=-1,
         search_method="grid",
-        n_jobs=1
+        n_jobs=3
     ),
     Tuner(
         run_limit=50,
         initial_runs=10,
         search_method="smac",
-        n_jobs=1
+        n_jobs=3
     ),
 ]
 hyperflow_pipeline = HyperFlowEstimator(tuners, hdl_constructors)

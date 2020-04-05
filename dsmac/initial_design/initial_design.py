@@ -1,20 +1,20 @@
 import logging
 import typing
 
+import numpy as np
 from ConfigSpace.configuration_space import Configuration, ConfigurationSpace
 from ConfigSpace.hyperparameters import NumericalHyperparameter, \
     Constant, CategoricalHyperparameter, OrdinalHyperparameter
 from ConfigSpace.util import deactivate_inactive_hyperparameters
-import numpy as np
 
 from dsmac.intensification.intensification import Intensifier
-from dsmac.tae.execute_ta_run import ExecuteTARun
-from dsmac.stats.stats import Stats
-from dsmac.utils.io.traj_logging import TrajLogger
-from dsmac.scenario.scenario import Scenario
 from dsmac.runhistory.runhistory import RunHistory
+from dsmac.scenario.scenario import Scenario
+from dsmac.stats.stats import Stats
+from dsmac.tae.execute_ta_run import ExecuteTARun
 from dsmac.tae.execute_ta_run import FirstRunCrashedException
 from dsmac.utils import constants
+from dsmac.utils.io.traj_logging import TrajLogger
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2019, AutoML"
@@ -42,9 +42,9 @@ class InitialDesign:
                  rng: np.random.RandomState,
                  intensifier: Intensifier,
                  aggregate_func: typing.Callable,
-                 configs: typing.Optional[typing.List[Configuration]]=None,
-                 n_configs_x_params: int=10,
-                 max_config_fracs: float=0.25,
+                 configs: typing.Optional[typing.List[Configuration]] = None,
+                 n_configs_x_params: int = 10,
+                 max_config_fracs: float = 0.25,
                  initial_configurations=None
                  ):
         """Constructor
@@ -78,7 +78,7 @@ class InitialDesign:
         max_config_fracs: float
             use at most X*budget in the initial design. Not active if a time limit is given.
         """
-        self.initial_configurations=initial_configurations
+        self.initial_configurations = initial_configurations
         self.tae_runner = tae_runner
         self.stats = stats
         self.traj_logger = traj_logger
@@ -93,8 +93,8 @@ class InitialDesign:
 
         n_params = len(self.scenario.cs.get_hyperparameters())
         # self.init_budget = max(scenario.initial_runs,10)
-        self.init_budget = max(scenario.initial_runs,1)
-        self.logger.info("Running initial design for %d configurations" %(self.init_budget))
+        self.init_budget = max(scenario.initial_runs, 1)
+        self.logger.info("Running initial design for %d configurations" % (self.init_budget))
 
     def select_configurations(self) -> typing.List[Configuration]:
 
@@ -106,7 +106,7 @@ class InitialDesign:
     def _select_configurations(self) -> typing.List[Configuration]:
         raise NotImplementedError
 
-    def run(self) -> Configuration:
+    def run(self, incumbent=None) -> Configuration:
         """Run the initial design.
 
         Returns
@@ -122,16 +122,21 @@ class InitialDesign:
         # run first design
         # ensures that first design is part of trajectory file
         inc = self._run_first_configuration(configs[0], self.scenario)
+        if incumbent is None:
+            incumbent = configs[0]
+            challengers = configs[1:]
+        else:
+            challengers = configs
 
-        if len(set(configs)) > 1:
+        if len(set(challengers)) > 0:
             # intensify will skip all challenger that are identical with the incumbent;
             # if <configs> has only identical configurations,
             # intensifiy will not do any configuration runs
             # (also not on the incumbent)
             # therefore, at least two different configurations have to be in <configs>
             inc, _ = self.intensifier.intensify(
-                challengers=configs[1:],
-                incumbent=configs[0],
+                challengers=challengers,
+                incumbent=incumbent,
                 run_history=self.runhistory,
                 aggregate_func=self.aggregate_func,
             )
@@ -153,7 +158,6 @@ class InitialDesign:
         self.traj_logger.add_entry(train_perf=2 ** 31,
                                    incumbent_id=1,
                                    incumbent=initial_incumbent)
-
         rand_inst = self.rng.choice(self.scenario.train_insts)
 
         if self.scenario.deterministic:
@@ -200,15 +204,15 @@ class InitialDesign:
                 # add a vector with zeros
                 design_ = np.zeros(np.array(design.shape) + np.array((0, 1)))
                 design_[:, :idx] = design[:, :idx]
-                design_[:, idx+1:] = design[:, idx:]
+                design_[:, idx + 1:] = design[:, idx:]
                 design = design_
             elif isinstance(param, CategoricalHyperparameter):
                 v_design = design[:, idx]
-                v_design[v_design == 1] = 1 - 10**-10
+                v_design[v_design == 1] = 1 - 10 ** -10
                 design[:, idx] = np.array(v_design * len(param.choices), dtype=np.int)
             elif isinstance(param, OrdinalHyperparameter):
                 v_design = design[:, idx]
-                v_design[v_design == 1] = 1 - 10**-10
+                v_design[v_design == 1] = 1 - 10 ** -10
                 design[:, idx] = np.array(v_design * len(param.sequence), dtype=np.int)
             else:
                 raise ValueError("Hyperparamer not supported in LHD")

@@ -34,6 +34,7 @@ class Scenario(object):
             after_run_callback: typing.Optional[typing.Callable]=None,
             db_type = "sqlite",
             db_params = None,
+            anneal_func=None
     ):
         """ Creates a scenario-object. The output_dir will be
         "output_dir/run_id/" and if that exists already, the old folder and its
@@ -50,6 +51,16 @@ class Scenario(object):
         cmd_options : dict
             Options from parsed command line arguments
         """
+        self.logger = logging.getLogger(
+            self.__module__ + '.' + self.__class__.__name__)
+        if isinstance(anneal_func,str):
+            try:
+                anneal_func=eval(anneal_func)
+            except Exception as e:
+                self.logger.error("Can not eval anneal_func\n"+str(e))
+                anneal_func=None
+
+        self.anneal_func = anneal_func
         self.db_params = db_params
         self.db_type = db_type
         self.after_run_callback = after_run_callback
@@ -61,8 +72,7 @@ class Scenario(object):
             self.file_system = HDFS(self.runtime_config.get('hdfs_url', 'http://0.0.0.0:50070'))
         else:
             self.file_system = LocalFS()
-        self.logger = logging.getLogger(
-            self.__module__ + '.' + self.__class__.__name__)
+
         self.PCA_DIM = 7
 
         self.in_reader = InputReader()

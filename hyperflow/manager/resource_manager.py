@@ -146,12 +146,17 @@ class ResourceManager():
         y_true_indexes_list = []
         y_preds_list = []
         for record in records:
+            exists = True
             if self.persistent_mode == "fs":
-                estimator_list.append(load(record.models_path))
+                if not self.file_system.exists(record.models_path):
+                    exists = False
+                else:
+                    estimator_list.append(load(record.models_path))
             else:
                 estimator_list.append(loads_pickle(record.models_bin))
-            y_true_indexes_list.append(loads_pickle(record.y_true_indexes))
-            y_preds_list.append(loads_pickle(record.y_preds))
+            if exists:
+                y_true_indexes_list.append(loads_pickle(record.y_true_indexes))
+                y_preds_list.append(loads_pickle(record.y_preds))
         return estimator_list, y_true_indexes_list, y_preds_list
 
     def set_is_master(self, is_master):
@@ -494,18 +499,15 @@ class ResourceManager():
 
     def insert_to_trials_db(self, info: Dict):
         self.connect_trials_db()
-        trial_id = self.estimate_new_id(self.TrialsModel, "trial_id")
-        # avoid pickle error in serialize model
-        for model in info["models"]:
-            model.resource_manager = None
+        config_id = info.get("config_id")
         if self.persistent_mode == "fs":
-            models_path = self.persistent_evaluated_model(info, trial_id)
+            models_path = self.persistent_evaluated_model(info, config_id)  # todo: 考虑更特殊的情况，不同的任务下，相同的配置
             models_bin = 0
         else:
             models_path = ""
             models_bin = dumps_pickle(info["models"])
         trial_record, created = self.TrialsModel.get_or_create(
-            config_id=info.get("config_id"),
+            config_id=config_id,
             task_id=self.task_id,
             hdl_id=self.hdl_id,
             experiment_id=self.experiment_id,
@@ -530,8 +532,6 @@ class ResourceManager():
             warning_info=info.get("warning_info", ""),
             timestamp=datetime.datetime.now()
         )
-        if trial_record.trial_id != trial_id:
-            print("warn: trial_record.trial_id!=trial_id")
 
     def delete_models(self):
         if hasattr(self, "sync_dict"):
@@ -551,8 +551,8 @@ class ResourceManager():
             estimators.append(record.estimator)
         for estimator in estimators:
             should_delete = self.TrialsModel.select().where(self.TrialsModel.estimator == estimator).order_by(
-                self.TrialsModel.loss, self.TrialsModel.cost_time).offset(50)
-            if should_delete:
+                self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
+            if len(should_delete):
                 if self.persistent_mode == "fs":
                     for record in should_delete:
                         models_path = record.models_path
