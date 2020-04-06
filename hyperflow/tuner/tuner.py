@@ -42,7 +42,7 @@ class Tuner():
         self.run_limit = run_limit
         self.evaluator = TrainEvaluator()
         self.search_method = search_method
-        self.evaluator.set_php2model(self.php2model)
+        self.evaluator.set_shp2model(self.shp2model)
         self.random_state = 0
         self.addition_info = {}
         self.resource_manager = None
@@ -132,6 +132,7 @@ class Tuner():
                 "runcount-limit": 1000,
                 "cs": self.shps,  # configuration space
                 "deterministic": "true",
+                # todo : 如果是local，存在experiment，如果是其他文件系统，不输出smac
                 # "output_dir": self.resource_manager.smac_output_dir,
             },
             initial_runs=0,
@@ -156,7 +157,7 @@ class Tuner():
                 print("info:exit")
                 break
 
-    def php2model(self, shp):
+    def shp2model(self, shp):
         php2dhp = SHP2DHP()
         dhp = php2dhp(shp)
         preprocessor = self.create_preprocessor(dhp)

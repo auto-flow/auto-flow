@@ -20,7 +20,7 @@ from hyperflow.metrics import r2, accuracy
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.concurrence import get_chunks
-from hyperflow.utils.config_space import replace_phps
+from hyperflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from hyperflow.utils.dict import update_placeholder_from_other_dict
 
 
@@ -76,7 +76,7 @@ class HyperFlowEstimator(BaseEstimator):
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
     ):
-        dataset_metadata=dict(dataset_metadata)
+        dataset_metadata = dict(dataset_metadata)
         # build data_manager
         self.data_manager = XYDataManager(
             X, y, X_test, y_test, dataset_metadata, column_descriptions
@@ -124,7 +124,9 @@ class HyperFlowEstimator(BaseEstimator):
                                                            column_descriptions, dataset_metadata, metric, splitter)
             self.resource_manager.close_experiments_db()
 
-            self.start_tuner(tuner, hdl)
+            result = self.start_tuner(tuner, hdl)
+            if result["is_manual"] == True:
+                break
 
             if step == n_step - 1:
                 if self.ensemble_builder:
@@ -141,6 +143,11 @@ class HyperFlowEstimator(BaseEstimator):
         tuner.set_data_manager(self.data_manager)
         tuner.set_random_state(self.random_state)
         tuner.set_hdl(hdl)  # just for get shps of tuner
+        if estimate_config_space_numbers(tuner.shps) == 1:
+            print("info:manual modeling")
+            dhp, self.estimator = tuner.shp2model(tuner.shps.sample_configuration())
+            self.estimator.fit(self.data_manager.X_train, self.data_manager.y_train)
+            return {"is_manual": True}
         n_jobs = tuner.n_jobs
         run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
@@ -166,6 +173,7 @@ class HyperFlowEstimator(BaseEstimator):
                 for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in
                 zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states)
             )
+        return {"is_manual": False}
 
     def run(self, tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict=None):
         if sync_dict:
@@ -190,8 +198,6 @@ class HyperFlowEstimator(BaseEstimator):
         )
         if sync_dict:
             sync_dict[os.getpid()] = 1
-
-
 
     def fit_ensemble(
             self,

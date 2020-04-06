@@ -155,14 +155,14 @@ class TrainEvaluator():
         info["warning_info"] = warning_info.getvalue()
         return final_loss, info
 
-    def set_php2model(self, php2model):
-        self.php2model = php2model
+    def set_shp2model(self, shp2model):
+        self.shp2model = shp2model
 
     def __call__(self, shp: Configuration):
         # 1. 将php变成model
         config_id = get_id_of_config(shp)
         start = time()
-        dhp, model = self.php2model(shp)
+        dhp, model = self.shp2model(shp)
         # 2. 获取数据
         X_train, y_train, X_test, y_test = self.get_Xy()
         # 3. 进行评价
