@@ -14,6 +14,7 @@ from hyperopt import fmin, tpe, hp
 import hyperflow.hdl.smac as smac_hdl
 from hyperflow.constants import MLTask
 from hyperflow.hdl.utils import is_hdl_bottom
+from hyperflow.utils.logging_ import get_logger
 from hyperflow.utils.packages import get_class_name_of_module
 
 
@@ -23,7 +24,8 @@ class RelyModels:
 
 class HDL2SHPS():
     def __init__(self):
-        self.ml_task=None
+        self.ml_task = None
+        self.logger = get_logger(__name__)
 
     def set_task(self, ml_task: MLTask):
         self.ml_task = ml_task
@@ -146,11 +148,12 @@ class HDL2SHPS():
 
             cur_cs.seed(42)
             try:
+                sample_times = len(all_models) * 15
                 counter = Counter([_hp.get("estimator:__choice__") for _hp in
-                                   cur_cs.sample_configuration(len(all_models) * 15)])
+                                   cur_cs.sample_configuration(sample_times)])
 
                 if debug:
-                    print(counter)
+                    self.logger.info(f"Finally, sample {sample_times} times in estimator list's frequency: \n{counter}")
             except Exception:
                 return np.inf
             vl = list(counter.values())
@@ -171,7 +174,7 @@ class HDL2SHPS():
             show_progressbar=False,
 
         )
-        print("best =", best)
+        self.logger.info(f"The best probability is {best}")
         objective(best, debug=True)
         self.set_probabilities_in_cs(cs, relied2models, relied2AllModels, all_models, **best)
         # todo: 将计算的概率缓存
@@ -273,7 +276,7 @@ class HDL2SHPS():
         for key, value in dict_.items():
             assert isinstance(value, list)
             if len(value) > length:
-                print("warn")
+                self.logger.warning("len(value) > length")
                 should_pop.append(key)
             elif len(value) == length:
                 should_pop.append(key)
@@ -312,9 +315,7 @@ class HDL2SHPS():
                     if key.startswith("__"):
                         conditions_dict[key] = value
                     else:
-                        # assert isinstance(value, dict)  # fixme ： 可以对常量进行编码
                         hp = self.__parse_dict_to_config(key, value)
-                        # hp.name = key
                         cs.add_hyperparameter(hp)
                         store[key] = hp
                 for key, value in conditions_dict.items():

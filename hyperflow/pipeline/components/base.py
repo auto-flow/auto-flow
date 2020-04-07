@@ -14,6 +14,7 @@ from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import densify
 from hyperflow.utils.dataframe import rectify_dtypes
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
+from hyperflow.utils.logging_ import get_logger
 
 
 class HyperFlowComponent(BaseEstimator):
@@ -34,6 +35,7 @@ class HyperFlowComponent(BaseEstimator):
         self.set_params(**self.hyperparams)
         self.in_feat_grp = None
         self.out_feat_grp = None
+        self.logger=get_logger(__name__)
 
     @property
     def class_(self):
@@ -221,27 +223,30 @@ class HyperFlowComponent(BaseEstimator):
             lr = hyperparams["learning_rate"]
             return max(int(value * (1 / lr)), 10)
         elif indicator == "sp1_ratio":
-            if hasattr(self, "shape"):
+            factor="shape"
+            if hasattr(self, factor):
                 n_components = max(
                     int(self.shape[1] * value),
                     1
                 )
             else:
-                print("warn")
+                self.logger.warning(f"{str(self)} haven't attribute {factor}")
                 n_components = 100
             return n_components
         elif indicator == "sp1_percent":
-            if hasattr(self, "shape"):
+            factor="shape"
+            if hasattr(self, factor):
                 n_components = max(
                     int(self.shape[1] * (value / 100)),
                     1
                 )
             else:
-                print("warn")
+                self.logger.warning(f"{str(self)} haven't attribute {factor}")
                 n_components = 100
             return n_components
         elif indicator == "sp1_dev":
-            if hasattr(self, "shape"):
+            factor="shape"
+            if hasattr(self, factor):
                 if value == 0:
                     value = 1
                 n_components = max(
@@ -249,17 +254,18 @@ class HyperFlowComponent(BaseEstimator):
                     1
                 )
             else:
-                print("warn")
+                self.logger.warning(f"{str(self)} haven't attribute {factor}")
                 n_components = 100
             return n_components
         elif indicator == "card_ratio":
-            if hasattr(self, "cardinality"):
+            factor="cardinality"
+            if hasattr(self, factor):
                 n_components = max(
                     math.ceil(self.cardinality * value),
                     2
                 )
             else:
-                print("warn")
+                self.logger.warning(f"{str(self)} haven't attribute {factor}")
                 n_components = 6
             return n_components
         else:

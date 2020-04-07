@@ -20,5 +20,5 @@ class Variance(SimilarityBase):
             if var <= self.threshold:
                 self.to_delete.append(col)
         end = time()
-        print("use time:", end - start)
+        self.logger.debug("use time:", end - start)
         return self

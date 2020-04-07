@@ -298,11 +298,6 @@ class SMBO(object):
             # if self.stats.is_budget_exhausted():
             #     break
 
-            if self.scenario.after_run_callback:
-                status = self.scenario.after_run_callback()
-                if not status:
-                    print("info:break")
-                    break
 
             self.stats.print_stats(debug_out=True)
 

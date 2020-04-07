@@ -4,6 +4,7 @@ from typing import Union, Tuple, List
 from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.utils.dict import add_prefix_in_dict_keys
+from hyperflow.utils.logging_ import get_logger
 
 
 class HDL_Constructor():
@@ -13,6 +14,7 @@ class HDL_Constructor():
             hdl_bank_path=None,
             hdl_bank=None,
     ):
+        self.logger = get_logger(__name__)
         if DAG_descriptions is None:
             DAG_descriptions = {
                 "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
@@ -54,7 +56,7 @@ class HDL_Constructor():
                 hdl_bank = get_default_hdl_bank()
         if hdl_bank is None:
             hdl_bank={}
-            print("warn:no hdl_bank, will use DAG_descriptions only.")
+            self.logger.warning("No hdl_bank, will use DAG_descriptions only.")
         self.hdl_bank = hdl_bank
         self.random_state = 42
         self.ml_task = None

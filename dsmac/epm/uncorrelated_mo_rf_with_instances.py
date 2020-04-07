@@ -56,7 +56,7 @@ class UncorrelatedMultiObjectiveRandomForestWithInstances(AbstractEPM):
 
         self.target_names = target_names
         self.num_targets = len(self.target_names)
-        print(seed, rf_kwargs)
+        self.logger.info(seed, rf_kwargs)
         self.estimators = [RandomForestWithInstances(configspace, types, bounds, **rf_kwargs)
                            for _ in range(self.num_targets)]
 

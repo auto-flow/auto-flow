@@ -86,34 +86,3 @@ def get_hash_of_str(s: str, m=None):
         m=hashlib.md5()
     m.update(s.encode("utf-8"))
     return m.hexdigest()
-
-if __name__ == '__main__':
-    df = pd.DataFrame(
-        {"a": [1, 2, 3],
-         "b": [1, 2, 3],
-         "c": [1, 2, 3]},
-    )
-    ans = get_hash_of_array(df.values)
-    print(ans)
-    ans = get_hash_of_array(df.values)
-    print(ans)
-
-    df = pd.DataFrame(
-        {"a": [1, False, 3],
-         "b": ["a", True, 3],
-         "c": [1, np.nan, 3]},
-    )
-    ans = get_hash_of_Xy(df)
-    print(ans)
-    ans = get_hash_of_Xy(df)
-    print(ans)
-
-    df = pd.DataFrame(
-        {"a": [1, 2, 3],
-         "b": [np.nan, 2, 3],
-         "c": [1, 2, 3]},
-    )
-    ans = get_hash_of_Xy(df)
-    print(ans)
-    ans = get_hash_of_Xy(df)
-    print(ans)

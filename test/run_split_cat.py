@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 
 
@@ -20,7 +22,7 @@ split_cat.update_hyperparams({
     "threshold": 0.5
 })
 result = split_cat.fit_transform(df2)
-print(result)
+logging.info(result)
 
 df2 = GenericDataFrame(df, feat_grp=["cat", "cat", "num"])
 drop_all = DropAll()
@@ -35,7 +37,7 @@ pipeline = GenericPipeline([
     ("split_cat", split_cat)
 ])
 result=pipeline.fit_transform(df2)
-print(result)
+logging.info(result)
 
 
 

@@ -11,9 +11,12 @@ from hyperflow.pipeline.components.preprocessing.impute.fill_cat import FillCat
 from hyperflow.pipeline.components.preprocessing.impute.fill_num import FillNum
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
+from hyperflow.utils.logging_ import get_logger
+
 
 class TestPipeline(unittest.TestCase):
     def test_pipeline(self):
+        self.logger=get_logger(__name__)
         df = pd.read_csv("../examples/classification/train_classification.csv")
         y = df.pop("Survived").values
         df = df.loc[:, ["Sex", "Cabin", "Age"]]
@@ -58,15 +61,15 @@ class TestPipeline(unittest.TestCase):
         pred_test = pipeline.predict(df_test)
         pred_valid = pipeline.predict(df_valid)
         score_valid = pipeline.predict_proba(df_valid)
-        print(accuracy_score(y_train, pred_train))
-        print(accuracy_score(y_valid, pred_valid))
-        print(accuracy_score(y_test, pred_test))
+        self.logger.info(accuracy_score(y_train, pred_train))
+        self.logger.info(accuracy_score(y_valid, pred_valid))
+        self.logger.info(accuracy_score(y_test, pred_test))
         result = pipeline.procedure(constants.binary_classification_task, df_train, y_train, df_valid, y_valid, df_test,
                                  y_test)
         pred_test = result["pred_test"]
         pred_valid = result["pred_valid"]
-        print(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
-        print(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))
+        self.logger.info(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
+        self.logger.info(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))
 
         pipeline = GenericPipeline([
             ("fill_cat", fill_cat),
@@ -89,5 +92,5 @@ class TestPipeline(unittest.TestCase):
                                  ret1["X_test"], y_test)
         pred_test = result["pred_test"]
         pred_valid = result["pred_valid"]
-        print(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
-        print(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))
+        self.logger.info(accuracy_score(y_valid, (pred_valid > .5).astype("int")[:, 1]))
+        self.logger.info(accuracy_score(y_test, (pred_test > .5).astype("int")[:, 1]))

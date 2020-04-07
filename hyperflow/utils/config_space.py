@@ -196,11 +196,3 @@ class ConfigSpaceGrid:
 
         return grid
 
-
-if __name__ == '__main__':
-    cs = ConfigurationSpace()
-    hp1 = CategoricalHyperparameter("choice", ["a", "b", "c"])
-    hp2 = UniformFloatHyperparameter("quniform", 0, 10)
-    cs.add_hyperparameters([hp1, hp2])
-    grid = ConfigSpaceGrid(cs).generate_grid()
-    print(grid)

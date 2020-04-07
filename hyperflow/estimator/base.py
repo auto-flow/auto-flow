@@ -22,6 +22,7 @@ from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.concurrence import get_chunks
 from hyperflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from hyperflow.utils.dict import update_placeholder_from_other_dict
+from hyperflow.utils.logging_ import get_logger
 
 
 class HyperFlowEstimator(BaseEstimator):
@@ -34,14 +35,16 @@ class HyperFlowEstimator(BaseEstimator):
             ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None,
             random_state=42
     ):
+        # ---logger------------------------------------
+        self.logger=get_logger(__name__)
         # ---random_state-----------------------------------
         self.random_state = random_state
         # ---ensemble_builder-----------------------------------
         if ensemble_builder is None:
-            print("info: 使用默认的stack集成学习器")
+            self.logger.info("Using default StackEnsembleBuilder.")
             ensemble_builder = StackEnsembleBuilder()
         elif ensemble_builder == False:
-            print("info: 不使用集成学习")
+            self.logger.info("Not using EnsembleBuilder, will select the best estimator.")
         else:
             ensemble_builder = StackEnsembleBuilder(set_model=ensemble_builder)
         self.ensemble_builder = ensemble_builder
@@ -63,6 +66,7 @@ class HyperFlowEstimator(BaseEstimator):
         self.resource_manager = resource_manager
         # ---member_variable------------------------------------
         self.estimator = None
+
 
     def fit(
             self,
@@ -110,8 +114,7 @@ class HyperFlowEstimator(BaseEstimator):
                 last_best_dhp = self.resource_manager.load_best_dhp()
                 last_best_dhp = json.loads(last_best_dhp)
                 hdl = update_placeholder_from_other_dict(raw_hdl, last_best_dhp)
-                print("info:updated hdl")
-                print(hdl)
+                self.logger.info(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
             else:
                 hdl = raw_hdl
             # get hdl_id, and insert record into "{task_id}.hdls" database
@@ -136,15 +139,13 @@ class HyperFlowEstimator(BaseEstimator):
         return self
 
     def start_tuner(self, tuner: Tuner, hdl: dict):
-        print("info:start fine tune in:")
-        print(hdl)
-        print("info:tuner:")
-        print(tuner)
+        self.logger.info(f"Start fine tune task, \nwhich HDL(Hyperparams Descriptions Language) is:\n{hdl}")
+        self.logger.info(f"which Tuner is:\n{tuner}")
         tuner.set_data_manager(self.data_manager)
         tuner.set_random_state(self.random_state)
         tuner.set_hdl(hdl)  # just for get shps of tuner
         if estimate_config_space_numbers(tuner.shps) == 1:
-            print("info:manual modeling")
+            self.logger.info("HDL(Hyperparams Descriptions Language) is a constant space, using manual modeling.")
             dhp, self.estimator = tuner.shp2model(tuner.shps.sample_configuration())
             self.estimator.fit(self.data_manager.X_train, self.data_manager.y_train)
             return {"is_manual": True}

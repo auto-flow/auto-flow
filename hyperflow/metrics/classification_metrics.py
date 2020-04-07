@@ -142,7 +142,6 @@ def pac_score(solution, prediction):
             # Each column is an independent problem, so we average.
             # The probabilities in one line do not add up to one.
             # log_loss = mvmean(log_loss)
-            # print('binary {}'.format(log_loss))
             # In the multilabel case, the right thing i to AVERAGE not sum
             # We return all the scores so we can normalize correctly later on
         else:
@@ -150,7 +149,6 @@ def pac_score(solution, prediction):
             log_loss = pos_class_log_loss
             # We sum the contributions of the columns.
             log_loss = np.sum(log_loss)
-            # print('multiclass {}'.format(log_loss))
         return log_loss
 
     def prior_log_loss(frac_pos, ml_task):
@@ -166,7 +164,6 @@ def pac_score(solution, prediction):
             neg_class_log_loss_ = -frac_neg * np.log(frac_neg_)
             base_log_loss = pos_class_log_loss_ + neg_class_log_loss_
             # base_log_loss = mvmean(base_log_loss)
-            # print('binary {}'.format(base_log_loss))
             # In the multilabel case, the right thing i to AVERAGE not sum
             # We return all the scores so we can normalize correctly later on
         else:  # multiclass case

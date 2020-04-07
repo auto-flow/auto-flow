@@ -174,7 +174,7 @@ class Intensifier(object):
                 self.logger.error(f"Error occurred in calculate anneal_func({r})\n{e}")
                 target = 0
             target = min(target, len(challengers) - 1)
-            print(target)
+            self.logger.debug(f"By anneal_func , target is {target}.")
             challengers[target], challengers[0] = challengers[0], challengers[target]
 
         for challenger in challengers:

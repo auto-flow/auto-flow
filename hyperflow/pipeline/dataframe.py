@@ -142,6 +142,7 @@ class GenericDataFrame(pd.DataFrame):
 
 
 if __name__ == '__main__':
+    import logging
     df = pd.read_csv("/home/tqc/PycharmProjects/hyperflow/examples/classification/train_classification.csv")
     suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
     feat_grp = ["id"] + suffix
@@ -151,13 +152,13 @@ if __name__ == '__main__':
     selected = df2.filter_feat_grp("id").values
     selected = np.hstack([selected, selected])
     df3 = df2.replace_feat_grp("id", selected, "id2")
-    print(df3)
+    logging.info(df3)
     # 测试1->1
     selected = df2.filter_feat_grp("id").values
     selected = np.hstack([selected])
     df3 = df2.replace_feat_grp("id", selected, "id2")
-    print(df3)
+    logging.info(df3)
     selected = df2.filter_feat_grp("id").values
     selected = np.zeros([selected.shape[0], 0])
     df3 = df2.replace_feat_grp("id", selected, "id2")
-    print(df3)
+    logging.info(df3)

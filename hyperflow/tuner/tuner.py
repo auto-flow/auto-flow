@@ -1,6 +1,7 @@
 import random
 import re
 import time
+import os
 from typing import Dict, Optional
 
 import numpy as np
@@ -20,6 +21,7 @@ from hyperflow.shp2dhp.shp2dhp import SHP2DHP
 from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
 from hyperflow.utils.dict import group_dict_items_before_first_dot
+from hyperflow.utils.logging_ import get_logger
 from hyperflow.utils.packages import get_class_object_in_pipeline_components
 from hyperflow.utils.pipeline import concat_pipeline
 
@@ -52,6 +54,7 @@ class Tuner():
         if exit_processes is None:
             exit_processes = max(self.n_jobs // 3, 1)
         self.exit_processes = exit_processes
+        self.logger=get_logger(__name__)
 
     def __str__(self):
         return (
@@ -113,9 +116,9 @@ class Tuner():
             splitter,
             initial_configs
     ):
-        time.sleep(random.random())
+        # time.sleep(random.random())
         if not initial_configs:
-            print("warn:no initial_configs")
+            self.logger.warning("Haven't initial_configs. Return.")
             return
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
@@ -154,7 +157,7 @@ class Tuner():
             smac.solver.run_()
             should_continue = self.evaluator.resource_manager.delete_models()
             if not should_continue:
-                print("info:exit")
+                self.logger.info(f"PID = {os.getpid()} is exiting.")
                 break
 
     def shp2model(self, shp):
@@ -163,7 +166,7 @@ class Tuner():
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
-        print(pipeline, pipeline[-1].hyperparams)
+        self.logger.debug(pipeline, pipeline[-1].hyperparams)
         return dhp, pipeline
 
     def hdl2phps(self, hdl: Dict):

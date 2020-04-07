@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from hyperflow.utils.logging_ import get_logger
+
 
 def get_start_end_tuples(threads, L):
     N = L * (L - 1) // 2
@@ -24,7 +26,6 @@ def get_start_end_tuples(threads, L):
         end = start + span
         start_end_tuples.append([start, end])
         start = end
-    print(start_end_tuples)
     return start_end_tuples
 
 
@@ -35,6 +36,7 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         self.threshold = threshold
         self.n_jobs = n_jobs
         self._type = "DataFrame"
+        self.logger=get_logger(__name__)
 
     name = None
 
@@ -63,7 +65,7 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
             self.to_delete.append(X.columns[ix])
         self.to_delete = self.to_delete[:int(X.shape[1] * self.max_delete)]
         end = time()
-        print("use time:", end - start)
+        self.logger.debug("use time:", end - start)
         return self
 
     def transform(self, X, y=None):
@@ -75,6 +77,6 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         col_before = X.shape[1]
         X = X.drop(self.to_delete, axis=1)
         col_after = X.shape[1]
-        print(f"features were deleted by {self.name}")
-        print(f"features before {col_before} , after {col_after}, {col_before - col_after} were deleted")
+        self.logger.debug(f"features were deleted by {self.name}")
+        self.logger.debug(f"features before {col_before} , after {col_after}, {col_before - col_after} were deleted")
         return X

@@ -33,9 +33,3 @@ class LabelEncoder(TransformerMixin, BaseEstimator):
         return np.vstack(arrs).T
 
 
-if __name__ == '__main__':
-    import pandas as pd
-
-    df = pd.read_csv("/home/tqc/PycharmProjects/hyperflow/examples/classification/train_classification.csv")
-    encoded = LabelEncoder().fit_transform(df[["Sex", "Cabin"]].fillna("nan"))
-    print(encoded)

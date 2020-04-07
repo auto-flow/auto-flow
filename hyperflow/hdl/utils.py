@@ -16,12 +16,13 @@ def is_hdl_bottom(key, value):
     return False
 
 
-def get_hdl_bank(path: str) -> Dict:
+def get_hdl_bank(path: str,logger=None) -> Dict:
     path = Path(path)
     if path.exists():
         return json.loads(path.read_text())
     else:
-        print("warn")
+        if logger is not None:
+            logger.warning(f"Specific hdl_bank: {path} is not exists, using get_default_hdl_bank() default.")
         return get_default_hdl_bank()
 
 

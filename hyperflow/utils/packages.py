@@ -47,11 +47,4 @@ def find_components(package, directory, base_class):
 
     return components
 
-if __name__ == '__main__':
-    from generic_fs import FileSystem
-    import generic_fs
-    import os
-    directory=os.path.split(generic_fs.__file__)[0]
-    ans=find_components(generic_fs.__package__, directory, FileSystem)
-    print(ans)
 

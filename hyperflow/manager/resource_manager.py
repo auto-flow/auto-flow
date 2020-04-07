@@ -19,6 +19,7 @@ from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import Scorer
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
+from hyperflow.utils.logging_ import get_logger
 from hyperflow.utils.packages import find_components
 
 
@@ -41,6 +42,9 @@ class ResourceManager():
             compress_suffix="bz2"
 
     ):
+        # --logger-------------------
+        self.logger=get_logger(__name__)
+        # --preprocessing------------
         file_system_params = dict(file_system_params)
         db_params = dict(db_params)
         redis_params = dict(redis_params)
@@ -172,7 +176,7 @@ class ResourceManager():
             self.is_init_redis = True
             return True
         except Exception as e:
-            print(f"warn:{e}")
+            self.logger.error(f"Redis Error:\n{e}")
             return False
 
     def close_redis(self):
@@ -248,7 +252,7 @@ class ResourceManager():
             else:
                 estimated_id = getattr(records[0], id_field) + 1
         except Exception as e:
-            print(f"warn: {e}")
+            self.logger.error(f"Database Error:\n{e}")
             estimated_id = 1
         return estimated_id
 
@@ -304,7 +308,7 @@ class ResourceManager():
         )
         fetched_experiment_id = experiment_record.experiment_id
         if fetched_experiment_id != experiment_id:
-            print("warn: experiment_id")
+            self.logger.warning("fetched_experiment_id != experiment_id")
         self.experiment_id = experiment_id
 
     def connect_experiments_db(self):
@@ -556,7 +560,7 @@ class ResourceManager():
                 if self.persistent_mode == "fs":
                     for record in should_delete:
                         models_path = record.models_path
-                        print("delete:" + models_path)
+                        self.logger.info(f"Delete expire Model in path : {models_path}")
                         self.file_system.delete(models_path)
                 self.TrialsModel.delete().where(
                     self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()

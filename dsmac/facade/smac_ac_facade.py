@@ -398,7 +398,7 @@ class SMAC4AC(object):
             'min_chall': scenario.intens_min_chall,
         }
         if hasattr(scenario, 'filter_callback') and scenario.filter_callback is not None:
-            print('update callback')
+            self.logger.info('update callback')
             intensifier_def_kwargs.update({'filter_callback': scenario.filter_callback})
         if intensifier_kwargs is not None:
             intensifier_def_kwargs.update(intensifier_kwargs)
