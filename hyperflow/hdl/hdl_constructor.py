@@ -3,6 +3,7 @@ from typing import Union, Tuple, List
 
 from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.manager.xy_data_manager import XYDataManager
+from hyperflow.utils.data import get_int_card
 from hyperflow.utils.dict import add_prefix_in_dict_keys
 from hyperflow.utils.logging_ import get_logger
 
@@ -55,7 +56,7 @@ class HDL_Constructor():
             else:
                 hdl_bank = get_default_hdl_bank()
         if hdl_bank is None:
-            hdl_bank={}
+            hdl_bank = {}
             self.logger.warning("No hdl_bank, will use DAG_descriptions only.")
         self.hdl_bank = hdl_bank
         self.random_state = 42
@@ -142,10 +143,12 @@ class HDL_Constructor():
         mainTask = self.ml_task.mainTask
         hdl_bank = get_default_hdl_bank()
         # 遍历DAG_describe，构造preprocessing
+        n_steps = len(self.DAG_describe)
+        int_card = get_int_card(n_steps)  # fixme: 获取整数多少位，这个变量名该怎么命名？
         for i, (key, values) in enumerate(self.DAG_describe.items()):
             if not isinstance(values, (list, tuple)):
                 values = [values]
-            formed_key = f"{i}{key}(choice)"
+            formed_key = f"{i:0{int_card}d}{key}(choice)"
             sub_dict = {}
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)

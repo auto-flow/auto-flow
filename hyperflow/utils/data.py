@@ -11,6 +11,13 @@ from hyperflow.constants import binary_classification_task, multiclass_classific
     multilabel_classification_task, regression_task
 
 
+def get_int_card(number):
+    Length = 0
+    while number != 0:
+        Length += 1
+        number = number // 10    #关键，整数除法去掉最右边的一位
+    return Length
+
 def sanitize_array(array):
     """
     Replace NaN and Inf (there should not be any!)
