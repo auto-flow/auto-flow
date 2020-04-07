@@ -43,7 +43,7 @@ class ResourceManager():
 
     ):
         # --logger-------------------
-        self.logger=get_logger(__name__)
+        self.logger = get_logger(__name__)
         # --preprocessing------------
         file_system_params = dict(file_system_params)
         db_params = dict(db_params)
@@ -93,6 +93,16 @@ class ResourceManager():
             self.file_system.mkdir(dir_path)
         # --db-----------------------------------------
         self.Datebase = get_db_class_by_db_type(self.db_type)
+        # --JSONField-----------------------------------------
+        if self.db_type == "sqlite":
+            from playhouse.sqlite_ext import JSONField
+            self.JSONField = JSONField
+        elif self.db_type == "postgresql":
+            from playhouse.postgres_ext import JSONField
+            self.JSONField = JSONField
+        elif self.db_type == "mysql":
+            from playhouse.mysql_ext import JSONField
+            self.JSONField = JSONField
 
     def get_runhistory_db_params(self):
         return self.update_db_params(self.get_trials_db_name())
