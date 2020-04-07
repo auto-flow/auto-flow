@@ -1,7 +1,7 @@
 import peewee as pw
 import pickle
 
-class PickleFileld(pw.BitField):
+class PickleFiled(pw.BitField):
     def db_value(self, value):
         return pickle.dumps(value)
 

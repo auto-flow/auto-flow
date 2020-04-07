@@ -168,7 +168,7 @@ class SMBO(object):
             # 根据runhistory选出最优
             incumbent = all_configs[0]
             min_cost = np.inf
-            for config in all_configs[1:]:
+            for config in all_configs:
                 cost = self.runhistory.get_cost(config)
                 if cost < min_cost:
                     min_cost = cost

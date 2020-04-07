@@ -57,34 +57,37 @@ class XYDataManager(AbstractDataManager):
         if X_test is not None:
             assert np.all(X.columns == X_test.columns)
         # --确定其他列--
-        column2featGrp = {}
+        column2feat_grp = {}
         for key, values in column_descriptions.items():
             if key in ("id", "target", "ignore"):
                 continue
             if isinstance(values, str):
                 values = [values]
             for value in values:
-                column2featGrp[value] = key
+                column2feat_grp[value] = key
 
         # ----对于没有标注的列，打上nan,cat,num三种标记
         for column in X.columns:
-            if column not in column2featGrp:
+            if column not in column2feat_grp:
                 feat_grp = self.parse_feat_grp(X[column])
-                column2featGrp[column] = feat_grp
-        feat_grp = [column2featGrp[column] for column in X.columns]
+                column2feat_grp[column] = feat_grp
+        feat_grp = [column2feat_grp[column] for column in X.columns]
         L1 = X.shape[0]
         if X_test is not None:
             L2 = X_test.shape[0]
             X_test.index = range(L1, L1 + L2)
         X.index = range(L1)
-        return X, y, X_test, y_test, feat_grp
+        return X, y, X_test, y_test, feat_grp, column2feat_grp
 
     def __init__(
             self, X, y=None, X_test=None, y_test=None, dataset_metadata=frozenset(), column_descriptions=None
     ):
-        dataset_metadata=dict(dataset_metadata)
+        dataset_metadata = dict(dataset_metadata)
         super(XYDataManager, self).__init__(dataset_metadata.get("dataset_name", "default_dataset_name"))
-        X, y, X_test, y_test, feat_grp = self.parse_column_descriptions(column_descriptions, X, y, X_test, y_test)
+        X, y, X_test, y_test, feat_grp, column2feat_grp = self.parse_column_descriptions(
+            column_descriptions, X, y, X_test, y_test
+        )
+        self.column2feat_grp = column2feat_grp
         self.ml_task: MLTask = get_task_from_y(y)
         self.X_train = GenericDataFrame(X, feat_grp=feat_grp)
         self.y_train = y

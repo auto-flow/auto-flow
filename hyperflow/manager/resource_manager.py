@@ -4,7 +4,7 @@ import os
 from getpass import getuser
 from typing import Dict, Tuple, List, Union
 
-import json5 as json
+# import json5 as json
 import peewee as pw
 from frozendict import frozendict
 from joblib import load
@@ -12,7 +12,7 @@ from redis import Redis
 
 import generic_fs
 from generic_fs import FileSystem
-from generic_fs.utils import dumps_pickle, loads_pickle, get_db_class_by_db_type
+from generic_fs.utils import get_db_class_by_db_type
 from hyperflow.constants import MLTask
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
@@ -21,6 +21,7 @@ from hyperflow.metrics import Scorer
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
 from hyperflow.utils.logging_ import get_logger
 from hyperflow.utils.packages import find_components
+from hyperflow.utils.peewee import PickleFiled
 
 
 class ResourceManager():
@@ -133,7 +134,7 @@ class ResourceManager():
         if self.persistent_mode == "fs":
             models = self.file_system.load_pickle(record.models_path)
         else:
-            models = loads_pickle(record.models_bin)
+            models = record.models_bin
         if ml_task.mainTask == "classification":
             estimator = VoteClassifier(models)
         else:
@@ -167,10 +168,10 @@ class ResourceManager():
                 else:
                     estimator_list.append(load(record.models_path))
             else:
-                estimator_list.append(loads_pickle(record.models_bin))
+                estimator_list.append(record.models_bin)
             if exists:
-                y_true_indexes_list.append(loads_pickle(record.y_true_indexes))
-                y_preds_list.append(loads_pickle(record.y_preds))
+                y_true_indexes_list.append(record.y_true_indexes)
+                y_preds_list.append(record.y_preds)
         return estimator_list, y_true_indexes_list, y_preds_list
 
     def set_is_master(self, is_master):
@@ -229,17 +230,18 @@ class ResourceManager():
             current_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             hdl_id = pw.CharField(default="")
             task_id = pw.CharField(default="")
-            hdl_constructors = pw.TextField(default="")
+            hdl_constructors = self.JSONField(default=[])
             hdl_constructor = pw.TextField(default="")
-            raw_hdl = pw.TextField(default="")
-            hdl = pw.TextField(default="")
-            tuners = pw.TextField(default="")
+            raw_hdl = self.JSONField(default={})
+            hdl = self.JSONField(default={})
+            tuners = self.JSONField(default=[])
             tuner = pw.TextField(default="")
             all_scoring_functions = pw.BooleanField(default=True)
-            data_manager_bin = pw.BitField(default=0)
+            data_manager_bin = PickleFiled(default=0)
             data_manager_path = pw.TextField(default="")
-            column_descriptions = pw.TextField(default="")
-            dataset_metadata = pw.TextField(default="")
+            column_descriptions = self.JSONField(default={})
+            column2feat_grp = self.JSONField(default={})
+            dataset_metadata = self.JSONField(default={})
             metric = pw.CharField(default=""),
             splitter = pw.CharField(default="")
             ml_task = pw.CharField(default="")
@@ -295,23 +297,24 @@ class ResourceManager():
             self.file_system.dump_pickle(data_manager, data_manager_path)
         else:
             data_manager_path = ""
-            data_manager_bin = dumps_pickle(data_manager)
+            data_manager_bin = data_manager
         experiment_record = self.ExperimentsModel.create(
             general_experiment_timestamp=general_experiment_timestamp,
             current_experiment_timestamp=current_experiment_timestamp,
             hdl_id=self.hdl_id,
             task_id=self.task_id,
-            hdl_constructors=str(hdl_constructors),
+            hdl_constructors=[str(item) for item in hdl_constructors],
             hdl_constructor=str(hdl_constructor),
-            raw_hdl=json.dumps(raw_hdl),
-            hdl=json.dumps(hdl),
-            tuners=str(tuners),
+            raw_hdl=raw_hdl,
+            hdl=hdl,
+            tuners=[str(item) for item in tuners],
             tuner=str(tuner),
             all_scoring_functions=all_scoring_functions,
             data_manager_bin=data_manager_bin,
             data_manager_path=data_manager_path,
-            column_descriptions=json.dumps(column_descriptions),
-            dataset_metadata=json.dumps(dataset_metadata),
+            column_descriptions=column_descriptions,
+            column2feat_grp=data_manager.column2feat_grp,  # todo
+            dataset_metadata=dataset_metadata,
             metric=metric.name,
             splitter=str(splitter),
             ml_task=str(data_manager.ml_task)
@@ -341,6 +344,7 @@ class ResourceManager():
             metric = pw.CharField(default="")
             splitter = pw.CharField(default="")
             ml_task = pw.CharField(default="")
+            specific_task_token = pw.CharField(default="")
             # Xy_train
             Xy_train_hash = pw.CharField(default="")
             Xy_train_path = pw.TextField(default="")
@@ -356,7 +360,7 @@ class ResourceManager():
         self.tasks_db.create_tables([Tasks])
         return Tasks
 
-    def insert_to_tasks_db(self, data_manager: XYDataManager, metric: Scorer, splitter):
+    def insert_to_tasks_db(self, data_manager: XYDataManager, metric: Scorer, splitter, specific_task_token):
         self.connect_tasks_db()
         Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
         Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
@@ -369,7 +373,7 @@ class ResourceManager():
             Xy_train_bin = 0
         else:
             Xy_train_path = ""
-            Xy_train_bin = dumps_pickle(Xy_train)
+            Xy_train_bin = Xy_train
         if Xy_test_hash:
             if self.persistent_mode == "fs":
                 Xy_test_path = self.file_system.join(self.datasets_dir,
@@ -378,7 +382,7 @@ class ResourceManager():
                 Xy_test_bin = 0
             else:
                 Xy_test_path = ""
-                Xy_test_bin = dumps_pickle(Xy_test)
+                Xy_test_bin = Xy_test
         else:
             Xy_test_path = ""
             Xy_test_bin = 0
@@ -392,15 +396,17 @@ class ResourceManager():
         get_hash_of_str(metric_str, m)
         get_hash_of_str(splitter_str, m)
         get_hash_of_str(ml_task_str, m)
+        get_hash_of_str(specific_task_token, m)
         task_hash = m.hexdigest()
         task_id = "task_" + task_hash
         records = self.TasksModel.select().where(self.TasksModel.task_id == task_id)
         if len(records) == 0:
-            task_record, created = self.TasksModel.get_or_create(
+            self.TasksModel.create(
                 task_id=task_id,
                 metric=metric_str,
                 splitter=splitter_str,
                 ml_task=ml_task_str,
+                specific_task_token=specific_task_token,
                 # Xy_train
                 Xy_train_hash=Xy_train_hash,
                 Xy_train_path=Xy_train_path,
@@ -409,6 +415,7 @@ class ResourceManager():
                 Xy_test_hash=Xy_test_hash,
                 Xy_test_path=Xy_test_path,
                 Xy_test_bin=Xy_test_bin,
+
             )
         self.task_id = task_id
 
@@ -428,7 +435,7 @@ class ResourceManager():
     def get_hdls_model(self) -> pw.Model:
         class HDLs(pw.Model):
             hdl_id = pw.CharField(primary_key=True)
-            hdl = pw.TextField(default="")
+            hdl = self.JSONField(default={})
 
             class Meta:
                 database = self.hdls_db
@@ -442,9 +449,9 @@ class ResourceManager():
         hdl_id = "hdl_" + hdl_hash
         records = self.HDLsModel.select().where(self.HDLsModel.hdl_id == hdl_id)
         if len(records) == 0:
-            hdl_record, created = self.HDLsModel.get_or_create(
+            self.HDLsModel.create(
                 hdl_id=hdl_id,
-                hdl=json.dumps(hdl)
+                hdl=hdl
             )
         self.hdl_id = hdl_id
 
@@ -473,25 +480,26 @@ class ResourceManager():
             experiment_id = pw.IntegerField(default=0)
             estimator = pw.CharField(default="")
             loss = pw.FloatField(default=65535)
-            losses = pw.TextField(default="")
-            test_loss = pw.FloatField(default=65535)
-            all_score = pw.TextField(default="")
-            all_scores = pw.TextField(default="")
-            test_all_score = pw.FloatField(default=0)
-            models_bin = pw.BitField(default=0)
-            models_path = pw.CharField(default="")
-            y_true_indexes = pw.BitField(default=0)
-            y_preds = pw.BitField(default=0)
-            y_test_true = pw.BitField(default=0)
-            y_test_pred = pw.BitField(default=0)
-            smac_hyper_param = pw.BitField(default=0)
-            dict_hyper_param = pw.TextField(default="")  # todo: json field
+            losses = self.JSONField(default=[])
+            test_loss = self.JSONField(default=[])
+            all_score = self.JSONField(default={})
+            all_scores = self.JSONField(default=[])
+            test_all_score = self.JSONField(default={})
+            models_bin = PickleFiled(default=0)
+            models_path = pw.TextField(default="")
+            y_true_indexes = PickleFiled(default=0)
+            y_preds = PickleFiled(default=0)
+            y_test_true = PickleFiled(default=0)
+            y_test_pred = PickleFiled(default=0)
+            smac_hyper_param = PickleFiled(default=0)
+            dict_hyper_param = self.JSONField(default={})  # todo: json field
             cost_time = pw.FloatField(default=65535)
             status = pw.CharField(default="success")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
             timestamp = pw.DateTimeField(default=datetime.datetime.now)
             user = pw.CharField(default=getuser)
+            pid = pw.IntegerField(default=os.getpid)
 
             class Meta:
                 database = self.trials_db
@@ -519,32 +527,31 @@ class ResourceManager():
             models_bin = 0
         else:
             models_path = ""
-            models_bin = dumps_pickle(info["models"])
-        trial_record, created = self.TrialsModel.get_or_create(
+            models_bin = info["models"]
+        self.TrialsModel.create(
             config_id=config_id,
             task_id=self.task_id,
             hdl_id=self.hdl_id,
             experiment_id=self.experiment_id,
             estimator=info.get("estimator", ""),
             loss=info.get("loss", 65535),
-            losses=json.dumps(info.get("losses")),
+            losses=info.get("losses"),
             test_loss=info.get("test_loss", 65535),
-            all_score=json.dumps(info.get("all_score")),
-            all_scores=json.dumps(info.get("all_scores")),
-            test_all_score=json.dumps(info.get("test_all_score")),
+            all_score=info.get("all_score"),
+            all_scores=info.get("all_scores"),
+            test_all_score=info.get("test_all_score"),
             models_bin=models_bin,
             models_path=models_path,
-            y_true_indexes=dumps_pickle(info.get("y_true_indexes")),
-            y_preds=dumps_pickle(info.get("y_preds")),
-            y_test_true=dumps_pickle(info.get("y_test_true")),
-            y_test_pred=dumps_pickle(info.get("y_test_pred")),
-            smac_hyper_param=dumps_pickle(info.get("program_hyper_param")),
-            dict_hyper_param=json.dumps(info.get("dict_hyper_param")),  # t,odo: json field
+            y_true_indexes=info.get("y_true_indexes"),
+            y_preds=info.get("y_preds"),
+            y_test_true=info.get("y_test_true"),
+            y_test_pred=info.get("y_test_pred"),
+            smac_hyper_param=info.get("program_hyper_param"),
+            dict_hyper_param=info.get("dict_hyper_param"),
             cost_time=info.get("cost_time", 65535),
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),
             warning_info=info.get("warning_info", ""),
-            timestamp=datetime.datetime.now()
         )
 
     def delete_models(self):

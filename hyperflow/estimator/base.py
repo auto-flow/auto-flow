@@ -36,7 +36,7 @@ class HyperFlowEstimator(BaseEstimator):
             random_state=42
     ):
         # ---logger------------------------------------
-        self.logger=get_logger(__name__)
+        self.logger = get_logger(__name__)
         # ---random_state-----------------------------------
         self.random_state = random_state
         # ---ensemble_builder-----------------------------------
@@ -67,7 +67,6 @@ class HyperFlowEstimator(BaseEstimator):
         # ---member_variable------------------------------------
         self.estimator = None
 
-
     def fit(
             self,
             X: Union[np.ndarray, pd.DataFrame, GenericDataFrame],
@@ -79,6 +78,7 @@ class HyperFlowEstimator(BaseEstimator):
             metric=None,
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
+            specific_task_token=""
     ):
         dataset_metadata = dict(dataset_metadata)
         # build data_manager
@@ -96,7 +96,7 @@ class HyperFlowEstimator(BaseEstimator):
                 raise NotImplementedError()
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_to_tasks_db(self.data_manager, metric, splitter)
+        self.resource_manager.insert_to_tasks_db(self.data_manager, metric, splitter, specific_task_token)
         self.resource_manager.close_tasks_db()
         # store other params
         self.all_scoring_functions = all_scoring_functions
@@ -124,7 +124,8 @@ class HyperFlowEstimator(BaseEstimator):
             self.resource_manager.insert_to_experiments_db(general_experiment_timestamp, current_experiment_timestamp,
                                                            self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
                                                            self.tuners, tuner, all_scoring_functions, self.data_manager,
-                                                           column_descriptions, dataset_metadata, metric, splitter)
+                                                           column_descriptions,
+                                                           dataset_metadata, metric, splitter)
             self.resource_manager.close_experiments_db()
 
             result = self.start_tuner(tuner, hdl)
@@ -225,51 +226,9 @@ class HyperFlowEstimator(BaseEstimator):
         self.stack_estimator = self.ensemble_builder.build()
         return self.stack_estimator
 
-    def refit(
-            self,
-            dataset_name="default_dataset_name",
-            metric=None,
-            all_scoring_functions=None,
-            splitter=None
-    ):
-        def update_if_not_None(dict_: Dict, value_name, value):
-            if value is not None:
-                dict_.update({value_name: value})
-
-        # 不再初始化
-        self.tuners.initial_runs = 0
-        # resource_manager
-        self.resource_manager.load_dataset_path(dataset_name)
-        # data_manager
-        self.data_manager: XYDataManager = self.resource_manager.load_object("data_manager")
-        # hdl default_hp
-        hdl_info = self.resource_manager.load_hdl()
-        self.hdl = hdl_info["hdl"]
-        self.default_hp = hdl_info["default_hp"]
-        # evaluate info
-        evaluate_info: Dict = self.resource_manager.load_object("evaluate_info")
-        update_if_not_None(evaluate_info, "metric", metric)
-        update_if_not_None(evaluate_info, "all_scoring_functions", all_scoring_functions)
-        update_if_not_None(evaluate_info, "splitter", splitter)
-        self.set_dict_to_self(evaluate_info)
-        self.ml_task = self.data_manager.ml_task
-        # other
-        self.resource_manager.dump_db_to_csv()
-        # fine tune
-        self.run()
-        if self.ensemble_builder:
-            self.estimator = self.fit_ensemble()
-        else:
-            self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
-
-        return self
-
     def predict(self, X):
         return self.estimator.predict(X)
 
     def predict_proba(self, X):
         return self.estimator.predict_proba(X)
 
-    def set_dict_to_self(self, dict_):
-        for key, value in dict_.items():
-            setattr(self, key, value)
