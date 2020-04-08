@@ -18,7 +18,6 @@ from hyperflow.utils.logging_ import get_logger
 
 
 class HyperFlowComponent(BaseEstimator):
-    cls_hyperparams: dict = {}
     module__ = None
     class__ = None
     classification_only = False
@@ -31,11 +30,13 @@ class HyperFlowComponent(BaseEstimator):
     def __init__(self):
         self.resource_manager = None
         self.estimator = None
-        self.hyperparams = deepcopy(self.cls_hyperparams)
-        self.set_params(**self.hyperparams)
         self.in_feature_groups = None
         self.out_feature_groups = None
+        self.hyperparams= {}
         self.logger=get_logger(__name__)
+
+    def _get_param_names(cls):
+        return sorted(cls.hyperparams.keys())
 
     @property
     def class_(self):
@@ -52,6 +53,7 @@ class HyperFlowComponent(BaseEstimator):
     def get_estimator_class(self):
         M = import_module(self.module_)
         return getattr(M, self.class_)
+
 
     def after_process_hyperparams(self, hyperparams) -> Dict:
         hyperparams = deepcopy(hyperparams)
@@ -101,10 +103,6 @@ class HyperFlowComponent(BaseEstimator):
             else:
                 pass
         return validated
-
-    @staticmethod
-    def get_properties():
-        raise NotImplementedError()
 
     def preprocess_data(self, X: Optional[GenericDataFrame], extract_info=False):
         # todo 考虑在这                                                                                                                                                                                                   里多densify
@@ -210,7 +208,7 @@ class HyperFlowComponent(BaseEstimator):
     def update_hyperparams(self, hp: dict):
         '''set default hyperparameters in init'''
         self.hyperparams.update(hp)
-        # self.set_params(**self.hyperparams)
+        self.set_addition_info(hp)
 
     def get_estimator(self):
         return self.estimator
