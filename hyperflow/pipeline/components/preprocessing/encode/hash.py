@@ -12,7 +12,7 @@ class HashingEncoder(BaseEncoder):
     def fit(self, X_train, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
-        df = X_train.filter_feat_grp(self.in_feat_grp)
+        df = X_train.filter_feature_groups(self.in_feature_groups)
         cardinality = 0
         for i in range(df.shape[1]):
             cardinality += np.unique(df.iloc[:, i].astype("str")).size

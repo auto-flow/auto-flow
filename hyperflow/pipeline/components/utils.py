@@ -32,17 +32,16 @@ def check_and_adjust_Xs_index(Xs: List[pd.DataFrame]):
     return True
 
 
-def get_categorical_features_indices(X, origin_grp):
+def get_categorical_features_indices(X, columns_metadata):
     if isinstance(X, pd.DataFrame):
         X = X.values
     categorical_features_indices = []
-    for i, elem in enumerate(origin_grp):
-        if "cat" in elem:
-            col = X[:, i]
-            try:
-                col = col.astype("float")
-            except Exception:
-                pass
-            if type_of_target(col) not in ("binary", "continuous"):  # todo: debug
-                categorical_features_indices.append(i)
+    for i in range(X.shape[1]):
+        col = X[:, i]
+        try:
+            col = col.astype("float")
+        except Exception:
+            pass
+        if type_of_target(col) in ("binary", "multiclass"):  # todo: debug
+            categorical_features_indices.append(i)
     return categorical_features_indices

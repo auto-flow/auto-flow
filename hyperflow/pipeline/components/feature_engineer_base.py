@@ -28,7 +28,7 @@ class HyperFlowFeatureEngineerAlgorithm(HyperFlowComponent):
         X_ = self.before_trans_X(X_)
         X_ = self._transform_proc(X_)
         X_ = densify(X_)  # todo: 改为判断的形式？
-        return X.replace_feat_grp(self.in_feat_grp, X_, self.out_feat_grp)
+        return X.replace_feature_groups(self.in_feature_groups, X_, self.out_feature_groups)
 
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
                        y_train=None):

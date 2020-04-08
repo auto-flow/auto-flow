@@ -20,10 +20,10 @@ class TestPipeline(unittest.TestCase):
         df = pd.read_csv("../examples/classification/train_classification.csv")
         y = df.pop("Survived").values
         df = df.loc[:, ["Sex", "Cabin", "Age"]]
-        feat_grp = ["cat_nan", "cat_nan", "num_nan"]
+        feature_groups = ["cat_nan", "cat_nan", "num_nan"]
         df_train, df_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=10)
-        df_train = GenericDataFrame(df_train, feat_grp=feat_grp)
-        df_test = GenericDataFrame(df_test, feat_grp=feat_grp)
+        df_train = GenericDataFrame(df_train, feature_groups=feature_groups)
+        df_test = GenericDataFrame(df_test, feature_groups=feature_groups)
         cv = KFold(n_splits=5, random_state=10, shuffle=True)
         train_ix, valid_ix = next(cv.split(df_train))
 
@@ -32,21 +32,21 @@ class TestPipeline(unittest.TestCase):
         y_train = y_train[train_ix]
 
         fill_cat = FillCat()
-        fill_cat.in_feat_grp = "cat_nan"
-        fill_cat.out_feat_grp = "cat"
+        fill_cat.in_feature_groups = "cat_nan"
+        fill_cat.out_feature_groups = "cat"
         fill_cat.update_hyperparams({"strategy": "<NULL>"})
 
         fill_num = FillNum()
-        fill_num.in_feat_grp = "num_nan"
-        fill_num.out_feat_grp = "num"
+        fill_num.in_feature_groups = "num_nan"
+        fill_num.out_feature_groups = "num"
         fill_num.update_hyperparams({"strategy": "median"})
 
         ohe = OneHotEncoder()
-        ohe.in_feat_grp = "cat"
-        ohe.out_feat_grp = "num"
+        ohe.in_feature_groups = "cat"
+        ohe.out_feature_groups = "num"
 
         sgd = SGD()
-        sgd.in_feat_grp = "num"
+        sgd.in_feature_groups = "num"
         sgd.update_hyperparams({"loss": "log", "random_state": 10})
 
         pipeline = GenericPipeline([

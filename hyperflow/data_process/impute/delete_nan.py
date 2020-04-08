@@ -4,7 +4,7 @@ from hyperflow.pipeline.dataframe import GenericDataFrame
 
 
 def is_nan_rejection(X: GenericDataFrame, y, nan_grp):
-    selected_df = X.filter_feat_grp(nan_grp)
+    selected_df = X.filter_feature_groups(nan_grp)
     deleted_index = selected_df.dropna().index
     if not isinstance(y, (pd.DataFrame, pd.Series)):
         y = pd.Series(y)

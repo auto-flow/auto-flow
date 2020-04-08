@@ -32,10 +32,10 @@ class HyperFlowDataProcessAlgorithm(HyperFlowComponent):
 
     def _transform(self, X: GenericDataFrame, y):
         columns = X.columns
-        feat_grp = X.feat_grp
-        origin_grp = X.origin_grp
+        feature_groups = X.feature_groups
+        columns_metadata = X.columns_metadata
         X_, y_ = self._transform_proc(X, y)
-        X = GenericDataFrame(pd.DataFrame(X_, columns=columns), feat_grp=feat_grp, origin_grp=origin_grp)
+        X = GenericDataFrame(pd.DataFrame(X_, columns=columns), feature_groups=feature_groups, columns_metadata=columns_metadata)
         return X, y_
 
     def _transform_proc(self, X_train, y_train):

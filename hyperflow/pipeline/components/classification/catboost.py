@@ -12,8 +12,8 @@ class CatBoostClassifier(HyperFlowClassificationAlgorithm):
     tree_model = True
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feat_grp=None, origin_grp=None):
-        categorical_features_indices = get_categorical_features_indices(X, origin_grp)
+                 y_test=None, feature_groups=None, columns_metadata=None):
+        categorical_features_indices = get_categorical_features_indices(X, columns_metadata)
         if (X_valid is not None) and (y_valid is not None):
             eval_set = (X_valid, y_valid)
         else:

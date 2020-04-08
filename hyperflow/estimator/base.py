@@ -78,7 +78,8 @@ class HyperFlowEstimator(BaseEstimator):
             metric=None,
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
-            specific_task_token=""
+            specific_task_token="",
+
     ):
         dataset_metadata = dict(dataset_metadata)
         # build data_manager

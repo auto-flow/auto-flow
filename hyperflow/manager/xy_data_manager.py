@@ -12,7 +12,7 @@ from hyperflow.utils.dataframe import pop_if_exists
 
 class XYDataManager(AbstractDataManager):
 
-    def parse_feat_grp(self, series: pd.Series):
+    def parse_feature_groups(self, series: pd.Series):
         if is_nan(series):
             return "nan"
         elif is_cat(series):
@@ -57,41 +57,41 @@ class XYDataManager(AbstractDataManager):
         if X_test is not None:
             assert np.all(X.columns == X_test.columns)
         # --确定其他列--
-        column2feat_grp = {}
+        column2feature_groups = {}
         for key, values in column_descriptions.items():
             if key in ("id", "target", "ignore"):
                 continue
             if isinstance(values, str):
                 values = [values]
             for value in values:
-                column2feat_grp[value] = key
+                column2feature_groups[value] = key
 
         # ----对于没有标注的列，打上nan,cat,num三种标记
         for column in X.columns:
-            if column not in column2feat_grp:
-                feat_grp = self.parse_feat_grp(X[column])
-                column2feat_grp[column] = feat_grp
-        feat_grp = [column2feat_grp[column] for column in X.columns]
+            if column not in column2feature_groups:
+                feature_groups = self.parse_feature_groups(X[column])
+                column2feature_groups[column] = feature_groups
+        feature_groups = [column2feature_groups[column] for column in X.columns]
         L1 = X.shape[0]
         if X_test is not None:
             L2 = X_test.shape[0]
             X_test.index = range(L1, L1 + L2)
         X.index = range(L1)
-        return X, y, X_test, y_test, feat_grp, column2feat_grp
+        return X, y, X_test, y_test, feature_groups, column2feature_groups
 
     def __init__(
             self, X, y=None, X_test=None, y_test=None, dataset_metadata=frozenset(), column_descriptions=None
     ):
         dataset_metadata = dict(dataset_metadata)
         super(XYDataManager, self).__init__(dataset_metadata.get("dataset_name", "default_dataset_name"))
-        X, y, X_test, y_test, feat_grp, column2feat_grp = self.parse_column_descriptions(
+        X, y, X_test, y_test, feature_groups, column2feature_groups = self.parse_column_descriptions(
             column_descriptions, X, y, X_test, y_test
         )
-        self.column2feat_grp = column2feat_grp
+        self.column2feature_groups = column2feature_groups
         self.ml_task: MLTask = get_task_from_y(y)
-        self.X_train = GenericDataFrame(X, feat_grp=feat_grp)
+        self.X_train = GenericDataFrame(X, feature_groups=feature_groups)
         self.y_train = y
-        self.X_test = GenericDataFrame(X_test, feat_grp=feat_grp) if X_test is not None else None
+        self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None
         self.y_test = y_test if y_test is not None else None
 
         # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定

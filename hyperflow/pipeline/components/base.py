@@ -33,8 +33,8 @@ class HyperFlowComponent(BaseEstimator):
         self.estimator = None
         self.hyperparams = deepcopy(self.cls_hyperparams)
         self.set_params(**self.hyperparams)
-        self.in_feat_grp = None
-        self.out_feat_grp = None
+        self.in_feature_groups = None
+        self.out_feature_groups = None
         self.logger=get_logger(__name__)
 
     @property
@@ -113,12 +113,12 @@ class HyperFlowComponent(BaseEstimator):
         elif isinstance(X, GenericDataFrame):
             from hyperflow.pipeline.components.feature_engineer_base import HyperFlowFeatureEngineerAlgorithm
             if issubclass(self.__class__, HyperFlowFeatureEngineerAlgorithm):
-                df = X.filter_feat_grp(self.in_feat_grp)
+                df = X.filter_feature_groups(self.in_feature_groups)
             else:
                 df = X
             rectify_dtypes(df)
             if extract_info:
-                return df, df.feat_grp, df.origin_grp
+                return df, df.feature_groups, df.columns_metadata
             else:
                 return df
         elif isinstance(X, pd.DataFrame):
@@ -143,9 +143,9 @@ class HyperFlowComponent(BaseEstimator):
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
         # todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？
-        # 只选择当前需要的feat_grp
+        # 只选择当前需要的feature_groups
         assert isinstance(X_train, GenericDataFrame)
-        X_train_, feat_grp, origin_grp = self.preprocess_data(X_train, True)
+        X_train_, feature_groups, columns_metadata = self.preprocess_data(X_train, True)
         X_valid_ = self.preprocess_data(X_valid)
         X_test_ = self.preprocess_data(X_test)
         # 通过以上步骤，保证所有的X都是np.ndarray 形式
@@ -168,7 +168,7 @@ class HyperFlowComponent(BaseEstimator):
         # todo: 测试特征全部删除的情况
         if len(X_train_.shape) > 1 and X_train_.shape[1] > 0:
             self.estimator = self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
-                                       y_test, feat_grp, origin_grp)
+                                       y_test, feature_groups, columns_metadata)
         return self
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
@@ -176,13 +176,13 @@ class HyperFlowComponent(BaseEstimator):
 
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
-             y_test=None, feat_grp=None, origin_grp=None):
+             y_test=None, feature_groups=None, columns_metadata=None):
         # 保留其他数据集的参数，方便模型拓展
         X = self.prepare_X_to_fit(X_train, X_valid, X_test)
         if self.store_intermediate:
             if self.resource_manager is None:
                 print("warn: no resource_manager when store_intermediate is True")
-                fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feat_grp,  origin_grp)
+                fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feature_groups,  columns_metadata)
             else:
                 # get hash value from X, y, hyperparameters
                 Xy_hash = get_hash_of_Xy(X, y_train)
@@ -195,12 +195,12 @@ class HyperFlowComponent(BaseEstimator):
                 else:
                     fitted_estimator = pickle.loads(result)
         else:
-            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feat_grp,  origin_grp)
+            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feature_groups,  columns_metadata)
         self.resource_manager = None  # avoid can not pickle error
         return fitted_estimator
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feat_grp=None, origin_grp=None):
+                 y_test=None, feature_groups=None, columns_metadata=None):
         return estimator.fit(X, y)
 
     def set_addition_info(self, dict_: dict):

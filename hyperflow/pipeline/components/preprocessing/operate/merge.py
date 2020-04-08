@@ -17,11 +17,11 @@ class Merge(HyperFlowFeatureEngineerAlgorithm):
 
         if X_origin is None:
             return None
-        if isinstance(self.out_feat_grp, (list, tuple)):
-            assert len(self.out_feat_grp) == 1
-            self.out_feat_grp = self.out_feat_grp[0]
+        if isinstance(self.out_feature_groups, (list, tuple)):
+            assert len(self.out_feature_groups) == 1
+            self.out_feature_groups = self.out_feature_groups[0]
         # fixme: deepcopy
-        X_origin.set_feat_grp(X_origin.feat_grp.replace(self.in_feat_grp, self.out_feat_grp))
+        X_origin.set_feature_groups(X_origin.feature_groups.replace(self.in_feature_groups, self.out_feature_groups))
         return X_origin
 
     def transform(self, X_train=None, X_valid=None, X_test=None, y_train=None):

@@ -1,5 +1,5 @@
 from hyperflow.pipeline.components.feature_engineer_base import HyperFlowFeatureEngineerAlgorithm
-
+import pandas as pd
 
 class BaseEncoder(HyperFlowFeatureEngineerAlgorithm):
 
@@ -8,5 +8,5 @@ class BaseEncoder(HyperFlowFeatureEngineerAlgorithm):
             return None
         else:
             trans = self.estimator.transform(X)
-            trans[X == -999] = -999
+            trans[pd.DataFrame(X) == -999] = -999  # todo: 有没有更优化的解决办法
             return trans

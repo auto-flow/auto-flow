@@ -198,26 +198,26 @@ class Tuner():
             key = pattern.sub("", key)
         if "->" in key:
             _from, _to = key.split("->")
-            in_feat_grp = _from
-            out_feat_grp = _to
+            in_feature_groups = _from
+            out_feature_groups = _to
         else:
-            in_feat_grp, out_feat_grp = None, None
-        if not in_feat_grp:
-            in_feat_grp = None
-        if not out_feat_grp:
-            out_feat_grp = None
-        return in_feat_grp, out_feat_grp, additional_info
+            in_feature_groups, out_feature_groups = None, None
+        if not in_feature_groups:
+            in_feature_groups = None
+        if not out_feature_groups:
+            out_feature_groups = None
+        return in_feature_groups, out_feature_groups, additional_info
 
     def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
         preprocessing_dict: dict = dhp["preprocessing"]
         pipeline_list = []
         for key, value in preprocessing_dict.items():
             name = key  # like: "cat->num"
-            in_feat_grp, out_feat_grp, outsideEdge_info = self.parse_key(key)
+            in_feature_groups, out_feature_groups, outsideEdge_info = self.parse_key(key)
             sub_dict = preprocessing_dict[name]
             if sub_dict is None:
                 continue
-            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feat_grp, out_feat_grp,
+            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feature_groups, out_feature_groups,
                                                  outsideEdge_info)
             pipeline_list.extend(preprocessor)
         if pipeline_list:
@@ -236,7 +236,7 @@ class Tuner():
         component.update_hyperparams(params)
         return component
 
-    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feat_grp="all", out_feat_grp="all",
+    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feature_groups="all", out_feature_groups="all",
                          outsideEdge_info=None):
         pipeline_list = []
         assert phase in ("preprocessing", "estimator")
@@ -251,16 +251,16 @@ class Tuner():
                 grouped_params[packages[0]] = {}
         for package in packages[:-1]:
             preprocessor = self._create_component("preprocessing", package, grouped_params[package])
-            preprocessor.in_feat_grp = in_feat_grp
-            preprocessor.out_feat_grp = in_feat_grp
+            preprocessor.in_feature_groups = in_feature_groups
+            preprocessor.out_feature_groups = in_feature_groups
             pipeline_list.append([
                 package,
                 preprocessor
             ])
         key1 = "preprocessing" if phase == "preprocessing" else self.ml_task.mainTask
         component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
-        component.in_feat_grp = in_feat_grp
-        component.out_feat_grp = out_feat_grp
+        component.in_feature_groups = in_feature_groups
+        component.out_feature_groups = out_feature_groups
         if outsideEdge_info:
             component.update_hyperparams(outsideEdge_info)
         pipeline_list.append([

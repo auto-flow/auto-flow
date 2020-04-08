@@ -240,7 +240,7 @@ class ResourceManager():
             data_manager_bin = PickleFiled(default=0)
             data_manager_path = pw.TextField(default="")
             column_descriptions = self.JSONField(default={})
-            column2feat_grp = self.JSONField(default={})
+            column2feature_groups = self.JSONField(default={})
             dataset_metadata = self.JSONField(default={})
             metric = pw.CharField(default=""),
             splitter = pw.CharField(default="")
@@ -313,7 +313,7 @@ class ResourceManager():
             data_manager_bin=data_manager_bin,
             data_manager_path=data_manager_path,
             column_descriptions=column_descriptions,
-            column2feat_grp=data_manager.column2feat_grp,  # todo
+            column2feature_groups=data_manager.column2feature_groups,  # todo
             dataset_metadata=dataset_metadata,
             metric=metric.name,
             splitter=str(splitter),

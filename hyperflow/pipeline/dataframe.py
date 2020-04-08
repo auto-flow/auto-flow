@@ -6,61 +6,68 @@ import pandas as pd
 from pandas._typing import FrameOrSeries
 from pandas.core.generic import bool_t
 
+from hyperflow.utils.logging_ import get_logger
+
+logger = get_logger(__name__)
+
 
 class GenericDataFrame(pd.DataFrame):
     def __init__(self, *args, **kwargs):
-        if "feat_grp" in kwargs:
-            feat_grp = kwargs.pop("feat_grp")
+        # self.
+        if "feature_groups" in kwargs:
+            feature_groups = kwargs.pop("feature_groups")
         else:
-            feat_grp = None
-        if "origin_grp" in kwargs:
-            origin_grp = kwargs.pop("origin_grp")
+            feature_groups = None
+        if "columns_metadata" in kwargs:
+            columns_metadata = kwargs.pop("columns_metadata")
         else:
-            origin_grp = None
+            columns_metadata = None
         super(GenericDataFrame, self).__init__(*args, **kwargs)
-        if feat_grp is None:
-            feat_grp = ["cat"] * self.shape[1]
-        assert (len(feat_grp) == self.shape[1])
-        self.set_feat_grp(pd.Series(feat_grp))
-        if origin_grp is None:
-            origin_grp = deepcopy(feat_grp)
-        self.set_origin_grp(pd.Series(origin_grp))
+        if feature_groups is None:
+            logger.warning("feature_groups is None, set it all to 'cat' feature group.")
+            feature_groups = ["cat"] * self.shape[1]
+        assert (len(feature_groups) == self.shape[1])
+        self.set_feature_groups(pd.Series(feature_groups))
+        if columns_metadata is None:
+            columns_metadata = [{}] * self.shape[1]
+        self.set_columns_metadata(pd.Series(columns_metadata))
 
     @property
-    def feat_grp(self):
-        return self.__dict__["feat_grp"]
+    def feature_groups(self):
+        return self.__dict__["feature_groups"]
 
     @property
-    def origin_grp(self):
-        return self.__dict__["origin_grp"]
+    def columns_metadata(self):
+        return self.__dict__["columns_metadata"]
 
-    def set_feat_grp(self, feat_grp):
-        self.__dict__["feat_grp"] = feat_grp
+    def set_feature_groups(self, feature_groups):
+        self.__dict__["feature_groups"] = feature_groups
 
-    def set_origin_grp(self, origin_grp):
-        self.__dict__["origin_grp"] = origin_grp
+    def set_columns_metadata(self, columns_metadata):
+        self.__dict__["columns_metadata"] = columns_metadata
 
     def __repr__(self):
-        return super(GenericDataFrame, self).__repr__() + "\n" + repr((self.feat_grp))
+        return super(GenericDataFrame, self).__repr__() + "\n" + "feature_groups: "+repr(list(self.feature_groups))
 
-    def filter_feat_grp(self, feat_grp: Union[List, str], copy=True, isin=True):  # , inplace=False
-        if feat_grp == "all":
-            feat_grp = np.unique(self.feat_grp).tolist()
-        # 用于过滤feat_grp
-        if isinstance(feat_grp, str):
-            feat_grp = [feat_grp]
+    def filter_feature_groups(self, feature_group: Union[List, str], copy=True, isin=True):  # , inplace=False
+        if feature_group == "all":  # todo 用正则表达式判断
+            feature_group = np.unique(self.feature_groups).tolist()
+        # 用于过滤feature_groups
+        if isinstance(feature_group, str):
+            feature_group = [feature_group]
         if copy:
             result = deepcopy(self)
-            result = GenericDataFrame(result, feat_grp=self.feat_grp, origin_grp=self.origin_grp)
+            result = GenericDataFrame(result, feature_groups=self.feature_groups,
+                                      columns_metadata=self.columns_metadata)
         else:
             result = self
-        loc = result.feat_grp.isin(feat_grp)
+        loc = result.feature_groups.isin(feature_group)
         if not isin:
             loc = (~loc)
-        result.set_feat_grp(result.feat_grp[loc])
-        result.set_origin_grp(result.origin_grp[loc])
+        result.set_feature_groups(result.feature_groups[loc])
+        result.set_columns_metadata(result.columns_metadata[loc])
         loc_df = result.loc[:, result.columns[loc]]
-        return GenericDataFrame(loc_df, feat_grp=result.feat_grp, origin_grp=result.origin_grp)
+        return GenericDataFrame(loc_df, feature_groups=result.feature_groups, columns_metadata=result.columns_metadata)
 
     def concat_two(self, df1, df2):
         assert isinstance(df1, GenericDataFrame)
@@ -68,97 +75,94 @@ class GenericDataFrame(pd.DataFrame):
 
         new_df = pd.concat([df1, df2], axis=1)
         # todo: 杜绝重复列
-        new_feat_grp = pd.concat([df1.feat_grp, df2.feat_grp], ignore_index=True)
-        new_origin_grp = pd.concat([df1.origin_grp, df2.origin_grp], ignore_index=True)
-        return GenericDataFrame(new_df, feat_grp=new_feat_grp, origin_grp=new_origin_grp)
+        new_feature_groups = pd.concat([df1.feature_groups, df2.feature_groups], ignore_index=True)
+        new_columns_metadata = pd.concat([df1.columns_metadata, df2.columns_metadata], ignore_index=True)
+        return GenericDataFrame(new_df, feature_groups=new_feature_groups, columns_metadata=new_columns_metadata)
 
-    def replace_feat_grp(self, old_feat_grp: Union[List, str],
-                         values: np.ndarray,
-                         new_feat_grp: Union[str, List, pd.Series],
-                         new_origin_grp: Union[str, List, None, pd.Series] = None):
-        if old_feat_grp == "all":
-            old_feat_grp = np.unique(self.feat_grp).tolist()
-        if isinstance(old_feat_grp, str):
-            old_feat_grp = [old_feat_grp]
-        # 如果参数new_origin_grp为None，根据长度是否改变对new_origin_grp进行赋值
-        if new_origin_grp is None:
-            selected_origin_grp = self.origin_grp[self.feat_grp.isin(old_feat_grp)]
-            if len(selected_origin_grp) == values.shape[1]:
-                new_origin_grp = deepcopy(selected_origin_grp)
-            else:
-                unique = pd.unique(selected_origin_grp)
-                new_origin_grp = str(unique[0])
-        # 将new_origin_grp从str表达为list
-        if isinstance(new_origin_grp, str):
-            # assert isinstance(new_origin_grp, str)
-            new_origin_grp = [new_origin_grp] * values.shape[1]
-        else:
-            assert len(new_origin_grp) == values.shape[1]
+    def replace_feature_groups(self, old_feature_group: Union[List[str], str],
+                               values: Union[np.ndarray, pd.DataFrame],
+                               new_feature_group: Union[str, List[str], pd.Series],
+                               new_columns_metadata: Union[str, List[dict], None, pd.Series] = None):
+        if old_feature_group == "all":
+            old_feature_group = np.unique(self.feature_groups).tolist()
+        if isinstance(old_feature_group, str):
+            old_feature_group = [old_feature_group]
 
-        # 将 new_feat_grp 从str表达为list
-        if isinstance(new_feat_grp, str):
-            new_feat_grp = [new_feat_grp] * values.shape[1]
+        if new_columns_metadata is None:
+            new_columns_metadata = [{}] * values.shape[1]
+        assert len(new_columns_metadata) == values.shape[1]
+        new_columns_metadata = pd.Series(new_columns_metadata)
+
+        # 将 new_feature_groups 从str表达为list
+        if isinstance(new_feature_group, str):
+            new_feature_group = [new_feature_group] * values.shape[1]
+        assert len(new_feature_group) == values.shape[1]
+        new_feature_group = pd.Series(new_feature_group)
+
         # new_df 的 columns
-        replaced_columns = self.columns[self.feat_grp.isin(old_feat_grp)]
+        replaced_columns = self.columns[self.feature_groups.isin(old_feature_group)]
         if len(replaced_columns) == values.shape[1]:
             columns = replaced_columns
         else:
-            columns = [f"{x}_{i}" for i, x in enumerate(new_feat_grp)]
+            columns = [f"{x}_{i}" for i, x in enumerate(new_feature_group)]
+
         # 开始构造df
         if isinstance(values, np.ndarray):
             values = pd.DataFrame(values, columns=columns)
-        deleted_df = self.filter_feat_grp(old_feat_grp, True, False)
-        new_df = GenericDataFrame(values, feat_grp=new_feat_grp,
-                                  origin_grp=new_origin_grp)
+        deleted_df = self.filter_feature_groups(old_feature_group, True, False)
+        new_df = GenericDataFrame(values, feature_groups=new_feature_group,
+                                  columns_metadata=new_columns_metadata)
         new_df.index = deleted_df.index
         return self.concat_two(deleted_df, new_df)
 
     def split(self, indexes, type="iloc"):
-        assert type in ("loc","iloc")
+        assert type in ("loc", "iloc")
         for index in indexes:
-            if type=="iloc":
-                yield GenericDataFrame(self.iloc[index, :], feat_grp=self.feat_grp,
-                                       origin_grp=self.origin_grp)
-            elif type=="loc":
-                yield GenericDataFrame(self.loc[index, :], feat_grp=self.feat_grp,
-                                       origin_grp=self.origin_grp)
+            if type == "iloc":
+                yield GenericDataFrame(self.iloc[index, :], feature_groups=self.feature_groups,
+                                       columns_metadata=self.columns_metadata)
+            elif type == "loc":
+                yield GenericDataFrame(self.loc[index, :], feature_groups=self.feature_groups,
+                                       columns_metadata=self.columns_metadata)
 
     def copy(self: FrameOrSeries, deep: bool_t = True) -> FrameOrSeries:
-        return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feat_grp=self.feat_grp,
-                                origin_grp=self.origin_grp)
+        return GenericDataFrame(super(GenericDataFrame, self).copy(deep=deep), feature_groups=self.feature_groups,
+                                columns_metadata=self.columns_metadata)
 
     def __reduce__(self):
         result = super(GenericDataFrame, self).__reduce__()
         result[2].update({
-            "feat_grp": self.feat_grp,
-            "origin_grp": self.origin_grp
+            "feature_groups": self.feature_groups,
+            "columns_metadata": self.columns_metadata
         })
         return result
 
     def __setstate__(self, state):
-        self.set_feat_grp(state.pop("feat_grp"))
-        self.set_origin_grp(state.pop("origin_grp"))
+        self.set_feature_groups(state.pop("feature_groups"))
+        self.set_columns_metadata(state.pop("columns_metadata"))
         super(GenericDataFrame, self).__setstate__(state)
 
 
 if __name__ == '__main__':
     import logging
-    df = pd.read_csv("/home/tqc/PycharmProjects/hyperflow/examples/classification/train_classification.csv")
-    suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
-    feat_grp = ["id"] + suffix
 
-    df2 = GenericDataFrame(df, feat_grp=feat_grp)
+    df = pd.read_csv("/home/tqc/PycharmProjects/HyperFlow/examples/classification/train_classification.csv")
+    suffix = ["num"] * 2 + ["cat"] * 2 + ["num"] * 5 + ["cat"] * 2
+    feature_groups = ["id"] + suffix
+
+    df2 = GenericDataFrame(df, feature_groups=feature_groups)
     # 测试1->2
-    selected = df2.filter_feat_grp("id").values
+    selected = df2.filter_feature_groups("id").values
     selected = np.hstack([selected, selected])
-    df3 = df2.replace_feat_grp("id", selected, "id2")
+    df3 = df2.replace_feature_groups("id", selected, "id2")
     logging.info(df3)
     # 测试1->1
-    selected = df2.filter_feat_grp("id").values
+    selected = df2.filter_feature_groups("id").values
     selected = np.hstack([selected])
-    df3 = df2.replace_feat_grp("id", selected, "id2")
+    df3 = df2.replace_feature_groups("id", selected, "id2")
     logging.info(df3)
-    selected = df2.filter_feat_grp("id").values
+    # 测试1->0
+    selected = df2.filter_feature_groups("id").values
     selected = np.zeros([selected.shape[0], 0])
-    df3 = df2.replace_feat_grp("id", selected, "id2")
+    df3 = df2.replace_feature_groups("id", selected, "id2")
     logging.info(df3)
