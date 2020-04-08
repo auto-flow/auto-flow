@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Union, Tuple, List
 
 from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
-from hyperflow.manager.xy_data_manager import XYDataManager
+from hyperflow.manager.data_manager import DataManager
 from hyperflow.utils.data import get_int_card
 from hyperflow.utils.dict import add_prefix_in_dict_keys
 from hyperflow.utils.logging_ import get_logger
@@ -75,7 +75,7 @@ class HDL_Constructor():
     def set_random_state(self, random_state):
         self.random_state = random_state
 
-    def set_data_manager(self, data_manager: XYDataManager):
+    def set_data_manager(self, data_manager: DataManager):
         self.data_manager = data_manager
         self.ml_task = data_manager.ml_task
 

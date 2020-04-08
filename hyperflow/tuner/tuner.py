@@ -14,7 +14,7 @@ from hyperflow.constants import MLTask
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
 from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
 from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.manager.xy_data_manager import XYDataManager
+from hyperflow.manager.data_manager import DataManager
 from hyperflow.metrics import Scorer
 from hyperflow.pipeline.pipeline import GenericPipeline
 from hyperflow.shp2dhp.shp2dhp import SHP2DHP
@@ -88,7 +88,7 @@ class Tuner():
     def set_task(self, ml_task: MLTask):
         self.ml_task = ml_task
 
-    def set_data_manager(self, data_manager: XYDataManager):
+    def set_data_manager(self, data_manager: DataManager):
         self.data_manager = data_manager
         self.ml_task=data_manager.ml_task
 
@@ -110,11 +110,12 @@ class Tuner():
 
     def run(
             self,
-            datamanager: XYDataManager,
+            datamanager: DataManager,
             metric: Scorer,
             all_scoring_functions: bool,
             splitter,
-            initial_configs
+            initial_configs,
+            should_store_intermediate_result
     ):
         # time.sleep(random.random())
         if not initial_configs:
@@ -127,6 +128,7 @@ class Tuner():
             metric,
             all_scoring_functions,
             splitter,
+            should_store_intermediate_result
         )
 
         self.scenario = Scenario(

@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression, Lasso
 
 from hyperflow.ensemble.stack.classifier import StackingClassifier
 from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.manager.xy_data_manager import XYDataManager
+from hyperflow.manager.data_manager import DataManager
 from generic_fs import LocalFS
 
 
@@ -32,7 +32,7 @@ class StackEnsembleBuilder():
 
     def set_data(
             self,
-            data_manager: Union[XYDataManager, Dict],
+            data_manager: Union[DataManager, Dict],
             dataset_paths: Union[List, str],
             resource_manager: ResourceManager
     ):

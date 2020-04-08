@@ -14,8 +14,8 @@ from sklearn.model_selection import KFold
 
 from hyperflow.ensemble.stack.builder import StackEnsembleBuilder
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
+from hyperflow.manager.data_manager import DataManager
 from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.manager.xy_data_manager import XYDataManager
 from hyperflow.metrics import r2, accuracy
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.tuner.tuner import Tuner
@@ -79,11 +79,13 @@ class HyperFlowEstimator(BaseEstimator):
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
             specific_task_token="",
+            should_store_intermediate_result=False
 
     ):
+        self.should_store_intermediate_result = should_store_intermediate_result
         dataset_metadata = dict(dataset_metadata)
         # build data_manager
-        self.data_manager = XYDataManager(
+        self.data_manager = DataManager(
             X, y, X_test, y_test, dataset_metadata, column_descriptions
         )
         self.ml_task = self.data_manager.ml_task
@@ -126,7 +128,8 @@ class HyperFlowEstimator(BaseEstimator):
                                                            self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
                                                            self.tuners, tuner, all_scoring_functions, self.data_manager,
                                                            column_descriptions,
-                                                           dataset_metadata, metric, splitter)
+                                                           dataset_metadata, metric, splitter,
+                                                           should_store_intermediate_result)
             self.resource_manager.close_experiments_db()
 
             result = self.start_tuner(tuner, hdl)
@@ -197,7 +200,8 @@ class HyperFlowEstimator(BaseEstimator):
             self.metric,
             self.all_scoring_functions,
             self.splitter,
-            initial_configs
+            initial_configs,
+            self.should_store_intermediate_result
         )
         if sync_dict:
             sync_dict[os.getpid()] = 1
@@ -232,4 +236,3 @@ class HyperFlowEstimator(BaseEstimator):
 
     def predict_proba(self, X):
         return self.estimator.predict_proba(X)
-

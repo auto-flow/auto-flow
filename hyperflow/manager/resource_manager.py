@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+from copy import deepcopy
 from getpass import getuser
 from typing import Dict, Tuple, List, Union
 
@@ -16,7 +17,7 @@ from generic_fs.utils import get_db_class_by_db_type
 from hyperflow.constants import MLTask
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
-from hyperflow.manager.xy_data_manager import XYDataManager
+from hyperflow.manager.data_manager import DataManager
 from hyperflow.metrics import Scorer
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
 from hyperflow.utils.logging_ import get_logger
@@ -120,12 +121,18 @@ class ResourceManager():
             raise NotImplementedError
         return db_params
 
-    def persistent_evaluated_model(self, info: Dict, trial_id):
+    def persistent_evaluated_model(self, info: Dict, trial_id) -> Tuple[str, str]:
         self.trial_dir = self.file_system.join(self.parent_trials_dir, self.task_id, self.hdl_id)
         self.file_system.mkdir(self.trial_dir)
-        file_path = self.file_system.join(self.trial_dir, f"{trial_id}.{self.compress_suffix}")
-        self.file_system.dump_pickle(info["models"], file_path)
-        return file_path
+        model_path = self.file_system.join(self.trial_dir, f"{trial_id}.{self.compress_suffix}")
+        if info["intermediate_result"] is not None:
+            intermediate_result_path = self.file_system.join(self.trial_dir,
+                                                             f"{trial_id}_inter-res.{self.compress_suffix}")
+        else:
+            intermediate_result_path = ""
+        self.file_system.dump_pickle(info["models"], model_path)
+        self.file_system.dump_pickle(info["intermediate_result"], intermediate_result_path)
+        return model_path, intermediate_result_path
 
     def load_best_estimator(self, ml_task: MLTask):
         # todo: 最后调用分析程序？
@@ -245,6 +252,7 @@ class ResourceManager():
             metric = pw.CharField(default=""),
             splitter = pw.CharField(default="")
             ml_task = pw.CharField(default="")
+            should_store_intermediate_result = pw.BooleanField(default=False)
             user = pw.CharField(default=getuser)
 
             class Meta:
@@ -284,6 +292,7 @@ class ResourceManager():
             dataset_metadata,
             metric,
             splitter,
+            should_store_intermediate_result
     ):
         self.connect_experiments_db()
         # estimate new experiment_id
@@ -297,7 +306,11 @@ class ResourceManager():
             self.file_system.dump_pickle(data_manager, data_manager_path)
         else:
             data_manager_path = ""
-            data_manager_bin = data_manager
+            data_manager_bin = deepcopy(data_manager)
+            data_manager_bin.X_train = None
+            data_manager_bin.X_test = None
+            data_manager_bin.y_train = None
+            data_manager_bin.y_test = None
         experiment_record = self.ExperimentsModel.create(
             general_experiment_timestamp=general_experiment_timestamp,
             current_experiment_timestamp=current_experiment_timestamp,
@@ -317,7 +330,8 @@ class ResourceManager():
             dataset_metadata=dataset_metadata,
             metric=metric.name,
             splitter=str(splitter),
-            ml_task=str(data_manager.ml_task)
+            ml_task=str(data_manager.ml_task),
+            should_store_intermediate_result=should_store_intermediate_result
         )
         fetched_experiment_id = experiment_record.experiment_id
         if fetched_experiment_id != experiment_id:
@@ -360,7 +374,7 @@ class ResourceManager():
         self.tasks_db.create_tables([Tasks])
         return Tasks
 
-    def insert_to_tasks_db(self, data_manager: XYDataManager, metric: Scorer, splitter, specific_task_token):
+    def insert_to_tasks_db(self, data_manager: DataManager, metric: Scorer, splitter, specific_task_token):
         self.connect_tasks_db()
         Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
         Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
@@ -497,6 +511,8 @@ class ResourceManager():
             status = pw.CharField(default="success")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
+            intermediate_result_path = pw.TextField(default=""),
+            intermediate_result_bin = PickleFiled(default=b''),
             timestamp = pw.DateTimeField(default=datetime.datetime.now)
             user = pw.CharField(default=getuser)
             pid = pw.IntegerField(default=os.getpid)
@@ -523,11 +539,16 @@ class ResourceManager():
         self.connect_trials_db()
         config_id = info.get("config_id")
         if self.persistent_mode == "fs":
-            models_path = self.persistent_evaluated_model(info, config_id)  # todo: 考虑更特殊的情况，不同的任务下，相同的配置
-            models_bin = 0
+            # todo: 考虑更特殊的情况，不同的任务下，相同的配置
+            models_path, intermediate_result_path = \
+                self.persistent_evaluated_model(info, config_id)
+            models_bin = None
+            intermediate_result_bin = None
         else:
             models_path = ""
+            intermediate_result_path = ""
             models_bin = info["models"]
+            intermediate_result_bin = info["intermediate_result"]
         self.TrialsModel.create(
             config_id=config_id,
             task_id=self.task_id,
@@ -552,6 +573,8 @@ class ResourceManager():
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),
             warning_info=info.get("warning_info", ""),
+            intermediate_result_path=intermediate_result_path,
+            intermediate_result_bin=intermediate_result_bin,
         )
 
     def delete_models(self):

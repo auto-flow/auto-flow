@@ -11,10 +11,10 @@ df_train = df.iloc[train_ix, :]
 df_test = df.iloc[test_ix, :]
 
 tuner = Tuner(
-    initial_runs=1,
-    run_limit=100,
+    initial_runs=0,
+    run_limit=1,
     n_jobs=1,
-    search_method_params={"anneal_func":"lambda x:1*(1/(-(3*(x-1))))"}
+    search_method_params={"anneal_func": "lambda x:1*(1/(-(3*(x-1))))"}
 )
 hyperflow_pipeline = HyperFlowEstimator(tuner)
 column_descriptions = {
@@ -23,5 +23,5 @@ column_descriptions = {
     "ignore": "Name"
 }
 hyperflow_pipeline.fit(
-    X=df_train, X_test=df_test, column_descriptions=column_descriptions
+    X=df_train, X_test=df_test, column_descriptions=column_descriptions, should_store_intermediate_result=True
 )

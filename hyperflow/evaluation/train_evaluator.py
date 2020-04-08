@@ -9,7 +9,7 @@ from ConfigSpace import Configuration
 from dsmac.runhistory.utils import get_id_of_config
 from hyperflow.constants import MLTask
 from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.manager.xy_data_manager import XYDataManager
+from hyperflow.manager.data_manager import DataManager
 from hyperflow.metrics import Scorer, calculate_score
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
@@ -21,13 +21,13 @@ class TrainEvaluator():
     def __init__(self):
         self.resource_manager = None
 
-
     def init_data(
             self,
-            data_manager: XYDataManager,
+            data_manager: DataManager,
             metric: Scorer,
             all_scoring_functions: bool,
-            splitter=None,
+            splitter,
+            should_store_intermediate_result: bool,
     ):
         self.splitter = splitter
         self.data_manager = data_manager
@@ -35,7 +35,7 @@ class TrainEvaluator():
         self.y_train = self.data_manager.y_train
         self.X_test = self.data_manager.X_test
         self.y_test = self.data_manager.y_test
-
+        self.should_store_intermediate_result = should_store_intermediate_result
         self.metric = metric
         self.ml_task: MLTask = self.data_manager.ml_task
 
@@ -48,9 +48,6 @@ class TrainEvaluator():
 
         logger_name = self.__class__.__name__
         self.logger = get_logger(logger_name)
-
-        self.Y_optimization = None
-        self.Y_actual_train = None
 
     def loss(self, y_true, y_hat):
         all_scoring_functions = (
@@ -105,8 +102,12 @@ class TrainEvaluator():
                 X: GenericDataFrame
                 X_train, X_valid = X.split([train_index, valid_index])
                 y_train, y_valid = y[train_index], y[valid_index]
+                if self.should_store_intermediate_result:
+                    intermediate_result = []
+                else:
+                    intermediate_result = None
                 procedure_result = model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid, X_test, y_test,
-                                                   self.resource_manager)
+                                                   self.resource_manager, intermediate_result)
                 models.append(model)
                 y_true_indexes.append(valid_index)
                 y_pred = procedure_result["pred_valid"]
@@ -137,6 +138,7 @@ class TrainEvaluator():
                 "models": models,
                 "y_true_indexes": y_true_indexes,
                 "y_preds": y_preds,
+                "intermediate_result": intermediate_result
             }
             # todo
             if y_test is not None:

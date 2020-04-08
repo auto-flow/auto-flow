@@ -4,13 +4,12 @@ import numpy as np
 import pandas as pd
 
 from hyperflow.constants import MLTask
-from hyperflow.manager.abstract_data_manager import AbstractDataManager
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import get_task_from_y, is_nan, is_cat
 from hyperflow.utils.dataframe import pop_if_exists
 
 
-class XYDataManager(AbstractDataManager):
+class DataManager():
 
     def parse_feature_groups(self, series: pd.Series):
         if is_nan(series):
@@ -83,7 +82,7 @@ class XYDataManager(AbstractDataManager):
             self, X, y=None, X_test=None, y_test=None, dataset_metadata=frozenset(), column_descriptions=None
     ):
         dataset_metadata = dict(dataset_metadata)
-        super(XYDataManager, self).__init__(dataset_metadata.get("dataset_name", "default_dataset_name"))
+        self.dataset_metadata = dataset_metadata
         X, y, X_test, y_test, feature_groups, column2feature_groups = self.parse_column_descriptions(
             column_descriptions, X, y, X_test, y_test
         )

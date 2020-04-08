@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from sklearn import clone
 from sklearn.pipeline import Pipeline
 from sklearn.utils import _print_elapsed_time
@@ -32,7 +34,7 @@ class GenericPipeline(Pipeline):
     resource_manager = None
 
     # todo: 适配当做普通Pipeline的情况
-    def _fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
+    def _fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, intermediate_result=None):
         # shallow copy of steps - this should really be steps_
         self.steps = list(self.steps)
         self._validate_steps()
@@ -75,6 +77,12 @@ class GenericPipeline(Pipeline):
             X_valid = result.get("X_valid")
             X_test = result.get("X_test")
             y_train = result.get("y_train")
+            if intermediate_result is not None and isinstance(intermediate_result,list):
+                intermediate_result.append({
+                    "X_train":deepcopy(X_train),
+                    "X_valid":deepcopy(X_valid),
+                    "X_test":deepcopy(X_test),
+                })
             # Replace the transformer of the step with the fitted
             # transformer. This is necessary when loading the transformer
             # from the cache.
@@ -82,8 +90,8 @@ class GenericPipeline(Pipeline):
 
         return {"X_train": X_train, "X_valid": X_valid, "X_test": X_test, "y_train": y_train}
 
-    def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
-        result = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+    def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, intermediate_result=None):
+        result = self._fit(X_train, y_train, X_valid, y_valid, X_test, y_test, intermediate_result)
         X_train = result["X_train"]
         X_valid = result.get("X_valid")
         X_test = result.get("X_test")
@@ -91,19 +99,18 @@ class GenericPipeline(Pipeline):
         self.last_data = result
         with _print_elapsed_time('Pipeline',
                                  self._log_message(len(self.steps) - 1)):
-            if self._final_estimator != 'passthrough':
-                self._final_estimator.resource_manager = self.resource_manager
-                self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
-                self._final_estimator.resource_manager = None
+            self._final_estimator.resource_manager = self.resource_manager
+            self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+            self._final_estimator.resource_manager = None
         return self
 
-    def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
-        return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
+    def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None,intermediate_result=None):
+        return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test,intermediate_result).transform(X_train, X_valid, X_test, y_train)
 
     def procedure(self, ml_task: MLTask, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None,
-                  resource_manager=None):
+                  resource_manager=None,intermediate_result=None):
         self.resource_manager = resource_manager
-        self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+        self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test,intermediate_result)
         X_train = self.last_data["X_train"]
         y_train = self.last_data["y_train"]
         X_valid = self.last_data.get("X_valid")
