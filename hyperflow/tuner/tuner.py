@@ -110,7 +110,7 @@ class Tuner():
 
     def run(
             self,
-            datamanager: DataManager,
+            data_manager: DataManager,
             metric: Scorer,
             all_scoring_functions: bool,
             splitter,
@@ -124,7 +124,7 @@ class Tuner():
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
         self.evaluator.init_data(
-            datamanager,
+            data_manager,
             metric,
             all_scoring_functions,
             splitter,
