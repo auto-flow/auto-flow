@@ -212,8 +212,10 @@ class HyperFlowEstimator(BaseEstimator):
 
     def fit_ensemble(
             self,
-            data_manager=None,
-            dataset_paths=None,
+            task_id=None,
+            hdl_id=None,
+
+
     ):
         if not data_manager:
             if hasattr(self, "data_manager"):
