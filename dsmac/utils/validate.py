@@ -12,7 +12,8 @@ from dsmac.epm.rf_with_instances import RandomForestWithInstances
 from dsmac.epm.rfr_imputator import RFRImputator
 from dsmac.epm.util_funcs import get_types
 from dsmac.optimizer.objective import average_cost
-from dsmac.runhistory.runhistory import RunHistory, RunKey, StatusType
+from dsmac.runhistory.runhistory import RunHistory, StatusType
+from dsmac.runhistory.structure import RunKey
 from dsmac.runhistory.runhistory2epm import RunHistory2EPM4Cost
 from dsmac.scenario.scenario import Scenario
 from dsmac.stats.stats import Stats

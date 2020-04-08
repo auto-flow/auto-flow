@@ -1,6 +1,7 @@
 import numpy as np
 
-from dsmac.runhistory.runhistory import RunKey, RunHistory
+from dsmac.runhistory.runhistory import RunHistory
+from dsmac.runhistory.structure import RunKey
 from dsmac.configspace import Configuration
 """Define overall objectives.
 

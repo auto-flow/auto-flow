@@ -26,6 +26,7 @@ from hyperflow.utils.logging_ import get_logger
 
 
 class HyperFlowEstimator(BaseEstimator):
+    checked_mainTask = None
 
     def __init__(
             self,
@@ -66,6 +67,7 @@ class HyperFlowEstimator(BaseEstimator):
         self.resource_manager = resource_manager
         # ---member_variable------------------------------------
         self.estimator = None
+        self.ensemble_estimator = None
 
     def fit(
             self,
@@ -89,6 +91,8 @@ class HyperFlowEstimator(BaseEstimator):
             X, y, X_test, y_test, dataset_metadata, column_descriptions
         )
         self.ml_task = self.data_manager.ml_task
+        if self.checked_mainTask is not None:
+            assert self.checked_mainTask == self.ml_task.mainTask
         # parse metric
         if metric is None:
             if self.ml_task.mainTask == "regression":
@@ -228,11 +232,8 @@ class HyperFlowEstimator(BaseEstimator):
             self.resource_manager
         )
         self.ensemble_builder.init_data()
-        self.stack_estimator = self.ensemble_builder.build()
-        return self.stack_estimator
+        self.ensemble_estimator = self.ensemble_builder.build()
+        return self.ensemble_estimator
 
     def predict(self, X):
         return self.estimator.predict(X)
-
-    def predict_proba(self, X):
-        return self.estimator.predict_proba(X)

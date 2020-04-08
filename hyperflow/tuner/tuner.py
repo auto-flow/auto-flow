@@ -137,6 +137,7 @@ class Tuner():
                 "runcount-limit": 1000,
                 "cs": self.shps,  # configuration space
                 "deterministic": "true",
+                "instances":[[self.resource_manager.task_id]]
                 # todo : 如果是local，存在experiment，如果是其他文件系统，不输出smac
                 # "output_dir": self.resource_manager.smac_output_dir,
             },

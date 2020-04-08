@@ -6,7 +6,8 @@ import typing
 import numpy as np
 
 from dsmac.tae.execute_ta_run import StatusType
-from dsmac.runhistory.runhistory import RunHistory, RunKey, RunValue
+from dsmac.runhistory.runhistory import RunHistory
+from dsmac.runhistory.structure import RunKey, RunValue
 from dsmac.configspace import convert_configurations_to_array
 from dsmac.epm.base_imputor import BaseImputor
 from dsmac.utils import constants

@@ -12,8 +12,9 @@ df_train = df.iloc[train_ix, :]
 df_test = df.iloc[test_ix, :]
 
 tuner = Tuner(
-    initial_runs=5,
+    initial_runs=1,
     run_limit=12,
+    n_jobs=1
 )
 hdl_constructor=HDL_Constructor(
     DAG_descriptions={
@@ -31,5 +32,5 @@ column_descriptions = {
 }
 
 hyperflow_pipeline.fit(
-    X=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
+    X=df_train, X_test=df_test, column_descriptions=column_descriptions
 )

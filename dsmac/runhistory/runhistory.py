@@ -1,21 +1,16 @@
 import collections
-import datetime
 import json
-import os
-import pickle
 import typing
-from enum import Enum
 
 import numpy as np
-import peewee as pw
-from frozendict import frozendict
 
 from dsmac.configspace import Configuration, ConfigurationSpace
+from dsmac.runhistory.runhistory_db import RunHistoryDB
+from dsmac.runhistory.structure import RunKey, InstSeedKey, RunValue, EnumEncoder, DataOrigin
 from dsmac.runhistory.utils import get_id_of_config
 from dsmac.tae.execute_ta_run import StatusType
 from dsmac.utils.logging import PickableLoggerAdapter
 from generic_fs import LocalFS
-from generic_fs.utils import get_db_class_by_db_type
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2015, ML4AAD"
@@ -23,49 +18,6 @@ __license__ = "3-clause BSD"
 __maintainer__ = "Marius Lindauer"
 __email__ = "lindauer@cs.uni-freiburg.de"
 __version__ = "0.0.1"
-
-RunKey = collections.namedtuple(
-    'RunKey', ['config_id', 'instance_id', 'seed'])
-
-InstSeedKey = collections.namedtuple(
-    'InstSeedKey', ['instance', 'seed'])
-
-RunValue = collections.namedtuple(
-    'RunValue', ['cost', 'time', 'status', 'additional_info'])
-
-
-class EnumEncoder(json.JSONEncoder):
-    """Custom encoder for enum-serialization
-    (implemented for StatusType from tae/execute_ta_run).
-    Using encoder implied using object_hook as defined in StatusType
-    to deserialize from json.
-    """
-
-    def default(self, obj):
-        if isinstance(obj, StatusType):
-            return {"__enum__": str(obj)}
-        return json.JSONEncoder.default(self, obj)
-
-
-class DataOrigin(Enum):
-    """
-    Definition of how data in the runhistory is used.
-
-    * ``INTERNAL``: internal data which was gathered during the current
-      optimization run. It will be saved to disk, used for building EPMs and
-      during intensify.
-    * ``EXTERNAL_SAME_INSTANCES``: external data, which was gathered by running
-       another program on the same instances as the current optimization run
-       runs on (for example pSMAC). It will not be saved to disk, but used both
-       for EPM building and during intensify.
-    * ``EXTERNAL_DIFFERENT_INSTANCES``: external data, which was gathered on a
-       different instance set as the one currently used, but due to having the
-       same instance features can still provide useful information. Will not be
-       saved to disk and only used for EPM building.
-    """
-    INTERNAL = 1
-    EXTERNAL_SAME_INSTANCES = 2
-    EXTERNAL_DIFFERENT_INSTANCES = 3
 
 
 class RunHistory(object):
@@ -141,9 +93,19 @@ class RunHistory(object):
         self.aggregate_func = aggregate_func
         self.overwrite_existing_runs = overwrite_existing_runs
 
+    def get_incumbent(self):
+        incumbent = None
+        min_cost = np.inf
+        for run_key, run_value in self.data.items():
+            cost = run_value.cost
+            if cost < min_cost:
+                incumbent = self.ids_config[run_key.config_id]
+                min_cost = cost
+        return incumbent
+
     def add(self, config: Configuration, cost: float, time: float,
-            status: StatusType, instance_id: str = None,
-            seed: int = None,
+            status: StatusType, instance_id: str = "",
+            seed: int = 0,
             additional_info: dict = None,
             origin: DataOrigin = DataOrigin.INTERNAL):
         """Adds a data of a new target algorithm (TA) run;
@@ -473,131 +435,3 @@ class RunHistory(object):
                      origin=origin)
 
 
-class RunHistoryDB():
-
-    def __init__(self, config_space: ConfigurationSpace, runhistory: RunHistory, db_type="sqlite",
-                 db_params=frozendict()):
-        self.runhistory = runhistory
-        self.db_type = db_type
-        self.db_params = db_params
-        self.Datebase = get_db_class_by_db_type(self.db_type)
-        self.db: pw.Database = self.Datebase(**self.db_params)
-        self.Model: pw.Model = self.get_model()
-        self.config_space: ConfigurationSpace = config_space
-
-    def get_model(self) -> pw.Model:
-        class Run_History(pw.Model):
-            config_id = pw.CharField(primary_key=True)
-            config = pw.TextField(default="")
-            config_bit = pw.BitField(0)
-            config_origin = pw.TextField(default="")
-            cost = pw.FloatField(default=65535)
-            time = pw.FloatField(default=0.0)
-            instance_id = pw.CharField(default="")
-            seed = pw.IntegerField(default=0)
-            status = pw.IntegerField(default=0)
-            additional_info = pw.CharField(default="")
-            origin = pw.IntegerField(default=0)
-            pid = pw.IntegerField(default=0)
-            timestamp = pw.DateTimeField(default=datetime.datetime.now)  # pw.TimestampField()
-
-            class Meta:
-                database = self.db
-                # indexes=
-                # primary_key=
-
-        self.db.create_tables([Run_History])
-        return Run_History
-
-    def appointment_config(self, config) -> bool:
-        config_id = get_id_of_config(config)
-        query = self.Model.select().where(self.Model.config_id == config_id)
-        if query.exists():
-            return False
-        try:
-            self.Model.create(
-                config_id=config_id,
-                origin=-1
-            )
-        except Exception as e:
-            return False
-        return True
-
-    def insert_runhistory(self, config: Configuration, cost: float, time: float,
-                          status: StatusType, instance_id: str = "",
-                          seed: int = 0,
-                          additional_info: dict = {},
-                          origin: DataOrigin = DataOrigin.INTERNAL):
-        config_id = get_id_of_config(config)
-        if instance_id is None:
-            instance_id = ""
-        try:
-            self.Model.create(
-                config_id=config_id,
-                config=json.dumps(config.get_dictionary()),
-                config_origin=config.origin,
-                config_bit=pickle.dumps(config),
-                cost=cost,
-                time=time,
-                instance_id=instance_id,
-                seed=seed,
-                status=status.value,
-                additional_info=json.dumps(additional_info),
-                origin=origin.value,
-                pid=os.getpid(),
-                timestamp=datetime.datetime.now()
-            )
-        except pw.IntegrityError:
-            self.Model(
-                config_id=config_id,
-                config=json.dumps(config.get_dictionary()),
-                config_origin=config.origin,
-                config_bit=pickle.dumps(config),
-                cost=cost,
-                time=time,
-                instance_id=instance_id,
-                seed=seed,
-                status=status.value,
-                additional_info=json.dumps(additional_info),
-                origin=origin.value,
-                pid=os.getpid(),
-                timestamp=datetime.datetime.now(),
-            ).save()
-        self.timestamp = datetime.datetime.now()
-
-    def fetch_new_runhistory(self, is_init=False):
-        if is_init:
-            query = self.Model.select().where(self.Model.origin >= 0)
-        else:
-            query = self.Model.select().where(self.Model.pid != os.getpid()).where(self.Model.origin >= 0)
-        config_cost = []
-        for model in query:
-            config_id = model.config_id
-            config = model.config
-            config_bit = model.config_bit
-            config_origin = model.config_origin
-            cost = model.cost
-            time = model.time
-            instance_id = model.instance_id
-            seed = model.seed
-            status = model.status
-            additional_info = model.additional_info
-            origin = model.origin
-            timestamp = model.timestamp
-            try:
-                config = pickle.loads(config_bit)
-            except:
-                config = Configuration(self.config_space, values=json.loads(config), origin=config_origin)
-            try:
-                additional_info = json.loads(additional_info)
-            except Exception:
-                pass
-            if not self.runhistory.ids_config.get(config_id):
-                config_cost.append([config, cost])
-                self.runhistory.add(config, cost, time, StatusType(status), instance_id, seed, additional_info,
-                                    DataOrigin(origin))
-        self.timestamp = datetime.datetime.now()
-        return config_cost
-
-    def delete_all(self):
-        self.Model.delete().execute()

@@ -131,7 +131,8 @@ class ResourceManager():
         else:
             intermediate_result_path = ""
         self.file_system.dump_pickle(info["models"], model_path)
-        self.file_system.dump_pickle(info["intermediate_result"], intermediate_result_path)
+        if intermediate_result_path:
+            self.file_system.dump_pickle(info["intermediate_result"], intermediate_result_path)
         return model_path, intermediate_result_path
 
     def load_best_estimator(self, ml_task: MLTask):
@@ -556,11 +557,11 @@ class ResourceManager():
             experiment_id=self.experiment_id,
             estimator=info.get("estimator", ""),
             loss=info.get("loss", 65535),
-            losses=info.get("losses"),
+            losses=info.get("losses",[]),
             test_loss=info.get("test_loss", 65535),
-            all_score=info.get("all_score"),
-            all_scores=info.get("all_scores"),
-            test_all_score=info.get("test_all_score"),
+            all_score=info.get("all_score",{}),
+            all_scores=info.get("all_scores",[]),
+            test_all_score=info.get("test_all_score",{}),
             models_bin=models_bin,
             models_path=models_path,
             y_true_indexes=info.get("y_true_indexes"),
@@ -568,7 +569,7 @@ class ResourceManager():
             y_test_true=info.get("y_test_true"),
             y_test_pred=info.get("y_test_pred"),
             smac_hyper_param=info.get("program_hyper_param"),
-            dict_hyper_param=info.get("dict_hyper_param"),
+            dict_hyper_param=info.get("dict_hyper_param",{}),
             cost_time=info.get("cost_time", 65535),
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),

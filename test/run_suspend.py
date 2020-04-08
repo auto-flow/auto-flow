@@ -14,9 +14,10 @@ hdl_constructor = HDL_Constructor(
     }
 )
 tuner = Tuner(
-    run_limit=12,
+    run_limit=5,
     initial_runs=12,
-    search_method="smac"
+    search_method="smac",
+    n_jobs=1
 )
 hyperflow_pipeline = HyperFlowEstimator(tuner, hdl_constructor)
 column_descriptions = {
@@ -25,5 +26,5 @@ column_descriptions = {
 }
 
 hyperflow_pipeline.fit(
-    X=df, column_descriptions=column_descriptions, n_jobs=3
+    X=df, column_descriptions=column_descriptions
 )

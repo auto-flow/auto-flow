@@ -1,4 +1,5 @@
-from dsmac.runhistory.runhistory import RunHistory, DataOrigin
+from dsmac.runhistory.runhistory import RunHistory
+from dsmac.runhistory.structure import DataOrigin
 from dsmac.scenario.scenario import Scenario
 from dsmac.configspace import ConfigurationSpace
 from dsmac.optimizer.objective import average_cost

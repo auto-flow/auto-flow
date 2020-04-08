@@ -88,6 +88,8 @@ class Intensifier(object):
         if instances is None:
             instances = []
         self.instances = set(instances)
+
+        self.instance = instances[0] if len(instances) > 0 else None
         if instance_specifics is None:
             self.instance_specifics = {}
         else:
@@ -178,7 +180,7 @@ class Intensifier(object):
             challengers[target], challengers[0] = challengers[0], challengers[target]
 
         for challenger in challengers:
-            if not run_history.db.appointment_config(challenger):
+            if not run_history.db.appointment_config(challenger, self.instance):
                 continue
             if challenger == incumbent:
                 self.logger.debug("Challenger was the same as the current incumbent; Skipping challenger")

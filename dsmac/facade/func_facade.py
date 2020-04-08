@@ -6,7 +6,7 @@ import numpy as np
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
 from dsmac.configspace import ConfigurationSpace
-from dsmac.runhistory.runhistory import RunKey
+from dsmac.runhistory.structure import RunKey
 from dsmac.tae.execute_func import ExecuteTAFuncArray
 
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter

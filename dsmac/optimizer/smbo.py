@@ -164,28 +164,14 @@ class SMBO(object):
     def start_(self):
         self.runhistory.db.fetch_new_runhistory(True)
         all_configs = self.runhistory.get_all_configs()
-        if len(all_configs):
-            # 根据runhistory选出最优
-            incumbent = all_configs[0]
-            min_cost = np.inf
-            for config in all_configs:
-                cost = self.runhistory.get_cost(config)
-                if cost < min_cost:
-                    min_cost = cost
-                    incumbent = config
-            self.incumbent = incumbent
-        else:
-            incumbent = None
-        self.start(incumbent)
+        self.incumbent = self.runhistory.get_incumbent()
+        self.start(self.incumbent)
 
     def run_(self):
         start_time = time.time()
-        cur_cost = self.runhistory.get_cost(self.incumbent)
-        config_cost = self.runhistory.db.fetch_new_runhistory(False)
-        for config, cost in config_cost:
-            if cost < cur_cost:
-                self.incumbent = config
-                cur_cost = cost
+        self.runhistory.db.fetch_new_runhistory(False)
+        # todo: 做一个信息提示？
+        self.incumbent = self.runhistory.get_incumbent()
         X, Y = self.rh2EPM.transform(self.runhistory)
 
         self.logger.debug("Search for next configuration")
@@ -213,12 +199,6 @@ class SMBO(object):
 
         # if self.stats.is_budget_exhausted():
         #     break
-
-        # if self.scenario.after_run_callback:
-        #     status = self.scenario.after_run_callback()
-        #     if not status:
-        #         print("info:break")
-        #         break
         self.stats.print_stats(debug_out=True)
 
     def run(self):
@@ -229,24 +209,9 @@ class SMBO(object):
         incumbent: np.array(1, H)
             The best found configuration
         """
-        # file=self.scenario.output_dir+"/"+RUNHISTORY_FILEPATTERN
-        # if self.scenario.file_system.exists(file):
-        #     new_runhistory = RunHistory(self.aggregate_func,file_system=self.scenario.file_system)
-        #     new_runhistory.load_json(file, self.config_space)
-        #     self.runhistory=new_runhistory
         self.runhistory.db.fetch_new_runhistory(True)
-        all_configs = self.runhistory.get_all_configs()
-        if len(all_configs):
-            # 根据runhistory选出最优
-            incumbent = all_configs[0]
-            min_cost = np.inf
-            for config in all_configs[1:]:
-                cost = self.runhistory.get_cost(config)
-                if cost < min_cost:
-                    min_cost = cost
-                    incumbent = config
-            self.incumbent = incumbent
-        self.start()
+        self.incumbent = self.runhistory.get_incumbent()
+        self.start(self.incumbent)
 
         # Main BO loop
         if hasattr(self.scenario, 'ta_run_limit') and isinstance(self.scenario.ta_run_limit, (int, float)):
@@ -297,7 +262,6 @@ class SMBO(object):
 
             # if self.stats.is_budget_exhausted():
             #     break
-
 
             self.stats.print_stats(debug_out=True)
 

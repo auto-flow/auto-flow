@@ -12,7 +12,7 @@ df_test = df.iloc[test_ix, :]
 
 tuner = Tuner(
     initial_runs=0,
-    run_limit=1,
+    run_limit=50,
     n_jobs=1,
     search_method_params={"anneal_func": "lambda x:1*(1/(-(3*(x-1))))"}
 )

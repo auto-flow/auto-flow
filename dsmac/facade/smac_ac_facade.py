@@ -229,6 +229,7 @@ class SMAC4AC(object):
         if runhistory is None:
             runhistory = RunHistory(
                 **runhistory_def_kwargs,
+                config_space=self.scenario.cs,
                 file_system=scenario.file_system,
                 db_type=scenario.db_type,
                 db_params=scenario.db_params,
