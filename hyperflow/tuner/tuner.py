@@ -1,8 +1,6 @@
-import random
-import re
-import time
+import inspect
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, Callable
 
 import numpy as np
 from ConfigSpace import ConfigurationSpace
@@ -11,24 +9,20 @@ from frozendict import frozendict
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
 from hyperflow.constants import MLTask
+from hyperflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
 from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
-from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.manager.data_manager import DataManager
-from hyperflow.metrics import Scorer
-from hyperflow.pipeline.pipeline import GenericPipeline
-from hyperflow.shp2dhp.shp2dhp import SHP2DHP
+from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
-from hyperflow.utils.dict import group_dict_items_before_first_dot
-from hyperflow.utils.logging_ import get_logger
-from hyperflow.utils.packages import get_class_object_in_pipeline_components
-from hyperflow.utils.pipeline import concat_pipeline
+from hyperflow.utils.logging import get_logger
 
 
 class Tuner():
     def __init__(
             self,
+            evaluator: Callable = "TrainEvaluator",
             search_method: str = "smac",
             run_limit: int = 100,
             initial_runs: int = 20,
@@ -36,15 +30,29 @@ class Tuner():
             n_jobs: int = 1,
             exit_processes: Optional[int] = None
     ):
+        self.logger = get_logger(__name__)
+        search_method_params = dict(search_method_params)
+        if isinstance(evaluator, str):
+            if evaluator == "TrainEvaluator":
+                evaluator = TrainEvaluator
+            elif evaluator == "EnsembleEvaluator":
+                evaluator = EnsembleEvaluator
+            else:
+                raise NotImplementedError
+        assert callable(evaluator)
+        self.evaluator_prototype = evaluator
+        if inspect.isfunction(evaluator):
+            self.evaluator = evaluator
+        else:
+            self.evaluator = evaluator()
         self.search_method_params = search_method_params
         assert search_method in ("smac", "grid", "random")
         if search_method in ("grid", "random"):
             initial_runs = 0
         self.initial_runs = initial_runs
         self.run_limit = run_limit
-        self.evaluator = TrainEvaluator()
+        self.evaluator = TrainEvaluator()  # todo 可选项
         self.search_method = search_method
-        self.evaluator.set_shp2model(self.shp2model)
         self.random_state = 0
         self.addition_info = {}
         self.resource_manager = None
@@ -54,11 +62,11 @@ class Tuner():
         if exit_processes is None:
             exit_processes = max(self.n_jobs // 3, 1)
         self.exit_processes = exit_processes
-        self.logger=get_logger(__name__)
 
     def __str__(self):
         return (
             f"hyperflow.Tuner("
+            f"evaluator={repr(self.evaluator_prototype.__name__)}, "
             f"search_method={repr(self.search_method)}, "
             f"run_limit={repr(self.run_limit)}, "
             f"initial_runs={repr(self.initial_runs)}, "
@@ -72,13 +80,18 @@ class Tuner():
     def set_random_state(self, random_state):
         self.random_state = random_state
 
-    def set_addition_info(self, addition_info):
-        self.addition_info = addition_info
+    # def set_addition_info(self, addition_info):
+    #     self.addition_info = addition_info
+
+    def hdl2shps(self, hdl: Dict):
+        hdl2shps = HDL2SHPS()
+        hdl2shps.set_task(self.ml_task)
+        return hdl2shps(hdl)
 
     def set_hdl(self, hdl: Dict):
         self.hdl = hdl
         # todo: 泛化ML管线后，可能存在多个preprocessing
-        self.shps: ConfigurationSpace = self.hdl2phps(hdl)
+        self.shps: ConfigurationSpace = self.hdl2shps(hdl)
         self.shps.seed(self.random_state)
 
     def set_resource_manager(self, resource_manager: ResourceManager):
@@ -90,7 +103,7 @@ class Tuner():
 
     def set_data_manager(self, data_manager: DataManager):
         self.data_manager = data_manager
-        self.ml_task=data_manager.ml_task
+        self.ml_task = data_manager.ml_task
 
     def design_initial_configs(self, n_jobs):
         if self.search_method == "smac":
@@ -110,26 +123,18 @@ class Tuner():
 
     def run(
             self,
-            data_manager: DataManager,
-            metric: Scorer,
-            all_scoring_functions: bool,
-            splitter,
             initial_configs,
-            should_store_intermediate_result
+            evaluator_params=frozendict(),
+            instance_id="",
+            rh_db_type="sqlite",
+            rh_db_params=frozendict(),
     ):
         # time.sleep(random.random())
         if not initial_configs:
             self.logger.warning("Haven't initial_configs. Return.")
             return
-        if hasattr(splitter, "random_state"):
-            setattr(splitter, "random_state", self.random_state)
-        self.evaluator.init_data(
-            data_manager,
-            metric,
-            all_scoring_functions,
-            splitter,
-            should_store_intermediate_result
-        )
+
+        self.evaluator.init_data(**evaluator_params)
 
         self.scenario = Scenario(
             {
@@ -137,13 +142,13 @@ class Tuner():
                 "runcount-limit": 1000,
                 "cs": self.shps,  # configuration space
                 "deterministic": "true",
-                "instances":[[self.resource_manager.task_id]]
+                "instances": [[instance_id]]
                 # todo : 如果是local，存在experiment，如果是其他文件系统，不输出smac
                 # "output_dir": self.resource_manager.smac_output_dir,
             },
             initial_runs=0,
-            db_type=self.resource_manager.db_type,
-            db_params=self.resource_manager.get_runhistory_db_params(),
+            db_type=rh_db_type,
+            db_params=rh_db_params,
             anneal_func=self.search_method_params.get("anneal_func")
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
@@ -162,112 +167,3 @@ class Tuner():
             if not should_continue:
                 self.logger.info(f"PID = {os.getpid()} is exiting.")
                 break
-
-    def shp2model(self, shp):
-        php2dhp = SHP2DHP()
-        dhp = php2dhp(shp)
-        preprocessor = self.create_preprocessor(dhp)
-        estimator = self.create_estimator(dhp)
-        pipeline = concat_pipeline(preprocessor, estimator)
-        self.logger.debug(pipeline, pipeline[-1].hyperparams)
-        return dhp, pipeline
-
-    def hdl2phps(self, hdl: Dict):
-        hdl2phps = HDL2SHPS()
-        hdl2phps.set_task(self.ml_task)
-        return hdl2phps(hdl)
-
-    def parse_key(self, key: str):
-        cnt = ""
-        ix = 0
-        for i, c in enumerate(key):
-            if c.isdigit():
-                cnt += c
-            else:
-                ix = i
-                break
-        cnt = int(cnt)
-        key = key[ix:]
-        pattern = re.compile(r"(\{.*\})")
-        match = pattern.search(key)
-        additional_info = {}
-        if match:
-            braces_content = match.group(1)
-            _to = braces_content[1:-1]
-            param_kvs = _to.split(",")
-            for param_kv in param_kvs:
-                k, v = param_kv.split("=")
-                additional_info[k] = v
-            key = pattern.sub("", key)
-        if "->" in key:
-            _from, _to = key.split("->")
-            in_feature_groups = _from
-            out_feature_groups = _to
-        else:
-            in_feature_groups, out_feature_groups = None, None
-        if not in_feature_groups:
-            in_feature_groups = None
-        if not out_feature_groups:
-            out_feature_groups = None
-        return in_feature_groups, out_feature_groups, additional_info
-
-    def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
-        preprocessing_dict: dict = dhp["preprocessing"]
-        pipeline_list = []
-        for key, value in preprocessing_dict.items():
-            name = key  # like: "cat->num"
-            in_feature_groups, out_feature_groups, outsideEdge_info = self.parse_key(key)
-            sub_dict = preprocessing_dict[name]
-            if sub_dict is None:
-                continue
-            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feature_groups, out_feature_groups,
-                                                 outsideEdge_info)
-            pipeline_list.extend(preprocessor)
-        if pipeline_list:
-            return GenericPipeline(pipeline_list)
-        else:
-            return None
-
-    def create_estimator(self, dhp: Dict) -> GenericPipeline:
-        # 根据超参构造一个估计器
-        return GenericPipeline(self.create_component(dhp["estimator"], "estimator", self.ml_task.role))
-
-    def _create_component(self, key1, key2, params):
-        cls = get_class_object_in_pipeline_components(key1, key2)
-        component = cls()
-        component.set_addition_info(self.addition_info)
-        component.update_hyperparams(params)
-        return component
-
-    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feature_groups="all", out_feature_groups="all",
-                         outsideEdge_info=None):
-        pipeline_list = []
-        assert phase in ("preprocessing", "estimator")
-        packages = list(sub_dhp.keys())[0]
-        params = sub_dhp[packages]
-        packages = packages.split("|")
-        grouped_params = group_dict_items_before_first_dot(params)
-        if len(packages) == 1:
-            if bool(grouped_params):
-                grouped_params[packages[0]] = grouped_params.pop("single")
-            else:
-                grouped_params[packages[0]] = {}
-        for package in packages[:-1]:
-            preprocessor = self._create_component("preprocessing", package, grouped_params[package])
-            preprocessor.in_feature_groups = in_feature_groups
-            preprocessor.out_feature_groups = in_feature_groups
-            pipeline_list.append([
-                package,
-                preprocessor
-            ])
-        key1 = "preprocessing" if phase == "preprocessing" else self.ml_task.mainTask
-        component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
-        component.in_feature_groups = in_feature_groups
-        component.out_feature_groups = out_feature_groups
-        if outsideEdge_info:
-            component.update_hyperparams(outsideEdge_info)
-        pipeline_list.append([
-            step_name,
-            component
-        ])
-        return pipeline_list

@@ -2,17 +2,21 @@ import datetime
 import math
 import os
 from copy import deepcopy
+from importlib import import_module
 from multiprocessing import Manager
-from typing import Union, Optional, Dict, List
+from typing import Union, Optional, Dict, List, Any
 
 import joblib
 import json5 as json
 import numpy as np
 import pandas as pd
+from frozendict import frozendict
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
-from hyperflow.ensemble.stack.builder import StackEnsembleBuilder
+from hyperflow.ensemble.base import EnsembleEstimator
+from hyperflow.ensemble.trained_data_fetcher import TrainedDataFetcher
+from hyperflow.ensemble.trials_fetcher import TrialsFetcher
 from hyperflow.hdl.hdl_constructor import HDL_Constructor
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.manager.resource_manager import ResourceManager
@@ -22,7 +26,8 @@ from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.concurrence import get_chunks
 from hyperflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from hyperflow.utils.dict import update_placeholder_from_other_dict
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
+from hyperflow.utils.packages import get_class_name_of_module
 
 
 class HyperFlowEstimator(BaseEstimator):
@@ -33,22 +38,13 @@ class HyperFlowEstimator(BaseEstimator):
             tuner: Union[Tuner, List[Tuner], None, dict] = None,
             hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
-            ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None,
+            # ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None,
             random_state=42
     ):
         # ---logger------------------------------------
         self.logger = get_logger(__name__)
         # ---random_state-----------------------------------
         self.random_state = random_state
-        # ---ensemble_builder-----------------------------------
-        if ensemble_builder is None:
-            self.logger.info("Using default StackEnsembleBuilder.")
-            ensemble_builder = StackEnsembleBuilder()
-        elif ensemble_builder == False:
-            self.logger.info("Not using EnsembleBuilder, will select the best estimator.")
-        else:
-            ensemble_builder = StackEnsembleBuilder(set_model=ensemble_builder)
-        self.ensemble_builder = ensemble_builder
         # ---tuners-----------------------------------
         if not tuner:
             tuner = Tuner()
@@ -76,16 +72,19 @@ class HyperFlowEstimator(BaseEstimator):
             X_test=None,
             y_test=None,
             column_descriptions: Optional[Dict] = None,
-            dataset_metadata=frozenset(),
+            dataset_metadata: dict = frozenset(),
             metric=None,
             all_scoring_functions=True,
             splitter=KFold(5, True, 42),
             specific_task_token="",
-            should_store_intermediate_result=False
+            should_store_intermediate_result=False,
+            additional_info: dict = frozendict(),
+            fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto"
 
     ):
         self.should_store_intermediate_result = should_store_intermediate_result
         dataset_metadata = dict(dataset_metadata)
+        additional_info = dict(additional_info)
         # build data_manager
         self.data_manager = DataManager(
             X, y, X_test, y_test, dataset_metadata, column_descriptions
@@ -141,10 +140,30 @@ class HyperFlowEstimator(BaseEstimator):
                 break
 
             if step == n_step - 1:
-                if self.ensemble_builder:
-                    self.estimator = self.fit_ensemble()
-                else:
+                if isinstance(fit_ensemble_params, str):
+                    if fit_ensemble_params == "auto":
+                        self.logger.info(f"'fit_ensemble_params' is 'auto', use default params to fit_ensemble_params.")
+                        self.estimator = self.fit_ensemble()
+                    else:
+                        raise NotImplementedError
+                elif isinstance(fit_ensemble_params, bool):
+                    if fit_ensemble_params:
+                        self.logger.info(f"'fit_ensemble_params' is True, use default params to fit_ensemble_params.")
+                        self.estimator = self.fit_ensemble()
+                    else:
+                        self.logger.info(
+                            f"'fit_ensemble_params' is False, don't fit_ensemble but use best trial as result.")
+                        self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
+                elif isinstance(fit_ensemble_params, dict):
+                    self.logger.info(
+                        f"'fit_ensemble_params' is specific: {fit_ensemble_params}.")
+                    self.estimator = self.fit_ensemble(**fit_ensemble_params)
+                elif fit_ensemble_params is None:
+                    self.logger.info(
+                        f"'fit_ensemble_params' is None, don't fit_ensemble but use best trial as result.")
                     self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
+                else:
+                    raise NotImplementedError
         return self
 
     def start_tuner(self, tuner: Tuner, hdl: dict):
@@ -155,7 +174,7 @@ class HyperFlowEstimator(BaseEstimator):
         tuner.set_hdl(hdl)  # just for get shps of tuner
         if estimate_config_space_numbers(tuner.shps) == 1:
             self.logger.info("HDL(Hyperparams Descriptions Language) is a constant space, using manual modeling.")
-            dhp, self.estimator = tuner.shp2model(tuner.shps.sample_configuration())
+            dhp, self.estimator = tuner.evaluator.shp2model(tuner.shps.sample_configuration())
             self.estimator.fit(self.data_manager.X_train, self.data_manager.y_train)
             return {"is_manual": True}
         n_jobs = tuner.n_jobs
@@ -197,15 +216,21 @@ class HyperFlowEstimator(BaseEstimator):
         tuner.set_resource_manager(resource_manager)
         replace_phps(tuner.shps, "random_state", int(random_state))
         tuner.shps.seed(random_state)
-        tuner.set_addition_info({})
         # todo : 增加 n_jobs ? 调研默认值
         tuner.run(
-            self.data_manager,
-            self.metric,
-            self.all_scoring_functions,
-            self.splitter,
-            initial_configs,
-            self.should_store_intermediate_result
+            initial_configs=initial_configs,
+            evaluator_params=dict(
+                random_state=random_state,
+                data_manager=self.data_manager,
+                metric=self.metric,
+                all_scoring_functions=self.all_scoring_functions,
+                splitter=self.splitter,
+                should_store_intermediate_result=self.should_store_intermediate_result,
+                resource_manager=resource_manager
+            ),
+            instance_id=resource_manager.task_id,
+            rh_db_type=resource_manager.db_type,
+            rh_db_params=resource_manager.get_runhistory_db_params()
         )
         if sync_dict:
             sync_dict[os.getpid()] = 1
@@ -214,28 +239,44 @@ class HyperFlowEstimator(BaseEstimator):
             self,
             task_id=None,
             hdl_id=None,
-
-
+            trials_fetcher="GetBestK",
+            trials_fetcher_params=frozendict(k=10),
+            ensemble_type="stack",
+            ensemble_params=frozendict(),
+            return_Xy_test=False
     ):
-        if not data_manager:
-            if hasattr(self, "data_manager"):
-                data_manager = self.data_manager
-            else:
-                if isinstance(dataset_paths, str):
-                    dataset_path = dataset_paths
-                else:
-                    dataset_path = dataset_paths[0]
-                data_manager = joblib.load(dataset_path + "/data_manager.bz2")
-        if not dataset_paths:
-            dataset_paths = self.resource_manager.datasets_dir
-        self.ensemble_builder.set_data(
-            data_manager,
-            dataset_paths,
-            self.resource_manager
-        )
-        self.ensemble_builder.init_data()
-        self.ensemble_estimator = self.ensemble_builder.build()
-        return self.ensemble_estimator
+        if task_id is None:
+            assert hasattr(self.resource_manager, "task_id") and self.resource_manager.task_id is not None
+            task_id = self.resource_manager.task_id
+        if hdl_id is None:
+            assert hasattr(self.resource_manager, "hdl_id") and self.resource_manager.hdl_id is not None
+            hdl_id = self.resource_manager.hdl_id
+        trials_fetcher_name = trials_fetcher
+        from hyperflow.ensemble import trials_fetcher
+        assert hasattr(trials_fetcher, trials_fetcher_name)
+        trials_fetcher_cls = getattr(trials_fetcher, trials_fetcher_name)
+        trials_fetcher: TrialsFetcher = trials_fetcher_cls(resource_manager=self.resource_manager, task_id=task_id,
+                                                           hdl_id=hdl_id,
+                                                           **trials_fetcher_params)
+        trial_ids = trials_fetcher.fetch()
+        estimator_list, y_true_indexes_list, y_preds_list = TrainedDataFetcher(
+            task_id, hdl_id, trial_ids, self.resource_manager).fetch()
+        ml_task, Xy_train, Xy_test = self.resource_manager.get_ensemble_needed_info(task_id, hdl_id)
+        y_true = Xy_train[1]
+        ensemble_estimator_package_name = f"hyperflow.ensemble.{ensemble_type}.{ml_task.role}"
+        ensemble_estimator_package = import_module(ensemble_estimator_package_name)
+        ensemble_estimator_class_name = get_class_name_of_module(ensemble_estimator_package_name)
+        ensemble_estimator_class = getattr(ensemble_estimator_package, ensemble_estimator_class_name)
+        ensemble_estimator: EnsembleEstimator = ensemble_estimator_class(**ensemble_params)
+        ensemble_estimator.fit_trained_data(estimator_list, y_true_indexes_list, y_preds_list, y_true)
+        self.ensemble_estimator = ensemble_estimator
+        if return_Xy_test:
+            return self.ensemble_estimator, Xy_test
+        else:
+            return self.ensemble_estimator
+
+    def auto_fit_ensemble(self):
+        pass
 
     def predict(self, X):
         return self.estimator.predict(X)

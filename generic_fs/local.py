@@ -49,4 +49,4 @@ class LocalFS(FileSystem):
         dump(data, path)
 
     def load_pickle(self, path):
-        load(path)
+        return load(path)

@@ -24,7 +24,7 @@ class RunHistoryDB():
         self.db_params = db_params
         self.Datebase = get_db_class_by_db_type(self.db_type)
         self.db: pw.Database = self.Datebase(**self.db_params)
-        self.logger=PickableLoggerAdapter(__name__)
+        self.logger = PickableLoggerAdapter(__name__)
         # --JSONField-----------------------------------------
         if self.db_type == "sqlite":
             from playhouse.sqlite_ext import JSONField
@@ -38,7 +38,6 @@ class RunHistoryDB():
         # -----------------------------------------------------
         self.Model: pw.Model = self.get_model()
         self.config_space: ConfigurationSpace = config_space
-
 
     def get_model(self) -> pw.Model:
         class Run_History(pw.Model):
@@ -54,7 +53,7 @@ class RunHistoryDB():
             status = pw.IntegerField(default=0)
             additional_info = pw.CharField(default="")
             origin = pw.IntegerField(default=0)
-            weight=pw.FloatField(default=0.0)
+            weight = pw.FloatField(default=0.0)
             pid = pw.IntegerField(default=os.getpid)
             timestamp = pw.DateTimeField(default=datetime.datetime.now)
 
@@ -88,7 +87,7 @@ class RunHistoryDB():
                           additional_info: dict = frozendict(),
                           origin: DataOrigin = DataOrigin.INTERNAL):
         config_id = get_id_of_config(config)
-        run_id = self.get_run_id(instance_id,config_id)
+        run_id = self.get_run_id(instance_id, config_id)
         if instance_id is None:
             instance_id = ""
         try:
@@ -125,7 +124,9 @@ class RunHistoryDB():
 
     def fetch_new_runhistory(self, is_init=False):
         if is_init:
-            self.Model.delete().where(self.Model.origin<0)
+            n_del = self.Model.delete().where(self.Model.origin < 0).execute()
+            if n_del > 0:
+                self.logger.info(f"Delete {n_del} invalid records in run_history database.")
             query = self.Model.select().where(self.Model.origin >= 0)
         else:
             query = self.Model.select().where(self.Model.pid != os.getpid()).where(self.Model.origin >= 0)
@@ -152,7 +153,7 @@ class RunHistoryDB():
                 additional_info = json.loads(additional_info)
             except Exception as e:
                 self.logger.error(f"{e}\nSet default to additional_info.")
-                additional_info={}
+                additional_info = {}
             self.runhistory.add(config, cost, time, StatusType(status), instance_id, seed, additional_info,
                                 DataOrigin(origin))
         self.timestamp = datetime.datetime.now()

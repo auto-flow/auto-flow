@@ -5,7 +5,7 @@ from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.utils.data import get_int_card
 from hyperflow.utils.dict import add_prefix_in_dict_keys
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
 
 
 class HDL_Constructor():

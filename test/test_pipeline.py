@@ -11,7 +11,7 @@ from hyperflow.pipeline.components.preprocessing.impute.fill_cat import FillCat
 from hyperflow.pipeline.components.preprocessing.impute.fill_num import FillNum
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
 
 
 class TestPipeline(unittest.TestCase):

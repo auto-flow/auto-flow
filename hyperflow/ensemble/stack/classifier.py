@@ -1,51 +1,30 @@
-from typing import List
-
 import numpy as np
 from scipy import sparse
-from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.base import ClassifierMixin
 
+from hyperflow.ensemble.stack.base import StackEstimator
 
-class StackingClassifier(BaseEstimator, ClassifierMixin):
+__all__=["StackClassifier"]
+
+class StackClassifier(StackEstimator, ClassifierMixin):
+    ml_task = "classification"
 
     def __init__(
             self,
-            meta_learner,
-            estimator_list: List,
-            y_true_indexes_list: List,
-            y_preds_list: List,
-            drop_last_proba=False,
+            meta_learner=None,
             use_features_in_secondary=False,
+            drop_last_proba=False,
             use_probas=True
     ):
-        self.y_preds_list = y_preds_list
-        self.y_true_indexes_list = y_true_indexes_list
-        self.models_list = estimator_list
+        super(StackClassifier, self).__init__(meta_learner, use_features_in_secondary)
         self.use_probas = use_probas
-        self.meta_learner = meta_learner
-        self.use_features_in_secondary = use_features_in_secondary
         self.drop_last_proba = drop_last_proba
-        self.build_prediction_list()
-
-    def build_prediction_list(self):
-        prediction_list = []
-        for y_true_indexes, y_preds in zip(self.y_true_indexes_list, self.y_preds_list):
-            prediction = np.zeros_like(np.vstack(y_preds))
-            for y_index, y_pred in zip(y_true_indexes, y_preds):
-                prediction[y_index] = y_pred
-            prediction_list.append(prediction)
-        self.prediction_list = prediction_list
-
-    def fit(self, X, y):
-        # todo ： 验证所有的 y_true_indexes 合法
-        # todo : 做完stack之后在验证集上的表现
-        meta_features = self.predict_meta_features(X, True)
-        self.meta_learner.fit(meta_features, y)
 
     def predict_meta_features(self, X, is_train):
 
         per_model_preds = []
 
-        for i, models in enumerate(self.models_list):
+        for i, models in enumerate(self.estimators_list):
             if is_train:
                 proba = self.prediction_list[i]
             else:
@@ -69,13 +48,6 @@ class StackingClassifier(BaseEstimator, ClassifierMixin):
             return (sparse.hstack((X, meta_features)))
         else:
             return (np.hstack((X, meta_features)))
-
-    def _do_predict(self, X, predict_fn):
-        meta_features = self.predict_meta_features(X, False)
-        return predict_fn(meta_features)
-
-    def predict(self, X):
-        return self._do_predict(X, self.meta_learner.predict)
 
     def predict_proba(self, X):
         return self._do_predict(X, self.meta_learner.predict_proba)

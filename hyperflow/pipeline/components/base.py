@@ -14,7 +14,7 @@ from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import densify
 from hyperflow.utils.dataframe import rectify_dtypes
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
 
 
 class HyperFlowComponent(BaseEstimator):

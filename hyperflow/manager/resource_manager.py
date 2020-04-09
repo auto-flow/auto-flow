@@ -3,7 +3,7 @@ import hashlib
 import os
 from copy import deepcopy
 from getpass import getuser
-from typing import Dict, Tuple, List, Union
+from typing import Dict, Tuple, List, Union, Any
 
 # import json5 as json
 import peewee as pw
@@ -20,7 +20,7 @@ from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.metrics import Scorer
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
 from hyperflow.utils.packages import find_components
 from hyperflow.utils.peewee import PickleFiled
 
@@ -134,6 +134,25 @@ class ResourceManager():
         if intermediate_result_path:
             self.file_system.dump_pickle(info["intermediate_result"], intermediate_result_path)
         return model_path, intermediate_result_path
+
+    def get_ensemble_needed_info(self, task_id, hdl_id) -> Tuple[MLTask, Any, Any]:
+        self.task_id = task_id
+        self.hdl_id = hdl_id
+        self.connect_tasks_db()
+        task_record = self.TasksModel.select().where(self.TasksModel.task_id == task_id)[0]
+        ml_task_str = task_record.ml_task
+        ml_task = eval(ml_task_str)
+        if self.persistent_mode == "fs":
+            Xy_train_path = task_record.Xy_train_path
+            Xy_train = self.file_system.load_pickle(Xy_train_path)
+            Xy_test_path = task_record.Xy_test_path
+            Xy_test = self.file_system.load_pickle(Xy_test_path)
+        elif self.persistent_mode == "db":
+            Xy_train = self.TasksModel.Xy_train
+            Xy_test = self.TasksModel.Xy_test
+        else:
+            raise NotImplementedError
+        return ml_task, Xy_train, Xy_test
 
     def load_best_estimator(self, ml_task: MLTask):
         # todo: 最后调用分析程序？
@@ -379,32 +398,10 @@ class ResourceManager():
         self.connect_tasks_db()
         Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
         Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
-        Xy_train = [data_manager.X_train, data_manager.y_train]
-        Xy_test = [data_manager.X_test, data_manager.y_test]
-        if self.persistent_mode == "fs":
-            Xy_train_path = self.file_system.join(self.datasets_dir,
-                                                  f"{Xy_train_hash}.{self.compress_suffix}")
-            self.file_system.dump_pickle(Xy_train, Xy_train_path)
-            Xy_train_bin = 0
-        else:
-            Xy_train_path = ""
-            Xy_train_bin = Xy_train
-        if Xy_test_hash:
-            if self.persistent_mode == "fs":
-                Xy_test_path = self.file_system.join(self.datasets_dir,
-                                                     f"{Xy_test_hash}.{self.compress_suffix}")
-                self.file_system.dump_pickle(Xy_test, Xy_test_path)
-                Xy_test_bin = 0
-            else:
-                Xy_test_path = ""
-                Xy_test_bin = Xy_test
-        else:
-            Xy_test_path = ""
-            Xy_test_bin = 0
         metric_str = metric.name
         splitter_str = str(splitter)
         ml_task_str = str(data_manager.ml_task)
-        # task_id
+        # ---task_id----------------------------------------------------
         m = hashlib.md5()
         get_hash_of_Xy(data_manager.X_train, data_manager.y_train, m)
         get_hash_of_Xy(data_manager.X_test, data_manager.y_test, m)
@@ -415,7 +412,33 @@ class ResourceManager():
         task_hash = m.hexdigest()
         task_id = "task_" + task_hash
         records = self.TasksModel.select().where(self.TasksModel.task_id == task_id)
+        # ---store_task_record----------------------------------------------------
         if len(records) == 0:
+            # ---store_datasets----------------------------------------------------
+            Xy_train = [data_manager.X_train, data_manager.y_train]
+            Xy_test = [data_manager.X_test, data_manager.y_test]
+            if self.persistent_mode == "fs":
+                Xy_train_path = self.file_system.join(self.datasets_dir,
+                                                      f"{Xy_train_hash}.{self.compress_suffix}")
+                self.file_system.dump_pickle(Xy_train, Xy_train_path)
+                Xy_train_bin = 0
+            else:
+                Xy_train_path = ""
+                Xy_train_bin = Xy_train
+            if Xy_test_hash:
+                if self.persistent_mode == "fs":
+                    Xy_test_path = self.file_system.join(self.datasets_dir,
+                                                         f"{Xy_test_hash}.{self.compress_suffix}")
+                    self.file_system.dump_pickle(Xy_test, Xy_test_path)
+                    Xy_test_bin = 0
+                else:
+                    Xy_test_path = ""
+                    Xy_test_bin = Xy_test
+            else:
+                Xy_test_path = ""
+                Xy_test_bin = 0
+        # if len(records) == 0:
+
             self.TasksModel.create(
                 task_id=task_id,
                 metric=metric_str,
@@ -557,11 +580,11 @@ class ResourceManager():
             experiment_id=self.experiment_id,
             estimator=info.get("estimator", ""),
             loss=info.get("loss", 65535),
-            losses=info.get("losses",[]),
+            losses=info.get("losses", []),
             test_loss=info.get("test_loss", 65535),
-            all_score=info.get("all_score",{}),
-            all_scores=info.get("all_scores",[]),
-            test_all_score=info.get("test_all_score",{}),
+            all_score=info.get("all_score", {}),
+            all_scores=info.get("all_scores", []),
+            test_all_score=info.get("test_all_score", {}),
             models_bin=models_bin,
             models_path=models_path,
             y_true_indexes=info.get("y_true_indexes"),
@@ -569,7 +592,7 @@ class ResourceManager():
             y_test_true=info.get("y_test_true"),
             y_test_pred=info.get("y_test_pred"),
             smac_hyper_param=info.get("program_hyper_param"),
-            dict_hyper_param=info.get("dict_hyper_param",{}),
+            dict_hyper_param=info.get("dict_hyper_param", {}),
             cost_time=info.get("cost_time", 65535),
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),

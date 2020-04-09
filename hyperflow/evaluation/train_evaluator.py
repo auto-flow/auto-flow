@@ -1,34 +1,46 @@
+import re
 from collections import defaultdict
 from contextlib import redirect_stderr
 from io import StringIO
 from time import time
+from typing import Dict, Optional
 
 import numpy as np
 from ConfigSpace import Configuration
 
 from dsmac.runhistory.utils import get_id_of_config
 from hyperflow.constants import MLTask
-from hyperflow.manager.resource_manager import ResourceManager
+from hyperflow.evaluation.base import BaseEvaluator
 from hyperflow.manager.data_manager import DataManager
+from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.metrics import Scorer, calculate_score
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
+from hyperflow.shp2dhp.shp2dhp import SHP2DHP
 from hyperflow.utils.data import mean_predicts, vote_predicts
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.dict import group_dict_items_before_first_dot
+from hyperflow.utils.logging import get_logger
+from hyperflow.utils.packages import get_class_object_in_pipeline_components
+from hyperflow.utils.pipeline import concat_pipeline
 
 
-class TrainEvaluator():
-    def __init__(self):
-        self.resource_manager = None
+class TrainEvaluator(BaseEvaluator):
+    # def __init__(self):
+    #     self.resource_manager = None
 
     def init_data(
             self,
+            random_state,
             data_manager: DataManager,
             metric: Scorer,
             all_scoring_functions: bool,
             splitter,
             should_store_intermediate_result: bool,
+            resource_manager: ResourceManager
     ):
+        self.random_state = random_state
+        if hasattr(splitter, "random_state"):
+            setattr(splitter, "random_state", self.random_state)
         self.splitter = splitter
         self.data_manager = data_manager
         self.X_train = self.data_manager.X_train
@@ -46,8 +58,9 @@ class TrainEvaluator():
         else:
             self.predict_function = self._predict_proba
 
-        logger_name = self.__class__.__name__
-        self.logger = get_logger(logger_name)
+        self.logger = get_logger(__name__)
+        self.resource_manager = resource_manager
+        # ---member variable----
 
     def loss(self, y_true, y_hat):
         all_scoring_functions = (
@@ -75,14 +88,14 @@ class TrainEvaluator():
         self.resource_manager = resource_manager
 
     def _predict_proba(self, X, model):
-        Y_pred = model.predict_proba(X)
-        return Y_pred
+        y_pred = model.predict_proba(X)
+        return y_pred
 
     def _predict_regression(self, X, model):
-        Y_pred = model.predict(X)
-        if len(Y_pred.shape) == 1:
-            Y_pred = Y_pred.reshape((-1, 1))
-        return Y_pred
+        y_pred = model.predict(X)
+        if len(y_pred.shape) == 1:
+            y_pred = y_pred.reshape((-1, 1))
+        return y_pred
 
     def get_Xy(self):
         return self.X_train, self.y_train, self.X_test, self.y_test
@@ -157,9 +170,6 @@ class TrainEvaluator():
         info["warning_info"] = warning_info.getvalue()
         return final_loss, info
 
-    def set_shp2model(self, shp2model):
-        self.shp2model = shp2model
-
     def __call__(self, shp: Configuration):
         # 1. 将php变成model
         config_id = get_id_of_config(shp)
@@ -180,3 +190,107 @@ class TrainEvaluator():
         info["cost_time"] = cost_time
         self.resource_manager.insert_to_trials_db(info)
         return loss
+
+    def shp2model(self, shp):
+        shp2dhp = SHP2DHP()
+        dhp = shp2dhp(shp)
+        preprocessor = self.create_preprocessor(dhp)
+        estimator = self.create_estimator(dhp)
+        pipeline = concat_pipeline(preprocessor, estimator)
+        self.logger.debug(pipeline, pipeline[-1].hyperparams)
+        return dhp, pipeline
+
+    def parse_key(self, key: str):
+        cnt = ""
+        ix = 0
+        for i, c in enumerate(key):
+            if c.isdigit():
+                cnt += c
+            else:
+                ix = i
+                break
+        cnt = int(cnt)
+        key = key[ix:]
+        pattern = re.compile(r"(\{.*\})")
+        match = pattern.search(key)
+        additional_info = {}
+        if match:
+            braces_content = match.group(1)
+            _to = braces_content[1:-1]
+            param_kvs = _to.split(",")
+            for param_kv in param_kvs:
+                k, v = param_kv.split("=")
+                additional_info[k] = v
+            key = pattern.sub("", key)
+        if "->" in key:
+            _from, _to = key.split("->")
+            in_feature_groups = _from
+            out_feature_groups = _to
+        else:
+            in_feature_groups, out_feature_groups = None, None
+        if not in_feature_groups:
+            in_feature_groups = None
+        if not out_feature_groups:
+            out_feature_groups = None
+        return in_feature_groups, out_feature_groups, additional_info
+
+    def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
+        preprocessing_dict: dict = dhp["preprocessing"]
+        pipeline_list = []
+        for key, value in preprocessing_dict.items():
+            name = key  # like: "cat->num"
+            in_feature_groups, out_feature_groups, outsideEdge_info = self.parse_key(key)
+            sub_dict = preprocessing_dict[name]
+            if sub_dict is None:
+                continue
+            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feature_groups, out_feature_groups,
+                                                 outsideEdge_info)
+            pipeline_list.extend(preprocessor)
+        if pipeline_list:
+            return GenericPipeline(pipeline_list)
+        else:
+            return None
+
+    def create_estimator(self, dhp: Dict) -> GenericPipeline:
+        # 根据超参构造一个估计器
+        return GenericPipeline(self.create_component(dhp["estimator"], "estimator", self.ml_task.role))
+
+    def _create_component(self, key1, key2, params):
+        cls = get_class_object_in_pipeline_components(key1, key2)
+        component = cls()
+        # component.set_addition_info(self.addition_info)
+        component.update_hyperparams(params)
+        return component
+
+    def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feature_groups="all", out_feature_groups="all",
+                         outsideEdge_info=None):
+        pipeline_list = []
+        assert phase in ("preprocessing", "estimator")
+        packages = list(sub_dhp.keys())[0]
+        params = sub_dhp[packages]
+        packages = packages.split("|")
+        grouped_params = group_dict_items_before_first_dot(params)
+        if len(packages) == 1:
+            if bool(grouped_params):
+                grouped_params[packages[0]] = grouped_params.pop("single")
+            else:
+                grouped_params[packages[0]] = {}
+        for package in packages[:-1]:
+            preprocessor = self._create_component("preprocessing", package, grouped_params[package])
+            preprocessor.in_feature_groups = in_feature_groups
+            preprocessor.out_feature_groups = in_feature_groups
+            pipeline_list.append([
+                package,
+                preprocessor
+            ])
+        key1 = "preprocessing" if phase == "preprocessing" else self.ml_task.mainTask
+        component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
+        component.in_feature_groups = in_feature_groups
+        component.out_feature_groups = out_feature_groups
+        if outsideEdge_info:
+            component.update_hyperparams(outsideEdge_info)
+        pipeline_list.append([
+            step_name,
+            component
+        ])
+        return pipeline_list

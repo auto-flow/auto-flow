@@ -14,7 +14,7 @@ from hyperopt import fmin, tpe, hp
 import hyperflow.hdl.smac as smac_hdl
 from hyperflow.constants import MLTask
 from hyperflow.hdl.utils import is_hdl_bottom
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
 from hyperflow.utils.packages import get_class_name_of_module
 
 

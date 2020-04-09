@@ -6,7 +6,7 @@ import pandas as pd
 from pandas._typing import FrameOrSeries
 from pandas.core.generic import bool_t
 
-from hyperflow.utils.logging_ import get_logger
+from hyperflow.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
