@@ -233,6 +233,7 @@ class SMAC4AC(object):
                 file_system=scenario.file_system,
                 db_type=scenario.db_type,
                 db_params=scenario.db_params,
+                db_table_name=scenario.db_table_name
             )
         elif inspect.isclass(runhistory):
             runhistory = runhistory(**runhistory_def_kwargs)

@@ -102,8 +102,8 @@ class HyperFlowEstimator(BaseEstimator):
                 raise NotImplementedError()
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_to_tasks_db(self.data_manager, metric, splitter, specific_task_token)
-        self.resource_manager.close_tasks_db()
+        self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter, specific_task_token)
+        self.resource_manager.close_tasks_table()
         # store other params
         self.all_scoring_functions = all_scoring_functions
         self.splitter = splitter
@@ -124,16 +124,16 @@ class HyperFlowEstimator(BaseEstimator):
             else:
                 hdl = raw_hdl
             # get hdl_id, and insert record into "{task_id}.hdls" database
-            self.resource_manager.insert_to_hdls_db(hdl)
-            self.resource_manager.close_hdls_db()
+            self.resource_manager.insert_to_hdls_table(hdl)
+            self.resource_manager.close_hdls_table()
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
-            self.resource_manager.insert_to_experiments_db(general_experiment_timestamp, current_experiment_timestamp,
-                                                           self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
-                                                           self.tuners, tuner, all_scoring_functions, self.data_manager,
-                                                           column_descriptions,
-                                                           dataset_metadata, metric, splitter,
-                                                           should_store_intermediate_result)
-            self.resource_manager.close_experiments_db()
+            self.resource_manager.insert_to_experiments_table(general_experiment_timestamp, current_experiment_timestamp,
+                                                              self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
+                                                              self.tuners, tuner, all_scoring_functions, self.data_manager,
+                                                              column_descriptions,
+                                                              dataset_metadata, metric, splitter,
+                                                              should_store_intermediate_result)
+            self.resource_manager.close_experiments_table()
 
             result = self.start_tuner(tuner, hdl)
             if result["is_manual"] == True:
@@ -190,7 +190,7 @@ class HyperFlowEstimator(BaseEstimator):
             sync_dict["exit_processes"] = tuner.exit_processes
         else:
             sync_dict = None
-        self.resource_manager.close_trials_db()
+        self.resource_manager.close_trials_table()
         self.resource_manager.clear_pid_list()
         self.resource_manager.close_redis()
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
@@ -230,7 +230,8 @@ class HyperFlowEstimator(BaseEstimator):
             ),
             instance_id=resource_manager.task_id,
             rh_db_type=resource_manager.db_type,
-            rh_db_params=resource_manager.get_runhistory_db_params()
+            rh_db_params=resource_manager.runhistory_db_params,
+            rh_db_table_name=resource_manager.runhistory_table_name
         )
         if sync_dict:
             sync_dict[os.getpid()] = 1

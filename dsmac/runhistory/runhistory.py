@@ -3,6 +3,7 @@ import json
 import typing
 
 import numpy as np
+from frozendict import frozendict
 
 from dsmac.configspace import Configuration, ConfigurationSpace
 from dsmac.runhistory.runhistory_db import RunHistoryDB
@@ -49,7 +50,8 @@ class RunHistory(object):
             file_system=LocalFS(),
             config_space=None,
             db_type="sqlite",
-            db_params=None,
+            db_params=frozendict(),
+            db_table_name="runhistory"
     ) -> None:
         """Constructor
 
@@ -62,7 +64,7 @@ class RunHistory(object):
             algorithm-instance-seed were measured
             multiple times
         """
-        self.db: RunHistoryDB = RunHistoryDB(config_space, self, db_type, db_params)
+        self.db: RunHistoryDB = RunHistoryDB(config_space, self, db_type, db_params, db_table_name)
         self.file_system = file_system
         self.logger = PickableLoggerAdapter(
             self.__module__ + "." + self.__class__.__name__

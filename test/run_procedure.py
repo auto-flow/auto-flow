@@ -11,7 +11,7 @@ df_train = df.iloc[train_ix, :]
 df_test = df.iloc[test_ix, :]
 
 tuner = Tuner(
-    initial_runs=0,
+    initial_runs=10,
     run_limit=50,
     n_jobs=1,
     search_method_params={"anneal_func": "lambda x:1*(1/(-(3*(x-1))))"}

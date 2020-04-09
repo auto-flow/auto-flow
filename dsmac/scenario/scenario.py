@@ -5,9 +5,9 @@ import typing
 import numpy as np
 
 from dsmac.utils.io.cmd_reader import CMDReader
-from generic_fs import HDFS, LocalFS
 from dsmac.utils.io.input_reader import InputReader
 from dsmac.utils.io.output_writer import OutputWriter
+from generic_fs import HDFS, LocalFS
 
 __author__ = "Marius Lindauer, Matthias Feurer, Aaron Kimmig"
 __copyright__ = "Copyright 2016, ML4AAD"
@@ -30,10 +30,11 @@ class Scenario(object):
             self, scenario=None, cmd_options: dict = None,
             runtime='local', runtime_config=None,
             initial_runs=20,
-            filter_callback: typing.Optional[typing.Callable]=None,
-            after_run_callback: typing.Optional[typing.Callable]=None,
-            db_type = "sqlite",
-            db_params = None,
+            filter_callback: typing.Optional[typing.Callable] = None,
+            after_run_callback: typing.Optional[typing.Callable] = None,
+            db_type="sqlite",
+            db_params=None,
+            db_table_name="runhistory",
             anneal_func=None
     ):
         """ Creates a scenario-object. The output_dir will be
@@ -53,16 +54,17 @@ class Scenario(object):
         """
         self.logger = logging.getLogger(
             self.__module__ + '.' + self.__class__.__name__)
-        if isinstance(anneal_func,str):
+        if isinstance(anneal_func, str):
             try:
-                anneal_func=eval(anneal_func)
+                anneal_func = eval(anneal_func)
             except Exception as e:
-                self.logger.error("Can not eval anneal_func\n"+str(e))
-                anneal_func=None
+                self.logger.error("Can not eval anneal_func\n" + str(e))
+                anneal_func = None
 
         self.anneal_func = anneal_func
         self.db_params = db_params
         self.db_type = db_type
+        self.db_table_name = db_table_name
         self.after_run_callback = after_run_callback
         self.filter_callback = filter_callback
         self.initial_runs = initial_runs

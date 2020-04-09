@@ -188,7 +188,7 @@ class TrainEvaluator(BaseEvaluator):
         estimator = list(dhp.get("estimator", {"unk": ""}).keys())[0]
         info["estimator"] = estimator
         info["cost_time"] = cost_time
-        self.resource_manager.insert_to_trials_db(info)
+        self.resource_manager.insert_to_trials_table(info)
         return loss
 
     def shp2model(self, shp):

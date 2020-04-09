@@ -17,8 +17,9 @@ from generic_fs.utils import get_db_class_by_db_type
 class RunHistoryDB():
 
     def __init__(self, config_space: ConfigurationSpace, runhistory, db_type="sqlite",
-                 db_params=frozendict()):
+                 db_params=frozendict(), db_table_name="runhistory"):
 
+        self.db_table_name = db_table_name
         self.runhistory = runhistory
         self.db_type = db_type
         self.db_params = db_params
@@ -59,6 +60,7 @@ class RunHistoryDB():
 
             class Meta:
                 database = self.db
+                table_name = self.db_table_name
 
         self.db.create_tables([Run_History])
         return Run_History

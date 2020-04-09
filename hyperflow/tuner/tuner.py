@@ -128,6 +128,7 @@ class Tuner():
             instance_id="",
             rh_db_type="sqlite",
             rh_db_params=frozendict(),
+            rh_db_table_name="runhistory"
     ):
         # time.sleep(random.random())
         if not initial_configs:
@@ -149,6 +150,7 @@ class Tuner():
             initial_runs=0,
             db_type=rh_db_type,
             db_params=rh_db_params,
+            db_table_name=rh_db_table_name,
             anneal_func=self.search_method_params.get("anneal_func")
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数

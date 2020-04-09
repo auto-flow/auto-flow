@@ -106,9 +106,6 @@ class ResourceManager():
             from playhouse.mysql_ext import JSONField
             self.JSONField = JSONField
 
-    def get_runhistory_db_params(self):
-        return self.update_db_params(self.get_trials_db_name())
-
     def update_db_params(self, database):
         db_params = dict(self.db_params)
         if self.db_type == "sqlite":
@@ -120,6 +117,21 @@ class ResourceManager():
         else:
             raise NotImplementedError
         return db_params
+
+    def estimate_new_id(self, Dataset, id_field):
+        try:
+            records = Dataset.select(getattr(Dataset, id_field)). \
+                where(getattr(Dataset, id_field)). \
+                order_by(-getattr(Dataset, id_field)). \
+                limit(1)
+            if len(records) == 0:
+                estimated_id = 1
+            else:
+                estimated_id = getattr(records[0], id_field) + 1
+        except Exception as e:
+            self.logger.error(f"Database Error:\n{e}")
+            estimated_id = 1
+        return estimated_id
 
     def persistent_evaluated_model(self, info: Dict, trial_id) -> Tuple[str, str]:
         self.trial_dir = self.file_system.join(self.parent_trials_dir, self.task_id, self.hdl_id)
@@ -138,7 +150,7 @@ class ResourceManager():
     def get_ensemble_needed_info(self, task_id, hdl_id) -> Tuple[MLTask, Any, Any]:
         self.task_id = task_id
         self.hdl_id = hdl_id
-        self.connect_tasks_db()
+        self.init_tasks_table()
         task_record = self.TasksModel.select().where(self.TasksModel.task_id == task_id)[0]
         ml_task_str = task_record.ml_task
         ml_task = eval(ml_task_str)
@@ -156,7 +168,7 @@ class ResourceManager():
 
     def load_best_estimator(self, ml_task: MLTask):
         # todo: 最后调用分析程序？
-        self.connect_trials_db()
+        self.init_trials_table()
         record = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
         if self.persistent_mode == "fs":
             models = self.file_system.load_pickle(record.models_path)
@@ -174,7 +186,7 @@ class ResourceManager():
         return record.dict_hyper_param
 
     def get_best_k_trials(self, k):
-        self.connect_trials_db()
+        self.init_trials_table()
         trial_ids = []
         records = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
         for record in records:
@@ -182,7 +194,7 @@ class ResourceManager():
         return trial_ids
 
     def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
-        self.connect_trials_db()
+        self.init_trials_table()
         records = self.TrialsModel.select().where(self.TrialsModel.trial_id << trials)
         estimator_list = []
         y_true_indexes_list = []
@@ -203,6 +215,26 @@ class ResourceManager():
 
     def set_is_master(self, is_master):
         self.is_master = is_master
+
+    # ----------runhistory------------------------------------------------------------------
+    @property
+    def runhistory_db_params(self):
+        return self.update_db_params(self.current_tasks_db_name)
+
+    @property
+    def runhistory_table_name(self):
+        return f"runhistory_{self.hdl_id}"
+
+    # ----------database name------------------------------------------------------------------
+
+    @property
+    def meta_records_db_name(self):
+        return "meta_records"
+
+    @property
+    def current_tasks_db_name(self):
+        # return f"{self.task_id}-{self.hdl_id}"
+        return f"task_{self.task_id}"
 
     # ----------redis------------------------------------------------------------------
 
@@ -281,22 +313,7 @@ class ResourceManager():
         self.experiments_db.create_tables([Experiments])
         return Experiments
 
-    def estimate_new_id(self, Dataset, id_field):
-        try:
-            records = Dataset.select(getattr(Dataset, id_field)). \
-                where(getattr(Dataset, id_field)). \
-                order_by(-getattr(Dataset, id_field)). \
-                limit(1)
-            if len(records) == 0:
-                estimated_id = 1
-            else:
-                estimated_id = getattr(records[0], id_field) + 1
-        except Exception as e:
-            self.logger.error(f"Database Error:\n{e}")
-            estimated_id = 1
-        return estimated_id
-
-    def insert_to_experiments_db(
+    def insert_to_experiments_table(
             self,
             general_experiment_timestamp,
             current_experiment_timestamp,
@@ -314,7 +331,7 @@ class ResourceManager():
             splitter,
             should_store_intermediate_result
     ):
-        self.connect_experiments_db()
+        self.init_experiments_table()
         # estimate new experiment_id
         experiment_id = self.estimate_new_id(self.ExperimentsModel, "experiment_id")
         # todo: 是否需要删除data_manager的Xy
@@ -358,14 +375,14 @@ class ResourceManager():
             self.logger.warning("fetched_experiment_id != experiment_id")
         self.experiment_id = experiment_id
 
-    def connect_experiments_db(self):
+    def init_experiments_table(self):
         if self.is_init_experiments_db:
             return
         self.is_init_experiments_db = True
-        self.experiments_db: pw.Database = self.Datebase(**self.update_db_params("experiments"))
+        self.experiments_db: pw.Database = self.Datebase(**self.update_db_params(self.meta_records_db_name))
         self.ExperimentsModel = self.get_experiments_model()
 
-    def close_experiments_db(self):
+    def close_experiments_table(self):
         self.is_init_experiments_db = False
         self.experiments_db = None
         self.ExperimentsModel = None
@@ -394,8 +411,8 @@ class ResourceManager():
         self.tasks_db.create_tables([Tasks])
         return Tasks
 
-    def insert_to_tasks_db(self, data_manager: DataManager, metric: Scorer, splitter, specific_task_token):
-        self.connect_tasks_db()
+    def insert_to_tasks_table(self, data_manager: DataManager, metric: Scorer, splitter, specific_task_token):
+        self.init_tasks_table()
         Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
         Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
         metric_str = metric.name
@@ -410,7 +427,7 @@ class ResourceManager():
         get_hash_of_str(ml_task_str, m)
         get_hash_of_str(specific_task_token, m)
         task_hash = m.hexdigest()
-        task_id = "task_" + task_hash
+        task_id = task_hash
         records = self.TasksModel.select().where(self.TasksModel.task_id == task_id)
         # ---store_task_record----------------------------------------------------
         if len(records) == 0:
@@ -437,7 +454,7 @@ class ResourceManager():
             else:
                 Xy_test_path = ""
                 Xy_test_bin = 0
-        # if len(records) == 0:
+            # if len(records) == 0:
 
             self.TasksModel.create(
                 task_id=task_id,
@@ -457,14 +474,14 @@ class ResourceManager():
             )
         self.task_id = task_id
 
-    def connect_tasks_db(self):
+    def init_tasks_table(self):
         if self.is_init_tasks_db:
             return
         self.is_init_tasks_db = True
-        self.tasks_db: pw.Database = self.Datebase(**self.update_db_params("tasks"))
+        self.tasks_db: pw.Database = self.Datebase(**self.update_db_params(self.meta_records_db_name))
         self.TasksModel = self.get_tasks_model()
 
-    def close_tasks_db(self):
+    def close_tasks_table(self):
         self.is_init_tasks_db = False
         self.tasks_db = None
         self.TasksModel = None
@@ -481,10 +498,10 @@ class ResourceManager():
         self.hdls_db.create_tables([HDLs])
         return HDLs
 
-    def insert_to_hdls_db(self, hdl):
-        self.connect_hdls_db()
+    def insert_to_hdls_table(self, hdl):
+        self.init_hdls_table()
         hdl_hash = get_hash_of_dict(hdl)
-        hdl_id = "hdl_" + hdl_hash
+        hdl_id = hdl_hash
         records = self.HDLsModel.select().where(self.HDLsModel.hdl_id == hdl_id)
         if len(records) == 0:
             self.HDLsModel.create(
@@ -493,21 +510,19 @@ class ResourceManager():
             )
         self.hdl_id = hdl_id
 
-    def connect_hdls_db(self):
+    def init_hdls_table(self):
         if self.is_init_hdls_db:
             return
         self.is_init_hdls_db = True
-        self.hdls_db: pw.Database = self.Datebase(**self.update_db_params(self.task_id))
+        self.hdls_db: pw.Database = self.Datebase(**self.update_db_params(self.current_tasks_db_name))
         self.HDLsModel = self.get_hdls_model()
 
-    def close_hdls_db(self):
+    def close_hdls_table(self):
         self.is_init_hdls_db = False
         self.hdls_db = None
         self.HDLsModel = None
 
     # ----------trials_model------------------------------------------------------------------
-    def get_trials_db_name(self):
-        return f"{self.task_id}-{self.hdl_id}"
 
     def get_trials_model(self) -> pw.Model:
         class Trials(pw.Model):
@@ -547,20 +562,20 @@ class ResourceManager():
         self.trials_db.create_tables([Trials])
         return Trials
 
-    def connect_trials_db(self):
+    def init_trials_table(self):
         if self.is_init_trials_db:
             return
         self.is_init_trials_db = True
-        self.trials_db: pw.Database = self.Datebase(**self.update_db_params(self.get_trials_db_name()))
+        self.trials_db: pw.Database = self.Datebase(**self.update_db_params(self.current_tasks_db_name))
         self.TrialsModel = self.get_trials_model()
 
-    def close_trials_db(self):
+    def close_trials_table(self):
         self.is_init_trials_db = False
         self.trials_db = None
         self.TrialsModel = None
 
-    def insert_to_trials_db(self, info: Dict):
-        self.connect_trials_db()
+    def insert_to_trials_table(self, info: Dict):
+        self.init_trials_table()
         config_id = info.get("config_id")
         if self.persistent_mode == "fs":
             # todo: 考虑更特殊的情况，不同的任务下，相同的配置
@@ -613,7 +628,7 @@ class ResourceManager():
         # master segment
         if not self.is_master:
             return True
-        self.connect_trials_db()
+        self.init_trials_table()
         estimators = []
         for record in self.TrialsModel.select().group_by(self.TrialsModel.estimator):
             estimators.append(record.estimator)
@@ -634,7 +649,7 @@ class ResourceManager():
 if __name__ == '__main__':
     rm = ResourceManager("/home/tqc/PycharmProjects/hyperflow/test/test_db")
     rm.init_dataset_path("default_dataset_name")
-    rm.connect_trials_db()
+    rm.init_trials_table()
     estimators = []
     for record in rm.TrialsModel.select().group_by(rm.TrialsModel.estimator):
         estimators.append(record.estimator)
