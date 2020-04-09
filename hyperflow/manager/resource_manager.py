@@ -295,7 +295,7 @@ class ResourceManager():
             hdl = self.JSONField(default={})
             tuners = self.JSONField(default=[])
             tuner = pw.TextField(default="")
-            all_scoring_functions = pw.BooleanField(default=True)
+            should_calc_all_metric = pw.BooleanField(default=True)
             data_manager_bin = PickleFiled(default=0)
             data_manager_path = pw.TextField(default="")
             column_descriptions = self.JSONField(default={})
@@ -305,6 +305,8 @@ class ResourceManager():
             splitter = pw.CharField(default="")
             ml_task = pw.CharField(default="")
             should_store_intermediate_result = pw.BooleanField(default=False)
+            fit_ensemble_params = pw.TextField(default="auto")
+            additional_info=self.JSONField(default={})
             user = pw.CharField(default=getuser)
 
             class Meta:
@@ -323,18 +325,25 @@ class ResourceManager():
             hdl,
             tuners,
             tuner,
-            all_scoring_functions,
+            should_calc_all_metric,
             data_manager,
             column_descriptions,
             dataset_metadata,
             metric,
             splitter,
-            should_store_intermediate_result
+            should_store_intermediate_result,
+            fit_ensemble_params,
+            additional_info
     ):
         self.init_experiments_table()
         # estimate new experiment_id
         experiment_id = self.estimate_new_id(self.ExperimentsModel, "experiment_id")
         # todo: 是否需要删除data_manager的Xy
+        data_manager = deepcopy(data_manager)
+        data_manager.X_train = None
+        data_manager.X_test = None
+        data_manager.y_train = None
+        data_manager.y_test = None
         if self.persistent_mode == "fs":
             self.experiment_dir = self.file_system.join(self.parent_experiments_dir, str(experiment_id))
             self.file_system.mkdir(self.experiment_dir)
@@ -343,11 +352,7 @@ class ResourceManager():
             self.file_system.dump_pickle(data_manager, data_manager_path)
         else:
             data_manager_path = ""
-            data_manager_bin = deepcopy(data_manager)
-            data_manager_bin.X_train = None
-            data_manager_bin.X_test = None
-            data_manager_bin.y_train = None
-            data_manager_bin.y_test = None
+            data_manager_bin=data_manager
         experiment_record = self.ExperimentsModel.create(
             general_experiment_timestamp=general_experiment_timestamp,
             current_experiment_timestamp=current_experiment_timestamp,
@@ -359,7 +364,7 @@ class ResourceManager():
             hdl=hdl,
             tuners=[str(item) for item in tuners],
             tuner=str(tuner),
-            all_scoring_functions=all_scoring_functions,
+            should_calc_all_metric=should_calc_all_metric,
             data_manager_bin=data_manager_bin,
             data_manager_path=data_manager_path,
             column_descriptions=column_descriptions,
@@ -368,7 +373,9 @@ class ResourceManager():
             metric=metric.name,
             splitter=str(splitter),
             ml_task=str(data_manager.ml_task),
-            should_store_intermediate_result=should_store_intermediate_result
+            should_store_intermediate_result=should_store_intermediate_result,
+            fit_ensemble_params=str(fit_ensemble_params),
+            additional_info=additional_info
         )
         fetched_experiment_id = experiment_record.experiment_id
         if fetched_experiment_id != experiment_id:

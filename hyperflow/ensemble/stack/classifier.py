@@ -4,10 +4,11 @@ from sklearn.base import ClassifierMixin
 
 from hyperflow.ensemble.stack.base import StackEstimator
 
-__all__=["StackClassifier"]
+__all__ = ["StackClassifier"]
+
 
 class StackClassifier(StackEstimator, ClassifierMixin):
-    ml_task = "classification"
+    mainTask = "classification"
 
     def __init__(
             self,

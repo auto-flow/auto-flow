@@ -6,6 +6,7 @@ import numpy as np
 from ConfigSpace import ConfigurationSpace, Configuration, CategoricalHyperparameter, OrdinalHyperparameter, Constant, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter
 
+from hyperflow.constants import PHASE1,PHASE2
 from hyperflow.hdl.smac import _encode
 
 
@@ -15,14 +16,14 @@ def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state
     shps.seed(random_state)
     for config in shps.get_hyperparameters():
         name: str = config.name
-        if name.startswith("preprocessing") and name.endswith("__choice__") and (None_name in config.choices):
+        if name.startswith(PHASE1) and name.endswith("__choice__") and (None_name in config.choices):  # fixme 重构之后 None_name是不是改变了？
             config.default_value = None_name
 
-    model_choice = shps.get_hyperparameter("estimator:__choice__")
+    model_choice = shps.get_hyperparameter(f"{PHASE2}:__choice__")
     result = []
     for choice in model_choice.choices:
         cur_phps = deepcopy(shps)
-        cur_phps.get_hyperparameter("estimator:__choice__").default_value = choice
+        cur_phps.get_hyperparameter(f"{PHASE2}:__choice__").default_value = choice
         default = cur_phps.get_default_configuration()
         result.append(default)
     if len(result) < n_configs:

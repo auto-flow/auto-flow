@@ -275,10 +275,10 @@ for name, metric in [
 
 
 def calculate_score(solution, prediction, ml_task: MLTask, metric,
-                    all_scoring_functions=False):
+                    should_calc_all_metric=False):
     if isinstance(solution, (pd.Series, pd.DataFrame)):
         solution = solution.values
-    if all_scoring_functions:
+    if should_calc_all_metric:
         score = dict()
         if ml_task.mainTask == "regression":
             # TODO put this into the regression metric itself

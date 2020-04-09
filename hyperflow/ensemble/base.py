@@ -7,7 +7,7 @@ from hyperflow.utils import typing
 
 
 class EnsembleEstimator(BaseEstimator):
-    ml_task = None
+    mainTask = None
 
 
     def build_prediction_list(self):
@@ -21,7 +21,7 @@ class EnsembleEstimator(BaseEstimator):
 
     def fit_trained_data(
             self,
-            estimators_list: List[List[typing.GenericEstimator]],  # fixme : typing是否存在局限性？
+            estimators_list: List[List[typing.GenericEstimator]],
             y_true_indexes_list: List[List[np.ndarray]],
             y_preds_list: List[List[np.ndarray]],
             y_true: np.ndarray

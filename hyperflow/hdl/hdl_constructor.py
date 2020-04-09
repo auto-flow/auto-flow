@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import Union, Tuple, List
 
+from hyperflow.constants import PHASE1, PHASE2
 from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.utils.data import get_int_card
@@ -112,11 +113,11 @@ class HDL_Constructor():
         return result
 
     def get_params_in_dict(self, hdl_bank: dict, packages: str, phase: str, mainTask):
-        assert phase in ("preprocessing", "estimator")
+        assert phase in (PHASE1, PHASE2)
         packages: list = packages.split("|")
-        params_list: List[dict] = [self._get_params_in_dict(hdl_bank["preprocessing"], package) for package in
+        params_list: List[dict] = [self._get_params_in_dict(hdl_bank[PHASE1], package) for package in
                                    packages[:-1]]
-        last_phase_key = "preprocessing" if phase == "preprocessing" else mainTask
+        last_phase_key = PHASE1 if phase == PHASE1 else mainTask
         params_list += [self._get_params_in_dict(hdl_bank[last_phase_key], packages[-1])]
         if len(params_list) == 0:
             raise AttributeError
@@ -153,7 +154,7 @@ class HDL_Constructor():
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
                 addition_dict.update({"random_state": self.random_state})  # fixme
-                params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, "preprocessing", mainTask)
+                params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE1, mainTask)
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)
             preprocessing_dict[formed_key] = sub_dict
@@ -161,12 +162,12 @@ class HDL_Constructor():
         estimator_dict = {}
         for estimator_value in estimator_values:
             packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
-            params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, "estimator", mainTask)
+            params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE2, mainTask)
             estimator_dict[packages] = params
             estimator_dict[packages].update(addition_dict)
         final_dict = {
-            "preprocessing": preprocessing_dict,
-            "estimator(choice)": estimator_dict
+            PHASE1: preprocessing_dict,
+            f"{PHASE2}(choice)": estimator_dict
         }
         self.hdl = final_dict
 

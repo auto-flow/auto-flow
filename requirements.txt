@@ -24,3 +24,4 @@ json5
 peewee
 pyyaml
 dill
+typing_extensions

@@ -9,7 +9,7 @@ import numpy as np
 from ConfigSpace import Configuration
 
 from dsmac.runhistory.utils import get_id_of_config
-from hyperflow.constants import MLTask
+from hyperflow.constants import MLTask, PHASE2, PHASE1
 from hyperflow.evaluation.base import BaseEvaluator
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.manager.resource_manager import ResourceManager
@@ -33,7 +33,7 @@ class TrainEvaluator(BaseEvaluator):
             random_state,
             data_manager: DataManager,
             metric: Scorer,
-            all_scoring_functions: bool,
+            should_calc_all_metric: bool,
             splitter,
             should_store_intermediate_result: bool,
             resource_manager: ResourceManager
@@ -51,7 +51,7 @@ class TrainEvaluator(BaseEvaluator):
         self.metric = metric
         self.ml_task: MLTask = self.data_manager.ml_task
 
-        self.all_scoring_functions = all_scoring_functions
+        self.should_calc_all_metric = should_calc_all_metric
 
         if self.ml_task.mainTask == "regression":
             self.predict_function = self._predict_regression
@@ -64,14 +64,14 @@ class TrainEvaluator(BaseEvaluator):
 
     def loss(self, y_true, y_hat):
         all_scoring_functions = (
-            self.all_scoring_functions
-            if self.all_scoring_functions is None
-            else self.all_scoring_functions
+            self.should_calc_all_metric
+            if self.should_calc_all_metric is None
+            else self.should_calc_all_metric
         )
 
         score = calculate_score(
             y_true, y_hat, self.ml_task, self.metric,
-            all_scoring_functions=all_scoring_functions)
+            should_calc_all_metric=self.should_calc_all_metric)
 
         if isinstance(score, dict):
             err = self.metric._optimum - score[self.metric.name]
@@ -185,7 +185,7 @@ class TrainEvaluator(BaseEvaluator):
         info["status"] = "success"
         info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
-        estimator = list(dhp.get("estimator", {"unk": ""}).keys())[0]
+        estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["estimator"] = estimator
         info["cost_time"] = cost_time
         self.resource_manager.insert_to_trials_table(info)
@@ -235,7 +235,7 @@ class TrainEvaluator(BaseEvaluator):
         return in_feature_groups, out_feature_groups, additional_info
 
     def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
-        preprocessing_dict: dict = dhp["preprocessing"]
+        preprocessing_dict: dict = dhp[PHASE1]
         pipeline_list = []
         for key, value in preprocessing_dict.items():
             name = key  # like: "cat->num"
@@ -243,7 +243,7 @@ class TrainEvaluator(BaseEvaluator):
             sub_dict = preprocessing_dict[name]
             if sub_dict is None:
                 continue
-            preprocessor = self.create_component(sub_dict, "preprocessing", name, in_feature_groups, out_feature_groups,
+            preprocessor = self.create_component(sub_dict, PHASE1, name, in_feature_groups, out_feature_groups,
                                                  outsideEdge_info)
             pipeline_list.extend(preprocessor)
         if pipeline_list:
@@ -253,7 +253,7 @@ class TrainEvaluator(BaseEvaluator):
 
     def create_estimator(self, dhp: Dict) -> GenericPipeline:
         # 根据超参构造一个估计器
-        return GenericPipeline(self.create_component(dhp["estimator"], "estimator", self.ml_task.role))
+        return GenericPipeline(self.create_component(dhp[PHASE2], PHASE2, self.ml_task.role))
 
     def _create_component(self, key1, key2, params):
         cls = get_class_object_in_pipeline_components(key1, key2)
@@ -265,7 +265,7 @@ class TrainEvaluator(BaseEvaluator):
     def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feature_groups="all", out_feature_groups="all",
                          outsideEdge_info=None):
         pipeline_list = []
-        assert phase in ("preprocessing", "estimator")
+        assert phase in (PHASE1, PHASE2)
         packages = list(sub_dhp.keys())[0]
         params = sub_dhp[packages]
         packages = packages.split("|")
@@ -276,14 +276,14 @@ class TrainEvaluator(BaseEvaluator):
             else:
                 grouped_params[packages[0]] = {}
         for package in packages[:-1]:
-            preprocessor = self._create_component("preprocessing", package, grouped_params[package])
+            preprocessor = self._create_component(PHASE1, package, grouped_params[package])
             preprocessor.in_feature_groups = in_feature_groups
             preprocessor.out_feature_groups = in_feature_groups
             pipeline_list.append([
                 package,
                 preprocessor
             ])
-        key1 = "preprocessing" if phase == "preprocessing" else self.ml_task.mainTask
+        key1 = PHASE1 if phase == PHASE1 else self.ml_task.mainTask
         component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
         component.in_feature_groups = in_feature_groups
         component.out_feature_groups = out_feature_groups

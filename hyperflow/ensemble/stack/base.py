@@ -15,12 +15,12 @@ class StackEstimator(EnsembleEstimator):
             use_features_in_secondary=False,
     ):
         self.use_features_in_secondary = use_features_in_secondary
-        assert self.ml_task in ("classification", "regression")
+        assert self.mainTask in ("classification", "regression")
         if not meta_learner:
-            if self.ml_task == "classification":
+            if self.mainTask == "classification":
                 meta_learner = LogisticRegression(penalty='l2', solver="lbfgs", multi_class="auto",
                                                   random_state=10)
-            elif self.ml_task == "regression":
+            elif self.mainTask == "regression":
                 meta_learner = ElasticNet()
         self.meta_learner = meta_learner
 

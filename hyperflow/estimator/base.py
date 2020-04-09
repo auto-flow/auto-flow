@@ -38,8 +38,8 @@ class HyperFlowEstimator(BaseEstimator):
             tuner: Union[Tuner, List[Tuner], None, dict] = None,
             hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
-            # ensemble_builder: Union[StackEnsembleBuilder, None, bool, int] = None,
-            random_state=42
+            random_state=42,
+            **kwargs
     ):
         # ---logger------------------------------------
         self.logger = get_logger(__name__)
@@ -74,13 +74,12 @@ class HyperFlowEstimator(BaseEstimator):
             column_descriptions: Optional[Dict] = None,
             dataset_metadata: dict = frozenset(),
             metric=None,
-            all_scoring_functions=True,
+            should_calc_all_metrics=True,
             splitter=KFold(5, True, 42),
             specific_task_token="",
             should_store_intermediate_result=False,
             additional_info: dict = frozendict(),
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto"
-
     ):
         self.should_store_intermediate_result = should_store_intermediate_result
         dataset_metadata = dict(dataset_metadata)
@@ -105,7 +104,7 @@ class HyperFlowEstimator(BaseEstimator):
         self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter, specific_task_token)
         self.resource_manager.close_tasks_table()
         # store other params
-        self.all_scoring_functions = all_scoring_functions
+        self.should_calc_all_metrics = should_calc_all_metrics
         self.splitter = splitter
         assert len(self.hdl_constructors) == len(self.tuners)
         n_step = len(self.hdl_constructors)
@@ -127,12 +126,15 @@ class HyperFlowEstimator(BaseEstimator):
             self.resource_manager.insert_to_hdls_table(hdl)
             self.resource_manager.close_hdls_table()
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
-            self.resource_manager.insert_to_experiments_table(general_experiment_timestamp, current_experiment_timestamp,
+            self.resource_manager.insert_to_experiments_table(general_experiment_timestamp,
+                                                              current_experiment_timestamp,
                                                               self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
-                                                              self.tuners, tuner, all_scoring_functions, self.data_manager,
+                                                              self.tuners, tuner, should_calc_all_metrics,
+                                                              self.data_manager,
                                                               column_descriptions,
                                                               dataset_metadata, metric, splitter,
-                                                              should_store_intermediate_result)
+                                                              should_store_intermediate_result, fit_ensemble_params,
+                                                              additional_info)
             self.resource_manager.close_experiments_table()
 
             result = self.start_tuner(tuner, hdl)
@@ -223,7 +225,7 @@ class HyperFlowEstimator(BaseEstimator):
                 random_state=random_state,
                 data_manager=self.data_manager,
                 metric=self.metric,
-                all_scoring_functions=self.all_scoring_functions,
+                should_calc_all_metric=self.should_calc_all_metrics,
                 splitter=self.splitter,
                 should_store_intermediate_result=self.should_store_intermediate_result,
                 resource_manager=resource_manager

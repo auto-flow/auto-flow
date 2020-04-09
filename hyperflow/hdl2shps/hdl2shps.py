@@ -12,10 +12,11 @@ from ConfigSpace import InCondition, EqualsCondition
 from hyperopt import fmin, tpe, hp
 
 import hyperflow.hdl.smac as smac_hdl
-from hyperflow.constants import MLTask
+from hyperflow.constants import MLTask, PHASE1
 from hyperflow.hdl.utils import is_hdl_bottom
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.packages import get_class_name_of_module
+from hyperflow.constants import PHASE2
 
 
 class RelyModels:
@@ -52,7 +53,7 @@ class HDL2SHPS():
             all_models: List[str],
             **kwargs
     ):
-        estimator = cs.get_hyperparameter("estimator:__choice__")
+        estimator = cs.get_hyperparameter(f"{PHASE2}:__choice__")
         probabilities = []
         model2prob = {}
         L = 0
@@ -75,7 +76,7 @@ class HDL2SHPS():
             path = path[:-1]
             forbid_eq_key = ":".join(path + ["__choice__"])
             forbid_eq_key_hp = cs.get_hyperparameter(forbid_eq_key)
-            forbid_in_key = "estimator:__choice__"
+            forbid_in_key = f"{PHASE2}:__choice__"
             hit = relied2AllModels.get(rely_model)
             if not hit:
                 choices = list(forbid_eq_key_hp.choices)
@@ -107,7 +108,7 @@ class HDL2SHPS():
     def __rely_model(self, cs: ConfigurationSpace):
         if not RelyModels.info:
             return
-        all_models = list(cs.get_hyperparameter("estimator:__choice__").choices)
+        all_models = list(cs.get_hyperparameter(f"{PHASE2}:__choice__").choices)
         rely_model_counter = Counter([x[0] for x in RelyModels.info])
         # 依赖模式->所有相应模型
         relied2AllModels = {}
@@ -149,7 +150,7 @@ class HDL2SHPS():
             cur_cs.seed(42)
             try:
                 sample_times = len(all_models) * 15
-                counter = Counter([_hp.get("estimator:__choice__") for _hp in
+                counter = Counter([_hp.get(f"{PHASE2}:__choice__") for _hp in
                                    cur_cs.sample_configuration(sample_times)])
 
                 if debug:
@@ -216,7 +217,7 @@ class HDL2SHPS():
 
     def __call__(self, hdl: Dict):
         # 对HDL进行处理
-        models = hdl["estimator(choice)"]
+        models = hdl[f"{PHASE2}(choice)"]
         self.drop_invalid_rely_in_hdl(hdl, models)
         self.purify_isolate_rely_in_hdl(hdl, models)
         RelyModels.info = []
