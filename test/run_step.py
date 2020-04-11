@@ -13,7 +13,7 @@ df_test = df.iloc[test_ix, :]
 
 hdl_constructors = [
     HDL_Constructor(
-        DAG_descriptions={
+        DAG_workflow={
             "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
             "lowR_nan->nan": "impute.fill_abnormal",
             "highR_nan->nan": "operate.drop",
@@ -28,7 +28,7 @@ hdl_constructors = [
         }
     ),
     HDL_Constructor(
-        DAG_descriptions={
+        DAG_workflow={
             "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
             "lowR_nan->nan": "impute.fill_abnormal",
             "highR_nan->nan": "operate.drop",

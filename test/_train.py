@@ -63,7 +63,7 @@ tuner = Tuner(
     run_limit=120,
 )
 hdl_constructor = HDL_Constructor(
-    DAG_descriptions={
+    DAG_workflow={
         "num->target": "lightgbm"
     }
 )

@@ -7,7 +7,7 @@ from hyperflow.tuner.tuner import Tuner
 df = pd.read_csv("../data/QSAR.csv")
 
 hdl_constructor = HDL_Constructor(
-    DAG_descriptions={
+    DAG_workflow={
         "num->var": "compress.variance",
         "var->pea": {"_name": "compress.pearson", "n_jobs": 6},
         "pea->target": "logistic_regression"

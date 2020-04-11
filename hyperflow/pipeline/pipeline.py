@@ -6,7 +6,7 @@ from sklearn.utils import _print_elapsed_time
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
-from hyperflow.constants import MLTask
+from hyperflow.utils.ml_task import MLTask
 
 
 def _fit_transform_one(transformer,

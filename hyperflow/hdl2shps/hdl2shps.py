@@ -12,7 +12,7 @@ from ConfigSpace import InCondition, EqualsCondition
 from hyperopt import fmin, tpe, hp
 
 import hyperflow.hdl.smac as smac_hdl
-from hyperflow.constants import MLTask
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.constants import PHASE2
 from hyperflow.hdl.utils import is_hdl_bottom
 from hyperflow.utils.logging import get_logger

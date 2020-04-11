@@ -7,9 +7,9 @@ import pandas as pd
 import sklearn.metrics
 from sklearn.utils.multiclass import type_of_target
 
-from hyperflow.constants import MLTask
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.metrics import classification_metrics
-from hyperflow.utils.data import sanitize_array
+from hyperflow.utils.array import sanitize_array
 
 
 class Scorer(object, metaclass=ABCMeta):

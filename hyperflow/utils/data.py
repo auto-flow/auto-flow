@@ -1,87 +1,8 @@
 # -*- encoding: utf-8 -*-
-import math
-from typing import List
 
 import numpy as np
 import pandas as pd
 from scipy.sparse import issparse
-from sklearn.utils.multiclass import type_of_target
-
-from hyperflow.constants import binary_classification_task, multiclass_classification_task, \
-    multilabel_classification_task, regression_task
-
-
-def get_int_card(number):
-    Length = 0
-    while number != 0:
-        Length += 1
-        number = number // 10    #关键，整数除法去掉最右边的一位
-    return Length
-
-def sanitize_array(array):
-    """
-    Replace NaN and Inf (there should not be any!)
-    :param array:
-    :return:
-    """
-    a = np.ravel(array)
-    maxi = np.nanmax(a[np.isfinite(a)])
-    mini = np.nanmin(a[np.isfinite(a)])
-    array[array == float('inf')] = maxi
-    array[array == float('-inf')] = mini
-    mid = (maxi + mini) / 2
-    array[np.isnan(array)] = mid
-    return array
-
-
-def get_task_from_y(y):
-    y_type = type_of_target(y)
-    if y_type == "binary":
-        ml_task = binary_classification_task
-    elif y_type == "multiclass":
-        ml_task = multiclass_classification_task
-    elif y_type == "multilabel-indicator":
-        ml_task = multilabel_classification_task
-    elif y_type == "multiclass-multioutput":
-        raise NotImplementedError()
-    elif y_type == "continuous":
-        ml_task = regression_task
-    else:
-        raise NotImplementedError()
-    return ml_task
-
-
-def vote_predicts(predicts: List[np.ndarray]):
-    probas_arr = np.array(predicts)
-    proba = np.average(probas_arr, axis=0)
-    return proba
-
-
-def mean_predicts(predicts: List[np.ndarray]):
-    probas_arr = np.array(predicts)
-    proba = np.average(probas_arr, axis=0)
-    return proba
-
-
-def binarization(array):
-    # Takes a binary-class datafile and turn the max value (positive class)
-    # into 1 and the min into 0
-    array = np.array(array, dtype=float)  # conversion needed to use np.inf
-    if len(np.unique(array)) > 2:
-        raise ValueError('The argument must be a binary-class datafile. '
-                         '{} classes detected'.format(len(np.unique(array))))
-
-    # manipulation which aims at avoid error in data
-    # with for example classes '1' and '2'.
-    array[array == np.amax(array)] = np.inf
-    array[array == np.amin(array)] = 0
-    array[array == np.inf] = 1
-    return np.array(array, dtype=int)
-
-
-def multilabel_to_multiclass(array):
-    array = binarization(array)
-    return np.array([np.nonzero(array[i, :])[0][0] for i in range(len(array))])
 
 
 def convert_to_num(Ybin):
@@ -148,18 +69,6 @@ def densify(X):
         return X
 
 
-def float_gcd(a, b):
-    def is_int(x):
-        return not bool(int(x) - x)
-
-    base = 1
-    while not (is_int(a) and is_int(b)):
-        a *= 10
-        b *= 10
-        base *= 10
-    return math.gcd(int(a), int(b)) / base
-
-
 def is_cat(s: pd.Series):
     for elem in s:
         if isinstance(elem, (float, int)):
@@ -169,11 +78,15 @@ def is_cat(s: pd.Series):
     return False
 
 
+def is_highR_nan(s: pd.Series, threshold):
+    return (np.count_nonzero(pd.isna(s)) / s.size) > threshold
+
+
 def is_nan(s: pd.Series):
     return np.any(pd.isna(s))
 
 
-def arraylize(X):
+def to_array(X):
     if isinstance(X, (pd.DataFrame, pd.Series)):
         return X.values
     return X

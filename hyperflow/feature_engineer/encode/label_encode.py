@@ -3,14 +3,14 @@ import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.preprocessing import LabelEncoder as SklearnLabelEncoder
 
-from hyperflow.utils.data import arraylize
+from hyperflow.utils.data import to_array
 
 __all__ = ["LabelEncoder"]
 
 
 class LabelEncoder(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None):
-        X=arraylize(X)
+        X=to_array(X)
         encoders = []
         for i in range(X.shape[1]):
             cur = X[:, i]
@@ -20,7 +20,7 @@ class LabelEncoder(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X, y=None):
-        X=arraylize(X)
+        X=to_array(X)
         arrs = []
         assert X.shape[1] == len(self.encoders)
         for i in range(X.shape[1]):

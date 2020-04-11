@@ -9,7 +9,8 @@ import numpy as np
 from ConfigSpace import Configuration
 
 from dsmac.runhistory.utils import get_id_of_config
-from hyperflow.constants import MLTask, PHASE2, PHASE1
+from hyperflow.constants import PHASE2, PHASE1
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.evaluation.base import BaseEvaluator
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.manager.resource_manager import ResourceManager
@@ -17,7 +18,7 @@ from hyperflow.metrics import Scorer, calculate_score
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
 from hyperflow.shp2dhp.shp2dhp import SHP2DHP
-from hyperflow.utils.data import mean_predicts, vote_predicts
+from hyperflow.ensemble.utils import vote_predicts, mean_predicts
 from hyperflow.utils.dict import group_dict_items_before_first_dot
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.packages import get_class_object_in_pipeline_components

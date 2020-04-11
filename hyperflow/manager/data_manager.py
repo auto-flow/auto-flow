@@ -3,17 +3,20 @@
 import numpy as np
 import pandas as pd
 
-from hyperflow.constants import MLTask
 from hyperflow.pipeline.dataframe import GenericDataFrame
-from hyperflow.utils.data import get_task_from_y, is_nan, is_cat
+from hyperflow.utils.data import is_nan, is_cat, is_highR_nan
 from hyperflow.utils.dataframe import pop_if_exists
+from hyperflow.utils.ml_task import MLTask, get_ml_task_from_y
 
 
 class DataManager():
 
     def parse_feature_groups(self, series: pd.Series):
         if is_nan(series):
-            return "nan"
+            if is_highR_nan(series,self.highR_nan_threshold):
+                return "highR_nan"
+            else:
+                return "nan"
         elif is_cat(series):
             return "cat"
         else:
@@ -65,7 +68,7 @@ class DataManager():
             for value in values:
                 column2feature_groups[value] = key
 
-        # ----对于没有标注的列，打上nan,cat,num三种标记
+        # ----对于没有标注的列，打上nan,highR_nan,cat,num三种标记
         for column in X.columns:
             if column not in column2feature_groups:
                 feature_groups = self.parse_feature_groups(X[column])
@@ -79,15 +82,18 @@ class DataManager():
         return X, y, X_test, y_test, feature_groups, column2feature_groups
 
     def __init__(
-            self, X, y=None, X_test=None, y_test=None, dataset_metadata=frozenset(), column_descriptions=None
+            self, X, y=None, X_test=None, y_test=None, dataset_metadata=frozenset(), column_descriptions=None,
+            highR_nan_threshold=0.5
     ):
         dataset_metadata = dict(dataset_metadata)
+        self.highR_nan_threshold = highR_nan_threshold
         self.dataset_metadata = dataset_metadata
         X, y, X_test, y_test, feature_groups, column2feature_groups = self.parse_column_descriptions(
             column_descriptions, X, y, X_test, y_test
         )
+        self.feature_groups=feature_groups
         self.column2feature_groups = column2feature_groups
-        self.ml_task: MLTask = get_task_from_y(y)
+        self.ml_task: MLTask = get_ml_task_from_y(y)
         self.X_train = GenericDataFrame(X, feature_groups=feature_groups)
         self.y_train = y
         self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None

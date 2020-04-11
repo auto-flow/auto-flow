@@ -12,7 +12,7 @@ df_train = df.iloc[train_ix, :]
 df_test = df.iloc[test_ix, :]
 
 hdl_constructor = HDL_Constructor(
-    DAG_descriptions={
+    DAG_workflow={
         "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
         "lowR_nan->nan": "impute.fill_abnormal",
         "highR_nan->nan": "operate.drop",

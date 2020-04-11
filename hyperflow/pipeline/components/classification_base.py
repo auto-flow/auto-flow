@@ -1,7 +1,8 @@
 from sklearn.multiclass import OneVsRestClassifier
 
 from hyperflow.pipeline.components.base import HyperFlowComponent
-from hyperflow.utils.data import get_task_from_y, softmax, densify
+from hyperflow.utils.data import softmax, densify
+from hyperflow.utils.ml_task import get_ml_task_from_y
 
 
 class HyperFlowClassificationAlgorithm(HyperFlowComponent):
@@ -18,7 +19,7 @@ class HyperFlowClassificationAlgorithm(HyperFlowComponent):
     def after_process_estimator(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
                                 y_test=None):
         # def after_process_estimator(self, estimator, X, y):
-        if self.isOVR() and get_task_from_y(y_train).subTask != "binary":
+        if self.isOVR() and get_ml_task_from_y(y_train).subTask != "binary":
             estimator = OneVsRestClassifier(estimator, n_jobs=1)
         return estimator
 

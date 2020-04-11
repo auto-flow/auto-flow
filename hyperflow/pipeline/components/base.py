@@ -1,7 +1,6 @@
 import inspect
 import math
 import pickle
-import time
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, Optional
@@ -32,8 +31,8 @@ class HyperFlowComponent(BaseEstimator):
         self.estimator = None
         self.in_feature_groups = None
         self.out_feature_groups = None
-        self.hyperparams= {}
-        self.logger=get_logger(__name__)
+        self.hyperparams = {}
+        self.logger = get_logger(__name__)
 
     def _get_param_names(cls):
         return sorted(cls.hyperparams.keys())
@@ -53,7 +52,6 @@ class HyperFlowComponent(BaseEstimator):
     def get_estimator_class(self):
         M = import_module(self.module_)
         return getattr(M, self.class_)
-
 
     def after_process_hyperparams(self, hyperparams) -> Dict:
         hyperparams = deepcopy(hyperparams)
@@ -172,7 +170,6 @@ class HyperFlowComponent(BaseEstimator):
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
         return X_train
 
-
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
              y_test=None, feature_groups=None, columns_metadata=None):
         # 保留其他数据集的参数，方便模型拓展
@@ -180,7 +177,8 @@ class HyperFlowComponent(BaseEstimator):
         if self.store_intermediate:
             if self.resource_manager is None:
                 print("warn: no resource_manager when store_intermediate is True")
-                fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feature_groups,  columns_metadata)
+                fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,
+                                                 feature_groups, columns_metadata)
             else:
                 # get hash value from X, y, hyperparameters
                 Xy_hash = get_hash_of_Xy(X, y_train)
@@ -193,7 +191,8 @@ class HyperFlowComponent(BaseEstimator):
                 else:
                     fitted_estimator = pickle.loads(result)
         else:
-            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,feature_groups,  columns_metadata)
+            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, feature_groups,
+                                             columns_metadata)
         self.resource_manager = None  # avoid can not pickle error
         return fitted_estimator
 
@@ -221,7 +220,7 @@ class HyperFlowComponent(BaseEstimator):
             lr = hyperparams["learning_rate"]
             return max(int(value * (1 / lr)), 10)
         elif indicator == "sp1_ratio":
-            factor="shape"
+            factor = "shape"
             if hasattr(self, factor):
                 n_components = max(
                     int(self.shape[1] * value),
@@ -232,7 +231,7 @@ class HyperFlowComponent(BaseEstimator):
                 n_components = 100
             return n_components
         elif indicator == "sp1_percent":
-            factor="shape"
+            factor = "shape"
             if hasattr(self, factor):
                 n_components = max(
                     int(self.shape[1] * (value / 100)),
@@ -243,7 +242,7 @@ class HyperFlowComponent(BaseEstimator):
                 n_components = 100
             return n_components
         elif indicator == "sp1_dev":
-            factor="shape"
+            factor = "shape"
             if hasattr(self, factor):
                 if value == 0:
                     value = 1
@@ -256,7 +255,7 @@ class HyperFlowComponent(BaseEstimator):
                 n_components = 100
             return n_components
         elif indicator == "card_ratio":
-            factor="cardinality"
+            factor = "cardinality"
             if hasattr(self, factor):
                 n_components = max(
                     math.ceil(self.cardinality * value),

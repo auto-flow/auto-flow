@@ -1,11 +1,10 @@
 import datetime
-import inspect
 import math
 import os
 from copy import deepcopy
 from importlib import import_module
 from multiprocessing import Manager
-from typing import Union, Optional, Dict, List, Any, Sequence
+from typing import Union, Optional, Dict, List, Any
 
 import joblib
 import json5 as json
@@ -27,38 +26,9 @@ from hyperflow.tuner.tuner import Tuner
 from hyperflow.utils.concurrence import get_chunks
 from hyperflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from hyperflow.utils.dict import update_placeholder_from_other_dict
+from hyperflow.utils.klass import instancing, sequencing
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.packages import get_class_name_of_module
-
-
-def get_valid_params_in_kwargs(klass, kwargs: Dict[str, Any]):
-    validated = {}
-    for key, value in kwargs.items():
-        if key in inspect.signature(klass.__init__).parameters.keys():
-            validated[key] = value
-    return validated
-
-
-def instancing(variable, klass, kwargs):
-    if variable is None:
-        variable = klass(**get_valid_params_in_kwargs(klass, kwargs))
-    elif isinstance(variable, dict):
-        variable = klass(**variable)
-    elif isinstance(variable, klass):
-        pass
-    elif isinstance(variable, Sequence):
-        for elem in variable:
-            assert isinstance(elem, klass)
-    else:
-        raise NotImplementedError
-    return variable
-
-
-def sequencing(variable, klass):
-    if not isinstance(variable, Sequence):
-        variable = [variable]
-    variables: Sequence[klass] = variable
-    return variables
 
 
 class HyperFlowEstimator(BaseEstimator):
@@ -117,7 +87,9 @@ class HyperFlowEstimator(BaseEstimator):
             specific_task_token="",
             should_store_intermediate_result=False,
             additional_info: dict = frozendict(),
-            fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto"
+            fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
+            highR_nan_threshold=0.5,
+            highR_cat_threshold=0.5,
     ):
 
         self.should_store_intermediate_result = should_store_intermediate_result
@@ -125,7 +97,7 @@ class HyperFlowEstimator(BaseEstimator):
         additional_info = dict(additional_info)
         # build data_manager
         self.data_manager = DataManager(
-            X, y, X_test, y_test, dataset_metadata, column_descriptions
+            X, y, X_test, y_test, dataset_metadata, column_descriptions, highR_nan_threshold
         )
         self.ml_task = self.data_manager.ml_task
         if self.checked_mainTask is not None:
@@ -150,9 +122,7 @@ class HyperFlowEstimator(BaseEstimator):
         general_experiment_timestamp = datetime.datetime.now()
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
             current_experiment_timestamp = datetime.datetime.now()
-            hdl_constructor.set_data_manager(self.data_manager)
-            hdl_constructor.set_random_state(self.random_state)
-            hdl_constructor.run()
+            hdl_constructor.run(self.data_manager, self.random_state, highR_cat_threshold)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()

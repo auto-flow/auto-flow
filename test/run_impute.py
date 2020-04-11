@@ -16,7 +16,7 @@ tuner = Tuner(
     run_limit=10,
 )
 hdl_constructor = HDL_Constructor(
-    DAG_descriptions={
+    DAG_workflow={
         "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
         "lowR_nan->nan": [],
         "highR_nan->nan": "operate.drop",

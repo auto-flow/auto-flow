@@ -23,7 +23,7 @@ tuner = Tuner(
     run_limit=12,
 )
 hyperflow_pipeline = HyperFlowEstimator(tuner, HDL_Constructor(
-    DAG_descriptions={
+    DAG_workflow={
         "num->num": [
             "select.from_model_clf"
         ],

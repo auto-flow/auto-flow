@@ -1,9 +1,4 @@
-from collections import namedtuple
-
-
-class MLTask(namedtuple("Task", ["mainTask", "subTask", "role"])):
-    pass
-
+from hyperflow.utils.ml_task import MLTask
 
 binary_classification_task = MLTask("classification", "binary", "classifier")
 multiclass_classification_task = MLTask("classification", "multiclass", "classifier")

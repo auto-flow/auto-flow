@@ -14,7 +14,7 @@ from redis import Redis
 import generic_fs
 from generic_fs import FileSystem
 from generic_fs.utils import get_db_class_by_db_type
-from hyperflow.constants import MLTask
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.manager.data_manager import DataManager

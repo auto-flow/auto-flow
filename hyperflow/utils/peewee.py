@@ -12,7 +12,7 @@ class PickleFiled(pw.BitField):
         if value is None or \
                 (isinstance(value, str) and value == "") or \
                 (isinstance(value, bytes) and value == b"") or \
-                (isinstance(value, (int)) and value == 0):
+                (isinstance(value, int) and value == 0):
             return b""
         return pickle.dumps(value)
 

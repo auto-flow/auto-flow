@@ -181,6 +181,18 @@
       "threshold_lambda": {"_type": "loguniform", "_value": [1e3,10e5],"_default": 1e4},
       "fit_intercept": true
     },
+    "catboost": {
+//      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
+      "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
+//      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
+      "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
+      "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
+      "border_count": {"_type": "int_loguniform","_value": [1,1000], "_default": 0},
+      "early_stopping_rounds": 500,
+      "thread_count": 1
+    },
     "decision_tree": {
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "mse"},//delete "mae"
 //      "max_depth_factor": {"_type": "quniform", "_value": [0,2],"_default": 0.5},

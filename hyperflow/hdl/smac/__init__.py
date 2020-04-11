@@ -1,10 +1,10 @@
 import math
 from typing import Any, List
 
-from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
+from ConfigSpace import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter, Constant
 
-from hyperflow.utils.data import float_gcd
+from hyperflow.utils.math import float_gcd
 
 
 def _encode(value: Any) -> str:
@@ -23,10 +23,6 @@ def _decode(str_value: str) -> Any:
         value_ = str_value[:ix]
         type_ = str_value[ix + 1:]
         return eval(value_)
-        if type_ in ("NoneType", "dict", "bool"):  # todo:
-            return eval(value_)
-        cls = eval(type_)
-        return cls(value_)
 
 
 def choice(label: str, options: List, default=None):

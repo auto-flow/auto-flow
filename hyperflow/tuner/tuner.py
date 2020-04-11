@@ -8,7 +8,7 @@ from frozendict import frozendict
 
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
-from hyperflow.constants import MLTask
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
 from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
