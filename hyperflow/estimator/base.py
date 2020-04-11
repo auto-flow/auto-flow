@@ -72,6 +72,19 @@ class HyperFlowEstimator(BaseEstimator):
             random_state=42,
             **kwargs
     ):
+        '''
+        Base Estimator of HyperFlow.
+
+        Parameters
+        ----------
+        tuner: dict
+            tuner is a object to fine tune the hyper-parameters.
+        hdl_constructor: int
+            H.D.L. is a abbreviation of Hyperparams Descriptions Language.
+            hdl_constructor is a object to build HDL by seeding specific parameters.
+        resource_manager: str
+            resource_manager is a object to manager the resources, such like database connections and file-systems.
+        '''
         # ---logger------------------------------------
         self.logger = get_logger(__name__)
         # ---random_state-----------------------------------
