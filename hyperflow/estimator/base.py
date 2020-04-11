@@ -1,10 +1,11 @@
 import datetime
+import inspect
 import math
 import os
 from copy import deepcopy
 from importlib import import_module
 from multiprocessing import Manager
-from typing import Union, Optional, Dict, List, Any
+from typing import Union, Optional, Dict, List, Any, Sequence
 
 import joblib
 import json5 as json
@@ -30,6 +31,36 @@ from hyperflow.utils.logging import get_logger
 from hyperflow.utils.packages import get_class_name_of_module
 
 
+def get_valid_params_in_kwargs(klass, kwargs: Dict[str, Any]):
+    validated = {}
+    for key, value in kwargs.items():
+        if key in inspect.signature(klass.__init__).parameters.keys():
+            validated[key] = value
+    return validated
+
+
+def instancing(variable, klass, kwargs):
+    if variable is None:
+        variable = klass(**get_valid_params_in_kwargs(klass, kwargs))
+    elif isinstance(variable, dict):
+        variable = klass(**variable)
+    elif isinstance(variable, klass):
+        pass
+    elif isinstance(variable, Sequence):
+        for elem in variable:
+            assert isinstance(elem, klass)
+    else:
+        raise NotImplementedError
+    return variable
+
+
+def sequencing(variable, klass):
+    if not isinstance(variable, Sequence):
+        variable = [variable]
+    variables: Sequence[klass] = variable
+    return variables
+
+
 class HyperFlowEstimator(BaseEstimator):
     checked_mainTask = None
 
@@ -45,22 +76,16 @@ class HyperFlowEstimator(BaseEstimator):
         self.logger = get_logger(__name__)
         # ---random_state-----------------------------------
         self.random_state = random_state
+        # ---tuner-----------------------------------
+        tuner = instancing(tuner, Tuner, kwargs)
         # ---tuners-----------------------------------
-        if not tuner:
-            tuner = Tuner()
-        if not isinstance(tuner, (list, tuple)):
-            tuner = [tuner]
-        self.tuners: List[Tuner] = tuner
-        # ---hdl_constructors-----------------------------------
-        if not hdl_constructor:
-            hdl_constructor = HDL_Constructor()
-        if not isinstance(hdl_constructor, (list, tuple)):
-            hdl_constructor = [hdl_constructor]
-        self.hdl_constructors = hdl_constructor
+        self.tuners = sequencing(tuner, Tuner)
+        # ---hdl_constructor--------------------------
+        hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
+        # ---hdl_constructors-------------------------
+        self.hdl_constructors = sequencing(hdl_constructor, HDL_Constructor)
         # ---resource_manager-----------------------------------
-        if resource_manager is None:
-            resource_manager = ResourceManager()
-        self.resource_manager = resource_manager
+        self.resource_manager = instancing(resource_manager, ResourceManager, kwargs)
         # ---member_variable------------------------------------
         self.estimator = None
         self.ensemble_estimator = None
@@ -81,6 +106,7 @@ class HyperFlowEstimator(BaseEstimator):
             additional_info: dict = frozendict(),
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto"
     ):
+
         self.should_store_intermediate_result = should_store_intermediate_result
         dataset_metadata = dict(dataset_metadata)
         additional_info = dict(additional_info)

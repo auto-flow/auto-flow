@@ -25,3 +25,4 @@ peewee
 pyyaml
 dill
 typing_extensions
+frozendict
