@@ -339,10 +339,4 @@ class HyperFlowEstimator(BaseEstimator):
                 f"We try to query trials database if you seed trial_id specifically.")
             raise NotImplementedError
 
-    def __reduce__(self):
-        self.resource_manager.close_redis()
-        self.resource_manager.close_experiments_table()
-        self.resource_manager.close_tasks_table()
-        self.resource_manager.close_hdls_table()
-        self.resource_manager.close_trials_table()
-        return super(HyperFlowEstimator, self).__reduce__()
+

@@ -106,6 +106,14 @@ class ResourceManager():
             from playhouse.mysql_ext import JSONField
             self.JSONField = JSONField
 
+    def __reduce__(self):
+        self.close_redis()
+        self.close_experiments_table()
+        self.close_tasks_table()
+        self.close_hdls_table()
+        self.close_trials_table()
+        return super(ResourceManager, self).__reduce__()
+
     def update_db_params(self, database):
         db_params = dict(self.db_params)
         if self.db_type == "sqlite":

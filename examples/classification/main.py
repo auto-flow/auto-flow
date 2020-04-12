@@ -1,6 +1,9 @@
+import os
+
 import joblib
 import pandas as pd
-import os
+from sklearn.model_selection import KFold
+
 from hyperflow import HyperFlowClassifier
 
 train_df = pd.read_csv("../data/train_classification.csv")
@@ -13,8 +16,10 @@ column_descriptions = {
 }
 if not os.path.exists("hyperflow_classification.bz2"):
     trained_pipeline.fit(
-        X=train_df, X_test=test_df, column_descriptions=column_descriptions, should_store_intermediate_result=True
+        X=train_df, X_test=test_df, column_descriptions=column_descriptions, should_store_intermediate_result=True,
+        splitter=KFold(n_splits=3, shuffle=True, random_state=42)
     )
     joblib.dump(trained_pipeline, "hyperflow_classification.bz2")
 predict_pipeline = joblib.load("hyperflow_classification.bz2")
 result = predict_pipeline.predict(test_df)
+print(result)

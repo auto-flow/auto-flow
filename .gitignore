@@ -6,6 +6,7 @@ __pycache__/
 run
 data
 .idea/
+*.bz2
 venv*
 # C extensions
 *.so

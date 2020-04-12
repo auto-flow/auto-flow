@@ -160,6 +160,8 @@ class DataManager():
             self.logger.error(
                 "In DataManager.process_X, processed columns' length don't equal to feature_groups' length.")
             raise ValueError
+        X=X[columns]
+        X = GenericDataFrame(X, feature_groups=self.feature_groups)
         return X
 
     def set_data(self, X_train=None, y_train=None, X_test=None, y_test=None):
