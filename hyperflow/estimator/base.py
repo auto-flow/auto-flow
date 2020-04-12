@@ -27,7 +27,7 @@ from hyperflow.utils.concurrence import get_chunks
 from hyperflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from hyperflow.utils.dict import update_placeholder_from_other_dict
 from hyperflow.utils.klass import instancing, sequencing
-from hyperflow.utils.logging import get_logger
+from hyperflow.utils.logging import get_logger, setup_logger
 from hyperflow.utils.packages import get_class_name_of_module
 
 
@@ -40,6 +40,7 @@ class HyperFlowEstimator(BaseEstimator):
             hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
             random_state=42,
+            log_file=None,
             **kwargs
     ):
         '''
@@ -56,7 +57,9 @@ class HyperFlowEstimator(BaseEstimator):
             resource_manager is a object to manager the resources, such like database connections and file-systems.
         '''
         # ---logger------------------------------------
-        self.logger = get_logger(__name__)
+        self.log_file = log_file
+        setup_logger(self.log_file)
+        self.logger = get_logger(self)
         # ---random_state-----------------------------------
         self.random_state = random_state
         # ---tuner-----------------------------------
@@ -128,7 +131,7 @@ class HyperFlowEstimator(BaseEstimator):
                 last_best_dhp = self.resource_manager.load_best_dhp()
                 last_best_dhp = json.loads(last_best_dhp)
                 hdl = update_placeholder_from_other_dict(raw_hdl, last_best_dhp)
-                self.logger.info(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
+                self.logger.debug(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
             else:
                 hdl = raw_hdl
             # get hdl_id, and insert record into "{task_id}.hdls" database
@@ -145,7 +148,12 @@ class HyperFlowEstimator(BaseEstimator):
                                                               should_store_intermediate_result, fit_ensemble_params,
                                                               additional_info)
             self.resource_manager.close_experiments_table()
-
+            self.task_id = self.resource_manager.task_id
+            self.hdl_id = self.resource_manager.hdl_id
+            self.experiment_id = self.resource_manager.experiment_id
+            self.logger.info(f"task_id:\t{self.task_id}")
+            self.logger.info(f"hdl_id:\t{self.hdl_id}")
+            self.logger.info(f"experiment_id:\t{self.experiment_id}")
             result = self.start_tuner(tuner, hdl)
             if result["is_manual"] == True:
                 break
@@ -178,8 +186,8 @@ class HyperFlowEstimator(BaseEstimator):
         return self
 
     def start_tuner(self, tuner: Tuner, hdl: dict):
-        self.logger.info(f"Start fine tune task, \nwhich HDL(Hyperparams Descriptions Language) is:\n{hdl}")
-        self.logger.info(f"which Tuner is:\n{tuner}")
+        self.logger.debug(f"Start fine tune task, \nwhich HDL(Hyperparams Descriptions Language) is:\n{hdl}")
+        self.logger.debug(f"which Tuner is:\n{tuner}")
         tuner.set_data_manager(self.data_manager)
         tuner.set_random_state(self.random_state)
         tuner.set_hdl(hdl)  # just for get shps of tuner
@@ -260,9 +268,9 @@ class HyperFlowEstimator(BaseEstimator):
         if task_id is None:
             assert hasattr(self.resource_manager, "task_id") and self.resource_manager.task_id is not None
             task_id = self.resource_manager.task_id
-        if hdl_id is None:
-            assert hasattr(self.resource_manager, "hdl_id") and self.resource_manager.hdl_id is not None
-            hdl_id = self.resource_manager.hdl_id
+        # if hdl_id is None:
+        #     assert hasattr(self.resource_manager, "hdl_id") and self.resource_manager.hdl_id is not None
+        #     hdl_id = self.resource_manager.hdl_id
         trials_fetcher_name = trials_fetcher
         from hyperflow.ensemble import trials_fetcher
         assert hasattr(trials_fetcher, trials_fetcher_name)
@@ -290,5 +298,51 @@ class HyperFlowEstimator(BaseEstimator):
     def auto_fit_ensemble(self):
         pass
 
-    def predict(self, X):
-        return self.estimator.predict(X)
+    def _predict(
+            self,
+            X_test,
+            task_id=None,
+            trial_id=None,
+            experiment_id=None,
+            column_descriptions: Optional[Dict] = None,
+            highR_nan_threshold=0.5
+    ):
+        is_set_X_test = False
+        if hasattr(self, "data_manager") and self.data_manager is not None:
+            self.logger.info(
+                "'data_manager' is existing in HyperFlowEstimator, will not load it from database or create it.")
+        else:
+            if task_id is not None:
+                _experiment_id = self.resource_manager.get_experiment_id_by_task_id(task_id)
+            elif experiment_id is not None:
+                _experiment_id = experiment_id
+            elif hasattr(self, "experiment_id") and self.experiment_id is not None:
+                _experiment_id = self.experiment_id
+            else:
+                _experiment_id = None
+            if _experiment_id is None:
+                self.logger.info(
+                    "'_experiment_id' is not exist, initializing data_manager by user given parameters.")
+                self.data_manager = DataManager(X_test, column_descriptions=column_descriptions,
+                                                highR_nan_threshold=highR_nan_threshold)
+                is_set_X_test = True
+            else:
+                self.logger.info(
+                    "'_experiment_id' is exist, loading data_manager by query meta_record.experiments database.")
+                self.data_manager: DataManager = self.resource_manager.load_data_manager_by_experiment_id(
+                    _experiment_id)
+        if not is_set_X_test:
+            self.data_manager.set_data(X_test=X_test)
+        if self.estimator is None:
+            self.logger.warning(
+                f"'{self.__class__.__name__}' 's estimator is None, maybe you didn't use fit method to train the data.\n"
+                f"We try to query trials database if you seed trial_id specifically.")
+            raise NotImplementedError
+
+    def __reduce__(self):
+        self.resource_manager.close_redis()
+        self.resource_manager.close_experiments_table()
+        self.resource_manager.close_tasks_table()
+        self.resource_manager.close_hdls_table()
+        self.resource_manager.close_trials_table()
+        return super(HyperFlowEstimator, self).__reduce__()

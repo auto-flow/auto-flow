@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from contextlib import redirect_stderr
+from copy import deepcopy
 from io import StringIO
 from time import time
 from typing import Dict, Optional
@@ -59,7 +60,7 @@ class TrainEvaluator(BaseEvaluator):
         else:
             self.predict_function = self._predict_proba
 
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(self)
         self.resource_manager = resource_manager
         # ---member variable----
 
@@ -99,7 +100,9 @@ class TrainEvaluator(BaseEvaluator):
         return y_pred
 
     def get_Xy(self):
-        return self.X_train, self.y_train, self.X_test, self.y_test
+        # fixme: 会出现结果被改变的情况！
+        # return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
+        return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
     def evaluate(self, model: GenericPipeline, X, y, X_test, y_test):
         assert self.resource_manager is not None
@@ -198,7 +201,7 @@ class TrainEvaluator(BaseEvaluator):
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
-        self.logger.debug(pipeline, pipeline[-1].hyperparams)
+        self.logger.debug(str(pipeline))
         return dhp, pipeline
 
     def parse_key(self, key: str):

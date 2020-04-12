@@ -36,7 +36,7 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         self.threshold = threshold
         self.n_jobs = n_jobs
         self._type = "DataFrame"
-        self.logger=get_logger(__name__)
+        self.logger=get_logger(self)
 
     name = None
 

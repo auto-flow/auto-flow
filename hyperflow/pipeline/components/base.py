@@ -32,7 +32,7 @@ class HyperFlowComponent(BaseEstimator):
         self.in_feature_groups = None
         self.out_feature_groups = None
         self.hyperparams = {}
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(self)
 
     def _get_param_names(cls):
         return sorted(cls.hyperparams.keys())
@@ -103,7 +103,7 @@ class HyperFlowComponent(BaseEstimator):
         return validated
 
     def preprocess_data(self, X: Optional[GenericDataFrame], extract_info=False):
-        # todo 考虑在这                                                                                                                                                                                                   里多densify
+        # todo 考虑在这                                                                                                                                                                                    里多densify
         if X is None:
             return None
         elif isinstance(X, GenericDataFrame):

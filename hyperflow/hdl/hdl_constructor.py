@@ -38,7 +38,7 @@ class HDL_Constructor():
         self.included_highR_nan_imputers = included_highR_nan_imputers
         self.included_regressors = included_regressors
         self.included_classifiers = included_classifiers
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(self)
         self.hdl_bank_path = hdl_bank_path
         self.DAG_workflow = DAG_workflow
         if hdl_bank is None:

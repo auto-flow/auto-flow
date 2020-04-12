@@ -30,7 +30,7 @@ class Tuner():
             n_jobs: int = 1,
             exit_processes: Optional[int] = None
     ):
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(self)
         search_method_params = dict(search_method_params)
         if isinstance(evaluator, str):
             if evaluator == "TrainEvaluator":

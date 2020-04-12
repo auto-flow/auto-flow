@@ -1,7 +1,7 @@
 import os
 from glob import glob
 from pathlib import Path
-
+import pandas as pd
 from joblib import dump, load
 
 from generic_fs import FileSystem
@@ -50,3 +50,9 @@ class LocalFS(FileSystem):
 
     def load_pickle(self, path):
         return load(path)
+
+    def dump_csv(self, data:pd.DataFrame, path,**kwargs):
+        data.to_csv(path,**kwargs)
+
+    def load_csv(self, path,**kwargs) ->pd.DataFrame:
+        return pd.read_csv(path,**kwargs)

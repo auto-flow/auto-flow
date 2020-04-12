@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
+import inspect
 import logging
 import logging.config
 import os
-import sys
 
 import yaml
 
@@ -28,6 +28,13 @@ def _create_logger(name):
 
 
 def get_logger(name):
+    # todo: 判断是类还是实例
+    if isinstance(name, str):
+        pass
+    elif inspect.isclass(name):
+        name = name.__module__ + "." + name.__name__
+    else:
+        name = name.__module__ + "." + name.__class__.__name__
     logger = PickableLoggerAdapter(name)
     return logger
 
@@ -47,7 +54,7 @@ class PickableLoggerAdapter(object):
         Dictionary, representing the object state to be pickled. Ignores
         the self.logger field and only returns the logger name.
         """
-        return { 'name': self.name }
+        return {'name': self.name}
 
     def __setstate__(self, state):
         """

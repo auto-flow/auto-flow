@@ -16,7 +16,7 @@ from hyperflow.utils.logging import get_logger
 
 class TestPipeline(unittest.TestCase):
     def test_pipeline(self):
-        self.logger=get_logger(__name__)
+        self.logger=get_logger(self)
         df = pd.read_csv("../examples/classification/train_classification.csv")
         y = df.pop("Survived").values
         df = df.loc[:, ["Sex", "Cabin", "Age"]]

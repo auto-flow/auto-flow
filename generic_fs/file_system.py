@@ -1,5 +1,5 @@
 import os
-
+import pandas as pd
 
 class FileSystem():
     def listdir(self, parent, **kwargs):
@@ -38,10 +38,14 @@ class FileSystem():
     def delete(self, path):
         raise NotImplementedError
 
-    def dump_pickle(self,data,path):
+    def dump_pickle(self, data, path):
         raise NotImplementedError
 
-    def load_pickle(self,path):
+    def load_pickle(self, path):
         raise NotImplementedError
 
+    def dump_csv(self, data:pd.DataFrame, path,**kwargs):
+        raise NotImplementedError
 
+    def load_csv(self, path,**kwargs)->pd.DataFrame:
+        raise NotImplementedError

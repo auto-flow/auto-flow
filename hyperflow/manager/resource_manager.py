@@ -14,13 +14,13 @@ from redis import Redis
 import generic_fs
 from generic_fs import FileSystem
 from generic_fs.utils import get_db_class_by_db_type
-from hyperflow.utils.ml_task import MLTask
 from hyperflow.ensemble.mean.regressor import MeanRegressor
 from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.metrics import Scorer
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
 from hyperflow.utils.logging import get_logger
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.utils.packages import find_components
 from hyperflow.utils.peewee import PickleFiled
 
@@ -45,7 +45,7 @@ class ResourceManager():
 
     ):
         # --logger-------------------
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(self)
         # --preprocessing------------
         file_system_params = dict(file_system_params)
         db_params = dict(db_params)
@@ -56,7 +56,7 @@ class ResourceManager():
         self.file_system_type = file_system
         if file_system not in file_system2cls:
             raise Exception(f"Invalid file_system {file_system}")
-        self.file_system = file_system2cls[file_system](**file_system_params)
+        self.file_system:FileSystem = file_system2cls[file_system](**file_system_params)
         if self.file_system_type == "local":
             store_path = os.path.expandvars(os.path.expanduser(store_path))
         self.store_path = store_path
@@ -119,6 +119,7 @@ class ResourceManager():
         return db_params
 
     def estimate_new_id(self, Dataset, id_field):
+        # fixme : 用来预测下一个自增主键的ID，但是感觉有问题
         try:
             records = Dataset.select(getattr(Dataset, id_field)). \
                 where(getattr(Dataset, id_field)). \
@@ -188,7 +189,7 @@ class ResourceManager():
     def get_best_k_trials(self, k):
         self.init_trials_table()
         trial_ids = []
-        records = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
+        records = self.TrialsModel.select().order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
         for record in records:
             trial_ids.append(record.trial_id)
         return trial_ids
@@ -306,7 +307,7 @@ class ResourceManager():
             ml_task = pw.CharField(default="")
             should_store_intermediate_result = pw.BooleanField(default=False)
             fit_ensemble_params = pw.TextField(default="auto")
-            additional_info=self.JSONField(default={})
+            additional_info = self.JSONField(default={})
             user = pw.CharField(default=getuser)
 
             class Meta:
@@ -314,6 +315,25 @@ class ResourceManager():
 
         self.experiments_db.create_tables([Experiments])
         return Experiments
+
+    def get_experiment_id_by_task_id(self, task_id):
+        self.init_tasks_table()
+        return self.TasksModel.select(self.TasksModel.experiment_id).where(self.TasksModel.task_id == task_id)[
+            0].experiment_id
+
+    def load_data_manager_by_experiment_id(self, experiment_id):
+        self.init_experiments_table()
+        experiment_id = int(experiment_id)
+        record = self.ExperimentsModel.select().where(self.ExperimentsModel.experiment_id == experiment_id)[0]
+        data_manager_bin = record.data_manager_bin
+        data_manager_path = record.data_manager_path
+        if self.persistent_mode == "fs":
+            data_manager = self.file_system.load_pickle(data_manager_path)
+        elif self.persistent_mode == "db":
+            data_manager = data_manager_bin
+        else:
+            raise NotImplementedError
+        return data_manager
 
     def insert_to_experiments_table(
             self,
@@ -352,7 +372,7 @@ class ResourceManager():
             self.file_system.dump_pickle(data_manager, data_manager_path)
         else:
             data_manager_path = ""
-            data_manager_bin=data_manager
+            data_manager_bin = data_manager
         experiment_record = self.ExperimentsModel.create(
             general_experiment_timestamp=general_experiment_timestamp,
             current_experiment_timestamp=current_experiment_timestamp,

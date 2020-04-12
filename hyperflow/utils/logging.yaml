@@ -3,44 +3,45 @@ version: 1
 disable_existing_loggers: False
 formatters:
   simple:
+    format: '[%(name)s] %(message)s'
+  formal:
     format: '[%(levelname)s] [%(asctime)s:%(name)s] %(message)s'
 
 handlers:
   console:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: simple
     stream: ext://sys.stdout
 
   file_handler:
     class: logging.FileHandler
     level: DEBUG
-    formatter: simple
-    filename: autosklearn.log
+    formatter: formal
+    filename: hyperflow.log
 
+# 如果设为DEBUG, sql也会下来
 root:
   level: DEBUG
-  handlers: [console, file_handler]
+  handlers: [file_handler, console]
 
 loggers:
-  autosklearn.metalearning:
-    level: DEBUG
+  hyperopt.tpe:
+    level: WARNING
     handlers: [file_handler]
-    propagate: no
-
-  dautosklearn.util.backend:
-    level: DEBUG
-    handlers: [file_handler]
-    propagate: no
 
   dsmac.intensification.intensification.Intensifier:
     level: DEBUG
-    handlers: [ console]
+    handlers: [file_handler, console]
 
   dsmac.optimizer.local_search.LocalSearch:
     level: DEBUG
-    handlers: [ console]
+    handlers: [file_handler, console]
 
   dsmac.optimizer.smbo.SMBO:
     level: DEBUG
-    handlers: [ console]
+    handlers: [file_handler, console]
+
+  peewee:
+    level: INFO
+    handlers: [file_handler]

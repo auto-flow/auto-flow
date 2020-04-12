@@ -7,6 +7,6 @@ column_descriptions = {
     "id": "PassengerId",
     "target": "Survived"
 }
-data_manager = DataManager(X=df, column_descriptions=column_descriptions)
+data_manager = DataManager(X_train=df, column_descriptions=column_descriptions)
 hash_value = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
 print(hash_value)
