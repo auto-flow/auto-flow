@@ -1,27 +1,27 @@
+from pathlib import Path
+
+import joblib
 import pandas as pd
-from sklearn.model_selection import ShuffleSplit
+from sklearn.model_selection import KFold
 
-from hyperflow.estimator.base import HyperFlowEstimator
-from hyperflow.tuner.tuner import Tuner
+import hyperflow
+from hyperflow import HyperFlowClassifier
 
-df = pd.read_csv("../examples/classification/train_classification.csv")
-ss = ShuffleSplit(n_splits=1, random_state=0, test_size=0.25)
-train_ix, test_ix = next(ss.split(df))
-df_train = df.iloc[train_ix, :]
-df_test = df.iloc[test_ix, :]
-
-tuner = Tuner(
-    initial_runs=10,
-    run_limit=50,
-    n_jobs=1,
-    search_method_params={"anneal_func": "lambda x:1*(1/(-(3*(x-1))))"}
-)
-hyperflow_pipeline = HyperFlowEstimator(tuner)
+examples_path = Path(hyperflow.__file__).parent.parent / "examples"
+train_df = pd.read_csv(examples_path / "data/train_classification.csv")
+test_df = pd.read_csv(examples_path / "data/test_classification.csv")
+trained_pipeline = HyperFlowClassifier(initial_runs=5, run_limit=10, n_jobs=2, included_classifiers=["lightgbm"])
 column_descriptions = {
     "id": "PassengerId",
     "target": "Survived",
     "ignore": "Name"
 }
-hyperflow_pipeline.fit(
-    X=df_train, X_test=df_test, column_descriptions=column_descriptions, should_store_intermediate_result=True
+# if not os.path.exists("hyperflow_classification.bz2"):
+trained_pipeline.fit(
+    X=train_df, X_test=test_df, column_descriptions=column_descriptions, should_store_intermediate_result=True,
+    splitter=KFold(n_splits=3, shuffle=True, random_state=42), fit_ensemble_params=False
 )
+joblib.dump(trained_pipeline, "hyperflow_classification.bz2")
+predict_pipeline = joblib.load("hyperflow_classification.bz2")
+result = predict_pipeline.predict(test_df)
+print(result)

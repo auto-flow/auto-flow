@@ -33,7 +33,7 @@ class AbstractTAFunc(ExecuteTARun):
                  memory_limit:int=None, par_factor:int=1,
                  cost_for_crash:float=float(MAXINT),
                  abort_on_first_run_crash: bool=False,
-                 use_pynisher:bool=False):
+                 use_pynisher:bool=True):
         """
         Abstract class for having a function as target algorithm
 
