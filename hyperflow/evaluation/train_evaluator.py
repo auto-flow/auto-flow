@@ -1,7 +1,7 @@
 import re
+import sys
 from collections import defaultdict
 from contextlib import redirect_stderr
-from copy import deepcopy
 from io import StringIO
 from time import time
 from typing import Dict, Optional
@@ -11,7 +11,7 @@ from ConfigSpace import Configuration
 
 from dsmac.runhistory.utils import get_id_of_config
 from hyperflow.constants import PHASE2, PHASE1
-from hyperflow.utils.ml_task import MLTask
+from hyperflow.ensemble.utils import vote_predicts, mean_predicts
 from hyperflow.evaluation.base import BaseEvaluator
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.manager.resource_manager import ResourceManager
@@ -19,16 +19,18 @@ from hyperflow.metrics import Scorer, calculate_score
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.pipeline.pipeline import GenericPipeline
 from hyperflow.shp2dhp.shp2dhp import SHP2DHP
-from hyperflow.ensemble.utils import vote_predicts, mean_predicts
 from hyperflow.utils.dict import group_dict_items_before_first_dot
 from hyperflow.utils.logging import get_logger
+from hyperflow.utils.ml_task import MLTask
 from hyperflow.utils.packages import get_class_object_in_pipeline_components
 from hyperflow.utils.pipeline import concat_pipeline
+from hyperflow.utils.sys import get_trance_back_msg
 
 
 class TrainEvaluator(BaseEvaluator):
-    # def __init__(self):
-    #     self.resource_manager = None
+    def __init__(self):
+        # ---member variable----
+        self.debug = False
 
     def init_data(
             self,
@@ -62,15 +64,8 @@ class TrainEvaluator(BaseEvaluator):
 
         self.logger = get_logger(self)
         self.resource_manager = resource_manager
-        # ---member variable----
 
     def loss(self, y_true, y_hat):
-        all_scoring_functions = (
-            self.should_calc_all_metric
-            if self.should_calc_all_metric is None
-            else self.should_calc_all_metric
-        )
-
         score = calculate_score(
             y_true, y_hat, self.ml_task, self.metric,
             should_calc_all_metric=self.should_calc_all_metric)
@@ -100,9 +95,9 @@ class TrainEvaluator(BaseEvaluator):
         return y_pred
 
     def get_Xy(self):
-        # fixme: 会出现结果被改变的情况！
-        # return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
-        return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
+        # fixme: 会出现结果被改变的情况！  目前这个bug在hyperflow.pipeline.components.preprocessing.operate.merge.Merge 出现过
+        return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
+        # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
     def evaluate(self, model: GenericPipeline, X, y, X_test, y_test):
         assert self.resource_manager is not None
@@ -115,6 +110,8 @@ class TrainEvaluator(BaseEvaluator):
             y_preds = []
             y_test_preds = []
             all_scores = []
+            status = "SUCCESS"
+            failed_info = ""
             for train_index, valid_index in self.splitter.split(X, y):
                 X: GenericDataFrame
                 X_train, X_valid = X.split([train_index, valid_index])
@@ -123,8 +120,16 @@ class TrainEvaluator(BaseEvaluator):
                     intermediate_result = []
                 else:
                     intermediate_result = None
-                procedure_result = model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid, X_test, y_test,
-                                                   self.resource_manager, intermediate_result)
+                try:
+                    procedure_result = model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid, X_test, y_test,
+                                                       self.resource_manager, intermediate_result)
+                except Exception as e:
+                    failed_info = get_trance_back_msg()
+                    status = "FAILED"
+                    if self.debug:
+                        self.logger.error("re-raise exception")
+                        raise sys.exc_info()[1]
+                    break
                 models.append(model)
                 y_true_indexes.append(valid_index)
                 y_pred = procedure_result["pred_valid"]
@@ -134,19 +139,23 @@ class TrainEvaluator(BaseEvaluator):
                 loss, all_score = self.loss(y_valid, y_pred)
                 losses.append(float(loss))
                 all_scores.append(all_score)
-
-            final_loss = float(np.array(losses).mean())
+            if len(losses) > 0:
+                final_loss = float(np.array(losses).mean())
+            else:
+                final_loss = 65535
             if len(all_scores) > 0 and all_scores[0]:
                 all_score = defaultdict(list)
                 for cur_all_score in all_scores:
-                    assert isinstance(cur_all_score, dict)
-                    for key, value in cur_all_score.items():
-                        all_score[key].append(value)
+                    if isinstance(cur_all_score, dict):
+                        for key, value in cur_all_score.items():
+                            all_score[key].append(value)
+                    else:
+                        self.logger.warning(f"TypeError: cur_all_score is not dict.\ncur_all_score = {cur_all_score}")
                 for key in all_score.keys():
                     all_score[key] = float(np.mean(all_score[key]))
             else:
-                all_score = None
-                all_scores = None
+                all_score = {}
+                all_scores = []
             info = {
                 "loss": final_loss,
                 "losses": losses,
@@ -155,7 +164,9 @@ class TrainEvaluator(BaseEvaluator):
                 "models": models,
                 "y_true_indexes": y_true_indexes,
                 "y_preds": y_preds,
-                "intermediate_result": intermediate_result
+                "intermediate_result": intermediate_result,
+                "status": status,
+                "failed_info": failed_info
             }
             # todo
             if y_test is not None:
@@ -172,7 +183,7 @@ class TrainEvaluator(BaseEvaluator):
                     "y_test_pred": y_test_pred
                 })
         info["warning_info"] = warning_info.getvalue()
-        return final_loss, info
+        return info
 
     def __call__(self, shp: Configuration):
         # 1. 将php变成model
@@ -182,18 +193,20 @@ class TrainEvaluator(BaseEvaluator):
         # 2. 获取数据
         X_train, y_train, X_test, y_test = self.get_Xy()
         # 3. 进行评价
-        loss, info = self.evaluate(model, X_train, y_train, X_test, y_test)  # todo : 考虑失败的情况
+        info = self.evaluate(model, X_train, y_train, X_test, y_test)  # todo : 考虑失败的情况
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id
-        info["status"] = "success"
         info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["estimator"] = estimator
         info["cost_time"] = cost_time
         self.resource_manager.insert_to_trials_table(info)
-        return loss
+        return {
+            "loss": info["loss"],
+            "status": info["status"]
+        }
 
     def shp2model(self, shp):
         shp2dhp = SHP2DHP()

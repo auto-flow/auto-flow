@@ -10,7 +10,7 @@ from hyperflow import HyperFlowClassifier
 examples_path = Path(hyperflow.__file__).parent.parent / "examples"
 train_df = pd.read_csv(examples_path / "data/train_classification.csv")
 test_df = pd.read_csv(examples_path / "data/test_classification.csv")
-trained_pipeline = HyperFlowClassifier(initial_runs=5, run_limit=10, n_jobs=2, included_classifiers=["lightgbm"])
+trained_pipeline = HyperFlowClassifier(initial_runs=5, run_limit=10, n_jobs=1, included_classifiers=["lightgbm"])
 column_descriptions = {
     "id": "PassengerId",
     "target": "Survived",

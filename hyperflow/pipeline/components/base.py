@@ -25,6 +25,7 @@ class HyperFlowComponent(BaseEstimator):
     tree_model = False
     store_intermediate = False
     suspend_other_processes = False
+    is_fit = False
 
     def __init__(self):
         self.resource_manager = None
@@ -165,6 +166,10 @@ class HyperFlowComponent(BaseEstimator):
         if len(X_train_.shape) > 1 and X_train_.shape[1] > 0:
             self.estimator = self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
                                        y_test, feature_groups, columns_metadata)
+            self.is_fit = True
+        else:
+            self.logger.warning(
+                f"Component: {self.__class__.__name__} is fitting a empty data.\nShape of X_train_ = {X_train_.shape}.")
         return self
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):

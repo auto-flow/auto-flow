@@ -4,6 +4,7 @@ from typing import Union, Any, Dict, Sequence
 import numpy as np
 import pandas as pd
 
+from hyperflow.pipeline.components.utils import stack_Xs
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import is_nan, is_cat, is_highR_nan
 from hyperflow.utils.dataframe import pop_if_exists
@@ -83,6 +84,7 @@ class DataManager():
                 pop_if_exists(X_test, ignore_col)
         # --验证X与X_test的列应该相同
         if both_set:
+            assert X_train.shape[1] == X_test.shape[1]
             assert np.all(X_train.columns == X_test.columns)
         # --确定其他列--
         column2feature_groups = {}
@@ -93,14 +95,15 @@ class DataManager():
                 values = [values]
             for value in values:
                 column2feature_groups[value] = key
-
+        # ----尝试将X_train与X_test拼在一起，然后做解析---------
+        X = stack_Xs(X_train, None, X_test)
         # ----对于没有标注的列，打上nan,highR_nan,cat,num三种标记
-        for column in X_train.columns:
+        for column in X.columns:
             if column not in column2feature_groups:
-                feature_group = self.parse_feature_groups(X_train[column])
+                feature_group = self.parse_feature_groups(X[column])
                 column2feature_groups[column] = feature_group
-        feature_groups = [column2feature_groups[column] for column in X_train.columns]
-        L1 = X_train.shape[0]
+        feature_groups = [column2feature_groups[column] for column in X.columns]
+        L1 = X_train.shape[0] if X_train is not None else 0
         if X_test is not None:
             L2 = X_test.shape[0]
             X_test.index = range(L1, L1 + L2)
@@ -160,7 +163,7 @@ class DataManager():
             self.logger.error(
                 "In DataManager.process_X, processed columns' length don't equal to feature_groups' length.")
             raise ValueError
-        X=X[columns]
+        X = X[columns]
         X = GenericDataFrame(X, feature_groups=self.feature_groups)
         return X
 

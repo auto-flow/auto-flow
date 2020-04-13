@@ -1,6 +1,6 @@
 import inspect
 import os
-from typing import Dict, Optional, Callable
+from typing import Dict, Optional, Callable, Union
 
 import numpy as np
 from ConfigSpace import ConfigurationSpace
@@ -8,7 +8,6 @@ from frozendict import frozendict
 
 from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
-from hyperflow.utils.ml_task import MLTask
 from hyperflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from hyperflow.evaluation.train_evaluator import TrainEvaluator
 from hyperflow.hdl2shps.hdl2shps import HDL2SHPS
@@ -17,20 +16,35 @@ from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
 from hyperflow.utils.logging import get_logger
+from hyperflow.utils.ml_task import MLTask
 
 
 class Tuner():
     def __init__(
             self,
-            evaluator: Callable = "TrainEvaluator",
+            evaluator: Union[Callable, str] = "TrainEvaluator",
             search_method: str = "smac",
             run_limit: int = 100,
             initial_runs: int = 20,
             search_method_params: dict = frozendict(),
             n_jobs: int = 1,
-            exit_processes: Optional[int] = None
+            exit_processes: Optional[int] = None,
+            limit_resource: bool = True,
+            per_run_time_limit: float = 60,
+            per_run_memory_limit: float = 3072,
+            time_left_for_this_task: float = None,
+            debug=False
     ):
+        self.debug = debug
+        self.per_run_memory_limit = per_run_memory_limit
+        self.time_left_for_this_task = time_left_for_this_task
+        self.per_run_time_limit = per_run_time_limit
+        self.limit_resource = limit_resource
         self.logger = get_logger(self)
+        if self.debug and self.limit_resource:
+            self.logger.warning(
+                "Tuner.debug and Tuner.limit_resource cannot be both True. set Tuner.limit_resource to False.")
+            self.limit_resource = False
         search_method_params = dict(search_method_params)
         if isinstance(evaluator, str):
             if evaluator == "TrainEvaluator":
@@ -45,13 +59,13 @@ class Tuner():
             self.evaluator = evaluator
         else:
             self.evaluator = evaluator()
+        self.evaluator.debug = self.debug
         self.search_method_params = search_method_params
         assert search_method in ("smac", "grid", "random")
         if search_method in ("grid", "random"):
             initial_runs = 0
         self.initial_runs = initial_runs
         self.run_limit = run_limit
-        self.evaluator = TrainEvaluator()  # todo 可选项
         self.search_method = search_method
         self.random_state = 0
         self.addition_info = {}
@@ -96,7 +110,7 @@ class Tuner():
 
     def set_resource_manager(self, resource_manager: ResourceManager):
         self.resource_manager = resource_manager
-        self.evaluator.set_resource_manager(resource_manager)
+        # self.evaluator.set_resource_manager(resource_manager)
 
     def set_task(self, ml_task: MLTask):
         self.ml_task = ml_task
@@ -136,22 +150,25 @@ class Tuner():
             return
 
         self.evaluator.init_data(**evaluator_params)
-
+        senario_dict = {
+            "run_obj": "quality",
+            "runcount-limit": 1000,
+            "cs": self.shps,  # configuration space
+            "deterministic": "true",
+            "instances": [[instance_id]],
+            "cutoff_time": self.per_run_time_limit,
+            "memory_limit": self.per_run_memory_limit
+            # todo : 如果是local，存在experiment，如果是其他文件系统，不输出smac
+            # "output_dir": self.resource_manager.smac_output_dir,
+        }
         self.scenario = Scenario(
-            {
-                "run_obj": "quality",
-                "runcount-limit": 1000,
-                "cs": self.shps,  # configuration space
-                "deterministic": "true",
-                "instances": [[instance_id]]
-                # todo : 如果是local，存在experiment，如果是其他文件系统，不输出smac
-                # "output_dir": self.resource_manager.smac_output_dir,
-            },
+            senario_dict,
             initial_runs=0,
             db_type=rh_db_type,
             db_params=rh_db_params,
             db_table_name=rh_db_table_name,
-            anneal_func=self.search_method_params.get("anneal_func")
+            anneal_func=self.search_method_params.get("anneal_func"),
+            use_pynisher=self.limit_resource
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
         smac = SMAC4HPO(

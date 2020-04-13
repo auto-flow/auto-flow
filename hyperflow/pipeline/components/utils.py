@@ -5,13 +5,17 @@ import pandas as pd
 from sklearn.utils.multiclass import type_of_target
 
 
-def stack_Xs(X_train, X_valid=None, X_test=None):
-    Xs = [X_train]
+def stack_Xs(X_train=None, X_valid=None, X_test=None):
+    Xs = []
+    if X_train is not None:
+        Xs.append(X_train)
     if X_valid is not None:
         Xs.append(X_valid)
     if X_test is not None:
         Xs.append(X_test)
+    assert len(Xs) > 0
     if isinstance(Xs[0], pd.DataFrame):
+        # 如果拼接后Xs的index已经无序了，先设置一个有序的index
         check_and_adjust_Xs_index(Xs)
         df = pd.concat(Xs, axis=0)
         df.sort_index(inplace=True)

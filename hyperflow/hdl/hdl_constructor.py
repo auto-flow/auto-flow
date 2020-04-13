@@ -21,7 +21,7 @@ class HDL_Constructor():
             included_regressors=(
                     "adaboost", "bayesian_ridge", "catboost", "decision_tree", "elasticnet", "extra_trees",
                     "gaussian_process", "k_nearest_neighbors", "kernel_ridge",
-                    "liblinear_svr", "libsvm_svr", "lightgbm", "random_forest", "sgd"),
+                    "liblinear_svr", "lightgbm", "random_forest", "sgd"),
             included_highR_nan_imputers=("operate.drop", {"_name": "operate.merge", "__rely_model": "boost_model"}),
             included_cat_nan_imputers=(
                     "impute.fill_cat", {"_name": "impute.fill_abnormal", "__rely_model": "boost_model"}),

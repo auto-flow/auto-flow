@@ -1,5 +1,7 @@
-from hyperflow.pipeline.components.feature_engineer_base import HyperFlowFeatureEngineerAlgorithm
 import pandas as pd
+
+from hyperflow.pipeline.components.feature_engineer_base import HyperFlowFeatureEngineerAlgorithm
+
 
 class BaseEncoder(HyperFlowFeatureEngineerAlgorithm):
 
@@ -10,3 +12,8 @@ class BaseEncoder(HyperFlowFeatureEngineerAlgorithm):
             trans = self.estimator.transform(X)
             trans[pd.DataFrame(X) == -999] = -999  # todo: 有没有更优化的解决办法
             return trans
+
+    def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feature_groups=None, columns_metadata=None):
+        X = X.astype(str)
+        return estimator.fit(X, y)

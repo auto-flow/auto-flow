@@ -1,12 +1,12 @@
 import datetime
 import math
+import multiprocessing
 import os
 from copy import deepcopy
 from importlib import import_module
 from multiprocessing import Manager
 from typing import Union, Optional, Dict, List, Any
 
-import joblib
 import json5 as json
 import numpy as np
 import pandas as pd
@@ -14,6 +14,7 @@ from frozendict import frozendict
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
+from hyperflow import constants
 from hyperflow.ensemble.base import EnsembleEstimator
 from hyperflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from hyperflow.ensemble.trials_fetcher import TrialsFetcher
@@ -104,7 +105,14 @@ class HyperFlowEstimator(BaseEstimator):
         )
         self.ml_task = self.data_manager.ml_task
         if self.checked_mainTask is not None:
-            assert self.checked_mainTask == self.ml_task.mainTask
+            if self.checked_mainTask != self.ml_task.mainTask:
+                if self.checked_mainTask == "regression":
+                    self.ml_task = constants.regression_task
+                    self.data_manager.ml_task = self.ml_task
+                else:
+                    self.logger.error(
+                        f"This task is supposed to be {self.checked_mainTask} task ,but the target data is {self.ml_task}.")
+                    raise ValueError
         # parse metric
         if metric is None:
             if self.ml_task.mainTask == "regression":
@@ -214,13 +222,22 @@ class HyperFlowEstimator(BaseEstimator):
         self.resource_manager.close_redis()
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
         tuners = [deepcopy(tuner) for i in range(n_jobs)]
-        with joblib.parallel_backend(n_jobs=n_jobs, backend="multiprocessing"):
-            joblib.Parallel()(
-                joblib.delayed(self.run)
-                (tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict)
-                for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in
-                zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states)
-            )
+        processes = []
+        for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in \
+                zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states):
+            args = (tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict)
+            if n_jobs == 1:
+                self.run(*args)
+            else:
+                p = multiprocessing.Process(
+                    target=self.run,
+                    args=args
+                )
+                processes.append(p)
+                p.start()
+        for p in processes:
+            p.join()
+
         return {"is_manual": False}
 
     def run(self, tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict=None):
@@ -338,5 +355,3 @@ class HyperFlowEstimator(BaseEstimator):
                 f"'{self.__class__.__name__}' 's estimator is None, maybe you didn't use fit method to train the data.\n"
                 f"We try to query trials database if you seed trial_id specifically.")
             raise NotImplementedError
-
-

@@ -352,7 +352,9 @@ class SMAC4AC(object):
             'runhistory': runhistory,
             'par_factor': scenario.par_factor,
             'cost_for_crash': scenario.cost_for_crash,
-            'abort_on_first_run_crash': scenario.abort_on_first_run_crash
+            'abort_on_first_run_crash': scenario.abort_on_first_run_crash,
+            'use_pynisher' :scenario.use_pynisher,
+            'memory_limit':scenario.memory_limit
         }
         if tae_runner_kwargs is not None:
             tae_def_kwargs.update(tae_runner_kwargs)

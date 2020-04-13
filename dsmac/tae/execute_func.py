@@ -1,8 +1,7 @@
-import logging
 import inspect
+import logging
 import math
 import time
-from pprint import pprint
 
 import numpy as np
 import pynisher
@@ -29,11 +28,11 @@ class AbstractTAFunc(ExecuteTARun):
     use_pynisher
     """
 
-    def __init__(self, ta, stats=None, runhistory=None, run_obj:str="quality",
-                 memory_limit:int=None, par_factor:int=1,
-                 cost_for_crash:float=float(MAXINT),
-                 abort_on_first_run_crash: bool=False,
-                 use_pynisher:bool=True):
+    def __init__(self, ta, stats=None, runhistory=None, run_obj: str = "quality",
+                 memory_limit: int = None, par_factor: int = 1,
+                 cost_for_crash: float = float(MAXINT),
+                 abort_on_first_run_crash: bool = False,
+                 use_pynisher: bool = True):
         """
         Abstract class for having a function as target algorithm
 
@@ -73,7 +72,7 @@ class AbstractTAFunc(ExecuteTARun):
         if memory_limit is not None:
             memory_limit = int(math.ceil(memory_limit))
         self.memory_limit = memory_limit
-        
+
         self.use_pynisher = use_pynisher
 
     def run(self, config, instance=None,
@@ -135,41 +134,60 @@ class AbstractTAFunc(ExecuteTARun):
 
             obj = pynisher.enforce_limits(**arguments)(self.ta)
             rval = self._call_ta(obj, config, **obj_kwargs)
-    
+
             if isinstance(rval, tuple):
                 result = rval[0]
                 additional_run_info = rval[1]
             else:
                 result = rval
                 additional_run_info = {}
-    
+
+            # 增加对于dict的判断
+            return_status = "SUCCESS"
+            if isinstance(rval, dict):
+                result = rval.get("loss")
+                additional_run_info = rval.get("additional_info", {})
+                return_status = rval.get("status", "SUCCESS")
+
             if obj.exit_status is pynisher.TimeoutException:
+                self.logger.warning(f"TimeoutException!\nconfig = \n{config}")
                 status = StatusType.TIMEOUT
                 cost = self.crash_cost
             elif obj.exit_status is pynisher.MemorylimitException:
+                self.logger.warning(f"MemorylimitException!\nconfig = \n{config}")
                 status = StatusType.MEMOUT
                 cost = self.crash_cost
             elif obj.exit_status == 0 and result is not None:
                 status = StatusType.SUCCESS
                 cost = result
-            else:
+            elif return_status == "FAILED":
+                self.logger.warning(f"return_status == 'FAILED'")
                 status = StatusType.CRASHED
                 cost = self.crash_cost
-        
+            else:
+                self.logger.warning(f"status = StatusType.CRASHED\nconfig = \n{config}")
+                status = StatusType.CRASHED
+                cost = self.crash_cost
+
             runtime = float(obj.wall_clock_time)
         else:
             start_time = time.time()
-            result = self.ta(config, **obj_kwargs)
-            
+            rval = self.ta(config, **obj_kwargs)
+            additional_run_info = {}
+
+            if isinstance(rval, dict):
+                result = rval.get("loss")
+                additional_run_info = rval.get("additional_info", {})
+                return_status = rval.get("status", "SUCCESS")
+            else:
+                result = rval
             if result is not None:
                 status = StatusType.SUCCESS
                 cost = result
             else:
                 status = StatusType.CRASHED
                 cost = self.crash_cost
-            
             runtime = time.time() - start_time
-            additional_run_info = {}
 
         return status, cost, runtime, additional_run_info
 
@@ -178,7 +196,6 @@ class AbstractTAFunc(ExecuteTARun):
 
 
 class ExecuteTAFuncDict(AbstractTAFunc):
-
     """Evaluate function for given configuration and resource limit.
 
     Passes the configuration as a dictionary to the target algorithm. The
@@ -212,7 +229,6 @@ class ExecuteTAFuncDict(AbstractTAFunc):
     """
 
     def _call_ta(self, obj, config, **kwargs):
-
         return obj(config, **kwargs)
 
 
@@ -250,7 +266,6 @@ class ExecuteTAFuncArray(AbstractTAFunc):
     """
 
     def _call_ta(self, obj, config, **kwargs):
-
         x = np.array([val for _, val in sorted(config.get_dictionary().items())],
                      dtype=np.float)
         return obj(x, **kwargs)

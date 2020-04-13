@@ -582,7 +582,7 @@ class ResourceManager():
             smac_hyper_param = PickleFiled(default=0)
             dict_hyper_param = self.JSONField(default={})  # todo: json field
             cost_time = pw.FloatField(default=65535)
-            status = pw.CharField(default="success")
+            status = pw.CharField(default="SUCCESS")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
             intermediate_result_path = pw.TextField(default=""),

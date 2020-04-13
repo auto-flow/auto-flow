@@ -26,3 +26,4 @@ pyyaml
 dill
 typing_extensions
 frozendict
+scikit-optimize==0.7.4

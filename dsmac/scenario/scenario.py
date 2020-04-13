@@ -35,7 +35,8 @@ class Scenario(object):
             db_type="sqlite",
             db_params=None,
             db_table_name="runhistory",
-            anneal_func=None
+            anneal_func=None,
+            use_pynisher=True
     ):
         """ Creates a scenario-object. The output_dir will be
         "output_dir/run_id/" and if that exists already, the old folder and its
@@ -52,6 +53,7 @@ class Scenario(object):
         cmd_options : dict
             Options from parsed command line arguments
         """
+        self.use_pynisher = use_pynisher
         self.logger = logging.getLogger(
             self.__module__ + '.' + self.__class__.__name__)
         if isinstance(anneal_func, str):

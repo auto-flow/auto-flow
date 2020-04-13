@@ -32,9 +32,13 @@ class HyperFlowFeatureEngineerAlgorithm(HyperFlowComponent):
 
     def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
                        y_train=None):
-        X_train = self._transform(X_train_, X_train)
-        X_valid = self._transform(X_valid_, X_valid)
-        X_test = self._transform(X_test_, X_test)
+        if not self.is_fit:
+            self.logger.warning(
+                f"Component: {self.__class__.__name__} is not fitted. Maybe it fit a empty data.\nReturn origin X defaultly.")
+        else:
+            X_train = self._transform(X_train_, X_train)
+            X_valid = self._transform(X_valid_, X_valid)
+            X_test = self._transform(X_test_, X_test)
         return {
             "X_train": X_train,
             "y_train": y_train,
