@@ -4,6 +4,14 @@ hyperflow.utils package
 Submodules
 ----------
 
+hyperflow.utils.array module
+----------------------------
+
+.. automodule:: hyperflow.utils.array
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 hyperflow.utils.concurrence module
 ----------------------------------
 
@@ -52,6 +60,14 @@ hyperflow.utils.hash module
     :undoc-members:
     :show-inheritance:
 
+hyperflow.utils.klass module
+----------------------------
+
+.. automodule:: hyperflow.utils.klass
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 hyperflow.utils.list module
 ---------------------------
 
@@ -64,6 +80,22 @@ hyperflow.utils.logging module
 ------------------------------
 
 .. automodule:: hyperflow.utils.logging
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+hyperflow.utils.math module
+---------------------------
+
+.. automodule:: hyperflow.utils.math
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+hyperflow.utils.ml_task module
+------------------------------
+
+.. automodule:: hyperflow.utils.ml_task
     :members:
     :undoc-members:
     :show-inheritance:

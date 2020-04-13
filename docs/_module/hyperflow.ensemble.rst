@@ -37,6 +37,14 @@ hyperflow.ensemble.trials_fetcher module
     :undoc-members:
     :show-inheritance:
 
+hyperflow.ensemble.utils module
+-------------------------------
+
+.. automodule:: hyperflow.ensemble.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

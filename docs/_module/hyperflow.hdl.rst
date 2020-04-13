@@ -11,14 +11,6 @@ Subpackages
 Submodules
 ----------
 
-hyperflow.hdl.default_hp module
--------------------------------
-
-.. automodule:: hyperflow.hdl.default_hp
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 hyperflow.hdl.hdl_constructor module
 ------------------------------------
 

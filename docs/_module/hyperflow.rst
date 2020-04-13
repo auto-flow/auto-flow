@@ -17,6 +17,7 @@ Subpackages
     hyperflow.metrics
     hyperflow.pipeline
     hyperflow.shp2dhp
+    hyperflow.splitter
     hyperflow.tuner
     hyperflow.utils
 
