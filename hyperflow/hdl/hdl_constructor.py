@@ -2,9 +2,12 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Union, Tuple, List, Any, Dict
 
+import pandas as pd
+
 from hyperflow.constants import PHASE1, PHASE2
 from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.utils.dict import add_prefix_in_dict_keys
+from hyperflow.utils.graphviz import ColorSelector
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.math import get_int_length
 
@@ -93,6 +96,8 @@ class HDL_Constructor():
     def purify_DAG_describe(self):
         DAG_describe = {}
         for k, v in self.DAG_workflow.items():
+            if not isinstance(v, (list, tuple)):
+                v = [v]
             DAG_describe[k.replace(" ", "").replace("\n", "").replace("\t", "")] = v
         self.DAG_workflow = DAG_describe
 
@@ -151,6 +156,59 @@ class HDL_Constructor():
         # todo: 如果特征多，做特征选择或者降维。如果特征少，做增维
         return DAG_workflow
 
+    def draw_workflow_space(self):
+        candidates_colors = ["#663366", "#663300", "#666633", "#333366", "#660033"]
+        feature_groups_colors = ["#0099CC", "#0066CC", "#339933","#FFCC33","#33CC99","#FF0033","#663399","#FF6600"]
+        cand2c = ColorSelector(candidates_colors)
+        feat2c = ColorSelector(feature_groups_colors)
+
+        def parsed_candidates(candidates):
+            parsed_candidates = []
+            for candidate in candidates:
+                if isinstance(candidate, dict):
+                    parsed_candidates.append(candidate["_name"])
+                else:
+                    parsed_candidates.append(candidate)
+            return parsed_candidates
+
+        def get_node_label(node_name):
+            return f'''<<font color="{feat2c[node_name]}">{node_name}</font>>'''
+
+        from graphviz import Digraph
+        DAG_workflow = deepcopy(self.DAG_workflow)
+        g = Digraph("workflow_space")
+        g.node("data")
+        for parsed_node in pd.unique(self.data_manager.feature_groups):
+            g.node(parsed_node, color=feat2c[parsed_node], label=get_node_label(parsed_node))
+            g.edge("data", parsed_node,
+                   label=f'''<data_manager: <font color="{feat2c[parsed_node]}">{parsed_node}</font>>''')
+        for indicate, candidates in DAG_workflow.items():
+            if "->" not in indicate:
+                continue
+            _from, _to = indicate.split("->")
+            g.node(_from, color=feat2c[_from], label=get_node_label(_from))
+            candidates = parsed_candidates(candidates)
+            if _to.startswith("{") and _to.endswith("}"):
+                candidate = candidates[0]
+                _to = _to[1:-1]
+                tails = []
+                for item in _to.split(","):
+                    tails.append(item.split("=")[-1])
+                for tail in tails:
+                    g.node(tail, color=feat2c[tail], label=get_node_label(tail))
+                    g.edge(_from, tail, f'''<{candidate}: <font color="{feat2c[tail]}">{tail}</font>>''')
+            else:
+                g.node(_to, color=feat2c[_to], label=get_node_label(_to))
+                if len(candidates) == 1:
+                    candidates_str = f'<font color="{cand2c[candidates[0]]}">{candidates[0]}</font>'
+                else:
+                    candidates_str = "<{" + ", ".join(
+                        [f'<font color="{cand2c[candidate]}">{candidate}</font>' for candidate in candidates]) + "}>"
+                g.edge(_from, _to, candidates_str)
+        g.attr(label=r'WorkFlow Space')
+        g.view()
+        pass
+
     def run(self, data_manager, random_state, highR_cat_threshold):
         self.highR_cat_threshold = highR_cat_threshold
         self.data_manager = data_manager
@@ -170,21 +228,22 @@ class HDL_Constructor():
 
         target_key = None
         self.purify_DAG_describe()
-        for key in self.DAG_workflow.keys():
+
+        # ---- 开始将 DAG_workflow 解析成 HDL
+        DAG_workflow = deepcopy(self.DAG_workflow)
+        for key in DAG_workflow.keys():
             if key.split("->")[-1] == "target":
                 target_key = key
-        estimator_values = self.DAG_workflow.pop(target_key)
+        estimator_values = DAG_workflow.pop(target_key)
         if not isinstance(estimator_values, (list, tuple)):
             estimator_values = [estimator_values]
         preprocessing_dict = {}
         mainTask = self.ml_task.mainTask
         hdl_bank = get_default_hdl_bank()
         # 遍历DAG_describe，构造preprocessing
-        n_steps = len(self.DAG_workflow)
+        n_steps = len(DAG_workflow)
         int_len = get_int_length(n_steps)
-        for i, (key, values) in enumerate(self.DAG_workflow.items()):
-            if not isinstance(values, (list, tuple)):
-                values = [values]
+        for i, (key, values) in enumerate(DAG_workflow.items()):
             formed_key = f"{i:0{int_len}d}{key}(choice)"
             sub_dict = {}
             for value in values:

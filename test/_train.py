@@ -12,7 +12,7 @@ from hyperflow.tuner.tuner import Tuner
 
 path = ("../data/train_0312.csv")
 
-
+HyperFlowEstimator()
 # data preprocessing
 def data_preprocessing():
     train_data_path = path
@@ -71,6 +71,6 @@ resource_manager = ResourceManager(os.getcwd() + "/for_hxw_result")
 hyperflow_pipeline = HyperFlowEstimator(tuner, hdl_constructor, ensemble_builder=False)
 
 hyperflow_pipeline.fit(
-    X=x_train, y=y_train, n_jobs=3
+    X_train=x_train, y_train=y_train, n_jobs=3
 )
 joblib.dump(hyperflow_pipeline, "hyperflow_pipeline_for_hxw.bz")

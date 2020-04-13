@@ -33,5 +33,5 @@ column_descriptions = {
 }
 
 hyperflow_pipeline.fit(
-    X=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
+    X_train=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
 )

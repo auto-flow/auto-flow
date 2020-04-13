@@ -41,9 +41,25 @@ class HyperFlowEstimator(BaseEstimator):
             hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
             random_state=42,
-            log_file=None,
+            log_file: str = None,
+            log_config: Optional[dict] = None,
+            highR_nan_threshold=0.5,
+            highR_cat_threshold=0.5,
             **kwargs
     ):
+        '''
+
+        :param tuner:
+        :param hdl_constructor:
+        :param resource_manager:
+        :param random_state:
+        :param log_file:
+        :param included_classifiers:
+        :param included_regressors:
+        '''
+        self.log_config = log_config
+        self.highR_nan_threshold = highR_nan_threshold
+        self.highR_cat_threshold = highR_cat_threshold
         '''
         Base Estimator of HyperFlow.
 
@@ -59,7 +75,7 @@ class HyperFlowEstimator(BaseEstimator):
         '''
         # ---logger------------------------------------
         self.log_file = log_file
-        setup_logger(self.log_file)
+        setup_logger(self.log_file, self.log_config)
         self.logger = get_logger(self)
         # ---random_state-----------------------------------
         self.random_state = random_state
@@ -79,8 +95,8 @@ class HyperFlowEstimator(BaseEstimator):
 
     def fit(
             self,
-            X: Union[np.ndarray, pd.DataFrame, GenericDataFrame],
-            y=None,
+            X_train: Union[np.ndarray, pd.DataFrame, GenericDataFrame],
+            y_train=None,
             X_test=None,
             y_test=None,
             column_descriptions: Optional[Dict] = None,
@@ -92,8 +108,7 @@ class HyperFlowEstimator(BaseEstimator):
             should_store_intermediate_result=False,
             additional_info: dict = frozendict(),
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
-            highR_nan_threshold=0.5,
-            highR_cat_threshold=0.5,
+
     ):
 
         self.should_store_intermediate_result = should_store_intermediate_result
@@ -101,7 +116,7 @@ class HyperFlowEstimator(BaseEstimator):
         additional_info = dict(additional_info)
         # build data_manager
         self.data_manager = DataManager(
-            X, y, X_test, y_test, dataset_metadata, column_descriptions, highR_nan_threshold
+            X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold
         )
         self.ml_task = self.data_manager.ml_task
         if self.checked_mainTask is not None:
@@ -133,7 +148,7 @@ class HyperFlowEstimator(BaseEstimator):
         general_experiment_timestamp = datetime.datetime.now()
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
             current_experiment_timestamp = datetime.datetime.now()
-            hdl_constructor.run(self.data_manager, self.random_state, highR_cat_threshold)
+            hdl_constructor.run(self.data_manager, self.random_state, self.highR_cat_threshold)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()

@@ -14,6 +14,53 @@ from hyperflow.utils.ml_task import MLTask, get_ml_task_from_y
 
 class DataManager():
 
+    def __init__(
+            self,
+            X_train: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
+            y_train: Union[pd.Series, np.ndarray, str, None] = None,
+            X_test: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
+            y_test: Union[pd.Series, np.ndarray, str, None] = None,
+            dataset_metadata: Dict[str, Any] = frozenset(),
+            column_descriptions: Dict[str, str] = None,
+            highR_nan_threshold: float = 0.5,
+    ):
+        '''
+        DataManager is a Dataset manager to store the pattern of dataset.
+
+        :param X_train:
+        :param y_train:
+        :param X_test:
+        :param y_test:
+        :param dataset_metadata:
+        :param column_descriptions:
+        :param highR_nan_threshold:
+        '''
+        self.logger = get_logger(self)
+        dataset_metadata = dict(dataset_metadata)
+        self.highR_nan_threshold = highR_nan_threshold
+        self.dataset_metadata = dataset_metadata
+        X_train, y_train, X_test, y_test, feature_groups, column2feature_groups = self.parse_column_descriptions(
+            column_descriptions, X_train, y_train, X_test, y_test
+        )
+        self.feature_groups = feature_groups
+        self.column2feature_groups = column2feature_groups
+        self.ml_task: MLTask = get_ml_task_from_y(y_train)
+        self.X_train = GenericDataFrame(X_train, feature_groups=feature_groups)
+        self.y_train = y_train
+        self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None
+        self.y_test = y_test if y_test is not None else None
+
+        # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定
+        # fixme: 不支持multilabel
+        if len(y_train.shape) > 2:
+            raise ValueError('y must not have more than two dimensions, '
+                             'but has %d.' % len(y_train.shape))
+
+        if X_train.shape[0] != y_train.shape[0]:
+            raise ValueError('X and y must have the same number of '
+                             'datapoints, but have %d and %d.' % (X_train.shape[0],
+                                                                  y_train.shape[0]))
+
     def parse_feature_groups(self, series: pd.Series):
         if is_nan(series):
             if is_highR_nan(series, self.highR_nan_threshold):
@@ -117,41 +164,7 @@ class DataManager():
     #         raise FileNotFoundError
     #     return self.resource_manager.file_system.load_csv(X)
 
-    def __init__(
-            self,
-            X_train: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
-            y_train: Union[pd.Series, np.ndarray, str, None] = None,
-            X_test: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
-            y_test: Union[pd.Series, np.ndarray, str, None] = None,
-            dataset_metadata: Dict[str, Any] = frozenset(),
-            column_descriptions: Dict[str, str] = None,
-            highR_nan_threshold: float = 0.5,
-    ):
-        self.logger = get_logger(self)
-        dataset_metadata = dict(dataset_metadata)
-        self.highR_nan_threshold = highR_nan_threshold
-        self.dataset_metadata = dataset_metadata
-        X_train, y_train, X_test, y_test, feature_groups, column2feature_groups = self.parse_column_descriptions(
-            column_descriptions, X_train, y_train, X_test, y_test
-        )
-        self.feature_groups = feature_groups
-        self.column2feature_groups = column2feature_groups
-        self.ml_task: MLTask = get_ml_task_from_y(y_train)
-        self.X_train = GenericDataFrame(X_train, feature_groups=feature_groups)
-        self.y_train = y_train
-        self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None
-        self.y_test = y_test if y_test is not None else None
 
-        # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定
-        # fixme: 不支持multilabel
-        if len(y_train.shape) > 2:
-            raise ValueError('y must not have more than two dimensions, '
-                             'but has %d.' % len(y_train.shape))
-
-        if X_train.shape[0] != y_train.shape[0]:
-            raise ValueError('X and y must have the same number of '
-                             'datapoints, but have %d and %d.' % (X_train.shape[0],
-                                                                  y_train.shape[0]))
 
     def process_X(self, X):
         if X is None:
