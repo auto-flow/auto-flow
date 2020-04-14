@@ -26,7 +26,7 @@ which can automatically select algorithm and optimize the parameters of
 machine learning workflow. 
 In other words, it can implement AutoML for tabular data.
 
-.. image:: docs/_images/workflow_space.png
+.. image:: docs/images/workflow_space.png
 
 
 Installation
