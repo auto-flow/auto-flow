@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.metrics package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.metrics package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.metrics.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-metrics-package">
+<h1>hyperflow.metrics package<a class="headerlink" href="#hyperflow-metrics-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.metrics.classification_metrics">
+<span id="hyperflow-metrics-classification-metrics-module"></span><h2>hyperflow.metrics.classification_metrics module<a class="headerlink" href="#module-hyperflow.metrics.classification_metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="hyperflow.metrics.classification_metrics.balanced_accuracy">
+<code class="descclassname">hyperflow.metrics.classification_metrics.</code><code class="descname">balanced_accuracy</code><span class="sig-paren">(</span><em>solution</em>, <em>prediction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/metrics/classification_metrics.html#balanced_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.metrics.classification_metrics.balanced_accuracy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="hyperflow.metrics.classification_metrics.pac_score">
+<code class="descclassname">hyperflow.metrics.classification_metrics.</code><code class="descname">pac_score</code><span class="sig-paren">(</span><em>solution</em>, <em>prediction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/metrics/classification_metrics.html#pac_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.metrics.classification_metrics.pac_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Probabilistic Accuracy based on log_loss metric.
+We assume the solution is in {0, 1} and prediction in [0, 1].
+Otherwise, run normalize_array.
+:param solution:
+:param prediction:
+:param ml_task:
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.metrics">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.metrics.Scorer">
+<em class="property">class </em><code class="descclassname">hyperflow.metrics.</code><code class="descname">Scorer</code><span class="sig-paren">(</span><em>name</em>, <em>score_func</em>, <em>optimum</em>, <em>sign</em>, <em>kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/metrics.html#Scorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.metrics.Scorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hyperflow.metrics.calculate_score">
+<code class="descclassname">hyperflow.metrics.</code><code class="descname">calculate_score</code><span class="sig-paren">(</span><em>solution</em>, <em>prediction</em>, <em>ml_task: hyperflow.utils.ml_task.MLTask</em>, <em>metric</em>, <em>should_calc_all_metric=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/metrics.html#calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.metrics.calculate_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="hyperflow.metrics.make_scorer">
+<code class="descclassname">hyperflow.metrics.</code><code class="descname">make_scorer</code><span class="sig-paren">(</span><em>name</em>, <em>score_func</em>, <em>optimum=1</em>, <em>greater_is_better=True</em>, <em>needs_proba=False</em>, <em>needs_threshold=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/metrics.html#make_scorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.metrics.make_scorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a scorer from a performance metric or loss function.</p>
+<p>Factory inspired by scikit-learn which wraps scikit-learn scoring functions
+to be used in auto-sklearn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>score_func</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#callable" title="(in Python v3.8)"><em>callable</em></a>) &#8211; Score function (or loss function) with signature
+<code class="docutils literal"><span class="pre">score_func(y,</span> <span class="pre">y_pred,</span> <span class="pre">**kwargs)</span></code>.</li>
+<li><strong>optimum</strong> (<em>int or float, default=1</em>) &#8211; The best score achievable by the score function, i.e. maximum in case of
+scorer function and minimum in case of loss function.</li>
+<li><strong>greater_is_better</strong> (<em>boolean, default=True</em>) &#8211; Whether score_func is a score function (default), meaning high is good,
+or a loss function, meaning low is good. In the latter case, the
+scorer object will sign-flip the outcome of the score_func.</li>
+<li><strong>needs_proba</strong> (<em>boolean, default=False</em>) &#8211; Whether score_func requires predict_proba to get probability estimates
+out of a classifier.</li>
+<li><strong>needs_threshold</strong> (<em>boolean, default=False</em>) &#8211; Whether score_func takes a continuous decision certainty.
+This only works for binary classification.</li>
+<li><strong>**kwargs</strong> &#8211; <p>Additional parameters to be passed to score_func.</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>scorer</strong> &#8211;
+Callable object that returns a scalar score; greater is better.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#callable" title="(in Python v3.8)">callable</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

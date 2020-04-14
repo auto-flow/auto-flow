@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.preprocessing.reduce package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.preprocessing.reduce package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.reduce.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-components-preprocessing-reduce-package">
+<h1>hyperflow.pipeline.components.preprocessing.reduce package<a class="headerlink" href="#hyperflow-pipeline-components-preprocessing-reduce-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce.fast_ica">
+<span id="hyperflow-pipeline-components-preprocessing-reduce-fast-ica-module"></span><h2>hyperflow.pipeline.components.preprocessing.reduce.fast_ica module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce.fast_ica" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.fast_ica.FastICA">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.reduce.fast_ica.</code><code class="descname">FastICA</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/fast_ica.html#FastICA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.fast_ica.FastICA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.fast_ica.FastICA.class__">
+<code class="descname">class__</code><em class="property"> = 'FastICA'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.fast_ica.FastICA.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.fast_ica.FastICA.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.decomposition'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.fast_ica.FastICA.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration">
+<span id="hyperflow-pipeline-components-preprocessing-reduce-feature-agglomeration-module"></span><h2>hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.</code><code class="descname">FeatureAgglomeration</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/feature_agglomeration.html#FeatureAgglomeration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/feature_agglomeration.html#FeatureAgglomeration.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration.class__">
+<code class="descname">class__</code><em class="property"> = 'FeatureAgglomeration'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.cluster'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration.FeatureAgglomeration.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce.kernel_pca">
+<span id="hyperflow-pipeline-components-preprocessing-reduce-kernel-pca-module"></span><h2>hyperflow.pipeline.components.preprocessing.reduce.kernel_pca module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce.kernel_pca" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.KernelPCA">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.</code><code class="descname">KernelPCA</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/kernel_pca.html#KernelPCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.KernelPCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.KernelPCA.class__">
+<code class="descname">class__</code><em class="property"> = 'KernelPCA'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.KernelPCA.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.KernelPCA.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.decomposition'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.kernel_pca.KernelPCA.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce.pca">
+<span id="hyperflow-pipeline-components-preprocessing-reduce-pca-module"></span><h2>hyperflow.pipeline.components.preprocessing.reduce.pca module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce.pca" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.pca.PCA">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.reduce.pca.</code><code class="descname">PCA</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/pca.html#PCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.pca.PCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.pca.PCA.class__">
+<code class="descname">class__</code><em class="property"> = 'PCA'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.pca.PCA.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.pca.PCA.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.decomposition'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.pca.PCA.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding">
+<span id="hyperflow-pipeline-components-preprocessing-reduce-random-trees-embedding-module"></span><h2>hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.RandomTreesEmbedding">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.</code><code class="descname">RandomTreesEmbedding</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/random_trees_embedding.html#RandomTreesEmbedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.RandomTreesEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.RandomTreesEmbedding.class__">
+<code class="descname">class__</code><em class="property"> = 'RandomTreesEmbedding'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.RandomTreesEmbedding.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.RandomTreesEmbedding.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.ensemble'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding.RandomTreesEmbedding.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD">
+<span id="hyperflow-pipeline-components-preprocessing-reduce-truncatedsvd-module"></span><h2>hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.TruncatedSVD">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.</code><code class="descname">TruncatedSVD</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/reduce/truncatedSVD.html#TruncatedSVD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.TruncatedSVD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.TruncatedSVD.class__">
+<code class="descname">class__</code><em class="property"> = 'TruncatedSVD'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.TruncatedSVD.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.TruncatedSVD.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.decomposition'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD.TruncatedSVD.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.reduce">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.reduce" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

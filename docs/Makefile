@@ -196,3 +196,6 @@ apidoc:
 
 view:
 	google-chrome _build/html/index.html
+
+copy:
+	cp -r _build/html/* .

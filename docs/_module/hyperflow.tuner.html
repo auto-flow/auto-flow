@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.tuner package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.tuner package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.tuner.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-tuner-package">
+<h1>hyperflow.tuner package<a class="headerlink" href="#hyperflow-tuner-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.tuner.tuner">
+<span id="hyperflow-tuner-tuner-module"></span><h2>hyperflow.tuner.tuner module<a class="headerlink" href="#module-hyperflow.tuner.tuner" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.tuner.tuner.Tuner">
+<em class="property">class </em><code class="descclassname">hyperflow.tuner.tuner.</code><code class="descname">Tuner</code><span class="sig-paren">(</span><em>evaluator: Union[Callable</em>, <em>str]='TrainEvaluator'</em>, <em>search_method: str='smac'</em>, <em>run_limit: int=100</em>, <em>initial_runs: int=20</em>, <em>search_method_params: dict=&lt;frozendict {}&gt;</em>, <em>n_jobs: int=1</em>, <em>exit_processes: Union[int</em>, <em>NoneType]=None</em>, <em>limit_resource: bool=True</em>, <em>per_run_time_limit: float=60</em>, <em>per_run_memory_limit: float=3072</em>, <em>time_left_for_this_task: float=None</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.design_initial_configs">
+<code class="descname">design_initial_configs</code><span class="sig-paren">(</span><em>n_jobs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.design_initial_configs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.design_initial_configs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.get_run_limit">
+<code class="descname">get_run_limit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.get_run_limit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.get_run_limit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.hdl2shps">
+<code class="descname">hdl2shps</code><span class="sig-paren">(</span><em>hdl: Dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.hdl2shps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.hdl2shps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>initial_configs</em>, <em>evaluator_params=&lt;frozendict {}&gt;</em>, <em>instance_id=''</em>, <em>rh_db_type='sqlite'</em>, <em>rh_db_params=&lt;frozendict {}&gt;</em>, <em>rh_db_table_name='runhistory'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.set_data_manager">
+<code class="descname">set_data_manager</code><span class="sig-paren">(</span><em>data_manager: hyperflow.manager.data_manager.DataManager</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_data_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_data_manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.set_hdl">
+<code class="descname">set_hdl</code><span class="sig-paren">(</span><em>hdl: Dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_hdl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_hdl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.set_random_state">
+<code class="descname">set_random_state</code><span class="sig-paren">(</span><em>random_state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_random_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_random_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.set_resource_manager">
+<code class="descname">set_resource_manager</code><span class="sig-paren">(</span><em>resource_manager: hyperflow.manager.resource_manager.ResourceManager</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_resource_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_resource_manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.tuner.tuner.Tuner.set_task">
+<code class="descname">set_task</code><span class="sig-paren">(</span><em>ml_task: hyperflow.utils.ml_task.MLTask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.tuner">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.tuner" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

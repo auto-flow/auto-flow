@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.tuner.tuner &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.tuner.tuner</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.tuner.tuner</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">ConfigurationSpace</span>
+<span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
+
+<span class="kn">from</span> <span class="nn">dsmac.facade.smac_hpo_facade</span> <span class="kn">import</span> <span class="n">SMAC4HPO</span>
+<span class="kn">from</span> <span class="nn">dsmac.scenario.scenario</span> <span class="kn">import</span> <span class="n">Scenario</span>
+<span class="kn">from</span> <span class="nn">hyperflow.evaluation.ensemble_evaluator</span> <span class="kn">import</span> <span class="n">EnsembleEvaluator</span>
+<span class="kn">from</span> <span class="nn">hyperflow.evaluation.train_evaluator</span> <span class="kn">import</span> <span class="n">TrainEvaluator</span>
+<span class="kn">from</span> <span class="nn">hyperflow.hdl2shps.hdl2shps</span> <span class="kn">import</span> <span class="n">HDL2SHPS</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">parse_n_jobs</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.config_space</span> <span class="kn">import</span> <span class="n">get_random_initial_configs</span><span class="p">,</span> <span class="n">get_grid_initial_configs</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
+
+
+<div class="viewcode-block" id="Tuner"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner">[docs]</a><span class="k">class</span> <span class="nc">Tuner</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">evaluator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;TrainEvaluator&quot;</span><span class="p">,</span>
+            <span class="n">search_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;smac&quot;</span><span class="p">,</span>
+            <span class="n">run_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">initial_runs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+            <span class="n">search_method_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">exit_processes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">limit_resource</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">per_run_time_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+            <span class="n">per_run_memory_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3072</span><span class="p">,</span>
+            <span class="n">time_left_for_this_task</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_run_memory_limit</span> <span class="o">=</span> <span class="n">per_run_memory_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_left_for_this_task</span> <span class="o">=</span> <span class="n">time_left_for_this_task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_run_time_limit</span> <span class="o">=</span> <span class="n">per_run_time_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit_resource</span> <span class="o">=</span> <span class="n">limit_resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit_resource</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Tuner.debug and Tuner.limit_resource cannot be both True. set Tuner.limit_resource to False.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">limit_resource</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">search_method_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">search_method_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">evaluator</span> <span class="o">==</span> <span class="s2">&quot;TrainEvaluator&quot;</span><span class="p">:</span>
+                <span class="n">evaluator</span> <span class="o">=</span> <span class="n">TrainEvaluator</span>
+            <span class="k">elif</span> <span class="n">evaluator</span> <span class="o">==</span> <span class="s2">&quot;EnsembleEvaluator&quot;</span><span class="p">:</span>
+                <span class="n">evaluator</span> <span class="o">=</span> <span class="n">EnsembleEvaluator</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">assert</span> <span class="n">callable</span><span class="p">(</span><span class="n">evaluator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluator_prototype</span> <span class="o">=</span> <span class="n">evaluator</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">evaluator</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span> <span class="o">=</span> <span class="n">evaluator</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span> <span class="o">=</span> <span class="n">evaluator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_method_params</span> <span class="o">=</span> <span class="n">search_method_params</span>
+        <span class="k">assert</span> <span class="n">search_method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;smac&quot;</span><span class="p">,</span> <span class="s2">&quot;grid&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">search_method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;grid&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">):</span>
+            <span class="n">initial_runs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_runs</span> <span class="o">=</span> <span class="n">initial_runs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_limit</span> <span class="o">=</span> <span class="n">run_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">=</span> <span class="n">search_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addition_info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="n">parse_n_jobs</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exit_processes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">exit_processes</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit_processes</span> <span class="o">=</span> <span class="n">exit_processes</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;hyperflow.Tuner(&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;evaluator={repr(self.evaluator_prototype.__name__)}, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;search_method={repr(self.search_method)}, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;run_limit={repr(self.run_limit)}, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;initial_runs={repr(self.initial_runs)}, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;search_method_params={repr(self.search_method_params)}, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;n_jobs={repr(self.n_jobs)}, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;exit_processes={repr(self.exit_processes)}&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;)&quot;</span><span class="p">)</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="Tuner.set_random_state"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_random_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span></div>
+
+    <span class="c1"># def set_addition_info(self, addition_info):</span>
+    <span class="c1">#     self.addition_info = addition_info</span>
+
+<div class="viewcode-block" id="Tuner.hdl2shps"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.hdl2shps">[docs]</a>    <span class="k">def</span> <span class="nf">hdl2shps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="n">hdl2shps</span> <span class="o">=</span> <span class="n">HDL2SHPS</span><span class="p">()</span>
+        <span class="n">hdl2shps</span><span class="o">.</span><span class="n">set_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hdl2shps</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tuner.set_hdl"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">set_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span> <span class="o">=</span> <span class="n">hdl</span>
+        <span class="c1"># todo: 泛化ML管线后，可能存在多个preprocessing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl2shps</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tuner.set_resource_manager"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_resource_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_resource_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">resource_manager</span></div>
+        <span class="c1"># self.evaluator.set_resource_manager(resource_manager)</span>
+
+<div class="viewcode-block" id="Tuner.set_task"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_task">[docs]</a>    <span class="k">def</span> <span class="nf">set_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">ml_task</span></div>
+
+<div class="viewcode-block" id="Tuner.set_data_manager"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_data_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_data_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">data_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span></div>
+
+<div class="viewcode-block" id="Tuner.design_initial_configs"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.design_initial_configs">[docs]</a>    <span class="k">def</span> <span class="nf">design_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;smac&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_random_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_runs</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_grid_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_limit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_random_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_limit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Tuner.get_run_limit"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.get_run_limit">[docs]</a>    <span class="k">def</span> <span class="nf">get_run_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;smac&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_limit</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Tuner.run"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">initial_configs</span><span class="p">,</span>
+            <span class="n">evaluator_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">instance_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">rh_db_type</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>
+            <span class="n">rh_db_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">rh_db_table_name</span><span class="o">=</span><span class="s2">&quot;runhistory&quot;</span>
+    <span class="p">):</span></div>
+        <span class="c1"># time.sleep(random.random())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">initial_configs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Haven&#39;t initial_configs. Return.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">init_data</span><span class="p">(</span><span class="o">**</span><span class="n">evaluator_params</span><span class="p">)</span>
+        <span class="n">senario_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;run_obj&quot;</span><span class="p">:</span> <span class="s2">&quot;quality&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;runcount-limit&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="s2">&quot;cs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">,</span>  <span class="c1"># configuration space</span>
+            <span class="s2">&quot;deterministic&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;instances&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="n">instance_id</span><span class="p">]],</span>
+            <span class="s2">&quot;cutoff_time&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_run_time_limit</span><span class="p">,</span>
+            <span class="s2">&quot;memory_limit&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_run_memory_limit</span>
+            <span class="c1"># todo : 如果是local，存在experiment，如果是其他文件系统，不输出smac</span>
+            <span class="c1"># &quot;output_dir&quot;: self.resource_manager.smac_output_dir,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span> <span class="o">=</span> <span class="n">Scenario</span><span class="p">(</span>
+            <span class="n">senario_dict</span><span class="p">,</span>
+            <span class="n">initial_runs</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">db_type</span><span class="o">=</span><span class="n">rh_db_type</span><span class="p">,</span>
+            <span class="n">db_params</span><span class="o">=</span><span class="n">rh_db_params</span><span class="p">,</span>
+            <span class="n">db_table_name</span><span class="o">=</span><span class="n">rh_db_table_name</span><span class="p">,</span>
+            <span class="n">anneal_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">search_method_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;anneal_func&quot;</span><span class="p">),</span>
+            <span class="n">use_pynisher</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">limit_resource</span>
+        <span class="p">)</span>
+        <span class="c1"># todo 将 file_system 传入，或者给file_system添加 runtime 参数</span>
+        <span class="n">smac</span> <span class="o">=</span> <span class="n">SMAC4HPO</span><span class="p">(</span>
+            <span class="n">scenario</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="p">,</span>
+            <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">),</span>
+            <span class="n">tae_runner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="p">,</span>
+            <span class="n">initial_configurations</span><span class="o">=</span><span class="n">initial_configs</span>
+        <span class="p">)</span>
+        <span class="n">smac</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">initial_configurations</span> <span class="o">=</span> <span class="n">initial_configs</span>
+        <span class="n">smac</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">start_</span><span class="p">()</span>
+        <span class="n">run_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_limit</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">run_limit</span><span class="p">):</span>
+            <span class="n">smac</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">run_</span><span class="p">()</span>
+            <span class="n">should_continue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">delete_models</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">should_continue</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PID = {os.getpid()} is exiting.&quot;</span><span class="p">)</span>
+                <span class="k">break</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

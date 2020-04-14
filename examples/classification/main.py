@@ -9,11 +9,11 @@ from hyperflow import HyperFlowClassifier
 # load data from csv file
 train_df = pd.read_csv("../data/train_classification.csv")
 test_df = pd.read_csv("../data/test_classification.csv")
-# initial_runs  is totally random search, to provide experience for SMAC algorithm
-# run_limit     is the maximum number of runs
-# n_jobs        start how many search process
-# included_classifiers restrict the search space . lightgbm is the only classifier that needs to be selected
-# per_run_time_limit restrict the run time. if a trial during 60 seconds, it is expired, should be shut off
+# initial_runs  -- is totally random search, to provide experience for SMAC algorithm
+# run_limit     -- is the maximum number of runs
+# n_jobs        -- start how many search process
+# included_classifiers -- restrict the search space . lightgbm is the only classifier that needs to be selected
+# per_run_time_limit -- restrict the run time. if a trial during 60 seconds, it is expired, should be shut off
 trained_pipeline = HyperFlowClassifier(initial_runs=5, run_limit=10, n_jobs=1, included_classifiers=["lightgbm"],
                                        per_run_time_limit=60)
 # describing meaning of columns. `id`, `target` and `ignore` all has specific meaning

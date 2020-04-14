@@ -49,30 +49,26 @@ class HyperFlowEstimator(BaseEstimator):
     ):
         '''
 
-        :param tuner:
-        :param hdl_constructor:
-        :param resource_manager:
-        :param random_state:
-        :param log_file:
-        :param included_classifiers:
-        :param included_regressors:
-        '''
-        self.log_config = log_config
-        self.highR_nan_threshold = highR_nan_threshold
-        self.highR_cat_threshold = highR_cat_threshold
-        '''
-        Base Estimator of HyperFlow.
-
         Parameters
         ----------
         tuner: dict
             tuner is a object to fine tune the hyper-parameters.
         hdl_constructor: int
-            H.D.L. is a abbreviation of Hyperparams Descriptions Language.
+            ``H.D.L.`` is a abbreviation of Hyperparams Descriptions Language.
             hdl_constructor is a object to build HDL by seeding specific parameters.
         resource_manager: str
             resource_manager is a object to manager the resources, such like database connections and file-systems.
+        random_state
+        log_file
+        log_config
+        highR_nan_threshold
+        highR_cat_threshold
+        kwargs
         '''
+        self.log_config = log_config
+        self.highR_nan_threshold = highR_nan_threshold
+        self.highR_cat_threshold = highR_cat_threshold
+
         # ---logger------------------------------------
         self.log_file = log_file
         setup_logger(self.log_file, self.log_config)

@@ -1,0 +1,511 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.evaluation.train_evaluator &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.evaluation.train_evaluator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.evaluation.train_evaluator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">redirect_stderr</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">Configuration</span>
+
+<span class="kn">from</span> <span class="nn">dsmac.runhistory.utils</span> <span class="kn">import</span> <span class="n">get_id_of_config</span>
+<span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">PHASE2</span><span class="p">,</span> <span class="n">PHASE1</span>
+<span class="kn">from</span> <span class="nn">hyperflow.ensemble.utils</span> <span class="kn">import</span> <span class="n">vote_predicts</span><span class="p">,</span> <span class="n">mean_predicts</span>
+<span class="kn">from</span> <span class="nn">hyperflow.evaluation.base</span> <span class="kn">import</span> <span class="n">BaseEvaluator</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.metrics</span> <span class="kn">import</span> <span class="n">Scorer</span><span class="p">,</span> <span class="n">calculate_score</span>
+<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">hyperflow.pipeline.pipeline</span> <span class="kn">import</span> <span class="n">GenericPipeline</span>
+<span class="kn">from</span> <span class="nn">hyperflow.shp2dhp.shp2dhp</span> <span class="kn">import</span> <span class="n">SHP2DHP</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.dict</span> <span class="kn">import</span> <span class="n">group_dict_items_before_first_dot</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_object_in_pipeline_components</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.pipeline</span> <span class="kn">import</span> <span class="n">concat_pipeline</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.sys</span> <span class="kn">import</span> <span class="n">get_trance_back_msg</span>
+
+
+<div class="viewcode-block" id="TrainEvaluator"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator">[docs]</a><span class="k">class</span> <span class="nc">TrainEvaluator</span><span class="p">(</span><span class="n">BaseEvaluator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># ---member variable----</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="TrainEvaluator.init_data"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.init_data">[docs]</a>    <span class="k">def</span> <span class="nf">init_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="p">,</span>
+            <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">:</span> <span class="n">Scorer</span><span class="p">,</span>
+            <span class="n">should_calc_all_metric</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="p">,</span>
+            <span class="n">should_store_intermediate_result</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">splitter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">data_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">should_store_intermediate_result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metric</span> <span class="o">=</span> <span class="n">should_calc_all_metric</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predict_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_regression</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predict_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">resource_manager</span></div>
+
+<div class="viewcode-block" id="TrainEvaluator.loss"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.loss">[docs]</a>    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">):</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">calculate_score</span><span class="p">(</span>
+            <span class="n">y_true</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">should_calc_all_metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metric</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">_optimum</span> <span class="o">-</span> <span class="n">score</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">all_score</span> <span class="o">=</span> <span class="n">score</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">_optimum</span> <span class="o">-</span> <span class="n">score</span>
+            <span class="n">all_score</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
+
+        <span class="k">return</span> <span class="n">err</span><span class="p">,</span> <span class="n">all_score</span></div>
+
+<div class="viewcode-block" id="TrainEvaluator.set_resource_manager"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.set_resource_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_resource_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">resource_manager</span></div>
+
+    <span class="k">def</span> <span class="nf">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y_pred</span>
+
+    <span class="k">def</span> <span class="nf">_predict_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">y_pred</span>
+
+<div class="viewcode-block" id="TrainEvaluator.get_Xy"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.get_Xy">[docs]</a>    <span class="k">def</span> <span class="nf">get_Xy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="c1"># fixme: 会出现结果被改变的情况！  目前这个bug在hyperflow.pipeline.components.preprocessing.operate.merge.Merge 出现过</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_test</span><span class="p">)</span>
+        <span class="c1"># return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)</span>
+
+<div class="viewcode-block" id="TrainEvaluator.evaluate"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">GenericPipeline</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">warning_info</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">redirect_stderr</span><span class="p">(</span><span class="n">warning_info</span><span class="p">):</span>
+            <span class="c1"># splitter 必须存在</span>
+            <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">models</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">y_true_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">y_preds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">y_test_preds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">all_scores</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;SUCCESS&quot;</span>
+            <span class="n">failed_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">train_index</span><span class="p">,</span> <span class="n">valid_index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+                <span class="n">X</span><span class="p">:</span> <span class="n">GenericDataFrame</span>
+                <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">split</span><span class="p">([</span><span class="n">train_index</span><span class="p">,</span> <span class="n">valid_index</span><span class="p">])</span>
+                <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">valid_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span><span class="p">:</span>
+                    <span class="n">intermediate_result</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">intermediate_result</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">procedure_result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">procedure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">,</span> <span class="n">intermediate_result</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">failed_info</span> <span class="o">=</span> <span class="n">get_trance_back_msg</span><span class="p">()</span>
+                    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;FAILED&quot;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;re-raise exception&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">break</span>
+                <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+                <span class="n">y_true_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">valid_index</span><span class="p">)</span>
+                <span class="n">y_pred</span> <span class="o">=</span> <span class="n">procedure_result</span><span class="p">[</span><span class="s2">&quot;pred_valid&quot;</span><span class="p">]</span>
+                <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">procedure_result</span><span class="p">[</span><span class="s2">&quot;pred_test&quot;</span><span class="p">]</span>
+                <span class="n">y_preds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
+                <span class="n">y_test_preds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_test_pred</span><span class="p">)</span>
+                <span class="n">loss</span><span class="p">,</span> <span class="n">all_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+                <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">loss</span><span class="p">))</span>
+                <span class="n">all_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_score</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">final_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">final_loss</span> <span class="o">=</span> <span class="mi">65535</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_scores</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">all_scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">all_score</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">cur_all_score</span> <span class="ow">in</span> <span class="n">all_scores</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cur_all_score</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">cur_all_score</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">all_score</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TypeError: cur_all_score is not dict.</span><span class="se">\n</span><span class="s2">cur_all_score = </span><span class="si">{cur_all_score}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">all_score</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">all_score</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_score</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">all_score</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">all_scores</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">final_loss</span><span class="p">,</span>
+                <span class="s2">&quot;losses&quot;</span><span class="p">:</span> <span class="n">losses</span><span class="p">,</span>
+                <span class="s2">&quot;all_score&quot;</span><span class="p">:</span> <span class="n">all_score</span><span class="p">,</span>
+                <span class="s2">&quot;all_scores&quot;</span><span class="p">:</span> <span class="n">all_scores</span><span class="p">,</span>
+                <span class="s2">&quot;models&quot;</span><span class="p">:</span> <span class="n">models</span><span class="p">,</span>
+                <span class="s2">&quot;y_true_indexes&quot;</span><span class="p">:</span> <span class="n">y_true_indexes</span><span class="p">,</span>
+                <span class="s2">&quot;y_preds&quot;</span><span class="p">:</span> <span class="n">y_preds</span><span class="p">,</span>
+                <span class="s2">&quot;intermediate_result&quot;</span><span class="p">:</span> <span class="n">intermediate_result</span><span class="p">,</span>
+                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
+                <span class="s2">&quot;failed_info&quot;</span><span class="p">:</span> <span class="n">failed_info</span>
+            <span class="p">}</span>
+            <span class="c1"># todo</span>
+            <span class="k">if</span> <span class="n">y_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># 验证集训练模型的组合去预测测试集的数据</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+                    <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">vote_predicts</span><span class="p">(</span><span class="n">y_test_preds</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">mean_predicts</span><span class="p">(</span><span class="n">y_test_preds</span><span class="p">)</span>
+                <span class="n">test_loss</span><span class="p">,</span> <span class="n">test_all_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_test_pred</span><span class="p">)</span>
+                <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                    <span class="s2">&quot;test_loss&quot;</span><span class="p">:</span> <span class="n">test_loss</span><span class="p">,</span>
+                    <span class="s2">&quot;test_all_score&quot;</span><span class="p">:</span> <span class="n">test_all_score</span><span class="p">,</span>
+                    <span class="s2">&quot;y_test_true&quot;</span><span class="p">:</span> <span class="n">y_test</span><span class="p">,</span>
+                    <span class="s2">&quot;y_test_pred&quot;</span><span class="p">:</span> <span class="n">y_test_pred</span>
+                <span class="p">})</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;warning_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">warning_info</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shp</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">):</span>
+        <span class="c1"># 1. 将php变成model</span>
+        <span class="n">config_id</span> <span class="o">=</span> <span class="n">get_id_of_config</span><span class="p">(</span><span class="n">shp</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">dhp</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shp2model</span><span class="p">(</span><span class="n">shp</span><span class="p">)</span>
+        <span class="c1"># 2. 获取数据</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Xy</span><span class="p">()</span>
+        <span class="c1"># 3. 进行评价</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>  <span class="c1"># todo : 考虑失败的情况</span>
+        <span class="c1"># 4. 持久化</span>
+        <span class="n">cost_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_id</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;program_hyper_param&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shp</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;dict_hyper_param&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dhp</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dhp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PHASE2</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;unk&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">estimator</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;cost_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cost_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_trials_table</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="TrainEvaluator.shp2model"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.shp2model">[docs]</a>    <span class="k">def</span> <span class="nf">shp2model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shp</span><span class="p">):</span>
+        <span class="n">shp2dhp</span> <span class="o">=</span> <span class="n">SHP2DHP</span><span class="p">()</span>
+        <span class="n">dhp</span> <span class="o">=</span> <span class="n">shp2dhp</span><span class="p">(</span><span class="n">shp</span><span class="p">)</span>
+        <span class="n">preprocessor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_preprocessor</span><span class="p">(</span><span class="n">dhp</span><span class="p">)</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_estimator</span><span class="p">(</span><span class="n">dhp</span><span class="p">)</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">concat_pipeline</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">estimator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dhp</span><span class="p">,</span> <span class="n">pipeline</span></div>
+
+<div class="viewcode-block" id="TrainEvaluator.parse_key"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.parse_key">[docs]</a>    <span class="k">def</span> <span class="nf">parse_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">cnt</span> <span class="o">+=</span> <span class="n">c</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ix</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">break</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="n">ix</span><span class="p">:]</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\{.*\})&quot;</span><span class="p">)</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">additional_info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">braces_content</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">_to</span> <span class="o">=</span> <span class="n">braces_content</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">param_kvs</span> <span class="o">=</span> <span class="n">_to</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">param_kv</span> <span class="ow">in</span> <span class="n">param_kvs</span><span class="p">:</span>
+                <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">param_kv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+                <span class="n">additional_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;-&gt;&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="n">_from</span><span class="p">,</span> <span class="n">_to</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">)</span>
+            <span class="n">in_feature_groups</span> <span class="o">=</span> <span class="n">_from</span>
+            <span class="n">out_feature_groups</span> <span class="o">=</span> <span class="n">_to</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">in_feature_groups</span><span class="p">,</span> <span class="n">out_feature_groups</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_feature_groups</span><span class="p">:</span>
+            <span class="n">in_feature_groups</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out_feature_groups</span><span class="p">:</span>
+            <span class="n">out_feature_groups</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">in_feature_groups</span><span class="p">,</span> <span class="n">out_feature_groups</span><span class="p">,</span> <span class="n">additional_info</span></div>
+
+<div class="viewcode-block" id="TrainEvaluator.create_preprocessor"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.create_preprocessor">[docs]</a>    <span class="k">def</span> <span class="nf">create_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dhp</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GenericPipeline</span><span class="p">]:</span>
+        <span class="n">preprocessing_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">dhp</span><span class="p">[</span><span class="n">PHASE1</span><span class="p">]</span>
+        <span class="n">pipeline_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">preprocessing_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">key</span>  <span class="c1"># like: &quot;cat-&gt;num&quot;</span>
+            <span class="n">in_feature_groups</span><span class="p">,</span> <span class="n">out_feature_groups</span><span class="p">,</span> <span class="n">outsideEdge_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">sub_dict</span> <span class="o">=</span> <span class="n">preprocessing_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sub_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">preprocessor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_component</span><span class="p">(</span><span class="n">sub_dict</span><span class="p">,</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">in_feature_groups</span><span class="p">,</span> <span class="n">out_feature_groups</span><span class="p">,</span>
+                                                 <span class="n">outsideEdge_info</span><span class="p">)</span>
+            <span class="n">pipeline_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pipeline_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">GenericPipeline</span><span class="p">(</span><span class="n">pipeline_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TrainEvaluator.create_estimator"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.create_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">create_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dhp</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GenericPipeline</span><span class="p">:</span></div>
+        <span class="c1"># 根据超参构造一个估计器</span>
+        <span class="k">return</span> <span class="n">GenericPipeline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_component</span><span class="p">(</span><span class="n">dhp</span><span class="p">[</span><span class="n">PHASE2</span><span class="p">],</span> <span class="n">PHASE2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">role</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_create_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_class_object_in_pipeline_components</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="p">)</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="c1"># component.set_addition_info(self.addition_info)</span>
+        <span class="n">component</span><span class="o">.</span><span class="n">update_hyperparams</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">component</span>
+
+<div class="viewcode-block" id="TrainEvaluator.create_component"><a class="viewcode-back" href="../../../_module/hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator.create_component">[docs]</a>    <span class="k">def</span> <span class="nf">create_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_dhp</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">in_feature_groups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">out_feature_groups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                         <span class="n">outsideEdge_info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">pipeline_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">assert</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">(</span><span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">)</span>
+        <span class="n">packages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sub_dhp</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">sub_dhp</span><span class="p">[</span><span class="n">packages</span><span class="p">]</span>
+        <span class="n">packages</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="n">grouped_params</span> <span class="o">=</span> <span class="n">group_dict_items_before_first_dot</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">grouped_params</span><span class="p">):</span>
+                <span class="n">grouped_params</span><span class="p">[</span><span class="n">packages</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">grouped_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;single&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">grouped_params</span><span class="p">[</span><span class="n">packages</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">preprocessor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_component</span><span class="p">(</span><span class="n">PHASE1</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">grouped_params</span><span class="p">[</span><span class="n">package</span><span class="p">])</span>
+            <span class="n">preprocessor</span><span class="o">.</span><span class="n">in_feature_groups</span> <span class="o">=</span> <span class="n">in_feature_groups</span>
+            <span class="n">preprocessor</span><span class="o">.</span><span class="n">out_feature_groups</span> <span class="o">=</span> <span class="n">in_feature_groups</span>
+            <span class="n">pipeline_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+                <span class="n">package</span><span class="p">,</span>
+                <span class="n">preprocessor</span>
+            <span class="p">])</span>
+        <span class="n">key1</span> <span class="o">=</span> <span class="n">PHASE1</span> <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="n">PHASE1</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_component</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">packages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">grouped_params</span><span class="p">[</span><span class="n">packages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">component</span><span class="o">.</span><span class="n">in_feature_groups</span> <span class="o">=</span> <span class="n">in_feature_groups</span>
+        <span class="n">component</span><span class="o">.</span><span class="n">out_feature_groups</span> <span class="o">=</span> <span class="n">out_feature_groups</span>
+        <span class="k">if</span> <span class="n">outsideEdge_info</span><span class="p">:</span>
+            <span class="n">component</span><span class="o">.</span><span class="n">update_hyperparams</span><span class="p">(</span><span class="n">outsideEdge_info</span><span class="p">)</span>
+        <span class="n">pipeline_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+            <span class="n">step_name</span><span class="p">,</span>
+            <span class="n">component</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">pipeline_list</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

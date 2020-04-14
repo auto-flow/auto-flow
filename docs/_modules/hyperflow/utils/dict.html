@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.utils.dict &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.utils.dict</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.utils.dict</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">hyperflow.utils.list</span> <span class="kn">import</span> <span class="n">remove_suffix_in_list</span>
+
+
+<div class="viewcode-block" id="add_prefix_in_dict_keys"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.add_prefix_in_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">result</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{prefix}{key}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="group_dict_items_before_first_dot"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.group_dict_items_before_first_dot">[docs]</a><span class="k">def</span> <span class="nf">group_dict_items_before_first_dot</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">packages</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">:</span>
+            <span class="n">split_list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">key1</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">key2</span> <span class="o">=</span> <span class="n">split_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">key1</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span>
+            <span class="n">key2</span> <span class="o">=</span> <span class="n">packages</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="replace_kv"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.replace_kv">[docs]</a><span class="k">def</span> <span class="nf">replace_kv</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">rv</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">replace_kv</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">rv</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="n">rk</span><span class="p">:</span>
+            <span class="n">dict_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv</span></div>
+
+
+<div class="viewcode-block" id="sort_dict"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.sort_dict">[docs]</a><span class="k">def</span> <span class="nf">sort_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="n">obj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="GlobalList"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.GlobalList">[docs]</a><span class="k">class</span> <span class="nc">GlobalList</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_find_token_in_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="p">[]):</span>  <span class="c1"># -&gt; Iterator[Tuple[List[str], str]]:</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">token</span><span class="p">:</span>
+            <span class="c1"># yield list(path), &quot;key&quot;</span>
+            <span class="n">GlobalList</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;key&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="n">token</span><span class="p">:</span>
+            <span class="c1"># yield list(path) + [key], &quot;value&quot;</span>
+            <span class="n">GlobalList</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="s2">&quot;value&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">_find_token_in_dict</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="find_token_in_dict"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.find_token_in_dict">[docs]</a><span class="k">def</span> <span class="nf">find_token_in_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="n">GlobalList</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_find_token_in_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">GlobalList</span><span class="o">.</span><span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="read_dict_in_path_mode"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.read_dict_in_path_mode">[docs]</a><span class="k">def</span> <span class="nf">read_dict_in_path_mode</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">dict_</span> <span class="o">=</span> <span class="n">dict_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dict_</span></div>
+
+
+<div class="viewcode-block" id="write_dict_in_path_mode"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.write_dict_in_path_mode">[docs]</a><span class="k">def</span> <span class="nf">write_dict_in_path_mode</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">dict_</span> <span class="o">=</span> <span class="n">dict_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">dict_</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="update_placeholder_from_other_dict"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.update_placeholder_from_other_dict">[docs]</a><span class="k">def</span> <span class="nf">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">ignored_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(choice)&quot;</span><span class="p">):</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">should_update</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">find_token_in_dict</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="n">origin_path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="n">template_path</span> <span class="o">=</span> <span class="n">remove_suffix_in_list</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ignored_suffix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span>
+            <span class="c1"># origin_value = updated[origin_path][token]</span>
+            <span class="n">origin_value</span> <span class="o">=</span> <span class="n">read_dict_in_path_mode</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">origin_path</span><span class="p">)[</span><span class="n">token</span><span class="p">]</span>
+            <span class="n">template_item</span> <span class="o">=</span> <span class="n">read_dict_in_path_mode</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">template_path</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">template_item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+            <span class="n">template_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">template_item</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">template_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="n">template_key</span> <span class="o">=</span> <span class="n">template_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">template_value</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">template_item</span><span class="p">[</span><span class="n">template_key</span><span class="p">]</span>
+            <span class="n">template_value</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">origin_value</span><span class="p">)</span>
+            <span class="n">write_dict_in_path_mode</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">origin_path</span><span class="p">,</span> <span class="p">{</span><span class="n">template_key</span><span class="p">:</span> <span class="n">template_value</span><span class="p">})</span>
+        <span class="k">elif</span> <span class="n">type_</span> <span class="o">==</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span>
+            <span class="n">write_dict_in_path_mode</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">origin_path</span><span class="p">,</span> <span class="n">read_dict_in_path_mode</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">template_path</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="k">return</span> <span class="n">updated</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+    <span class="n">hdl</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                          <span class="s1">&#39;1lowR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;impute.fill_abnormal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                          <span class="s1">&#39;2highR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                          <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                          <span class="s1">&#39;4cat-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                          <span class="s1">&#39;5num-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;&lt;placeholder&gt;&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_type&#39;</span><span class="p">:</span> <span class="s1">&#39;quniform&#39;</span><span class="p">,</span>
+                                                                                      <span class="s1">&#39;_value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                                                                                      <span class="s1">&#39;_default&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+                                                                  <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}}},</span>
+        <span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span><span class="p">}}}</span>
+    <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;gbdt&quot;</span><span class="p">}},</span>
+                     <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span>
+                         <span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                         <span class="s1">&#39;1lowR_nan-&gt;nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;impute.fill_abnormal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                         <span class="s1">&#39;2highR_nan-&gt;nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                         <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                         <span class="s1">&#39;4cat-&gt;num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                         <span class="s1">&#39;5num-&gt;num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;select.from_model_clf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+                                                                 <span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="s1">&#39;sklearn.svm.LinearSVC&#39;</span><span class="p">,</span>
+                                                                 <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+                                                                 <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                                                 <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                                                                 <span class="s1">&#39;multi_class&#39;</span><span class="p">:</span> <span class="s1">&#39;ovr&#39;</span><span class="p">,</span>
+                                                                 <span class="s1">&#39;penalty&#39;</span><span class="p">:</span> <span class="s1">&#39;l1&#39;</span><span class="p">}}}}</span>
+    <span class="n">updated_hdl</span> <span class="o">=</span> <span class="n">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;boosting_type&#39;</span><span class="p">:</span> <span class="s1">&#39;gbdt&#39;</span><span class="p">}},</span>
+              <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                  <span class="s1">&#39;1lowR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;impute.fill_abnormal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                  <span class="s1">&#39;2highR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                  <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                  <span class="s1">&#39;4cat-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
+                  <span class="s1">&#39;5num-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;select.from_model_clf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                                                  <span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_default&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+                                                                                      <span class="s1">&#39;_type&#39;</span><span class="p">:</span> <span class="s1">&#39;quniform&#39;</span><span class="p">,</span>
+                                                                                      <span class="s1">&#39;_value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span>
+                                                                                                 <span class="mi">100</span><span class="p">,</span>
+                                                                                                 <span class="mf">0.5</span><span class="p">]},</span>
+                                                                  <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                                                                  <span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="s1">&#39;sklearn.svm.LinearSVC&#39;</span><span class="p">,</span>
+                                                                  <span class="s1">&#39;multi_class&#39;</span><span class="p">:</span> <span class="s1">&#39;ovr&#39;</span><span class="p">,</span>
+                                                                  <span class="s1">&#39;penalty&#39;</span><span class="p">:</span> <span class="s1">&#39;l1&#39;</span><span class="p">,</span>
+                                                                  <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}}}}</span>
+    <span class="n">pprint</span><span class="p">(</span><span class="n">updated_hdl</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

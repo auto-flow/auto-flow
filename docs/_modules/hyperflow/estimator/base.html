@@ -1,0 +1,566 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.estimator.base &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.estimator.base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.estimator.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Manager</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">json5</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+
+<span class="kn">from</span> <span class="nn">hyperflow</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">hyperflow.ensemble.base</span> <span class="kn">import</span> <span class="n">EnsembleEstimator</span>
+<span class="kn">from</span> <span class="nn">hyperflow.ensemble.trained_data_fetcher</span> <span class="kn">import</span> <span class="n">TrainedDataFetcher</span>
+<span class="kn">from</span> <span class="nn">hyperflow.ensemble.trials_fetcher</span> <span class="kn">import</span> <span class="n">TrialsFetcher</span>
+<span class="kn">from</span> <span class="nn">hyperflow.hdl.hdl_constructor</span> <span class="kn">import</span> <span class="n">HDL_Constructor</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.metrics</span> <span class="kn">import</span> <span class="n">r2</span><span class="p">,</span> <span class="n">accuracy</span>
+<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">hyperflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">get_chunks</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.config_space</span> <span class="kn">import</span> <span class="n">replace_phps</span><span class="p">,</span> <span class="n">estimate_config_space_numbers</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_placeholder_from_other_dict</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">instancing</span><span class="p">,</span> <span class="n">sequencing</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">setup_logger</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_name_of_module</span>
+
+
+<div class="viewcode-block" id="HyperFlowEstimator"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+    <span class="n">checked_mainTask</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">tuner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuner</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuner</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">hdl_constructor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HDL_Constructor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">HDL_Constructor</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">resource_manager</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ResourceManager</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+            <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param tuner:</span>
+<span class="sd">        :param hdl_constructor:</span>
+<span class="sd">        :param resource_manager:</span>
+<span class="sd">        :param random_state:</span>
+<span class="sd">        :param log_file:</span>
+<span class="sd">        :param included_classifiers:</span>
+<span class="sd">        :param included_regressors:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Base Estimator of HyperFlow.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tuner: dict</span>
+<span class="sd">            tuner is a object to fine tune the hyper-parameters.</span>
+<span class="sd">        hdl_constructor: int</span>
+<span class="sd">            H.D.L. is a abbreviation of Hyperparams Descriptions Language.</span>
+<span class="sd">            hdl_constructor is a object to build HDL by seeding specific parameters.</span>
+<span class="sd">        resource_manager: str</span>
+<span class="sd">            resource_manager is a object to manager the resources, such like database connections and file-systems.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># ---logger------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="n">log_file</span>
+        <span class="n">setup_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># ---random_state-----------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="c1"># ---tuner-----------------------------------</span>
+        <span class="n">tuner</span> <span class="o">=</span> <span class="n">instancing</span><span class="p">(</span><span class="n">tuner</span><span class="p">,</span> <span class="n">Tuner</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># ---tuners-----------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tuners</span> <span class="o">=</span> <span class="n">sequencing</span><span class="p">(</span><span class="n">tuner</span><span class="p">,</span> <span class="n">Tuner</span><span class="p">)</span>
+        <span class="c1"># ---hdl_constructor--------------------------</span>
+        <span class="n">hdl_constructor</span> <span class="o">=</span> <span class="n">instancing</span><span class="p">(</span><span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">HDL_Constructor</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># ---hdl_constructors-------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span> <span class="o">=</span> <span class="n">sequencing</span><span class="p">(</span><span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">HDL_Constructor</span><span class="p">)</span>
+        <span class="c1"># ---resource_manager-----------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">instancing</span><span class="p">(</span><span class="n">resource_manager</span><span class="p">,</span> <span class="n">ResourceManager</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># ---member_variable------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="HyperFlowEstimator.fit"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">column_descriptions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">dataset_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
+            <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">should_calc_all_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span>
+            <span class="n">specific_task_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">additional_info</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">fit_ensemble_params</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="n">highR_nan_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">highR_cat_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="p">):</span></div>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">should_store_intermediate_result</span>
+        <span class="n">dataset_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_metadata</span><span class="p">)</span>
+        <span class="n">additional_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">additional_info</span><span class="p">)</span>
+        <span class="c1"># build data_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">DataManager</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="p">,</span> <span class="n">highR_nan_threshold</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked_mainTask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked_mainTask</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked_mainTask</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">regression_task</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;This task is supposed to be </span><span class="si">{self.checked_mainTask}</span><span class="s2"> task ,but the target data is </span><span class="si">{self.ml_task}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="c1"># parse metric</span>
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+                <span class="n">metric</span> <span class="o">=</span> <span class="n">r2</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+                <span class="n">metric</span> <span class="o">=</span> <span class="n">accuracy</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
+        <span class="c1"># get task_id, and insert record into &quot;tasks.tasks&quot; database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">specific_task_token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_tasks_table</span><span class="p">()</span>
+        <span class="c1"># store other params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metrics</span> <span class="o">=</span> <span class="n">should_calc_all_metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">splitter</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tuners</span><span class="p">)</span>
+        <span class="n">n_step</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">)</span>
+        <span class="n">general_experiment_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="p">(</span><span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">tuner</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tuners</span><span class="p">)):</span>
+            <span class="n">current_experiment_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">hdl_constructor</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span> <span class="n">highR_cat_threshold</span><span class="p">)</span>
+            <span class="n">raw_hdl</span> <span class="o">=</span> <span class="n">hdl_constructor</span><span class="o">.</span><span class="n">get_hdl</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">step</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_best_dhp</span><span class="p">()</span>
+                <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">last_best_dhp</span><span class="p">)</span>
+                <span class="n">hdl</span> <span class="o">=</span> <span class="n">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">raw_hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated HDL(Hyperparams Descriptions Language) in step </span><span class="si">{step}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{hdl}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">hdl</span> <span class="o">=</span> <span class="n">raw_hdl</span>
+            <span class="c1"># get hdl_id, and insert record into &quot;{task_id}.hdls&quot; database</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_hdls_table</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_hdls_table</span><span class="p">()</span>
+            <span class="c1"># now we get task_id and hdl_id, we can insert current runtime information into &quot;experiments.experiments&quot; database</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_experiments_table</span><span class="p">(</span><span class="n">general_experiment_timestamp</span><span class="p">,</span>
+                                                              <span class="n">current_experiment_timestamp</span><span class="p">,</span>
+                                                              <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">,</span> <span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">raw_hdl</span><span class="p">,</span> <span class="n">hdl</span><span class="p">,</span>
+                                                              <span class="bp">self</span><span class="o">.</span><span class="n">tuners</span><span class="p">,</span> <span class="n">tuner</span><span class="p">,</span> <span class="n">should_calc_all_metrics</span><span class="p">,</span>
+                                                              <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span>
+                                                              <span class="n">column_descriptions</span><span class="p">,</span>
+                                                              <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
+                                                              <span class="n">should_store_intermediate_result</span><span class="p">,</span> <span class="n">fit_ensemble_params</span><span class="p">,</span>
+                                                              <span class="n">additional_info</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_experiments_table</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">hdl_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">experiment_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;task_id:</span><span class="se">\t</span><span class="si">{self.task_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hdl_id:</span><span class="se">\t</span><span class="si">{self.hdl_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;experiment_id:</span><span class="se">\t</span><span class="si">{self.experiment_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_tuner</span><span class="p">(</span><span class="n">tuner</span><span class="p">,</span> <span class="n">hdl</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;is_manual&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="n">n_step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fit_ensemble_params</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">fit_ensemble_params</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;fit_ensemble_params&#39; is &#39;auto&#39;, use default params to fit_ensemble_params.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fit_ensemble_params</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">fit_ensemble_params</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;fit_ensemble_params&#39; is True, use default params to fit_ensemble_params.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;&#39;fit_ensemble_params&#39; is False, don&#39;t fit_ensemble but use best trial as result.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fit_ensemble_params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;&#39;fit_ensemble_params&#39; is specific: </span><span class="si">{fit_ensemble_params}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="o">**</span><span class="n">fit_ensemble_params</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">fit_ensemble_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;&#39;fit_ensemble_params&#39; is None, don&#39;t fit_ensemble but use best trial as result.&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="HyperFlowEstimator.start_tuner"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.start_tuner">[docs]</a>    <span class="k">def</span> <span class="nf">start_tuner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">:</span> <span class="n">Tuner</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start fine tune task, </span><span class="se">\n</span><span class="s2">which HDL(Hyperparams Descriptions Language) is:</span><span class="se">\n</span><span class="si">{hdl}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;which Tuner is:</span><span class="se">\n</span><span class="si">{tuner}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">set_data_manager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">)</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">set_hdl</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>  <span class="c1"># just for get shps of tuner</span>
+        <span class="k">if</span> <span class="n">estimate_config_space_numbers</span><span class="p">(</span><span class="n">tuner</span><span class="o">.</span><span class="n">shps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;HDL(Hyperparams Descriptions Language) is a constant space, using manual modeling.&quot;</span><span class="p">)</span>
+            <span class="n">dhp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">shp2model</span><span class="p">(</span><span class="n">tuner</span><span class="o">.</span><span class="n">shps</span><span class="o">.</span><span class="n">sample_configuration</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;is_manual&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="n">n_jobs</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">n_jobs</span>
+        <span class="n">run_limits</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">tuner</span><span class="o">.</span><span class="n">run_limit</span> <span class="o">/</span> <span class="n">n_jobs</span><span class="p">)]</span> <span class="o">*</span> <span class="n">n_jobs</span>
+        <span class="n">is_master_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_jobs</span>
+        <span class="n">is_master_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">initial_configs_list</span> <span class="o">=</span> <span class="n">get_chunks</span><span class="p">(</span>
+            <span class="n">tuner</span><span class="o">.</span><span class="n">design_initial_configs</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">),</span>
+            <span class="n">n_jobs</span><span class="p">)</span>
+        <span class="n">random_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+        <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">tuner</span><span class="o">.</span><span class="n">search_method</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="n">sync_dict</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+            <span class="n">sync_dict</span><span class="p">[</span><span class="s2">&quot;exit_processes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">exit_processes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sync_dict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">clear_pid_list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_redis</span><span class="p">()</span>
+        <span class="n">resource_managers</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)]</span>
+        <span class="n">tuners</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">tuner</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)]</span>
+        <span class="n">processes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tuner</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">,</span> <span class="n">run_limit</span><span class="p">,</span> <span class="n">initial_configs</span><span class="p">,</span> <span class="n">is_master</span><span class="p">,</span> <span class="n">random_state</span> <span class="ow">in</span> \
+                <span class="nb">zip</span><span class="p">(</span><span class="n">tuners</span><span class="p">,</span> <span class="n">resource_managers</span><span class="p">,</span> <span class="n">run_limits</span><span class="p">,</span> <span class="n">initial_configs_list</span><span class="p">,</span> <span class="n">is_master_list</span><span class="p">,</span> <span class="n">random_states</span><span class="p">):</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">tuner</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">,</span> <span class="n">run_limit</span><span class="p">,</span> <span class="n">initial_configs</span><span class="p">,</span> <span class="n">is_master</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">sync_dict</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
+                    <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
+                    <span class="n">args</span><span class="o">=</span><span class="n">args</span>
+                <span class="p">)</span>
+                <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;is_manual&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="HyperFlowEstimator.run"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">,</span> <span class="n">run_limit</span><span class="p">,</span> <span class="n">initial_configs</span><span class="p">,</span> <span class="n">is_master</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">sync_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sync_dict</span><span class="p">:</span>
+            <span class="n">sync_dict</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">resource_manager</span><span class="o">.</span><span class="n">sync_dict</span> <span class="o">=</span> <span class="n">sync_dict</span>
+        <span class="n">resource_manager</span><span class="o">.</span><span class="n">set_is_master</span><span class="p">(</span><span class="n">is_master</span><span class="p">)</span>
+        <span class="n">resource_manager</span><span class="o">.</span><span class="n">push_pid_list</span><span class="p">()</span>
+        <span class="c1"># random_state: 1. set_hdl中传给phps 2. 传给所有配置</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">run_limit</span> <span class="o">=</span> <span class="n">run_limit</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">set_resource_manager</span><span class="p">(</span><span class="n">resource_manager</span><span class="p">)</span>
+        <span class="n">replace_phps</span><span class="p">(</span><span class="n">tuner</span><span class="o">.</span><span class="n">shps</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">random_state</span><span class="p">))</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">shps</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="c1"># todo : 增加 n_jobs ? 调研默认值</span>
+        <span class="n">tuner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">initial_configs</span><span class="o">=</span><span class="n">initial_configs</span><span class="p">,</span>
+            <span class="n">evaluator_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+                <span class="n">data_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span>
+                <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+                <span class="n">should_calc_all_metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metrics</span><span class="p">,</span>
+                <span class="n">splitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
+                <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span><span class="p">,</span>
+                <span class="n">resource_manager</span><span class="o">=</span><span class="n">resource_manager</span>
+            <span class="p">),</span>
+            <span class="n">instance_id</span><span class="o">=</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span>
+            <span class="n">rh_db_type</span><span class="o">=</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">db_type</span><span class="p">,</span>
+            <span class="n">rh_db_params</span><span class="o">=</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">runhistory_db_params</span><span class="p">,</span>
+            <span class="n">rh_db_table_name</span><span class="o">=</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">runhistory_table_name</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">sync_dict</span><span class="p">:</span>
+            <span class="n">sync_dict</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()]</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="HyperFlowEstimator.fit_ensemble"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">hdl_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">trials_fetcher</span><span class="o">=</span><span class="s2">&quot;GetBestK&quot;</span><span class="p">,</span>
+            <span class="n">trials_fetcher_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+            <span class="n">ensemble_type</span><span class="o">=</span><span class="s2">&quot;stack&quot;</span><span class="p">,</span>
+            <span class="n">ensemble_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">return_Xy_test</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">,</span> <span class="s2">&quot;task_id&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span>
+        <span class="c1"># if hdl_id is None:</span>
+        <span class="c1">#     assert hasattr(self.resource_manager, &quot;hdl_id&quot;) and self.resource_manager.hdl_id is not None</span>
+        <span class="c1">#     hdl_id = self.resource_manager.hdl_id</span>
+        <span class="n">trials_fetcher_name</span> <span class="o">=</span> <span class="n">trials_fetcher</span>
+        <span class="kn">from</span> <span class="nn">hyperflow.ensemble</span> <span class="kn">import</span> <span class="n">trials_fetcher</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">trials_fetcher</span><span class="p">,</span> <span class="n">trials_fetcher_name</span><span class="p">)</span>
+        <span class="n">trials_fetcher_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">trials_fetcher</span><span class="p">,</span> <span class="n">trials_fetcher_name</span><span class="p">)</span>
+        <span class="n">trials_fetcher</span><span class="p">:</span> <span class="n">TrialsFetcher</span> <span class="o">=</span> <span class="n">trials_fetcher_cls</span><span class="p">(</span><span class="n">resource_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+                                                           <span class="n">hdl_id</span><span class="o">=</span><span class="n">hdl_id</span><span class="p">,</span>
+                                                           <span class="o">**</span><span class="n">trials_fetcher_params</span><span class="p">)</span>
+        <span class="n">trial_ids</span> <span class="o">=</span> <span class="n">trials_fetcher</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+        <span class="n">estimator_list</span><span class="p">,</span> <span class="n">y_true_indexes_list</span><span class="p">,</span> <span class="n">y_preds_list</span> <span class="o">=</span> <span class="n">TrainedDataFetcher</span><span class="p">(</span>
+            <span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">,</span> <span class="n">trial_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+        <span class="n">ml_task</span><span class="p">,</span> <span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">get_ensemble_needed_info</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">)</span>
+        <span class="n">y_true</span> <span class="o">=</span> <span class="n">Xy_train</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ensemble_estimator_package_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hyperflow.ensemble.</span><span class="si">{ensemble_type}</span><span class="s2">.</span><span class="si">{ml_task.role}</span><span class="s2">&quot;</span>
+        <span class="n">ensemble_estimator_package</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">ensemble_estimator_package_name</span><span class="p">)</span>
+        <span class="n">ensemble_estimator_class_name</span> <span class="o">=</span> <span class="n">get_class_name_of_module</span><span class="p">(</span><span class="n">ensemble_estimator_package_name</span><span class="p">)</span>
+        <span class="n">ensemble_estimator_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ensemble_estimator_package</span><span class="p">,</span> <span class="n">ensemble_estimator_class_name</span><span class="p">)</span>
+        <span class="n">ensemble_estimator</span><span class="p">:</span> <span class="n">EnsembleEstimator</span> <span class="o">=</span> <span class="n">ensemble_estimator_class</span><span class="p">(</span><span class="o">**</span><span class="n">ensemble_params</span><span class="p">)</span>
+        <span class="n">ensemble_estimator</span><span class="o">.</span><span class="n">fit_trained_data</span><span class="p">(</span><span class="n">estimator_list</span><span class="p">,</span> <span class="n">y_true_indexes_list</span><span class="p">,</span> <span class="n">y_preds_list</span><span class="p">,</span> <span class="n">y_true</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span> <span class="o">=</span> <span class="n">ensemble_estimator</span>
+        <span class="k">if</span> <span class="n">return_Xy_test</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span><span class="p">,</span> <span class="n">Xy_test</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span></div>
+
+<div class="viewcode-block" id="HyperFlowEstimator.auto_fit_ensemble"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.auto_fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">auto_fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X_test</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">trial_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">experiment_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">column_descriptions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">highR_nan_threshold</span><span class="o">=</span><span class="mf">0.5</span>
+    <span class="p">):</span>
+        <span class="n">is_set_X_test</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data_manager&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;data_manager&#39; is existing in HyperFlowEstimator, will not load it from database or create it.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">task_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">get_experiment_id_by_task_id</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">experiment_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_experiment_id</span> <span class="o">=</span> <span class="n">experiment_id</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;experiment_id&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_experiment_id</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">_experiment_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;&#39;_experiment_id&#39; is not exist, initializing data_manager by user given parameters.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">DataManager</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="o">=</span><span class="n">column_descriptions</span><span class="p">,</span>
+                                                <span class="n">highR_nan_threshold</span><span class="o">=</span><span class="n">highR_nan_threshold</span><span class="p">)</span>
+                <span class="n">is_set_X_test</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;&#39;_experiment_id&#39; is exist, loading data_manager by query meta_record.experiments database.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_data_manager_by_experiment_id</span><span class="p">(</span>
+                    <span class="n">_experiment_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_set_X_test</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{self.__class__.__name__}</span><span class="s2">&#39; &#39;s estimator is None, maybe you didn&#39;t use fit method to train the data.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;We try to query trials database if you seed trial_id specifically.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

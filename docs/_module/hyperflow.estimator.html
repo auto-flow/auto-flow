@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.estimator package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.estimator package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.estimator.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-estimator-package">
+<h1>hyperflow.estimator package<a class="headerlink" href="#hyperflow-estimator-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.estimator.base">
+<span id="hyperflow-estimator-base-module"></span><h2>hyperflow.estimator.base module<a class="headerlink" href="#module-hyperflow.estimator.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator">
+<em class="property">class </em><code class="descclassname">hyperflow.estimator.base.</code><code class="descname">HyperFlowEstimator</code><span class="sig-paren">(</span><em>tuner: Union[hyperflow.tuner.tuner.Tuner, List[hyperflow.tuner.tuner.Tuner], NoneType, dict]=None, hdl_constructor: Union[hyperflow.hdl.hdl_constructor.HDL_Constructor, List[hyperflow.hdl.hdl_constructor.HDL_Constructor], NoneType, dict]=None, resource_manager: Union[hyperflow.manager.resource_manager.ResourceManager, str]=None, random_state=42, log_file=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/base.html#HyperFlowEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuner</strong> &#8211; </li>
+<li><strong>hdl_constructor</strong> &#8211; </li>
+<li><strong>resource_manager</strong> &#8211; </li>
+<li><strong>random_state</strong> &#8211; </li>
+<li><strong>log_file</strong> &#8211; </li>
+<li><strong>included_classifiers</strong> &#8211; </li>
+<li><strong>included_regressors</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator.auto_fit_ensemble">
+<code class="descname">auto_fit_ensemble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/base.html#HyperFlowEstimator.auto_fit_ensemble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator.auto_fit_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator.checked_mainTask">
+<code class="descname">checked_mainTask</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator.checked_mainTask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X: Union[numpy.ndarray, pandas.core.frame.DataFrame], y=None, X_test=None, y_test=None, column_descriptions: Union[Dict, NoneType]=None, dataset_metadata: dict=frozenset(), metric=None, should_calc_all_metrics=True, splitter=KFold(n_splits=5, random_state=42, shuffle=True), specific_task_token='', should_store_intermediate_result=False, additional_info: dict=&lt;frozendict {}&gt;, fit_ensemble_params: Union[str, Dict[str, Any], NoneType, bool]='auto', highR_nan_threshold=0.5, highR_cat_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/base.html#HyperFlowEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator.fit_ensemble">
+<code class="descname">fit_ensemble</code><span class="sig-paren">(</span><em>task_id=None</em>, <em>hdl_id=None</em>, <em>trials_fetcher='GetBestK'</em>, <em>trials_fetcher_params=&lt;frozendict {'k': 10}&gt;</em>, <em>ensemble_type='stack'</em>, <em>ensemble_params=&lt;frozendict {}&gt;</em>, <em>return_Xy_test=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/base.html#HyperFlowEstimator.fit_ensemble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator.fit_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>tuner</em>, <em>resource_manager</em>, <em>run_limit</em>, <em>initial_configs</em>, <em>is_master</em>, <em>random_state</em>, <em>sync_dict=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/base.html#HyperFlowEstimator.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.base.HyperFlowEstimator.start_tuner">
+<code class="descname">start_tuner</code><span class="sig-paren">(</span><em>tuner: hyperflow.tuner.tuner.Tuner</em>, <em>hdl: dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/base.html#HyperFlowEstimator.start_tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.base.HyperFlowEstimator.start_tuner" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.estimator.classifier">
+<span id="hyperflow-estimator-classifier-module"></span><h2>hyperflow.estimator.classifier module<a class="headerlink" href="#module-hyperflow.estimator.classifier" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.estimator.classifier.HyperFlowClassifier">
+<em class="property">class </em><code class="descclassname">hyperflow.estimator.classifier.</code><code class="descname">HyperFlowClassifier</code><span class="sig-paren">(</span><em>tuner: Union[hyperflow.tuner.tuner.Tuner, List[hyperflow.tuner.tuner.Tuner], NoneType, dict]=None, hdl_constructor: Union[hyperflow.hdl.hdl_constructor.HDL_Constructor, List[hyperflow.hdl.hdl_constructor.HDL_Constructor], NoneType, dict]=None, resource_manager: Union[hyperflow.manager.resource_manager.ResourceManager, str]=None, random_state=42, log_file=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/classifier.html#HyperFlowClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.classifier.HyperFlowClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.estimator.base.HyperFlowEstimator" title="hyperflow.estimator.base.HyperFlowEstimator"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.estimator.base.HyperFlowEstimator</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuner</strong> &#8211; </li>
+<li><strong>hdl_constructor</strong> &#8211; </li>
+<li><strong>resource_manager</strong> &#8211; </li>
+<li><strong>random_state</strong> &#8211; </li>
+<li><strong>log_file</strong> &#8211; </li>
+<li><strong>included_classifiers</strong> &#8211; </li>
+<li><strong>included_regressors</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="hyperflow.estimator.classifier.HyperFlowClassifier.checked_mainTask">
+<code class="descname">checked_mainTask</code><em class="property"> = 'classification'</em><a class="headerlink" href="#hyperflow.estimator.classifier.HyperFlowClassifier.checked_mainTask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.classifier.HyperFlowClassifier.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>X_test</em>, <em>task_id=None</em>, <em>trial_id=None</em>, <em>experiment_id=None</em>, <em>column_descriptions: Union[Dict</em>, <em>NoneType]=None</em>, <em>highR_nan_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/classifier.html#HyperFlowClassifier.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.classifier.HyperFlowClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.classifier.HyperFlowClassifier.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>X_test</em>, <em>task_id=None</em>, <em>trial_id=None</em>, <em>experiment_id=None</em>, <em>column_descriptions: Union[Dict</em>, <em>NoneType]=None</em>, <em>highR_nan_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/classifier.html#HyperFlowClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.classifier.HyperFlowClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.estimator.regressor">
+<span id="hyperflow-estimator-regressor-module"></span><h2>hyperflow.estimator.regressor module<a class="headerlink" href="#module-hyperflow.estimator.regressor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.estimator.regressor.HyperFlowRegressor">
+<em class="property">class </em><code class="descclassname">hyperflow.estimator.regressor.</code><code class="descname">HyperFlowRegressor</code><span class="sig-paren">(</span><em>tuner: Union[hyperflow.tuner.tuner.Tuner, List[hyperflow.tuner.tuner.Tuner], NoneType, dict]=None, hdl_constructor: Union[hyperflow.hdl.hdl_constructor.HDL_Constructor, List[hyperflow.hdl.hdl_constructor.HDL_Constructor], NoneType, dict]=None, resource_manager: Union[hyperflow.manager.resource_manager.ResourceManager, str]=None, random_state=42, log_file=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/regressor.html#HyperFlowRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.regressor.HyperFlowRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.estimator.base.HyperFlowEstimator" title="hyperflow.estimator.base.HyperFlowEstimator"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.estimator.base.HyperFlowEstimator</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tuner</strong> &#8211; </li>
+<li><strong>hdl_constructor</strong> &#8211; </li>
+<li><strong>resource_manager</strong> &#8211; </li>
+<li><strong>random_state</strong> &#8211; </li>
+<li><strong>log_file</strong> &#8211; </li>
+<li><strong>included_classifiers</strong> &#8211; </li>
+<li><strong>included_regressors</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="hyperflow.estimator.regressor.HyperFlowRegressor.checked_mainTask">
+<code class="descname">checked_mainTask</code><em class="property"> = 'regression'</em><a class="headerlink" href="#hyperflow.estimator.regressor.HyperFlowRegressor.checked_mainTask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.estimator.regressor.HyperFlowRegressor.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>X_test</em>, <em>task_id=None</em>, <em>trial_id=None</em>, <em>experiment_id=None</em>, <em>column_descriptions: Union[Dict</em>, <em>NoneType]=None</em>, <em>highR_nan_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/estimator/regressor.html#HyperFlowRegressor.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.estimator.regressor.HyperFlowRegressor.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.estimator">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.estimator" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

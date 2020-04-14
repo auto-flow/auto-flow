@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.utils.config_space &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.utils.config_space</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.utils.config_space</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">CategoricalHyperparameter</span><span class="p">,</span> <span class="n">OrdinalHyperparameter</span><span class="p">,</span> <span class="n">Constant</span><span class="p">,</span> \
+    <span class="n">UniformFloatHyperparameter</span><span class="p">,</span> <span class="n">UniformIntegerHyperparameter</span>
+
+<span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span><span class="n">PHASE2</span>
+<span class="kn">from</span> <span class="nn">hyperflow.hdl.smac</span> <span class="kn">import</span> <span class="n">_encode</span>
+
+
+<div class="viewcode-block" id="get_random_initial_configs"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.get_random_initial_configs">[docs]</a><span class="k">def</span> <span class="nf">get_random_initial_configs</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">n_configs</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]:</span>
+    <span class="n">None_name</span> <span class="o">=</span> <span class="s2">&quot;None:NoneType&quot;</span>
+    <span class="n">shps</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">shps</span><span class="p">)</span>
+    <span class="n">shps</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">shps</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">PHASE1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;__choice__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">None_name</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">choices</span><span class="p">):</span>  <span class="c1"># fixme 重构之后 None_name是不是改变了？</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">None_name</span>
+
+    <span class="n">model_choice</span> <span class="o">=</span> <span class="n">shps</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">:__choice__&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">model_choice</span><span class="o">.</span><span class="n">choices</span><span class="p">:</span>
+        <span class="n">cur_phps</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">shps</span><span class="p">)</span>
+        <span class="n">cur_phps</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">:__choice__&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">choice</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">cur_phps</span><span class="o">.</span><span class="n">get_default_configuration</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_configs</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shps</span><span class="o">.</span><span class="n">sample_configuration</span><span class="p">(</span><span class="n">n_configs</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_configs</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">n_configs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="replace_phps"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.replace_phps">[docs]</a><span class="k">def</span> <span class="nf">replace_phps</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">shps</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">hp</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Constant&quot;</span> <span class="ow">and</span> <span class="n">hp</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">hp</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_encode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_grid_initial_configs"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.get_grid_initial_configs">[docs]</a><span class="k">def</span> <span class="nf">get_grid_initial_configs</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">n_configs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">):</span>
+    <span class="n">grid_phps</span> <span class="o">=</span> <span class="n">ConfigSpaceGrid</span><span class="p">(</span><span class="n">shps</span><span class="p">)</span>
+    <span class="n">grid_configs</span> <span class="o">=</span> <span class="n">grid_phps</span><span class="o">.</span><span class="n">generate_grid</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">n_configs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">grid_configs</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">grid_configs</span><span class="p">,</span> <span class="n">n_configs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid_configs</span></div>
+
+
+<div class="viewcode-block" id="estimate_config_space_numbers"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.estimate_config_space_numbers">[docs]</a><span class="k">def</span> <span class="nf">estimate_config_space_numbers</span><span class="p">(</span><span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
+        <span class="n">result</span> <span class="o">*=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get_num_neighbors</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="ConfigSpaceGrid"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.ConfigSpaceGrid">[docs]</a><span class="k">class</span> <span class="nc">ConfigSpaceGrid</span><span class="p">:</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration_space</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span> <span class="o">=</span> <span class="n">configuration_space</span>
+
+    <span class="k">def</span> <span class="nf">generate_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">num_steps_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a grid of Configurations for a given ConfigurationSpace. Can be used, for example, for grid search.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        configuration_space: :class:`~ConfigSpace.configuration_space.ConfigurationSpace`</span>
+<span class="sd">            The Configuration space over which to create a grid of HyperParameter Configuration values. It knows the types for all parameter values.</span>
+
+<span class="sd">        num_steps_dict: dict</span>
+<span class="sd">            A dict containing the number of points to divide the grid side formed by Hyperparameters which are either of type UniformFloatHyperparameter or type UniformIntegerHyperparameter. The keys in the dict should be the names of the corresponding Hyperparameters and the values should be the number of points to divide the grid side formed by the corresponding Hyperparameter in to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List containing Configurations. It is a cartesian product of tuples of HyperParameter values. Each tuple lists the possible values taken by the corresponding HyperParameter. Within the cartesian product, in each element, the ordering of HyperParameters is the same for the OrderedDict within the ConfigurationSpace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">value_sets</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of tuples: each tuple within is the grid values to be taken on by a Hyperparameter</span>
+        <span class="n">hp_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">hp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span><span class="o">.</span><span class="n">_children</span><span class="p">[</span><span class="s1">&#39;__HPOlib_configuration_space_root__&#39;</span><span class="p">]:</span>
+            <span class="n">value_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_set</span><span class="p">(</span><span class="n">num_steps_dict</span><span class="p">,</span> <span class="n">hp_name</span><span class="p">))</span>
+            <span class="n">hp_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hp_name</span><span class="p">)</span>
+
+        <span class="n">unchecked_grid_pts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cartesian_product</span><span class="p">(</span><span class="n">value_sets</span><span class="p">,</span> <span class="n">hp_names</span><span class="p">)</span>
+        <span class="n">checked_grid_pts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">condtional_grid_lens</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">unchecked_grid_pts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">grid_point</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span><span class="p">,</span> <span class="n">unchecked_grid_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">checked_grid_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grid_point</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">value_sets</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">hp_names</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">new_active_hp_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">hp_name</span> <span class="ow">in</span> <span class="n">unchecked_grid_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># For loop over currently active HP names</span>
+                    <span class="n">value_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="n">unchecked_grid_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">hp_name</span><span class="p">],</span> <span class="p">]))</span>
+                    <span class="n">hp_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hp_name</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">new_hp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span><span class="o">.</span><span class="n">_children</span><span class="p">[</span>
+                        <span class="n">hp_name</span><span class="p">]:</span>  <span class="c1"># Checks the HPs already active for their children also being active</span>
+                        <span class="k">if</span> <span class="n">new_hp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_active_hp_names</span> <span class="ow">and</span> <span class="n">new_hp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unchecked_grid_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                            <span class="n">all_cond_</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">for</span> <span class="n">cond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span><span class="o">.</span><span class="n">_parent_conditions_of</span><span class="p">[</span><span class="n">new_hp_name</span><span class="p">]:</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">cond</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">unchecked_grid_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                                    <span class="n">all_cond_</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="k">if</span> <span class="n">all_cond_</span><span class="p">:</span>
+                                <span class="n">new_active_hp_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_hp_name</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">hp_name</span> <span class="ow">in</span> <span class="n">new_active_hp_names</span><span class="p">:</span>
+                    <span class="n">value_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_set</span><span class="p">(</span><span class="n">num_steps_dict</span><span class="p">,</span> <span class="n">hp_name</span><span class="p">))</span>
+                    <span class="n">hp_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hp_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">new_active_hp_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># this check might not be needed, as there is always going to be a new active HP when in this except block?</span>
+                    <span class="n">new_conditonal_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cartesian_product</span><span class="p">(</span><span class="n">value_sets</span><span class="p">,</span> <span class="n">hp_names</span><span class="p">)</span>
+                    <span class="n">condtional_grid_lens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_conditonal_grid</span><span class="p">))</span>
+                    <span class="n">unchecked_grid_pts</span> <span class="o">+=</span> <span class="n">new_conditonal_grid</span>
+            <span class="k">del</span> <span class="n">unchecked_grid_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">checked_grid_pts</span>
+
+    <span class="k">def</span> <span class="nf">get_value_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps_dict</span><span class="p">,</span> <span class="n">hp_name</span><span class="p">):</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="n">hp_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="p">(</span><span class="n">CategoricalHyperparameter</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">param</span><span class="o">.</span><span class="n">choices</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="p">(</span><span class="n">OrdinalHyperparameter</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">param</span><span class="o">.</span><span class="n">sequence</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Constant</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">param</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">])</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">UniformFloatHyperparameter</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+                <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">([</span><span class="n">param</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span>
+
+            <span class="k">if</span> <span class="n">num_steps_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">num_steps</span> <span class="o">=</span> <span class="n">num_steps_dict</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>  <span class="c1"># check for log and for rounding issues</span>
+
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+                <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid_points</span><span class="p">)</span>
+
+            <span class="c1"># Avoiding rounding off issues</span>
+            <span class="k">if</span> <span class="n">grid_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">param</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+                <span class="n">grid_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">lower</span>
+            <span class="k">if</span> <span class="n">grid_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span><span class="p">:</span>
+                <span class="n">grid_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span>
+
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">grid_points</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">UniformIntegerHyperparameter</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+                <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">([</span><span class="n">param</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span>
+
+            <span class="k">if</span> <span class="n">num_steps_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">num_steps</span> <span class="o">=</span> <span class="n">num_steps_dict</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>  <span class="c1"># check for log and for rounding issues</span>
+
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+                <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid_points</span><span class="p">)</span>
+            <span class="n">grid_points</span> <span class="o">=</span> <span class="n">grid_points</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+            <span class="c1"># Avoiding rounding off issues</span>
+            <span class="k">if</span> <span class="n">grid_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">param</span><span class="o">.</span><span class="n">lower</span><span class="p">:</span>
+                <span class="n">grid_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">lower</span>
+            <span class="k">if</span> <span class="n">grid_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span><span class="p">:</span>
+                <span class="n">grid_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">upper</span>
+
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">grid_points</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unknown hyperparameter type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">param</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_cartesian_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_sets</span><span class="p">,</span> <span class="n">hp_names</span><span class="p">):</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="kn">import</span> <span class="nn">itertools</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">value_sets</span><span class="p">)):</span>
+            <span class="n">config_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">hp_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hp_names</span><span class="p">):</span>
+                <span class="n">config_dict</span><span class="p">[</span><span class="n">hp_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">grid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_dict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">grid</span>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

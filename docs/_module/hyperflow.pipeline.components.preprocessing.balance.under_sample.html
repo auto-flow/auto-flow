@@ -1,0 +1,417 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.preprocessing.balance.under_sample package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.preprocessing.balance.under_sample package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.balance.under_sample.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-components-preprocessing-balance-under-sample-package">
+<h1>hyperflow.pipeline.components.preprocessing.balance.under_sample package<a class="headerlink" href="#hyperflow-pipeline-components-preprocessing-balance-under-sample-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-all-knn-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.AllKNN">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.</code><code class="descname">AllKNN</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/all_knn.html#AllKNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.AllKNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.AllKNN.class__">
+<code class="descname">class__</code><em class="property"> = 'AllKNN'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.AllKNN.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.AllKNN.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn.AllKNN.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-cluster-centroids-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.ClusterCentroids">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.</code><code class="descname">ClusterCentroids</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/cluster_centroids.html#ClusterCentroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.ClusterCentroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.ClusterCentroids.class__">
+<code class="descname">class__</code><em class="property"> = 'ClusterCentroids'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.ClusterCentroids.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.ClusterCentroids.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids.ClusterCentroids.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-condensed-nearest-neighbour-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.CondensedNearestNeighbour">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.</code><code class="descname">CondensedNearestNeighbour</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/condensed_nearest_neighbour.html#CondensedNearestNeighbour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.CondensedNearestNeighbour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.CondensedNearestNeighbour.class__">
+<code class="descname">class__</code><em class="property"> = 'CondensedNearestNeighbour'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.CondensedNearestNeighbour.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.CondensedNearestNeighbour.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour.CondensedNearestNeighbour.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-edited-nearest-neighbours-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.EditedNearestNeighbours">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.</code><code class="descname">EditedNearestNeighbours</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/edited_nearest_neighbours.html#EditedNearestNeighbours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.EditedNearestNeighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.EditedNearestNeighbours.class__">
+<code class="descname">class__</code><em class="property"> = 'EditedNearestNeighbours'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.EditedNearestNeighbours.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.EditedNearestNeighbours.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours.EditedNearestNeighbours.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-instance-hardness-threshold-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.InstanceHardnessThreshold">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.</code><code class="descname">InstanceHardnessThreshold</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/instance_hardness_threshold.html#InstanceHardnessThreshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.InstanceHardnessThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.InstanceHardnessThreshold.class__">
+<code class="descname">class__</code><em class="property"> = 'InstanceHardnessThreshold'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.InstanceHardnessThreshold.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.InstanceHardnessThreshold.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold.InstanceHardnessThreshold.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-near-miss-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.NearMiss">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.</code><code class="descname">NearMiss</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/near_miss.html#NearMiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.NearMiss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.NearMiss.class__">
+<code class="descname">class__</code><em class="property"> = 'NearMiss'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.NearMiss.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.NearMiss.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss.NearMiss.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-neighbourhood-cleaning-rule-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.NeighbourhoodCleaningRule">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.</code><code class="descname">NeighbourhoodCleaningRule</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/neighbourhood_cleaning_rule.html#NeighbourhoodCleaningRule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.NeighbourhoodCleaningRule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.NeighbourhoodCleaningRule.class__">
+<code class="descname">class__</code><em class="property"> = 'NeighbourhoodCleaningRule'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.NeighbourhoodCleaningRule.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.NeighbourhoodCleaningRule.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule.NeighbourhoodCleaningRule.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-one-sided-selection-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.OneSidedSelection">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.</code><code class="descname">OneSidedSelection</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/one_sided_selection.html#OneSidedSelection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.OneSidedSelection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.OneSidedSelection.class__">
+<code class="descname">class__</code><em class="property"> = 'OneSidedSelection'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.OneSidedSelection.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.OneSidedSelection.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection.OneSidedSelection.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.random">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-random-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.random module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.random" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.random.RandomUnderSampler">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.random.</code><code class="descname">RandomUnderSampler</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/random.html#RandomUnderSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.random.RandomUnderSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.random.RandomUnderSampler.class__">
+<code class="descname">class__</code><em class="property"> = 'RandomUnderSampler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.random.RandomUnderSampler.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.random.RandomUnderSampler.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.random.RandomUnderSampler.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-repeated-edited-nearest-neighbours-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.RepeatedEditedNearestNeighbours">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.</code><code class="descname">RepeatedEditedNearestNeighbours</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/repeated_edited_nearest_neighbours.html#RepeatedEditedNearestNeighbours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.RepeatedEditedNearestNeighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.RepeatedEditedNearestNeighbours.class__">
+<code class="descname">class__</code><em class="property"> = 'RepeatedEditedNearestNeighbours'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.RepeatedEditedNearestNeighbours.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.RepeatedEditedNearestNeighbours.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours.RepeatedEditedNearestNeighbours.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links">
+<span id="hyperflow-pipeline-components-preprocessing-balance-under-sample-tomek-links-module"></span><h2>hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.TomekLinks">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.</code><code class="descname">TomekLinks</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/balance/under_sample/tomek_links.html#TomekLinks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.TomekLinks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.TomekLinks.class__">
+<code class="descname">class__</code><em class="property"> = 'TomekLinks'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.TomekLinks.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.TomekLinks.module__">
+<code class="descname">module__</code><em class="property"> = 'imblearn.under_sampling'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links.TomekLinks.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.balance.under_sample">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.balance.under_sample" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

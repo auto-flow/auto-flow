@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.preprocessing.impute package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.preprocessing.impute package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.impute.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-components-preprocessing-impute-package">
+<h1>hyperflow.pipeline.components.preprocessing.impute package<a class="headerlink" href="#hyperflow-pipeline-components-preprocessing-impute-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.impute.delete">
+<span id="hyperflow-pipeline-components-preprocessing-impute-delete-module"></span><h2>hyperflow.pipeline.components.preprocessing.impute.delete module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.impute.delete" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.delete.DeleteNanRow">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.impute.delete.</code><code class="descname">DeleteNanRow</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/delete.html#DeleteNanRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.delete.DeleteNanRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.delete.DeleteNanRow.class__">
+<code class="descname">class__</code><em class="property"> = 'DeleteNanRow'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.delete.DeleteNanRow.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.delete.DeleteNanRow.module__">
+<code class="descname">module__</code><em class="property"> = 'hyperflow.data_process.impute.delete_nan'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.delete.DeleteNanRow.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.impute.fill_abnormal">
+<span id="hyperflow-pipeline-components-preprocessing-impute-fill-abnormal-module"></span><h2>hyperflow.pipeline.components.preprocessing.impute.fill_abnormal module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.impute.fill_abnormal" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.</code><code class="descname">FillAbnormal</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/fill_abnormal.html#FillAbnormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/fill_abnormal.html#FillAbnormal.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal.class__">
+<code class="descname">class__</code><em class="property"> = 'SimpleImputer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.impute'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_abnormal.FillAbnormal.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.impute.fill_cat">
+<span id="hyperflow-pipeline-components-preprocessing-impute-fill-cat-module"></span><h2>hyperflow.pipeline.components.preprocessing.impute.fill_cat module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.impute.fill_cat" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.impute.fill_cat.</code><code class="descname">FillCat</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/fill_cat.html#FillCat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/fill_cat.html#FillCat.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat.class__">
+<code class="descname">class__</code><em class="property"> = 'SimpleImputer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.impute'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_cat.FillCat.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.impute.fill_num">
+<span id="hyperflow-pipeline-components-preprocessing-impute-fill-num-module"></span><h2>hyperflow.pipeline.components.preprocessing.impute.fill_num module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.impute.fill_num" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_num.FillNum">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.impute.fill_num.</code><code class="descname">FillNum</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/fill_num.html#FillNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_num.FillNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_num.FillNum.class__">
+<code class="descname">class__</code><em class="property"> = 'SimpleImputer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_num.FillNum.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.fill_num.FillNum.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.impute'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.fill_num.FillNum.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.impute.knn">
+<span id="hyperflow-pipeline-components-preprocessing-impute-knn-module"></span><h2>hyperflow.pipeline.components.preprocessing.impute.knn module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.impute.knn" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.knn.KNNImputer">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.impute.knn.</code><code class="descname">KNNImputer</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/impute/knn.html#KNNImputer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.knn.KNNImputer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.knn.KNNImputer.class__">
+<code class="descname">class__</code><em class="property"> = 'KNNImputer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.knn.KNNImputer.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.impute.knn.KNNImputer.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.impute'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.impute.knn.KNNImputer.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.impute">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.impute" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

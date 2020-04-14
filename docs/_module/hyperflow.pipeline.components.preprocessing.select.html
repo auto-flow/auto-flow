@@ -1,0 +1,444 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.preprocessing.select package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.preprocessing.select package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.select.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-components-preprocessing-select-package">
+<h1>hyperflow.pipeline.components.preprocessing.select package<a class="headerlink" href="#hyperflow-pipeline-components-preprocessing-select-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.base">
+<span id="hyperflow-pipeline-components-preprocessing-select-base-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.base module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.REF_Base">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.base.</code><code class="descname">REF_Base</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#REF_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin</span></code></a>, <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.REF_Base.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#REF_Base.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.REF_Base.class__">
+<code class="descname">class__</code><em class="property"> = 'RFE'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.REF_Base.max_feature_name">
+<code class="descname">max_feature_name</code><em class="property"> = '_n_features_to_select-sp1_percent'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base.max_feature_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.REF_Base.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.feature_selection'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.REF_Base.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.base.</code><code class="descname">SelectFromModelBase</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectFromModelBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin</span></code></a>, <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectFromModelBase.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.class__">
+<code class="descname">class__</code><em class="property"> = 'SelectFromModel'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.max_feature_name">
+<code class="descname">max_feature_name</code><em class="property"> = '_max_features-sp1_percent'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.max_feature_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.feature_selection'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.base.</code><code class="descname">SelectPercentileBase</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin</span></code></a>, <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_fit_X">
+<code class="descname">before_fit_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.before_fit_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_fit_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_trans_X">
+<code class="descname">before_trans_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.before_trans_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_trans_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.class__">
+<code class="descname">class__</code><em class="property"> = 'GenericUnivariateSelect'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_default_name">
+<code class="descname">get_default_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.get_default_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_name2func">
+<code class="descname">get_name2func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.get_name2func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_name2func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.max_feature_name">
+<code class="descname">max_feature_name</code><em class="property"> = 'param'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.max_feature_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.feature_selection'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.base.</code><code class="descname">SklearnSelectMixin</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SklearnSelectMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.before_parse_escape_hyperparameters">
+<code class="descname">before_parse_escape_hyperparameters</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/base.html#SklearnSelectMixin.before_parse_escape_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.before_parse_escape_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.max_feature_name">
+<code class="descname">max_feature_name</code><em class="property"> = '_max_features-sp1_percent'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.max_feature_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.from_model_clf">
+<span id="hyperflow-pipeline-components-preprocessing-select-from-model-clf-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.from_model_clf module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.from_model_clf" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.from_model_clf.</code><code class="descname">SelectFromModelClf</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/from_model_clf.html#SelectFromModelClf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase" title="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf.classification_only">
+<code class="descname">classification_only</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf.classification_only" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.from_model_reg">
+<span id="hyperflow-pipeline-components-preprocessing-select-from-model-reg-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.from_model_reg module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.from_model_reg" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.from_model_reg.</code><code class="descname">SelectFromModelReg</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/from_model_reg.html#SelectFromModelReg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase" title="hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SelectFromModelBase</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg.regression_only">
+<code class="descname">regression_only</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg.regression_only" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.rfe_clf">
+<span id="hyperflow-pipeline-components-preprocessing-select-rfe-clf-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.rfe_clf module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.rfe_clf" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.rfe_clf.</code><code class="descname">RFE_Clf</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/rfe_clf.html#RFE_Clf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base" title="hyperflow.pipeline.components.preprocessing.select.base.REF_Base"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.REF_Base</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf.classification_only">
+<code class="descname">classification_only</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf.classification_only" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.rfe_reg">
+<span id="hyperflow-pipeline-components-preprocessing-select-rfe-reg-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.rfe_reg module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.rfe_reg" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.rfe_reg.</code><code class="descname">RFE_Reg</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/rfe_reg.html#RFE_Reg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.REF_Base" title="hyperflow.pipeline.components.preprocessing.select.base.REF_Base"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.REF_Base</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg.regression_only">
+<code class="descname">regression_only</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg.regression_only" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.univar_clf">
+<span id="hyperflow-pipeline-components-preprocessing-select-univar-clf-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.univar_clf module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.univar_clf" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.univar_clf.</code><code class="descname">SelectPercentileClassification</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/univar_clf.html#SelectPercentileClassification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase" title="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.classification_only">
+<code class="descname">classification_only</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.classification_only" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_default_name">
+<code class="descname">get_default_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/univar_clf.html#SelectPercentileClassification.get_default_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_name2func">
+<code class="descname">get_name2func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/univar_clf.html#SelectPercentileClassification.get_name2func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_name2func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select.univar_reg">
+<span id="hyperflow-pipeline-components-preprocessing-select-univar-reg-module"></span><h2>hyperflow.pipeline.components.preprocessing.select.univar_reg module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select.univar_reg" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.select.univar_reg.</code><code class="descname">SelectPercentileRegression</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/univar_reg.html#SelectPercentileRegression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase" title="hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.select.base.SelectPercentileBase</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_default_name">
+<code class="descname">get_default_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/univar_reg.html#SelectPercentileRegression.get_default_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_name2func">
+<code class="descname">get_name2func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/select/univar_reg.html#SelectPercentileRegression.get_name2func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_name2func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.regression_only">
+<code class="descname">regression_only</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.regression_only" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.select">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.select" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

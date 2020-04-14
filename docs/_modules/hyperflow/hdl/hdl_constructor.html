@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.hdl.hdl_constructor &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.hdl.hdl_constructor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.hdl.hdl_constructor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span>
+<span class="kn">from</span> <span class="nn">hyperflow.hdl.utils</span> <span class="kn">import</span> <span class="n">get_hdl_bank</span><span class="p">,</span> <span class="n">get_default_hdl_bank</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.dict</span> <span class="kn">import</span> <span class="n">add_prefix_in_dict_keys</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.math</span> <span class="kn">import</span> <span class="n">get_int_length</span>
+
+
+<div class="viewcode-block" id="HDL_Constructor"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor">[docs]</a><span class="k">class</span> <span class="nc">HDL_Constructor</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">DAG_workflow</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;generic_recommend&quot;</span><span class="p">,</span>
+            <span class="n">hdl_bank_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">hdl_bank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">included_classifiers</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;adaboost&quot;</span><span class="p">,</span> <span class="s2">&quot;catboost&quot;</span><span class="p">,</span> <span class="s2">&quot;decision_tree&quot;</span><span class="p">,</span> <span class="s2">&quot;extra_trees&quot;</span><span class="p">,</span> <span class="s2">&quot;gaussian_nb&quot;</span><span class="p">,</span> <span class="s2">&quot;k_nearest_neighbors&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;liblinear_svc&quot;</span><span class="p">,</span> <span class="s2">&quot;libsvm_svc&quot;</span><span class="p">,</span> <span class="s2">&quot;lightgbm&quot;</span><span class="p">,</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span> <span class="s2">&quot;sgd&quot;</span><span class="p">),</span>
+            <span class="n">included_regressors</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;adaboost&quot;</span><span class="p">,</span> <span class="s2">&quot;bayesian_ridge&quot;</span><span class="p">,</span> <span class="s2">&quot;catboost&quot;</span><span class="p">,</span> <span class="s2">&quot;decision_tree&quot;</span><span class="p">,</span> <span class="s2">&quot;elasticnet&quot;</span><span class="p">,</span> <span class="s2">&quot;extra_trees&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;gaussian_process&quot;</span><span class="p">,</span> <span class="s2">&quot;k_nearest_neighbors&quot;</span><span class="p">,</span> <span class="s2">&quot;kernel_ridge&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;liblinear_svr&quot;</span><span class="p">,</span> <span class="s2">&quot;lightgbm&quot;</span><span class="p">,</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span> <span class="s2">&quot;sgd&quot;</span><span class="p">),</span>
+            <span class="n">included_highR_nan_imputers</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;operate.drop&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.merge&quot;</span><span class="p">,</span> <span class="s2">&quot;__rely_model&quot;</span><span class="p">:</span> <span class="s2">&quot;boost_model&quot;</span><span class="p">}),</span>
+            <span class="n">included_cat_nan_imputers</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;impute.fill_cat&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;impute.fill_abnormal&quot;</span><span class="p">,</span> <span class="s2">&quot;__rely_model&quot;</span><span class="p">:</span> <span class="s2">&quot;boost_model&quot;</span><span class="p">}),</span>
+            <span class="n">included_num_nan_imputers</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;impute.fill_num&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;impute.fill_abnormal&quot;</span><span class="p">,</span> <span class="s2">&quot;__rely_model&quot;</span><span class="p">:</span> <span class="s2">&quot;boost_model&quot;</span><span class="p">}),</span>
+            <span class="n">included_highR_cat_encoders</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;operate.drop&quot;</span><span class="p">,</span> <span class="s2">&quot;encode.label&quot;</span><span class="p">,</span> <span class="s2">&quot;encode.cat_boost&quot;</span><span class="p">),</span>
+            <span class="n">included_lowR_cat_encoders</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;encode.one_hot&quot;</span><span class="p">,</span> <span class="s2">&quot;encode.label&quot;</span><span class="p">,</span> <span class="s2">&quot;encode.cat_boost&quot;</span><span class="p">),</span>
+
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_lowR_cat_encoders</span> <span class="o">=</span> <span class="n">included_lowR_cat_encoders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_highR_cat_encoders</span> <span class="o">=</span> <span class="n">included_highR_cat_encoders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_num_nan_imputers</span> <span class="o">=</span> <span class="n">included_num_nan_imputers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_cat_nan_imputers</span> <span class="o">=</span> <span class="n">included_cat_nan_imputers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_highR_nan_imputers</span> <span class="o">=</span> <span class="n">included_highR_nan_imputers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_regressors</span> <span class="o">=</span> <span class="n">included_regressors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included_classifiers</span> <span class="o">=</span> <span class="n">included_classifiers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_bank_path</span> <span class="o">=</span> <span class="n">hdl_bank_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span> <span class="o">=</span> <span class="n">DAG_workflow</span>
+        <span class="k">if</span> <span class="n">hdl_bank</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">hdl_bank_path</span><span class="p">:</span>
+                <span class="n">hdl_bank</span> <span class="o">=</span> <span class="n">get_hdl_bank</span><span class="p">(</span><span class="n">hdl_bank_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">hdl_bank</span> <span class="o">=</span> <span class="n">get_default_hdl_bank</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">hdl_bank</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdl_bank</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No hdl_bank, will use DAG_descriptions only.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_bank</span> <span class="o">=</span> <span class="n">hdl_bank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;hyperflow.HDL_Constructor(&quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;DAG_descriptions={repr(self.DAG_workflow)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;hdl_bank_path={repr(self.hdl_bank_path)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;hdl_bank={repr(self.hdl_bank)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_classifiers={repr(self.included_classifiers)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_regressors={repr(self.included_regressors)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_highR_nan_imputers={repr(self.included_highR_nan_imputers)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_cat_nan_imputers={repr(self.included_cat_nan_imputers)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_num_nan_imputers={repr(self.included_num_nan_imputers)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_highR_cat_encoders={repr(self.included_highR_cat_encoders)}, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;included_lowR_cat_encoders={repr(self.included_lowR_cat_encoders)}&quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;)&quot;</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="HDL_Constructor.parse_item"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.parse_item">[docs]</a>    <span class="k">def</span> <span class="nf">parse_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_name&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;_vanilla&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">is_vanilla</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_vanilla&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">is_vanilla</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">addition_dict</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">addition_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">is_vanilla</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+            <span class="n">addition_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">is_vanilla</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
+        <span class="k">return</span> <span class="n">packages</span><span class="p">,</span> <span class="n">addition_dict</span><span class="p">,</span> <span class="n">is_vanilla</span></div>
+
+<div class="viewcode-block" id="HDL_Constructor.purify_DAG_describe"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.purify_DAG_describe">[docs]</a>    <span class="k">def</span> <span class="nf">purify_DAG_describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">DAG_describe</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">DAG_describe</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span> <span class="o">=</span> <span class="n">DAG_describe</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_params_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">package</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict_</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">package</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="HDL_Constructor.get_params_in_dict"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.get_params_in_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_params_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl_bank</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">packages</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mainTask</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">(</span><span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">)</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="n">params_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_params_in_dict</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">[</span><span class="n">PHASE1</span><span class="p">],</span> <span class="n">package</span><span class="p">)</span> <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span>
+                                   <span class="n">packages</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">last_phase_key</span> <span class="o">=</span> <span class="n">PHASE1</span> <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="n">PHASE1</span> <span class="k">else</span> <span class="n">mainTask</span>
+        <span class="n">params_list</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_params_in_dict</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">[</span><span class="n">last_phase_key</span><span class="p">],</span> <span class="n">packages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">params_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">params_list</span><span class="p">,</span> <span class="n">packages</span><span class="p">):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="HDL_Constructor.generic_recommend"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">[docs]</a>    <span class="k">def</span> <span class="nf">generic_recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">DAG_workflow</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">contain_highR_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">contain_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># todo: 对于num特征进行scale transform</span>
+        <span class="c1"># --------Start imputing missing(nan) value--------------------</span>
+        <span class="k">if</span> <span class="s2">&quot;highR_nan&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">:</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;highR_nan-&gt;nan&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_highR_nan_imputers</span>
+            <span class="n">contain_highR_nan</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">contain_highR_nan</span> <span class="ow">or</span> <span class="s2">&quot;nan&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">:</span>
+            <span class="c1"># split nan to cat_nan and num_nan</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;nan-&gt;{cat_name=cat_nan,num_name=num_nan}&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;operate.split.cat_num&quot;</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;num_nan-&gt;num&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_num_nan_imputers</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;cat_nan-&gt;cat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_cat_nan_imputers</span>
+            <span class="n">contain_nan</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># --------Start encoding categorical(cat) value --------------------</span>
+        <span class="k">if</span> <span class="n">contain_nan</span> <span class="ow">or</span> <span class="s2">&quot;cat&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">:</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;cat-&gt;{highR=highR_cat,lowR=lowR_cat}&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.split.cat&quot;</span><span class="p">,</span>
+                                                                    <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">highR_cat_threshold</span><span class="p">}</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;highR_cat-&gt;num&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_highR_cat_encoders</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;lowR_cat-&gt;num&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_lowR_cat_encoders</span>
+        <span class="c1"># --------Start estimating--------------------</span>
+        <span class="n">mainTask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span>
+        <span class="k">if</span> <span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;num-&gt;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_classifiers</span>
+        <span class="k">elif</span> <span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+            <span class="n">DAG_workflow</span><span class="p">[</span><span class="s2">&quot;num-&gt;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">included_regressors</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="c1"># todo: 如果特征多，做特征选择或者降维。如果特征少，做增维</span>
+        <span class="k">return</span> <span class="n">DAG_workflow</span></div>
+
+<div class="viewcode-block" id="HDL_Constructor.run"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">highR_cat_threshold</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highR_cat_threshold</span> <span class="o">=</span> <span class="n">highR_cat_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">data_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span> <span class="o">==</span> <span class="s2">&quot;generic_recommend&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using &#39;generic_recommend&#39; method to initialize a generic DAG_workflow, </span><span class="se">\n</span><span class="s2">&quot;</span>
+                                 <span class="s2">&quot;to Adapt to various data such like NaN and categorical features.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_recommend</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;DAG_workflow is specifically set by user.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="n">target_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">purify_DAG_describe</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span>
+                <span class="n">target_key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="n">estimator_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">target_key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">estimator_values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">estimator_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">estimator_values</span><span class="p">]</span>
+        <span class="n">preprocessing_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">mainTask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span>
+        <span class="n">hdl_bank</span> <span class="o">=</span> <span class="n">get_default_hdl_bank</span><span class="p">()</span>
+        <span class="c1"># 遍历DAG_describe，构造preprocessing</span>
+        <span class="n">n_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="p">)</span>
+        <span class="n">int_len</span> <span class="o">=</span> <span class="n">get_int_length</span><span class="p">(</span><span class="n">n_steps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+            <span class="n">formed_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;{i:0</span><span class="si">{int_len}</span><span class="s2">d}</span><span class="si">{key}</span><span class="s2">(choice)&quot;</span>
+            <span class="n">sub_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="n">packages</span><span class="p">,</span> <span class="n">addition_dict</span><span class="p">,</span> <span class="n">is_vanilla</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_item</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">addition_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">})</span>  <span class="c1"># fixme</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">is_vanilla</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params_in_dict</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">,</span> <span class="n">packages</span><span class="p">,</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">mainTask</span><span class="p">)</span>
+                <span class="n">sub_dict</span><span class="p">[</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+                <span class="n">sub_dict</span><span class="p">[</span><span class="n">packages</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">addition_dict</span><span class="p">)</span>
+            <span class="n">preprocessing_dict</span><span class="p">[</span><span class="n">formed_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_dict</span>
+        <span class="c1"># 构造estimator</span>
+        <span class="n">estimator_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">estimator_value</span> <span class="ow">in</span> <span class="n">estimator_values</span><span class="p">:</span>
+            <span class="n">packages</span><span class="p">,</span> <span class="n">addition_dict</span><span class="p">,</span> <span class="n">is_vanilla</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_item</span><span class="p">(</span><span class="n">estimator_value</span><span class="p">)</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">is_vanilla</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params_in_dict</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">,</span> <span class="n">packages</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">,</span> <span class="n">mainTask</span><span class="p">)</span>
+            <span class="n">estimator_dict</span><span class="p">[</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+            <span class="n">estimator_dict</span><span class="p">[</span><span class="n">packages</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">addition_dict</span><span class="p">)</span>
+        <span class="n">final_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">PHASE1</span><span class="p">:</span> <span class="n">preprocessing_dict</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">(choice)&quot;</span><span class="p">:</span> <span class="n">estimator_dict</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span> <span class="o">=</span> <span class="n">final_dict</span></div>
+
+<div class="viewcode-block" id="HDL_Constructor.get_hdl"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.get_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="c1"># 获取hdl</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
