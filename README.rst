@@ -4,4 +4,4 @@
 
 正在施工中。。。。
 
-.. image:: https://raw.githubusercontent.com/Hyper-Flow/HyperFlow/master/docs/_images/workflow_space.svg
+.. image:: docs/_images/workflow_space.png

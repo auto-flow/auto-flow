@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -17,4 +18,6 @@ column_descriptions = {
 pipe.data_manager = DataManager(X_train=train_df, X_test=test_df, column_descriptions=column_descriptions)
 pipe.hdl_constructors[0].run(pipe.data_manager, pipe.random_state, pipe.highR_cat_threshold)
 graph = pipe.hdl_constructors[0].draw_workflow_space()
-graph.view()
+open("workflow_space.gv").write(graph.source)
+cmd = f'''dot -Tpng -Gsize=9,15\! -Gdpi=300 -oworkflow_space.png workflow_space.gv'''
+os.system(cmd)
