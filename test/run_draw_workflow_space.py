@@ -1,8 +1,6 @@
 from pathlib import Path
 
-import joblib
 import pandas as pd
-from sklearn.model_selection import KFold
 
 import hyperflow
 from hyperflow import HyperFlowClassifier, DataManager
@@ -18,5 +16,5 @@ column_descriptions = {
 }
 pipe.data_manager = DataManager(X_train=train_df, X_test=test_df, column_descriptions=column_descriptions)
 pipe.hdl_constructors[0].run(pipe.data_manager, pipe.random_state, pipe.highR_cat_threshold)
-graph=pipe.hdl_constructors[0].draw_workflow_space()
+graph = pipe.hdl_constructors[0].draw_workflow_space()
 graph.view()

@@ -15,5 +15,5 @@ class BaseEncoder(HyperFlowFeatureEngineerAlgorithm):
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None, columns_metadata=None):
-        X = X.astype(str)
-        return estimator.fit(X, y)
+        X_ = X.astype(str)
+        return estimator.fit(X_, y)
