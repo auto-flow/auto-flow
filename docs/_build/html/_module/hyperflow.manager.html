@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.manager package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.manager package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.manager.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-manager-package">
+<h1>hyperflow.manager package<a class="headerlink" href="#hyperflow-manager-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.manager.data_manager">
+<span id="hyperflow-manager-data-manager-module"></span><h2>hyperflow.manager.data_manager module<a class="headerlink" href="#module-hyperflow.manager.data_manager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.manager.data_manager.DataManager">
+<em class="property">class </em><code class="descclassname">hyperflow.manager.data_manager.</code><code class="descname">DataManager</code><span class="sig-paren">(</span><em>X_train: Union[pandas.core.frame.DataFrame</em>, <em>numpy.ndarray</em>, <em>NoneType]=None</em>, <em>y_train: Union[pandas.core.series.Series</em>, <em>numpy.ndarray</em>, <em>str</em>, <em>NoneType]=None</em>, <em>X_test: Union[pandas.core.frame.DataFrame</em>, <em>numpy.ndarray</em>, <em>NoneType]=None</em>, <em>y_test: Union[pandas.core.series.Series</em>, <em>numpy.ndarray</em>, <em>str</em>, <em>NoneType]=None</em>, <em>dataset_metadata: Dict[str</em>, <em>Any]=frozenset()</em>, <em>column_descriptions: Dict[str</em>, <em>str]=None</em>, <em>highR_nan_threshold: float=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>DataManager is a Dataset manager to store the pattern of dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>X_train</strong> &#8211; </li>
+<li><strong>y_train</strong> &#8211; </li>
+<li><strong>X_test</strong> &#8211; </li>
+<li><strong>y_test</strong> &#8211; </li>
+<li><strong>dataset_metadata</strong> &#8211; </li>
+<li><strong>column_descriptions</strong> &#8211; </li>
+<li><strong>highR_nan_threshold</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="hyperflow.manager.data_manager.DataManager.parse_column_descriptions">
+<code class="descname">parse_column_descriptions</code><span class="sig-paren">(</span><em>column_descriptions</em>, <em>X_train</em>, <em>y_train</em>, <em>X_test</em>, <em>y_test</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.parse_column_descriptions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.data_manager.DataManager.parse_feature_groups">
+<code class="descname">parse_feature_groups</code><span class="sig-paren">(</span><em>series: pandas.core.series.Series</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.parse_feature_groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.data_manager.DataManager.process_X">
+<code class="descname">process_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.process_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.data_manager.DataManager.set_data">
+<code class="descname">set_data</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>y_train=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.set_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.data_manager.DataManager.type_check">
+<code class="descname">type_check</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.type_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.manager.resource_manager">
+<span id="hyperflow-manager-resource-manager-module"></span><h2>hyperflow.manager.resource_manager module<a class="headerlink" href="#module-hyperflow.manager.resource_manager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.manager.resource_manager.ResourceManager">
+<em class="property">class </em><code class="descclassname">hyperflow.manager.resource_manager.</code><code class="descname">ResourceManager</code><span class="sig-paren">(</span><em>store_path='~/hyperflow'</em>, <em>file_system='local'</em>, <em>file_system_params=&lt;frozendict {}&gt;</em>, <em>db_type='sqlite'</em>, <em>db_params=&lt;frozendict {}&gt;</em>, <em>redis_params=&lt;frozendict {}&gt;</em>, <em>max_persistent_estimators=50</em>, <em>persistent_mode='fs'</em>, <em>store_intermediate=True</em>, <em>compress_suffix='bz2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>ResourceManager: file_system and data_base</p>
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.clear_pid_list">
+<code class="descname">clear_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.clear_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.clear_pid_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.close_experiments_table">
+<code class="descname">close_experiments_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_experiments_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.close_hdls_table">
+<code class="descname">close_hdls_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_hdls_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.close_redis">
+<code class="descname">close_redis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_redis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_redis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.close_tasks_table">
+<code class="descname">close_tasks_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_tasks_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.close_trials_table">
+<code class="descname">close_trials_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_trials_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.connect_redis">
+<code class="descname">connect_redis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.connect_redis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.connect_redis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.current_tasks_db_name">
+<code class="descname">current_tasks_db_name</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.current_tasks_db_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.delete_models">
+<code class="descname">delete_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.delete_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.delete_models" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.estimate_new_id">
+<code class="descname">estimate_new_id</code><span class="sig-paren">(</span><em>Dataset</em>, <em>id_field</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.estimate_new_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.estimate_new_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_best_k_trials">
+<code class="descname">get_best_k_trials</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_best_k_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_best_k_trials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info">
+<code class="descname">get_ensemble_needed_info</code><span class="sig-paren">(</span><em>task_id</em>, <em>hdl_id</em><span class="sig-paren">)</span> &rarr; Tuple[hyperflow.utils.ml_task.MLTask, Any, Any]<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_ensemble_needed_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id">
+<code class="descname">get_experiment_id_by_task_id</code><span class="sig-paren">(</span><em>task_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_experiment_id_by_task_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_experiments_model">
+<code class="descname">get_experiments_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_experiments_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_experiments_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_hdls_model">
+<code class="descname">get_hdls_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_hdls_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_hdls_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_pid_list">
+<code class="descname">get_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_pid_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_tasks_model">
+<code class="descname">get_tasks_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_tasks_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_tasks_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.get_trials_model">
+<code class="descname">get_trials_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_trials_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_trials_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.init_experiments_table">
+<code class="descname">init_experiments_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_experiments_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.init_hdls_table">
+<code class="descname">init_hdls_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_hdls_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.init_tasks_table">
+<code class="descname">init_tasks_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_tasks_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.init_trials_table">
+<code class="descname">init_trials_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_trials_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">
+<code class="descname">insert_to_experiments_table</code><span class="sig-paren">(</span><em>general_experiment_timestamp</em>, <em>current_experiment_timestamp</em>, <em>hdl_constructors</em>, <em>hdl_constructor</em>, <em>raw_hdl</em>, <em>hdl</em>, <em>tuners</em>, <em>tuner</em>, <em>should_calc_all_metric</em>, <em>data_manager</em>, <em>column_descriptions</em>, <em>dataset_metadata</em>, <em>metric</em>, <em>splitter</em>, <em>should_store_intermediate_result</em>, <em>fit_ensemble_params</em>, <em>additional_info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_experiments_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">
+<code class="descname">insert_to_hdls_table</code><span class="sig-paren">(</span><em>hdl</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_hdls_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">
+<code class="descname">insert_to_tasks_table</code><span class="sig-paren">(</span><em>data_manager: hyperflow.manager.data_manager.DataManager</em>, <em>metric: hyperflow.metrics.Scorer</em>, <em>splitter</em>, <em>specific_task_token</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_tasks_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_trials_table">
+<code class="descname">insert_to_trials_table</code><span class="sig-paren">(</span><em>info: Dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_trials_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.load_best_dhp">
+<code class="descname">load_best_dhp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_best_dhp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_best_dhp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.load_best_estimator">
+<code class="descname">load_best_estimator</code><span class="sig-paren">(</span><em>ml_task: hyperflow.utils.ml_task.MLTask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_best_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_best_estimator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id">
+<code class="descname">load_data_manager_by_experiment_id</code><span class="sig-paren">(</span><em>experiment_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_data_manager_by_experiment_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.load_estimators_in_trials">
+<code class="descname">load_estimators_in_trials</code><span class="sig-paren">(</span><em>trials: Union[List, Tuple]</em><span class="sig-paren">)</span> &rarr; Tuple[List, List, List]<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_estimators_in_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_estimators_in_trials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.meta_records_db_name">
+<code class="descname">meta_records_db_name</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.meta_records_db_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">
+<code class="descname">persistent_evaluated_model</code><span class="sig-paren">(</span><em>info: Dict</em>, <em>trial_id</em><span class="sig-paren">)</span> &rarr; Tuple[str, str]<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.persistent_evaluated_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.persistent_evaluated_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.push_pid_list">
+<code class="descname">push_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.push_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.push_pid_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.redis_delete">
+<code class="descname">redis_delete</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.redis_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.redis_delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.redis_get">
+<code class="descname">redis_get</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.redis_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.redis_get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.redis_set">
+<code class="descname">redis_set</code><span class="sig-paren">(</span><em>name</em>, <em>value</em>, <em>ex=None</em>, <em>px=None</em>, <em>nx=False</em>, <em>xx=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.redis_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.redis_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.runhistory_db_params">
+<code class="descname">runhistory_db_params</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.runhistory_db_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.runhistory_table_name">
+<code class="descname">runhistory_table_name</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.runhistory_table_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.set_is_master">
+<code class="descname">set_is_master</code><span class="sig-paren">(</span><em>is_master</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.set_is_master"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.set_is_master" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.manager.resource_manager.ResourceManager.update_db_params">
+<code class="descname">update_db_params</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.update_db_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.update_db_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.manager">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.manager" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

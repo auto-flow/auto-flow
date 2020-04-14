@@ -200,14 +200,13 @@ class HDL_Constructor():
             else:
                 g.node(_to, color=feat2c[_to], label=get_node_label(_to))
                 if len(candidates) == 1:
-                    candidates_str = f'<font color="{cand2c[candidates[0]]}">{candidates[0]}</font>'
+                    candidates_str = f'<<font color="{cand2c[candidates[0]]}">{candidates[0]}</font>>'
                 else:
                     candidates_str = "<{" + ", ".join(
                         [f'<font color="{cand2c[candidate]}">{candidate}</font>' for candidate in candidates]) + "}>"
                 g.edge(_from, _to, candidates_str)
         g.attr(label=r'WorkFlow Space')
-        g.view()
-        pass
+        return g
 
     def run(self, data_manager, random_state, highR_cat_threshold):
         self.highR_cat_threshold = highR_cat_threshold

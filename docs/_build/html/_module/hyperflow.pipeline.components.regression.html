@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.regression package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.regression package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.components.regression.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-components-regression-package">
+<h1>hyperflow.pipeline.components.regression package<a class="headerlink" href="#hyperflow-pipeline-components-regression-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.adaboost">
+<span id="hyperflow-pipeline-components-regression-adaboost-module"></span><h2>hyperflow.pipeline.components.regression.adaboost module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.adaboost" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.adaboost.</code><code class="descname">AdaboostRegressor</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/adaboost.html#AdaboostRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/adaboost.html#AdaboostRegressor.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor.class__">
+<code class="descname">class__</code><em class="property"> = 'AdaBoostRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.ensemble'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.adaboost.AdaboostRegressor.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.ard_regression">
+<span id="hyperflow-pipeline-components-regression-ard-regression-module"></span><h2>hyperflow.pipeline.components.regression.ard_regression module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.ard_regression" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.ard_regression.ARDRegression">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.ard_regression.</code><code class="descname">ARDRegression</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/ard_regression.html#ARDRegression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.ard_regression.ARDRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.ard_regression.ARDRegression.class__">
+<code class="descname">class__</code><em class="property"> = 'ARDRegression'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.ard_regression.ARDRegression.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.ard_regression.ARDRegression.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.linear_model'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.ard_regression.ARDRegression.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.bayesian_ridge">
+<span id="hyperflow-pipeline-components-regression-bayesian-ridge-module"></span><h2>hyperflow.pipeline.components.regression.bayesian_ridge module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.bayesian_ridge" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.bayesian_ridge.BayesianRidge">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.bayesian_ridge.</code><code class="descname">BayesianRidge</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/bayesian_ridge.html#BayesianRidge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.bayesian_ridge.BayesianRidge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.bayesian_ridge.BayesianRidge.class__">
+<code class="descname">class__</code><em class="property"> = 'BayesianRidge'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.bayesian_ridge.BayesianRidge.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.bayesian_ridge.BayesianRidge.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.linear_model'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.bayesian_ridge.BayesianRidge.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.catboost">
+<span id="hyperflow-pipeline-components-regression-catboost-module"></span><h2>hyperflow.pipeline.components.regression.catboost module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.catboost" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.catboost.CatBoostRegressor">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.catboost.</code><code class="descname">CatBoostRegressor</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/catboost.html#CatBoostRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.catboost.CatBoostRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm" title="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.boost_model">
+<code class="descname">boost_model</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.boost_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.class__">
+<code class="descname">class__</code><em class="property"> = 'CatBoostRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.core_fit">
+<code class="descname">core_fit</code><span class="sig-paren">(</span><em>estimator</em>, <em>X</em>, <em>y</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>feature_groups=None</em>, <em>columns_metadata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/catboost.html#CatBoostRegressor.core_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.core_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.module__">
+<code class="descname">module__</code><em class="property"> = 'catboost'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.tree_model">
+<code class="descname">tree_model</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.catboost.CatBoostRegressor.tree_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.decision_tree">
+<span id="hyperflow-pipeline-components-regression-decision-tree-module"></span><h2>hyperflow.pipeline.components.regression.decision_tree module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.decision_tree" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.decision_tree.DecisionTree">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.decision_tree.</code><code class="descname">DecisionTree</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/decision_tree.html#DecisionTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.decision_tree.DecisionTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.decision_tree.DecisionTree.class__">
+<code class="descname">class__</code><em class="property"> = 'DecisionTreeRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.decision_tree.DecisionTree.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.decision_tree.DecisionTree.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.tree'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.decision_tree.DecisionTree.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.elasticnet">
+<span id="hyperflow-pipeline-components-regression-elasticnet-module"></span><h2>hyperflow.pipeline.components.regression.elasticnet module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.elasticnet" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.elasticnet.ElasticNet">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.elasticnet.</code><code class="descname">ElasticNet</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/elasticnet.html#ElasticNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.elasticnet.ElasticNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.elasticnet.ElasticNet.class__">
+<code class="descname">class__</code><em class="property"> = 'ElasticNet'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.elasticnet.ElasticNet.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.elasticnet.ElasticNet.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.linear_model'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.elasticnet.ElasticNet.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.extra_trees">
+<span id="hyperflow-pipeline-components-regression-extra-trees-module"></span><h2>hyperflow.pipeline.components.regression.extra_trees module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.extra_trees" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.extra_trees.ExtraTreesRegressor">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.extra_trees.</code><code class="descname">ExtraTreesRegressor</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/extra_trees.html#ExtraTreesRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.extra_trees.ExtraTreesRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.extra_trees.ExtraTreesRegressor.class__">
+<code class="descname">class__</code><em class="property"> = 'ETR'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.extra_trees.ExtraTreesRegressor.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.extra_trees.ExtraTreesRegressor.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.ensemble'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.extra_trees.ExtraTreesRegressor.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.gaussian_process">
+<span id="hyperflow-pipeline-components-regression-gaussian-process-module"></span><h2>hyperflow.pipeline.components.regression.gaussian_process module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.gaussian_process" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.gaussian_process.</code><code class="descname">GaussianProcess</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/gaussian_process.html#GaussianProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/gaussian_process.html#GaussianProcess.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess.class__">
+<code class="descname">class__</code><em class="property"> = 'GaussianProcessRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.gaussian_process'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.gaussian_process.GaussianProcess.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.gradient_boosting">
+<span id="hyperflow-pipeline-components-regression-gradient-boosting-module"></span><h2>hyperflow.pipeline.components.regression.gradient_boosting module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.gradient_boosting" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.gradient_boosting.GradientBoosting">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.gradient_boosting.</code><code class="descname">GradientBoosting</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/gradient_boosting.html#GradientBoosting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.gradient_boosting.GradientBoosting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.gradient_boosting.GradientBoosting.class__">
+<code class="descname">class__</code><em class="property"> = 'GradientBoostingRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.gradient_boosting.GradientBoosting.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.gradient_boosting.GradientBoosting.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.ensemble'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.gradient_boosting.GradientBoosting.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.k_nearest_neighbors">
+<span id="hyperflow-pipeline-components-regression-k-nearest-neighbors-module"></span><h2>hyperflow.pipeline.components.regression.k_nearest_neighbors module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.k_nearest_neighbors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.k_nearest_neighbors.</code><code class="descname">KNearestNeighborsRegressor</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/k_nearest_neighbors.html#KNearestNeighborsRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor.after_process_hyperparams">
+<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/k_nearest_neighbors.html#KNearestNeighborsRegressor.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor.class__">
+<code class="descname">class__</code><em class="property"> = 'KNeighborsRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.neighbors'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.k_nearest_neighbors.KNearestNeighborsRegressor.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.kernel_ridge">
+<span id="hyperflow-pipeline-components-regression-kernel-ridge-module"></span><h2>hyperflow.pipeline.components.regression.kernel_ridge module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.kernel_ridge" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.kernel_ridge.ElasticNet">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.kernel_ridge.</code><code class="descname">ElasticNet</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/kernel_ridge.html#ElasticNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.kernel_ridge.ElasticNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.kernel_ridge.ElasticNet.class__">
+<code class="descname">class__</code><em class="property"> = 'KernelRidge'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.kernel_ridge.ElasticNet.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.kernel_ridge.ElasticNet.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.kernel_ridge'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.kernel_ridge.ElasticNet.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.liblinear_svr">
+<span id="hyperflow-pipeline-components-regression-liblinear-svr-module"></span><h2>hyperflow.pipeline.components.regression.liblinear_svr module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.liblinear_svr" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.liblinear_svr.</code><code class="descname">LibLinear_SVR</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/liblinear_svr.html#LibLinear_SVR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.after_pred_y">
+<code class="descname">after_pred_y</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/liblinear_svr.html#LibLinear_SVR.after_pred_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.after_pred_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.before_fit_y">
+<code class="descname">before_fit_y</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/liblinear_svr.html#LibLinear_SVR.before_fit_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.before_fit_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.class__">
+<code class="descname">class__</code><em class="property"> = 'LinearSVR'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.svm'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.liblinear_svr.LibLinear_SVR.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.lightgbm">
+<span id="hyperflow-pipeline-components-regression-lightgbm-module"></span><h2>hyperflow.pipeline.components.regression.lightgbm module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.lightgbm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.lightgbm.</code><code class="descname">LGBMRegressor</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/lightgbm.html#LGBMRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm" title="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.before_pred_X">
+<code class="descname">before_pred_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/lightgbm.html#LGBMRegressor.before_pred_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.before_pred_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.boost_model">
+<code class="descname">boost_model</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.boost_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.class__">
+<code class="descname">class__</code><em class="property"> = 'LGBMRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.core_fit">
+<code class="descname">core_fit</code><span class="sig-paren">(</span><em>estimator</em>, <em>X</em>, <em>y=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>feature_groups=None</em>, <em>columns_metadata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/lightgbm.html#LGBMRegressor.core_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.core_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.module__">
+<code class="descname">module__</code><em class="property"> = 'lightgbm'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.tree_model">
+<code class="descname">tree_model</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.tree_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.random_forest">
+<span id="hyperflow-pipeline-components-regression-random-forest-module"></span><h2>hyperflow.pipeline.components.regression.random_forest module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.random_forest" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.random_forest.RandomForest">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.random_forest.</code><code class="descname">RandomForest</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/random_forest.html#RandomForest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.random_forest.RandomForest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.random_forest.RandomForest.class__">
+<code class="descname">class__</code><em class="property"> = 'RandomForestRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.random_forest.RandomForest.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.random_forest.RandomForest.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.ensemble'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.random_forest.RandomForest.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression.sgd">
+<span id="hyperflow-pipeline-components-regression-sgd-module"></span><h2>hyperflow.pipeline.components.regression.sgd module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression.sgd" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.regression.sgd.SGD">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression.sgd.</code><code class="descname">SGD</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/sgd.html#SGD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.sgd.SGD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.sgd.SGD.after_pred_y">
+<code class="descname">after_pred_y</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/sgd.html#SGD.after_pred_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.sgd.SGD.after_pred_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.regression.sgd.SGD.before_fit_y">
+<code class="descname">before_fit_y</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression/sgd.html#SGD.before_fit_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression.sgd.SGD.before_fit_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.sgd.SGD.class__">
+<code class="descname">class__</code><em class="property"> = 'SGDRegressor'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.sgd.SGD.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.regression.sgd.SGD.module__">
+<code class="descname">module__</code><em class="property"> = 'sklearn.linear_model.stochastic_gradient'</em><a class="headerlink" href="#hyperflow.pipeline.components.regression.sgd.SGD.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.regression">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline.components.regression" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

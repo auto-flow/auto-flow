@@ -1,0 +1,254 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.feature_engineer_base &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.feature_engineer_base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.pipeline.components.feature_engineer_base</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.base</span> <span class="kn">import</span> <span class="n">HyperFlowComponent</span>
+<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">stack_Xs</span>
+<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.data</span> <span class="kn">import</span> <span class="n">densify</span>
+
+
+<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowFeatureEngineerAlgorithm</span><span class="p">(</span><span class="n">HyperFlowComponent</span><span class="p">):</span>
+    <span class="n">need_y</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.fit_transform"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.transform"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_or_trans</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_transform_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">GenericDataFrame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">X_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_trans_X</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_proc</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">densify</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>  <span class="c1"># todo: 改为判断的形式？</span>
+        <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">replace_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_feature_groups</span><span class="p">,</span> <span class="n">X_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_feature_groups</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pred_or_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train_</span><span class="p">,</span> <span class="n">X_valid_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fit</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Component: </span><span class="si">{self.__class__.__name__}</span><span class="s2"> is not fitted. Maybe it fit a empty data.</span><span class="se">\n</span><span class="s2">Return origin X defaultly.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="p">(</span><span class="n">X_train_</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
+            <span class="n">X_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="p">(</span><span class="n">X_valid_</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">)</span>
+            <span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="p">(</span><span class="n">X_test_</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;X_train&quot;</span><span class="p">:</span> <span class="n">X_train</span><span class="p">,</span>
+            <span class="s2">&quot;y_train&quot;</span><span class="p">:</span> <span class="n">y_train</span><span class="p">,</span>
+            <span class="s2">&quot;X_valid&quot;</span><span class="p">:</span> <span class="n">X_valid</span><span class="p">,</span>
+            <span class="s2">&quot;X_test&quot;</span><span class="p">:</span> <span class="n">X_test</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.before_trans_X"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.before_trans_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_trans_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span></div>
+
+<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_X_to_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_y</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stack_Xs</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">X_train</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

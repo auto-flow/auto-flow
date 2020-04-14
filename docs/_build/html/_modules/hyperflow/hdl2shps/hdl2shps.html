@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.hdl2shps.hdl2shps &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.hdl2shps.hdl2shps</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.hdl2shps.hdl2shps</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">CategoricalHyperparameter</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">ConfigurationSpace</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">ForbiddenInClause</span><span class="p">,</span> <span class="n">ForbiddenEqualsClause</span><span class="p">,</span> <span class="n">ForbiddenAndConjunction</span>
+<span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">InCondition</span><span class="p">,</span> <span class="n">EqualsCondition</span>
+<span class="kn">from</span> <span class="nn">hyperopt</span> <span class="kn">import</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">tpe</span><span class="p">,</span> <span class="n">hp</span>
+
+<span class="kn">import</span> <span class="nn">hyperflow.hdl.smac</span> <span class="k">as</span> <span class="nn">smac_hdl</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
+<span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">PHASE2</span>
+<span class="kn">from</span> <span class="nn">hyperflow.hdl.utils</span> <span class="kn">import</span> <span class="n">is_hdl_bottom</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_name_of_module</span>
+
+
+<div class="viewcode-block" id="RelyModels"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.RelyModels">[docs]</a><span class="k">class</span> <span class="nc">RelyModels</span><span class="p">:</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="HDL2SHPS"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS">[docs]</a><span class="k">class</span> <span class="nc">HDL2SHPS</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HDL2SHPS.set_task"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.set_task">[docs]</a>    <span class="k">def</span> <span class="nf">set_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">ml_task</span></div>
+
+<div class="viewcode-block" id="HDL2SHPS.get_forbid_hit_in_models_by_rely"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.get_forbid_hit_in_models_by_rely">[docs]</a>    <span class="k">def</span> <span class="nf">get_forbid_hit_in_models_by_rely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">rely_model</span><span class="o">=</span><span class="s2">&quot;boost_model&quot;</span><span class="p">):</span>
+        <span class="n">forbid_in_value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">hit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+            <span class="n">module_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hyperflow.pipeline.components.</span><span class="si">{self.ml_task.mainTask}</span><span class="s2">.</span><span class="si">{model}</span><span class="s2">&quot;</span>
+            <span class="n">_class</span> <span class="o">=</span> <span class="n">get_class_name_of_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">_class</span><span class="p">)</span>
+            <span class="n">is_hit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rely_model</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_hit</span><span class="p">:</span>
+                <span class="n">forbid_in_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">hit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">forbid_in_value</span><span class="p">,</span> <span class="n">hit</span></div>
+
+<div class="viewcode-block" id="HDL2SHPS.set_probabilities_in_cs"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.set_probabilities_in_cs">[docs]</a>    <span class="k">def</span> <span class="nf">set_probabilities_in_cs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span>
+            <span class="n">relied2models</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+            <span class="n">relied2AllModels</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+            <span class="n">all_models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">:__choice__&quot;</span><span class="p">)</span>
+        <span class="n">probabilities</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">model2prob</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">rely_model</span> <span class="ow">in</span> <span class="n">relied2models</span><span class="p">:</span>
+            <span class="n">cur_models</span> <span class="o">=</span> <span class="n">relied2models</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span>
+            <span class="n">L</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_models</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">cur_models</span><span class="p">:</span>
+                <span class="n">model2prob</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_models</span><span class="p">)</span>
+        <span class="n">p_rest</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model2prob</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_models</span><span class="p">)</span> <span class="o">-</span> <span class="n">L</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">choices</span><span class="p">:</span>
+            <span class="n">probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model2prob</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">p_rest</span><span class="p">))</span>
+        <span class="n">estimator</span><span class="o">.</span><span class="n">probabilities</span> <span class="o">=</span> <span class="n">probabilities</span>
+        <span class="n">default_estimator_choice</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">models</span> <span class="ow">in</span> <span class="n">relied2models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">models</span><span class="p">:</span>
+                <span class="n">default_estimator_choice</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">estimator</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">default_estimator_choice</span>
+        <span class="k">for</span> <span class="n">rely_model</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">RelyModels</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
+            <span class="n">forbid_eq_value</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">forbid_eq_key</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;__choice__&quot;</span><span class="p">])</span>
+            <span class="n">forbid_eq_key_hp</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="n">forbid_eq_key</span><span class="p">)</span>
+            <span class="n">forbid_in_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">:__choice__&quot;</span>
+            <span class="n">hit</span> <span class="o">=</span> <span class="n">relied2AllModels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rely_model</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">hit</span><span class="p">:</span>
+                <span class="n">choices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forbid_eq_key_hp</span><span class="o">.</span><span class="n">choices</span><span class="p">)</span>
+                <span class="n">choices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">forbid_eq_value</span><span class="p">)</span>
+                <span class="n">forbid_eq_key_hp</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span>
+                <span class="n">forbid_eq_key_hp</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">forbid_eq_key_hp</span><span class="o">.</span><span class="n">probabilities</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">choices</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span>
+                <span class="c1"># fixme  最后我放弃了在这上面进行修改，在hdl部分就做了预处理</span>
+                <span class="k">continue</span>
+            <span class="n">forbid_in_value</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">all_models</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">hit</span><span class="p">))</span>
+            <span class="c1"># 只选择了boost模型</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">forbid_in_value</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">choices</span> <span class="o">=</span> <span class="n">forbid_eq_key_hp</span><span class="o">.</span><span class="n">choices</span>
+            <span class="n">probabilities</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span>
+            <span class="n">p_rest</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="n">forbid_eq_value</span><span class="p">:</span>
+                    <span class="n">probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">probabilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_rest</span><span class="p">)</span>
+            <span class="n">forbid_eq_key_hp</span><span class="o">.</span><span class="n">probabilities</span> <span class="o">=</span> <span class="n">probabilities</span>
+            <span class="n">cs</span><span class="o">.</span><span class="n">add_forbidden_clause</span><span class="p">(</span><span class="n">ForbiddenAndConjunction</span><span class="p">(</span>
+                <span class="n">ForbiddenEqualsClause</span><span class="p">(</span><span class="n">forbid_eq_key_hp</span><span class="p">,</span> <span class="n">forbid_eq_value</span><span class="p">),</span>
+                <span class="n">ForbiddenInClause</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="n">forbid_in_key</span><span class="p">),</span> <span class="n">forbid_in_value</span><span class="p">),</span>
+            <span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__rely_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">RelyModels</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">all_models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">:__choice__&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">choices</span><span class="p">)</span>
+        <span class="n">rely_model_counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">RelyModels</span><span class="o">.</span><span class="n">info</span><span class="p">])</span>
+        <span class="c1"># 依赖模式-&gt;所有相应模型</span>
+        <span class="n">relied2AllModels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># 依赖模式-&gt;无交集相应模型</span>
+        <span class="n">relied2models</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">rely_model</span> <span class="ow">in</span> <span class="n">rely_model_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">hit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_forbid_hit_in_models_by_rely</span><span class="p">(</span><span class="n">all_models</span><span class="p">,</span> <span class="n">rely_model</span><span class="p">)</span>
+            <span class="n">relied2AllModels</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span> <span class="o">=</span> <span class="n">hit</span>
+        <span class="c1"># 如果某依赖模式不对应任何模型，删除</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">relied2AllModels</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">relied2AllModels</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">rely_model_counter</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">has_any_hit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">relied2AllModels</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_any_hit</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># 按照规则计算  relied2models  ：  无交集相应模型</span>
+        <span class="n">relied_cnts_tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rely_model_counter</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="n">relied_cnts_tuples</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">rely_model</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">relied_cnts_tuples</span><span class="p">:</span>
+            <span class="n">models</span> <span class="o">=</span> <span class="n">relied2AllModels</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">rely_model_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="p">{</span><span class="n">rely_model</span><span class="p">}:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">rely_model</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">other_models</span> <span class="o">=</span> <span class="n">relied2AllModels</span><span class="p">[</span><span class="n">other</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_models</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">):</span>
+                    <span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">other_models</span><span class="p">))</span>
+                    <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">rely_model</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+                    <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">other</span><span class="p">,</span> <span class="n">rely_model</span><span class="p">))</span>
+            <span class="n">relied2models</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span> <span class="o">=</span> <span class="n">models</span>
+
+        <span class="c1"># 键的顺序遵循rely_model_counter.keys()</span>
+        <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">relyModel2prob</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="c1"># relyModel2prob = {rely_model: prob for rely_model, prob in zip(list(rely_model_counter.keys()), args)}</span>
+            <span class="n">cur_cs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_probabilities_in_cs</span><span class="p">(</span><span class="n">cur_cs</span><span class="p">,</span> <span class="n">relied2models</span><span class="p">,</span> <span class="n">relied2AllModels</span><span class="p">,</span> <span class="n">all_models</span><span class="p">,</span> <span class="o">**</span><span class="n">relyModel2prob</span><span class="p">)</span>
+
+            <span class="n">cur_cs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sample_times</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_models</span><span class="p">)</span> <span class="o">*</span> <span class="mi">15</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">:__choice__&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">_hp</span> <span class="ow">in</span>
+                                   <span class="n">cur_cs</span><span class="o">.</span><span class="n">sample_configuration</span><span class="p">(</span><span class="n">sample_times</span><span class="p">)])</span>
+
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finally, sample </span><span class="si">{sample_times}</span><span class="s2"> times in estimator list&#39;s frequency: </span><span class="se">\n</span><span class="si">{counter}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="n">vl</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">vl</span><span class="p">)</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">vl</span><span class="p">))</span>
+
+        <span class="n">space</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.001</span>
+        <span class="n">N_rely_model</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rely_model_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">rely_model</span> <span class="ow">in</span> <span class="n">rely_model_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">space</span><span class="p">[</span><span class="n">rely_model</span><span class="p">]</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">rely_model</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">N_rely_model</span><span class="p">)</span> <span class="o">-</span> <span class="n">eps</span><span class="p">)</span>
+
+        <span class="n">best</span> <span class="o">=</span> <span class="n">fmin</span><span class="p">(</span>
+            <span class="n">fn</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span>
+            <span class="n">space</span><span class="o">=</span><span class="n">space</span><span class="p">,</span>
+            <span class="n">algo</span><span class="o">=</span><span class="n">tpe</span><span class="o">.</span><span class="n">suggest</span><span class="p">,</span>
+            <span class="n">max_evals</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">rstate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">),</span>
+            <span class="n">show_progressbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The best probability is </span><span class="si">{best}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">objective</span><span class="p">(</span><span class="n">best</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_probabilities_in_cs</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span> <span class="n">relied2models</span><span class="p">,</span> <span class="n">relied2AllModels</span><span class="p">,</span> <span class="n">all_models</span><span class="p">,</span> <span class="o">**</span><span class="n">best</span><span class="p">)</span>
+        <span class="c1"># todo: 将计算的概率缓存</span>
+
+<div class="viewcode-block" id="HDL2SHPS.purify_isolate_rely_in_hdl"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.purify_isolate_rely_in_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">purify_isolate_rely_in_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span></div>
+        <span class="c1"># 为了应对estimator中全为boost的情况</span>
+        <span class="c1"># 做法： 删除 __rely_model键</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hdl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">ok</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;__rely_model&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="n">ok</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">rely_model</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;__rely_model&quot;</span><span class="p">]</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">hit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_forbid_hit_in_models_by_rely</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">rely_model</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">hit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">models</span><span class="p">):</span>
+                            <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;__rely_model&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">purify_isolate_rely_in_hdl</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">models</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HDL2SHPS.drop_invalid_rely_in_hdl"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.drop_invalid_rely_in_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">drop_invalid_rely_in_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span></div>
+        <span class="c1"># 为了应对estimator中没有boost，但是特征工程序列中却有依赖boost的特征工程的情况</span>
+        <span class="c1"># 做法：将这样的特征工程删除</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hdl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">ok</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">deleted_keys</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;__rely_model&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="n">ok</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">rely_model</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;__rely_model&quot;</span><span class="p">]</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">hit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_forbid_hit_in_models_by_rely</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">rely_model</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">hit</span><span class="p">:</span>
+                            <span class="n">deleted_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">deleted_key</span> <span class="ow">in</span> <span class="n">deleted_keys</span><span class="p">:</span>
+                    <span class="n">value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">deleted_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">drop_invalid_rely_in_hdl</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">models</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="c1"># 对HDL进行处理</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="n">hdl</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{PHASE2}</span><span class="s2">(choice)&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_invalid_rely_in_hdl</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">models</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">purify_isolate_rely_in_hdl</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">models</span><span class="p">)</span>
+        <span class="n">RelyModels</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recursion</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rely_model</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cs</span>
+        <span class="c1"># return {</span>
+        <span class="c1">#     &quot;shps&quot;:cs,</span>
+        <span class="c1">#     &quot;p&quot;:p</span>
+        <span class="c1"># }</span>
+
+    <span class="k">def</span> <span class="nf">__condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">store</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="n">child</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;_child&quot;</span><span class="p">]</span>
+        <span class="n">child</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">child</span><span class="p">]</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;_parent&quot;</span><span class="p">]</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;_values&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">cond</span> <span class="o">=</span> <span class="n">InCondition</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">smac_hdl</span><span class="o">.</span><span class="n">_encode</span><span class="p">,</span> <span class="n">value</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cond</span> <span class="o">=</span> <span class="n">EqualsCondition</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">smac_hdl</span><span class="o">.</span><span class="n">_encode</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cond</span>
+
+    <span class="k">def</span> <span class="nf">__forbidden</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">store</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+            <span class="n">clauses</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ForbiddenInClause</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">smac_hdl</span><span class="o">.</span><span class="n">_encode</span><span class="p">,</span> <span class="n">v</span><span class="p">))))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ForbiddenEqualsClause</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">smac_hdl</span><span class="o">.</span><span class="n">_encode</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+            <span class="n">cs</span><span class="o">.</span><span class="n">add_forbidden_clause</span><span class="p">(</span><span class="n">ForbiddenAndConjunction</span><span class="p">(</span><span class="o">*</span><span class="n">clauses</span><span class="p">))</span>
+
+    <span class="c1"># def activate_helper(self,value):</span>
+<div class="viewcode-block" id="HDL2SHPS.reverse_dict"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.reverse_dict">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="n">reversed_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">reversed_dict</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reversed_dict</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">reversed_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">reversed_dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">reversed_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">reversed_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">reversed_dict</span></div>
+
+<div class="viewcode-block" id="HDL2SHPS.pop_covered_item"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.pop_covered_item">[docs]</a>    <span class="k">def</span> <span class="nf">pop_covered_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">dict_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict_</span><span class="p">)</span>
+        <span class="n">should_pop</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;len(value) &gt; length&quot;</span><span class="p">)</span>
+                <span class="n">should_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">length</span><span class="p">:</span>
+                <span class="n">should_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">should_pop</span><span class="p">:</span>
+            <span class="n">dict_</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dict_</span></div>
+
+    <span class="k">def</span> <span class="nf">__activate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">store</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+            <span class="n">reversed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">reversed_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_covered_item</span><span class="p">(</span><span class="n">reversed_dict</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">sk</span><span class="p">,</span> <span class="n">sv</span> <span class="ow">in</span> <span class="n">reversed_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__condition</span><span class="p">({</span>
+                    <span class="s2">&quot;_child&quot;</span><span class="p">:</span> <span class="n">sk</span><span class="p">,</span>
+                    <span class="s2">&quot;_values&quot;</span><span class="p">:</span> <span class="n">sv</span><span class="p">,</span>
+                    <span class="s2">&quot;_parent&quot;</span><span class="p">:</span> <span class="n">k</span>
+                <span class="p">},</span> <span class="n">store</span><span class="p">)</span>
+                <span class="n">cs</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="n">cond</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HDL2SHPS.recursion"><a class="viewcode-back" href="../../../_module/hyperflow.hdl2shps.html#hyperflow.hdl2shps.hdl2shps.HDL2SHPS.recursion">[docs]</a>    <span class="k">def</span> <span class="nf">recursion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">ConfigurationSpace</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigurationSpace</span><span class="p">()</span>
+        <span class="c1"># 检测一下这个dict是否在直接描述超参</span>
+        <span class="n">key_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hdl</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cs</span><span class="o">.</span><span class="n">add_hyperparameter</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="s2">&quot;placeholder&quot;</span><span class="p">,</span> <span class="s2">&quot;placeholder&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">cs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sample_key</span> <span class="o">=</span> <span class="n">key_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sample_value</span> <span class="o">=</span> <span class="n">hdl</span><span class="p">[</span><span class="n">sample_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">is_hdl_bottom</span><span class="p">(</span><span class="n">sample_key</span><span class="p">,</span> <span class="n">sample_value</span><span class="p">):</span>
+                <span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">conditions_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hdl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">):</span>
+                        <span class="n">conditions_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">hp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse_dict_to_config</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                        <span class="n">cs</span><span class="o">.</span><span class="n">add_hyperparameter</span><span class="p">(</span><span class="n">hp</span><span class="p">)</span>
+                        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">hp</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">conditions_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__condition&quot;</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                            <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__condition</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+                            <span class="n">cs</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="n">cond</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__activate&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__activate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">cs</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__forbidden&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__forbidden</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">cs</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__rely_model&quot;</span><span class="p">:</span>
+                        <span class="n">RelyModels</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+                            <span class="n">value</span><span class="p">,</span>
+                            <span class="n">deepcopy</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                        <span class="p">])</span>
+
+                <span class="k">return</span> <span class="n">cs</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(.*)\((.*)\)&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hdl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mat</span><span class="p">:</span>
+                <span class="n">groups</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                <span class="n">prefix_name</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">groups</span>
+                <span class="n">value_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_list</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;choice&quot;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+                <span class="n">cur_cs</span> <span class="o">=</span> <span class="n">ConfigurationSpace</span><span class="p">()</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="c1"># 不能用constant，会报错</span>
+                <span class="n">choice2proba</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">not_specific_proba_choices</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">sum_proba</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">value_list</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;__proba&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="n">proba</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;__proba&quot;</span><span class="p">)</span>
+                        <span class="n">choice2proba</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span>
+                        <span class="n">sum_proba</span> <span class="o">+=</span> <span class="n">proba</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">not_specific_proba_choices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sum_proba</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_specific_proba_choices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">p_rest</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sum_proba</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_specific_proba_choices</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">not_specific_proba_choice</span> <span class="ow">in</span> <span class="n">not_specific_proba_choices</span><span class="p">:</span>
+                            <span class="n">choice2proba</span><span class="p">[</span><span class="n">not_specific_proba_choice</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_rest</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">choice2proba</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_list</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">value_list</span><span class="p">}</span>
+                <span class="n">proba_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">choice2proba</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">value_list</span><span class="p">]</span>
+                <span class="n">value_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">smac_hdl</span><span class="o">.</span><span class="n">_encode</span><span class="p">,</span> <span class="n">value_list</span><span class="p">))</span>  <span class="c1"># choices must be str</span>
+
+                <span class="n">option_param</span> <span class="o">=</span> <span class="n">CategoricalHyperparameter</span><span class="p">(</span><span class="s1">&#39;__choice__&#39;</span><span class="p">,</span> <span class="n">value_list</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">proba_list</span><span class="p">)</span>  <span class="c1"># todo : default</span>
+                <span class="n">cur_cs</span><span class="o">.</span><span class="n">add_hyperparameter</span><span class="p">(</span><span class="n">option_param</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">sub_key</span><span class="p">,</span> <span class="n">sub_value</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                    <span class="n">sub_cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recursion</span><span class="p">(</span><span class="n">sub_value</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">prefix_name</span><span class="p">,</span> <span class="n">sub_key</span><span class="p">])</span>
+                    <span class="n">parent_hyperparameter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;parent&#39;</span><span class="p">:</span> <span class="n">option_param</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">sub_key</span><span class="p">}</span>
+                    <span class="n">cur_cs</span><span class="o">.</span><span class="n">add_configuration_space</span><span class="p">(</span><span class="n">sub_key</span><span class="p">,</span> <span class="n">sub_cs</span><span class="p">,</span> <span class="n">parent_hyperparameter</span><span class="o">=</span><span class="n">parent_hyperparameter</span><span class="p">)</span>
+                <span class="n">cs</span><span class="o">.</span><span class="n">add_configuration_space</span><span class="p">(</span><span class="n">prefix_name</span><span class="p">,</span> <span class="n">cur_cs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">sub_cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recursion</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="n">cs</span><span class="o">.</span><span class="n">add_configuration_space</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">sub_cs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">cs</span></div>
+
+    <span class="k">def</span> <span class="nf">__parse_dict_to_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_type&quot;</span><span class="p">)</span>
+            <span class="n">_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_value&quot;</span><span class="p">)</span>
+            <span class="n">_default</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_default&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="s2">&quot;choice&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">smac_hdl</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_value</span><span class="p">,</span> <span class="n">_default</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&#39;&#39;smac_hdl.</span><span class="si">{_type}</span><span class="s1">(&quot;</span><span class="si">{key}</span><span class="s1">&quot;,*_value,default=_default)&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Constant</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">smac_hdl</span><span class="o">.</span><span class="n">_encode</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

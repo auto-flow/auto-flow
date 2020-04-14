@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.metrics.classification_metrics &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../metrics.html">hyperflow.metrics</a> &raquo;</li>
+        
+      <li>hyperflow.metrics.classification_metrics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.metrics.classification_metrics</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="c1"># from sklearn.metrics.classification import _check_targets, type_of_target</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
+
+<div class="viewcode-block" id="balanced_accuracy"><a class="viewcode-back" href="../../../_module/hyperflow.metrics.html#hyperflow.metrics.classification_metrics.balanced_accuracy">[docs]</a><span class="k">def</span> <span class="nf">balanced_accuracy</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
+    <span class="n">y_type</span><span class="o">=</span><span class="n">type_of_target</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">y_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="s1">&#39;multilabel-indicator&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is not supported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_type</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;binary&#39;</span><span class="p">:</span>
+        <span class="c1"># Do not transform into any multiclass representation</span>
+        <span class="k">pass</span>
+
+    <span class="k">elif</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">:</span>
+        <span class="c1"># Need to create a multiclass solution and a multiclass predictions</span>
+        <span class="n">max_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))))</span>
+        <span class="n">solution_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">),</span> <span class="n">max_class</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">prediction_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">),</span> <span class="n">max_class</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">)):</span>
+            <span class="n">solution_binary</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prediction_binary</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">solution_binary</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction_binary</span>
+
+    <span class="k">elif</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;multilabel-indicator&#39;</span><span class="p">:</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;bac_metric does not support ml_task type </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                  <span class="o">%</span> <span class="n">y_type</span><span class="p">)</span>
+
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="c1"># Bounding to avoid division by 0</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-15</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">tp</span><span class="p">)</span>
+    <span class="n">pos_num</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="n">pos_num</span>  <span class="c1"># true positive rate (sensitivity)</span>
+
+    <span class="k">if</span> <span class="n">y_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;binary&#39;</span><span class="p">,</span> <span class="s1">&#39;multilabel-indicator&#39;</span><span class="p">):</span>
+        <span class="n">tn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solution</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)),</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solution</span><span class="p">),</span> <span class="n">prediction</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">tn</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">tn</span><span class="p">)</span>
+        <span class="n">neg_num</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">tn</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span>
+        <span class="n">tnr</span> <span class="o">=</span> <span class="n">tn</span> <span class="o">/</span> <span class="n">neg_num</span>  <span class="c1"># true negative rate (specificity)</span>
+        <span class="n">bac</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">tpr</span> <span class="o">+</span> <span class="n">tnr</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">:</span>
+        <span class="n">label_num</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">bac</span> <span class="o">=</span> <span class="n">tpr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">y_type</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bac</span><span class="p">)</span>  <span class="c1"># average over all classes</span></div>
+
+
+<div class="viewcode-block" id="pac_score"><a class="viewcode-back" href="../../../_module/hyperflow.metrics.html#hyperflow.metrics.classification_metrics.pac_score">[docs]</a><span class="k">def</span> <span class="nf">pac_score</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Probabilistic Accuracy based on log_loss metric.</span>
+<span class="sd">    We assume the solution is in {0, 1} and prediction in [0, 1].</span>
+<span class="sd">    Otherwise, run normalize_array.</span>
+<span class="sd">    :param solution:</span>
+<span class="sd">    :param prediction:</span>
+<span class="sd">    :param ml_task:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">normalize_array</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use min and max of solution as scaling factors to normalize prediction,</span>
+<span class="sd">        then threshold it to [0, 1].</span>
+<span class="sd">        Binarize solution to {0, 1}. This allows applying classification</span>
+<span class="sd">        scores to all cases. In principle, this should not do anything to</span>
+<span class="sd">        properly formatted classification inputs and outputs.</span>
+<span class="sd">        :param solution:</span>
+<span class="sd">        :param prediction:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Binarize solution</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>  <span class="c1"># convert to 1-d array</span>
+        <span class="n">maxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">sol</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sol</span><span class="p">)])</span>
+        <span class="n">mini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">sol</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sol</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="n">maxi</span> <span class="o">==</span> <span class="n">mini</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Warning, cannot normalize&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">]</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">maxi</span> <span class="o">-</span> <span class="n">mini</span>
+        <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">maxi</span> <span class="o">+</span> <span class="n">mini</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+
+        <span class="n">solution</span><span class="p">[</span><span class="n">solution</span> <span class="o">&gt;=</span> <span class="n">mid</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">solution</span><span class="p">[</span><span class="n">solution</span> <span class="o">&lt;</span> <span class="n">mid</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Normalize and threshold predictions (takes effect only if solution not</span>
+        <span class="c1"># in {0, 1})</span>
+
+        <span class="n">prediction</span> <span class="o">-=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mini</span><span class="p">)</span>
+        <span class="n">prediction</span> <span class="o">/=</span> <span class="nb">float</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+
+        <span class="c1"># and if predictions exceed the bounds [0, 1]</span>
+        <span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Make probabilities smoother</span>
+        <span class="c1"># new_prediction = np.power(new_prediction, (1./10))</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">log_loss</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Log loss for binary and multiclass.&quot;&quot;&quot;</span>
+        <span class="p">[</span><span class="n">sample_num</span><span class="p">,</span> <span class="n">label_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span>
+        <span class="c1"># Lower gives problems with float32!</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.00000003</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">ml_task</span> <span class="o">==</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">label_num</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># Make sure the lines add up to one for multi-class classification</span>
+            <span class="n">norma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_num</span><span class="p">):</span>
+                <span class="n">prediction</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">norma</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">eps</span><span class="p">)</span>
+
+            <span class="n">sample_num</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_num</span><span class="p">):</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># For the base prediction, this solution is ridiculous in the</span>
+            <span class="c1"># multi-label case</span>
+
+            <span class="c1"># Bounding of predictions to avoid log(0),1/0,...</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">prediction</span><span class="p">))</span>
+        <span class="c1"># Compute the log loss</span>
+        <span class="n">pos_class_log_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">solution</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prediction</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ml_task</span> <span class="o">!=</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">label_num</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># The multi-label case is a bunch of binary problems.</span>
+            <span class="c1"># The second class is the negative class for each column.</span>
+            <span class="n">neg_class_log_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">solution</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">log_loss</span> <span class="o">=</span> <span class="n">pos_class_log_loss</span> <span class="o">+</span> <span class="n">neg_class_log_loss</span>
+            <span class="c1"># Each column is an independent problem, so we average.</span>
+            <span class="c1"># The probabilities in one line do not add up to one.</span>
+            <span class="c1"># log_loss = mvmean(log_loss)</span>
+            <span class="c1"># In the multilabel case, the right thing i to AVERAGE not sum</span>
+            <span class="c1"># We return all the scores so we can normalize correctly later on</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># For the multiclass case the probabilities in one line add up one.</span>
+            <span class="n">log_loss</span> <span class="o">=</span> <span class="n">pos_class_log_loss</span>
+            <span class="c1"># We sum the contributions of the columns.</span>
+            <span class="n">log_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">log_loss</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">log_loss</span>
+
+    <span class="k">def</span> <span class="nf">prior_log_loss</span><span class="p">(</span><span class="n">frac_pos</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Baseline log loss.</span>
+<span class="sd">        For multiplr classes ot labels return the volues for each column</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-15</span>
+        <span class="n">frac_pos_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">frac_pos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ml_task</span> <span class="o">!=</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">:</span>  <span class="c1"># binary case</span>
+            <span class="n">frac_neg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">frac_pos</span>
+            <span class="n">frac_neg_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">frac_neg</span><span class="p">)</span>
+            <span class="n">pos_class_log_loss_</span> <span class="o">=</span> <span class="o">-</span><span class="n">frac_pos</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">frac_pos_</span><span class="p">)</span>
+            <span class="n">neg_class_log_loss_</span> <span class="o">=</span> <span class="o">-</span><span class="n">frac_neg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">frac_neg_</span><span class="p">)</span>
+            <span class="n">base_log_loss</span> <span class="o">=</span> <span class="n">pos_class_log_loss_</span> <span class="o">+</span> <span class="n">neg_class_log_loss_</span>
+            <span class="c1"># base_log_loss = mvmean(base_log_loss)</span>
+            <span class="c1"># In the multilabel case, the right thing i to AVERAGE not sum</span>
+            <span class="c1"># We return all the scores so we can normalize correctly later on</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># multiclass case</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">frac_pos_</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="n">frac_pos_</span>
+            <span class="p">)</span>  <span class="c1"># Need to renormalize the lines in multiclass case</span>
+            <span class="c1"># Only ONE label is 1 in the multiclass case active for each line</span>
+            <span class="n">pos_class_log_loss_</span> <span class="o">=</span> <span class="o">-</span><span class="n">frac_pos</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">base_log_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pos_class_log_loss_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">base_log_loss</span>
+
+    <span class="n">y_type</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;binary&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prediction</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;A prediction array with probability values &#39;</span>
+                                 <span class="s1">&#39;for </span><span class="si">%d</span><span class="s1"> classes is not a binary &#39;</span>
+                                 <span class="s1">&#39;classification problem&#39;</span> <span class="o">%</span> <span class="n">prediction</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c1"># Prediction will be copied into a new binary array - no copy</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid prediction shape </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">prediction</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Solution array must only contain one class &#39;</span>
+                                 <span class="s1">&#39;label, but contains </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Solution.shape </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="c1"># Need to create a multiclass solution and a multiclass predictions</span>
+        <span class="n">max_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))))</span>
+        <span class="n">solution_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">),</span> <span class="n">max_class</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">)):</span>
+            <span class="n">solution_binary</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">solution_binary</span>
+
+    <span class="k">elif</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s1">&#39;multilabel-indicator&#39;</span><span class="p">:</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;pac_score does not support ml_task type </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                  <span class="o">%</span> <span class="n">y_type</span><span class="p">)</span>
+
+    <span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span> <span class="o">=</span> <span class="n">normalize_array</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+    <span class="n">sample_num</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-7</span>
+    <span class="c1"># Compute the base log loss (using the prior probabilities)</span>
+    <span class="n">pos_num</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># float conversion!</span>
+    <span class="n">frac_pos</span> <span class="o">=</span> <span class="n">pos_num</span> <span class="o">/</span> <span class="n">sample_num</span>  <span class="c1"># prior proba of positive class</span>
+    <span class="n">the_base_log_loss</span> <span class="o">=</span> <span class="n">prior_log_loss</span><span class="p">(</span><span class="n">frac_pos</span><span class="p">,</span> <span class="n">y_type</span><span class="p">)</span>
+    <span class="n">the_log_loss</span> <span class="o">=</span> <span class="n">log_loss</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">y_type</span><span class="p">)</span>
+
+    <span class="c1"># Exponentiate to turn into an accuracy-like score.</span>
+    <span class="c1"># In the multi-label case, we need to average AFTER taking the exp</span>
+    <span class="c1"># because it is an NL operation</span>
+    <span class="n">pac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">the_log_loss</span><span class="p">))</span>
+    <span class="n">base_pac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">the_base_log_loss</span><span class="p">))</span>
+    <span class="c1"># Normalize: 0 for random, 1 for perfect</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="n">pac</span> <span class="o">-</span> <span class="n">base_pac</span><span class="p">)</span> <span class="o">/</span> <span class="n">sp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">base_pac</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">score</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

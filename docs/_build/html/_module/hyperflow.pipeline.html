@@ -1,0 +1,516 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-package">
+<h1>hyperflow.pipeline package<a class="headerlink" href="#hyperflow-pipeline-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hyperflow.pipeline.components.html">hyperflow.pipeline.components package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hyperflow.pipeline.components.classification.html">hyperflow.pipeline.components.classification package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.adaboost">hyperflow.pipeline.components.classification.adaboost module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.bernoulli_nb">hyperflow.pipeline.components.classification.bernoulli_nb module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.catboost">hyperflow.pipeline.components.classification.catboost module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.decision_tree">hyperflow.pipeline.components.classification.decision_tree module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.extra_trees">hyperflow.pipeline.components.classification.extra_trees module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.gaussian_nb">hyperflow.pipeline.components.classification.gaussian_nb module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.gradient_boosting">hyperflow.pipeline.components.classification.gradient_boosting module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.k_nearest_neighbors">hyperflow.pipeline.components.classification.k_nearest_neighbors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.lda">hyperflow.pipeline.components.classification.lda module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.liblinear_svc">hyperflow.pipeline.components.classification.liblinear_svc module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.libsvm_svc">hyperflow.pipeline.components.classification.libsvm_svc module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.lightgbm">hyperflow.pipeline.components.classification.lightgbm module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.logistic_regression">hyperflow.pipeline.components.classification.logistic_regression module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.multinomial_nb">hyperflow.pipeline.components.classification.multinomial_nb module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.qda">hyperflow.pipeline.components.classification.qda module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.random_forest">hyperflow.pipeline.components.classification.random_forest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification.sgd">hyperflow.pipeline.components.classification.sgd module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.classification.html#module-hyperflow.pipeline.components.classification">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.html">hyperflow.pipeline.components.preprocessing package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.abnormal.html">hyperflow.pipeline.components.preprocessing.abnormal package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.abnormal.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.abnormal.html#module-hyperflow.pipeline.components.preprocessing.abnormal.isolation_forest">hyperflow.pipeline.components.preprocessing.abnormal.isolation_forest module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.abnormal.html#module-hyperflow.pipeline.components.preprocessing.abnormal">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.html">hyperflow.pipeline.components.preprocessing.balance package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html">hyperflow.pipeline.components.preprocessing.balance.over_sample package</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#submodules">Submodules</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.adasyn">hyperflow.pipeline.components.preprocessing.balance.over_sample.adasyn module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.borderline_smote">hyperflow.pipeline.components.preprocessing.balance.over_sample.borderline_smote module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.kmeans_smote">hyperflow.pipeline.components.preprocessing.balance.over_sample.kmeans_smote module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.random">hyperflow.pipeline.components.preprocessing.balance.over_sample.random module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.smote">hyperflow.pipeline.components.preprocessing.balance.over_sample.smote module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.smotenc">hyperflow.pipeline.components.preprocessing.balance.over_sample.smotenc module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample.svmsmote">hyperflow.pipeline.components.preprocessing.balance.over_sample.svmsmote module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.over_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.over_sample">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l7"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html">hyperflow.pipeline.components.preprocessing.balance.under_sample package</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#submodules">Submodules</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn">hyperflow.pipeline.components.preprocessing.balance.under_sample.all_knn module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids">hyperflow.pipeline.components.preprocessing.balance.under_sample.cluster_centroids module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour">hyperflow.pipeline.components.preprocessing.balance.under_sample.condensed_nearest_neighbour module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours">hyperflow.pipeline.components.preprocessing.balance.under_sample.edited_nearest_neighbours module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold">hyperflow.pipeline.components.preprocessing.balance.under_sample.instance_hardness_threshold module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss">hyperflow.pipeline.components.preprocessing.balance.under_sample.near_miss module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule">hyperflow.pipeline.components.preprocessing.balance.under_sample.neighbourhood_cleaning_rule module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection">hyperflow.pipeline.components.preprocessing.balance.under_sample.one_sided_selection module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.random">hyperflow.pipeline.components.preprocessing.balance.under_sample.random module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours">hyperflow.pipeline.components.preprocessing.balance.under_sample.repeated_edited_nearest_neighbours module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links">hyperflow.pipeline.components.preprocessing.balance.under_sample.tomek_links module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.under_sample.html#module-hyperflow.pipeline.components.preprocessing.balance.under_sample">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.balance.html#module-hyperflow.pipeline.components.preprocessing.balance">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.compress.html">hyperflow.pipeline.components.preprocessing.compress package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.compress.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.compress.html#module-hyperflow.pipeline.components.preprocessing.compress.f1score">hyperflow.pipeline.components.preprocessing.compress.f1score module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.compress.html#module-hyperflow.pipeline.components.preprocessing.compress.pearson">hyperflow.pipeline.components.preprocessing.compress.pearson module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.compress.html#module-hyperflow.pipeline.components.preprocessing.compress.variance">hyperflow.pipeline.components.preprocessing.compress.variance module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.compress.html#module-hyperflow.pipeline.components.preprocessing.compress">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html">hyperflow.pipeline.components.preprocessing.encode package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.base">hyperflow.pipeline.components.preprocessing.encode.base module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.binary">hyperflow.pipeline.components.preprocessing.encode.binary module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.cat_boost">hyperflow.pipeline.components.preprocessing.encode.cat_boost module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.hash">hyperflow.pipeline.components.preprocessing.encode.hash module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.label">hyperflow.pipeline.components.preprocessing.encode.label module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.leave_one_out">hyperflow.pipeline.components.preprocessing.encode.leave_one_out module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.one_hot">hyperflow.pipeline.components.preprocessing.encode.one_hot module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.target">hyperflow.pipeline.components.preprocessing.encode.target module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence">hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.encode.html#module-hyperflow.pipeline.components.preprocessing.encode">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.expand.html">hyperflow.pipeline.components.preprocessing.expand package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.expand.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.expand.html#module-hyperflow.pipeline.components.preprocessing.expand.kitchen_sinks">hyperflow.pipeline.components.preprocessing.expand.kitchen_sinks module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.expand.html#module-hyperflow.pipeline.components.preprocessing.expand.nystroem_sampler">hyperflow.pipeline.components.preprocessing.expand.nystroem_sampler module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.expand.html#module-hyperflow.pipeline.components.preprocessing.expand.polynomial">hyperflow.pipeline.components.preprocessing.expand.polynomial module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.expand.html#module-hyperflow.pipeline.components.preprocessing.expand">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html">hyperflow.pipeline.components.preprocessing.impute package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#module-hyperflow.pipeline.components.preprocessing.impute.delete">hyperflow.pipeline.components.preprocessing.impute.delete module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#module-hyperflow.pipeline.components.preprocessing.impute.fill_abnormal">hyperflow.pipeline.components.preprocessing.impute.fill_abnormal module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#module-hyperflow.pipeline.components.preprocessing.impute.fill_cat">hyperflow.pipeline.components.preprocessing.impute.fill_cat module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#module-hyperflow.pipeline.components.preprocessing.impute.fill_num">hyperflow.pipeline.components.preprocessing.impute.fill_num module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#module-hyperflow.pipeline.components.preprocessing.impute.knn">hyperflow.pipeline.components.preprocessing.impute.knn module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.impute.html#module-hyperflow.pipeline.components.preprocessing.impute">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.html">hyperflow.pipeline.components.preprocessing.operate package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html">hyperflow.pipeline.components.preprocessing.operate.split package</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html#submodules">Submodules</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html#module-hyperflow.pipeline.components.preprocessing.operate.split.base">hyperflow.pipeline.components.preprocessing.operate.split.base module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html#module-hyperflow.pipeline.components.preprocessing.operate.split.cat">hyperflow.pipeline.components.preprocessing.operate.split.cat module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html#module-hyperflow.pipeline.components.preprocessing.operate.split.cat_num">hyperflow.pipeline.components.preprocessing.operate.split.cat_num module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html#module-hyperflow.pipeline.components.preprocessing.operate.split.nan">hyperflow.pipeline.components.preprocessing.operate.split.nan module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.split.html#module-hyperflow.pipeline.components.preprocessing.operate.split">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.html#module-hyperflow.pipeline.components.preprocessing.operate.drop">hyperflow.pipeline.components.preprocessing.operate.drop module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.html#module-hyperflow.pipeline.components.preprocessing.operate.merge">hyperflow.pipeline.components.preprocessing.operate.merge module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.operate.html#module-hyperflow.pipeline.components.preprocessing.operate">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html">hyperflow.pipeline.components.preprocessing.reduce package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce.fast_ica">hyperflow.pipeline.components.preprocessing.reduce.fast_ica module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration">hyperflow.pipeline.components.preprocessing.reduce.feature_agglomeration module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce.kernel_pca">hyperflow.pipeline.components.preprocessing.reduce.kernel_pca module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce.pca">hyperflow.pipeline.components.preprocessing.reduce.pca module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding">hyperflow.pipeline.components.preprocessing.reduce.random_trees_embedding module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD">hyperflow.pipeline.components.preprocessing.reduce.truncatedSVD module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.reduce.html#module-hyperflow.pipeline.components.preprocessing.reduce">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html">hyperflow.pipeline.components.preprocessing.scale package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#module-hyperflow.pipeline.components.preprocessing.scale.minmax">hyperflow.pipeline.components.preprocessing.scale.minmax module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#module-hyperflow.pipeline.components.preprocessing.scale.normalize">hyperflow.pipeline.components.preprocessing.scale.normalize module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#module-hyperflow.pipeline.components.preprocessing.scale.quantile_transformer">hyperflow.pipeline.components.preprocessing.scale.quantile_transformer module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#module-hyperflow.pipeline.components.preprocessing.scale.robust_scaler">hyperflow.pipeline.components.preprocessing.scale.robust_scaler module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#module-hyperflow.pipeline.components.preprocessing.scale.standardize">hyperflow.pipeline.components.preprocessing.scale.standardize module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.scale.html#module-hyperflow.pipeline.components.preprocessing.scale">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html">hyperflow.pipeline.components.preprocessing.select package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.base">hyperflow.pipeline.components.preprocessing.select.base module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.from_model_clf">hyperflow.pipeline.components.preprocessing.select.from_model_clf module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.from_model_reg">hyperflow.pipeline.components.preprocessing.select.from_model_reg module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.rfe_clf">hyperflow.pipeline.components.preprocessing.select.rfe_clf module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.rfe_reg">hyperflow.pipeline.components.preprocessing.select.rfe_reg module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.univar_clf">hyperflow.pipeline.components.preprocessing.select.univar_clf module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select.univar_reg">hyperflow.pipeline.components.preprocessing.select.univar_reg module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.select.html#module-hyperflow.pipeline.components.preprocessing.select">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.transform.html">hyperflow.pipeline.components.preprocessing.transform package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.transform.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.transform.html#module-hyperflow.pipeline.components.preprocessing.transform.power">hyperflow.pipeline.components.preprocessing.transform.power module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.transform.html#module-hyperflow.pipeline.components.preprocessing.transform.quantile">hyperflow.pipeline.components.preprocessing.transform.quantile module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.transform.html#module-hyperflow.pipeline.components.preprocessing.transform">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.preprocessing.html#module-hyperflow.pipeline.components.preprocessing">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hyperflow.pipeline.components.regression.html">hyperflow.pipeline.components.regression package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.adaboost">hyperflow.pipeline.components.regression.adaboost module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.ard_regression">hyperflow.pipeline.components.regression.ard_regression module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.bayesian_ridge">hyperflow.pipeline.components.regression.bayesian_ridge module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.catboost">hyperflow.pipeline.components.regression.catboost module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.decision_tree">hyperflow.pipeline.components.regression.decision_tree module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.elasticnet">hyperflow.pipeline.components.regression.elasticnet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.extra_trees">hyperflow.pipeline.components.regression.extra_trees module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.gaussian_process">hyperflow.pipeline.components.regression.gaussian_process module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.gradient_boosting">hyperflow.pipeline.components.regression.gradient_boosting module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.k_nearest_neighbors">hyperflow.pipeline.components.regression.k_nearest_neighbors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.kernel_ridge">hyperflow.pipeline.components.regression.kernel_ridge module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.liblinear_svr">hyperflow.pipeline.components.regression.liblinear_svr module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.lightgbm">hyperflow.pipeline.components.regression.lightgbm module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.random_forest">hyperflow.pipeline.components.regression.random_forest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression.sgd">hyperflow.pipeline.components.regression.sgd module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hyperflow.pipeline.components.regression.html#module-hyperflow.pipeline.components.regression">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components.base">hyperflow.pipeline.components.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components.classification_base">hyperflow.pipeline.components.classification_base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components.data_process_base">hyperflow.pipeline.components.data_process_base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components.feature_engineer_base">hyperflow.pipeline.components.feature_engineer_base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components.regression_base">hyperflow.pipeline.components.regression_base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components.utils">hyperflow.pipeline.components.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperflow.pipeline.components.html#module-hyperflow.pipeline.components">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.dataframe">
+<span id="hyperflow-pipeline-dataframe-module"></span><h2>hyperflow.pipeline.dataframe module<a class="headerlink" href="#module-hyperflow.pipeline.dataframe" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.dataframe.</code><code class="descname">GenericDataFrame</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pandas.core.frame.DataFrame</span></code></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.columns_metadata">
+<code class="descname">columns_metadata</code><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.columns_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.concat_two">
+<code class="descname">concat_two</code><span class="sig-paren">(</span><em>df1</em>, <em>df2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.concat_two"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.concat_two" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>deep: bool=True</em><span class="sig-paren">)</span> &rarr; ~FrameOrSeries<a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.feature_groups">
+<code class="descname">feature_groups</code><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.feature_groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.filter_feature_groups">
+<code class="descname">filter_feature_groups</code><span class="sig-paren">(</span><em>feature_group: Union[List, str], copy=True, isin=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.filter_feature_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.filter_feature_groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.replace_feature_groups">
+<code class="descname">replace_feature_groups</code><span class="sig-paren">(</span><em>old_feature_group: Union[List[str], str], values: Union[numpy.ndarray, pandas.core.frame.DataFrame], new_feature_group: Union[str, List[str], pandas.core.series.Series], new_columns_metadata: Union[str, List[dict], NoneType, pandas.core.series.Series]=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.replace_feature_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.replace_feature_groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.set_columns_metadata">
+<code class="descname">set_columns_metadata</code><span class="sig-paren">(</span><em>columns_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.set_columns_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.set_columns_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.set_feature_groups">
+<code class="descname">set_feature_groups</code><span class="sig-paren">(</span><em>feature_groups</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.set_feature_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.set_feature_groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.dataframe.GenericDataFrame.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>indexes</em>, <em>type='iloc'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/dataframe.html#GenericDataFrame.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.dataframe.GenericDataFrame.split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.pipeline">
+<span id="hyperflow-pipeline-pipeline-module"></span><h2>hyperflow.pipeline.pipeline module<a class="headerlink" href="#module-hyperflow.pipeline.pipeline" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.pipeline.</code><code class="descname">GenericPipeline</code><span class="sig-paren">(</span><em>steps</em>, <em>memory=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/pipeline.html#GenericPipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sklearn.pipeline.Pipeline</span></code></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X_train</em>, <em>y_train</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>intermediate_result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X_train</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>intermediate_result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.procedure">
+<code class="descname">procedure</code><span class="sig-paren">(</span><em>ml_task: hyperflow.utils.ml_task.MLTask</em>, <em>X_train</em>, <em>y_train</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>resource_manager=None</em>, <em>intermediate_result=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.procedure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.resource_manager">
+<code class="descname">resource_manager</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.resource_manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.pipeline.GenericPipeline.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X_train</em>, <em>X_valid=None</em>, <em>X_test=None</em>, <em>y_train=None</em>, <em>with_final=True</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.pipeline.GenericPipeline.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

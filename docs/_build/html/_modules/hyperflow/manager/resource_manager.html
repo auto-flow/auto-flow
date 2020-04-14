@@ -1,0 +1,894 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.manager.resource_manager &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hyperflow.manager.resource_manager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hyperflow.manager.resource_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getuser</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="c1"># import json5 as json</span>
+<span class="kn">import</span> <span class="nn">peewee</span> <span class="k">as</span> <span class="nn">pw</span>
+<span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">load</span>
+<span class="kn">from</span> <span class="nn">redis</span> <span class="kn">import</span> <span class="n">Redis</span>
+
+<span class="kn">import</span> <span class="nn">generic_fs</span>
+<span class="kn">from</span> <span class="nn">generic_fs</span> <span class="kn">import</span> <span class="n">FileSystem</span>
+<span class="kn">from</span> <span class="nn">generic_fs.utils</span> <span class="kn">import</span> <span class="n">get_db_class_by_db_type</span>
+<span class="kn">from</span> <span class="nn">hyperflow.ensemble.mean.regressor</span> <span class="kn">import</span> <span class="n">MeanRegressor</span>
+<span class="kn">from</span> <span class="nn">hyperflow.ensemble.vote.classifier</span> <span class="kn">import</span> <span class="n">VoteClassifier</span>
+<span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
+<span class="kn">from</span> <span class="nn">hyperflow.metrics</span> <span class="kn">import</span> <span class="n">Scorer</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.hash</span> <span class="kn">import</span> <span class="n">get_hash_of_Xy</span><span class="p">,</span> <span class="n">get_hash_of_str</span><span class="p">,</span> <span class="n">get_hash_of_dict</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.packages</span> <span class="kn">import</span> <span class="n">find_components</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.peewee</span> <span class="kn">import</span> <span class="n">PickleFiled</span>
+
+
+<div class="viewcode-block" id="ResourceManager"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager">[docs]</a><span class="k">class</span> <span class="nc">ResourceManager</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    ResourceManager: file_system and data_base</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">store_path</span><span class="o">=</span><span class="s2">&quot;~/hyperflow&quot;</span><span class="p">,</span>
+            <span class="n">file_system</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">,</span>
+            <span class="n">file_system_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">db_type</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>
+            <span class="n">db_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">redis_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">max_persistent_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">persistent_mode</span><span class="o">=</span><span class="s2">&quot;fs&quot;</span><span class="p">,</span>
+            <span class="n">store_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">compress_suffix</span><span class="o">=</span><span class="s2">&quot;bz2&quot;</span>
+
+    <span class="p">):</span>
+        <span class="c1"># --logger-------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># --preprocessing------------</span>
+        <span class="n">file_system_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">file_system_params</span><span class="p">)</span>
+        <span class="n">db_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">db_params</span><span class="p">)</span>
+        <span class="n">redis_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">redis_params</span><span class="p">)</span>
+        <span class="c1"># ---file_system------------</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">generic_fs</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">file_system2cls</span> <span class="o">=</span> <span class="n">find_components</span><span class="p">(</span><span class="n">generic_fs</span><span class="o">.</span><span class="n">__package__</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">FileSystem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system_type</span> <span class="o">=</span> <span class="n">file_system</span>
+        <span class="k">if</span> <span class="n">file_system</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_system2cls</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid file_system </span><span class="si">{file_system}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="p">:</span><span class="n">FileSystem</span> <span class="o">=</span> <span class="n">file_system2cls</span><span class="p">[</span><span class="n">file_system</span><span class="p">](</span><span class="o">**</span><span class="n">file_system_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system_type</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+            <span class="n">store_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">store_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_path</span> <span class="o">=</span> <span class="n">store_path</span>
+        <span class="c1"># ---data_base------------</span>
+        <span class="k">assert</span> <span class="n">db_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="s2">&quot;postgresql&quot;</span><span class="p">,</span> <span class="s2">&quot;mysql&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">=</span> <span class="n">db_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">db_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system_type</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span>
+        <span class="c1"># ---redis----------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_params</span> <span class="o">=</span> <span class="n">redis_params</span>
+        <span class="c1"># ---max_persistent_model---</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_persistent_estimators</span> <span class="o">=</span> <span class="n">max_persistent_estimators</span>
+        <span class="c1"># ---persistent_mode-------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">=</span> <span class="n">persistent_mode</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;fs&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">)</span>
+        <span class="c1"># ---store_intermediate-------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_intermediate</span> <span class="o">=</span> <span class="n">store_intermediate</span>
+        <span class="c1"># ---compress_suffix------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compress_suffix</span> <span class="o">=</span> <span class="n">compress_suffix</span>
+        <span class="c1"># ---post_process------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_path</span> <span class="o">=</span> <span class="n">store_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_redis</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_master</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># --some specific path based on file_system---</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_path</span><span class="p">,</span> <span class="s2">&quot;datasets&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">databases_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_path</span><span class="p">,</span> <span class="s2">&quot;databases&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_trials_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_path</span><span class="p">,</span> <span class="s2">&quot;trials&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_experiments_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_path</span><span class="p">,</span> <span class="s2">&quot;experiments&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dir_path</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">databases_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_experiments_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_trials_dir</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+        <span class="c1"># --db-----------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span> <span class="o">=</span> <span class="n">get_db_class_by_db_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_type</span><span class="p">)</span>
+        <span class="c1"># --JSONField-----------------------------------------</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">playhouse.sqlite_ext</span> <span class="kn">import</span> <span class="n">JSONField</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">JSONField</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;postgresql&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">playhouse.postgres_ext</span> <span class="kn">import</span> <span class="n">JSONField</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">JSONField</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;mysql&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">playhouse.mysql_ext</span> <span class="kn">import</span> <span class="n">JSONField</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">JSONField</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_redis</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_experiments_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_tasks_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_hdls_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_trials_table</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ResourceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ResourceManager.update_db_params"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.update_db_params">[docs]</a>    <span class="k">def</span> <span class="nf">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">):</span>
+        <span class="n">db_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+            <span class="n">db_params</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">databases_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{database}</span><span class="s2">.db&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;postgresql&quot;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;mysql&quot;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">return</span> <span class="n">db_params</span></div>
+
+<div class="viewcode-block" id="ResourceManager.estimate_new_id"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.estimate_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span></div>
+        <span class="c1"># fixme : 用来预测下一个自增主键的ID，但是感觉有问题</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">records</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
+                <span class="n">where</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
+                <span class="n">order_by</span><span class="p">(</span><span class="o">-</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
+                <span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">estimated_id</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">estimated_id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">id_field</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database Error:</span><span class="se">\n</span><span class="si">{e}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">estimated_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">estimated_id</span>
+
+<div class="viewcode-block" id="ResourceManager.persistent_evaluated_model"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">[docs]</a>    <span class="k">def</span> <span class="nf">persistent_evaluated_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_trials_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">)</span>
+        <span class="n">model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{trial_id}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;intermediate_result&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">,</span>
+                                                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{trial_id}</span><span class="s2">_inter-res.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">],</span> <span class="n">model_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">intermediate_result_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;intermediate_result&quot;</span><span class="p">],</span> <span class="n">intermediate_result_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span></div>
+
+<div class="viewcode-block" id="ResourceManager.get_ensemble_needed_info"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_ensemble_needed_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">MLTask</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
+        <span class="n">task_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ml_task_str</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">ml_task</span>
+        <span class="n">ml_task</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">ml_task_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+            <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">Xy_train_path</span>
+            <span class="n">Xy_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">Xy_train_path</span><span class="p">)</span>
+            <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">Xy_test_path</span>
+            <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">Xy_test_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span>
+            <span class="n">Xy_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">Xy_train</span>
+            <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">Xy_test</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">return</span> <span class="n">ml_task</span><span class="p">,</span> <span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_test</span></div>
+
+<div class="viewcode-block" id="ResourceManager.load_best_estimator"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_best_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span></div>
+        <span class="c1"># todo: 最后调用分析程序？</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+            <span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">models</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">models_bin</span>
+        <span class="k">if</span> <span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="n">VoteClassifier</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="n">MeanRegressor</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">estimator</span>
+
+<div class="viewcode-block" id="ResourceManager.load_best_dhp"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_best_dhp">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_dhp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">trial_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best_k_trials</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span> <span class="o">==</span> <span class="n">trial_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">dict_hyper_param</span></div>
+
+<div class="viewcode-block" id="ResourceManager.get_best_k_trials"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_best_k_trials">[docs]</a>    <span class="k">def</span> <span class="nf">get_best_k_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="n">trial_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+            <span class="n">trial_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">trial_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trial_ids</span></div>
+
+<div class="viewcode-block" id="ResourceManager.load_estimators_in_trials"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_estimators_in_trials">[docs]</a>    <span class="k">def</span> <span class="nf">load_estimators_in_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span> <span class="o">&lt;&lt;</span> <span class="n">trials</span><span class="p">)</span>
+        <span class="n">estimator_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">y_true_indexes_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">y_preds_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+            <span class="n">exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">):</span>
+                    <span class="n">exists</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">estimator_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">estimator_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_bin</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">exists</span><span class="p">:</span>
+                <span class="n">y_true_indexes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">y_true_indexes</span><span class="p">)</span>
+                <span class="n">y_preds_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">y_preds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">estimator_list</span><span class="p">,</span> <span class="n">y_true_indexes_list</span><span class="p">,</span> <span class="n">y_preds_list</span></div>
+
+<div class="viewcode-block" id="ResourceManager.set_is_master"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.set_is_master">[docs]</a>    <span class="k">def</span> <span class="nf">set_is_master</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_master</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_master</span> <span class="o">=</span> <span class="n">is_master</span></div>
+
+    <span class="c1"># ----------runhistory------------------------------------------------------------------</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">runhistory_db_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_tasks_db_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">runhistory_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;runhistory_</span><span class="si">{self.hdl_id}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># ----------database name------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">meta_records_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;meta_records&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_tasks_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># return f&quot;{self.task_id}-{self.hdl_id}&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;task_</span><span class="si">{self.task_id}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># ----------redis------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ResourceManager.connect_redis"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.connect_redis">[docs]</a>    <span class="k">def</span> <span class="nf">connect_redis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_redis</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span> <span class="o">=</span> <span class="n">Redis</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_init_redis</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Redis Error:</span><span class="se">\n</span><span class="si">{e}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ResourceManager.close_redis"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.close_redis">[docs]</a>    <span class="k">def</span> <span class="nf">close_redis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_redis</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ResourceManager.clear_pid_list"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.clear_pid_list">[docs]</a>    <span class="k">def</span> <span class="nf">clear_pid_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_delete</span><span class="p">(</span><span class="s2">&quot;hyperflow_pid_list&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ResourceManager.push_pid_list"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.push_pid_list">[docs]</a>    <span class="k">def</span> <span class="nf">push_pid_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="s2">&quot;hyperflow_pid_list&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ResourceManager.get_pid_list"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_pid_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_pid_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">lrange</span><span class="p">(</span><span class="s2">&quot;hyperflow_pid_list&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">decode</span><span class="p">()),</span> <span class="n">l</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="ResourceManager.redis_set"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.redis_set">[docs]</a>    <span class="k">def</span> <span class="nf">redis_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">px</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">xx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">px</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">xx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ResourceManager.redis_get"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.redis_get">[docs]</a>    <span class="k">def</span> <span class="nf">redis_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ResourceManager.redis_delete"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.redis_delete">[docs]</a>    <span class="k">def</span> <span class="nf">redis_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+    <span class="c1"># ----------experiments_model------------------------------------------------------------------</span>
+<div class="viewcode-block" id="ResourceManager.get_experiments_model"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_experiments_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiments_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+        <span class="k">class</span> <span class="nc">Experiments</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+            <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">general_experiment_timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+            <span class="n">current_experiment_timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+            <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">hdl_constructors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">hdl_constructor</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">raw_hdl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">hdl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">tuners</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">tuner</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">should_calc_all_metric</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">data_manager_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">column_descriptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">column2feature_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">dataset_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">metric</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">ml_task</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">fit_ensemble_params</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+            <span class="n">additional_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">getuser</span><span class="p">)</span>
+
+            <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+                <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">Experiments</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Experiments</span></div>
+
+<div class="viewcode-block" id="ResourceManager.get_experiment_id_by_task_id"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_id_by_task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)[</span>
+            <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">experiment_id</span></div>
+
+<div class="viewcode-block" id="ResourceManager.load_data_manager_by_experiment_id"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id">[docs]</a>    <span class="k">def</span> <span class="nf">load_data_manager_by_experiment_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
+        <span class="n">experiment_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">==</span> <span class="n">experiment_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">data_manager_bin</span>
+        <span class="n">data_manager_path</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">data_manager_path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+            <span class="n">data_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">data_manager_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span>
+            <span class="n">data_manager</span> <span class="o">=</span> <span class="n">data_manager_bin</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">return</span> <span class="n">data_manager</span></div>
+
+<div class="viewcode-block" id="ResourceManager.insert_to_experiments_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_experiments_table</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">general_experiment_timestamp</span><span class="p">,</span>
+            <span class="n">current_experiment_timestamp</span><span class="p">,</span>
+            <span class="n">hdl_constructors</span><span class="p">,</span>
+            <span class="n">hdl_constructor</span><span class="p">,</span>
+            <span class="n">raw_hdl</span><span class="p">,</span>
+            <span class="n">hdl</span><span class="p">,</span>
+            <span class="n">tuners</span><span class="p">,</span>
+            <span class="n">tuner</span><span class="p">,</span>
+            <span class="n">should_calc_all_metric</span><span class="p">,</span>
+            <span class="n">data_manager</span><span class="p">,</span>
+            <span class="n">column_descriptions</span><span class="p">,</span>
+            <span class="n">dataset_metadata</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="p">,</span>
+            <span class="n">should_store_intermediate_result</span><span class="p">,</span>
+            <span class="n">fit_ensemble_params</span><span class="p">,</span>
+            <span class="n">additional_info</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
+        <span class="c1"># estimate new experiment_id</span>
+        <span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_new_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="p">,</span> <span class="s2">&quot;experiment_id&quot;</span><span class="p">)</span>
+        <span class="c1"># todo: 是否需要删除data_manager的Xy</span>
+        <span class="n">data_manager</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">data_manager</span><span class="p">)</span>
+        <span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_experiments_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">)</span>
+            <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">data_manager_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;data_manager.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">data_manager_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_manager_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="n">data_manager</span>
+        <span class="n">experiment_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">general_experiment_timestamp</span><span class="o">=</span><span class="n">general_experiment_timestamp</span><span class="p">,</span>
+            <span class="n">current_experiment_timestamp</span><span class="o">=</span><span class="n">current_experiment_timestamp</span><span class="p">,</span>
+            <span class="n">hdl_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span>
+            <span class="n">hdl_constructors</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">hdl_constructors</span><span class="p">],</span>
+            <span class="n">hdl_constructor</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">hdl_constructor</span><span class="p">),</span>
+            <span class="n">raw_hdl</span><span class="o">=</span><span class="n">raw_hdl</span><span class="p">,</span>
+            <span class="n">hdl</span><span class="o">=</span><span class="n">hdl</span><span class="p">,</span>
+            <span class="n">tuners</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tuners</span><span class="p">],</span>
+            <span class="n">tuner</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tuner</span><span class="p">),</span>
+            <span class="n">should_calc_all_metric</span><span class="o">=</span><span class="n">should_calc_all_metric</span><span class="p">,</span>
+            <span class="n">data_manager_bin</span><span class="o">=</span><span class="n">data_manager_bin</span><span class="p">,</span>
+            <span class="n">data_manager_path</span><span class="o">=</span><span class="n">data_manager_path</span><span class="p">,</span>
+            <span class="n">column_descriptions</span><span class="o">=</span><span class="n">column_descriptions</span><span class="p">,</span>
+            <span class="n">column2feature_groups</span><span class="o">=</span><span class="n">data_manager</span><span class="o">.</span><span class="n">column2feature_groups</span><span class="p">,</span>  <span class="c1"># todo</span>
+            <span class="n">dataset_metadata</span><span class="o">=</span><span class="n">dataset_metadata</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">splitter</span><span class="p">),</span>
+            <span class="n">ml_task</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span><span class="p">),</span>
+            <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="n">should_store_intermediate_result</span><span class="p">,</span>
+            <span class="n">fit_ensemble_params</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fit_ensemble_params</span><span class="p">),</span>
+            <span class="n">additional_info</span><span class="o">=</span><span class="n">additional_info</span>
+        <span class="p">)</span>
+        <span class="n">fetched_experiment_id</span> <span class="o">=</span> <span class="n">experiment_record</span><span class="o">.</span><span class="n">experiment_id</span>
+        <span class="k">if</span> <span class="n">fetched_experiment_id</span> <span class="o">!=</span> <span class="n">experiment_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;fetched_experiment_id != experiment_id&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">=</span> <span class="n">experiment_id</span></div>
+
+<div class="viewcode-block" id="ResourceManager.init_experiments_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.init_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_experiments_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_records_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiments_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResourceManager.close_experiments_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.close_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_experiments_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="c1"># ----------tasks_model------------------------------------------------------------------</span>
+<div class="viewcode-block" id="ResourceManager.get_tasks_model"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_tasks_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_tasks_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+        <span class="k">class</span> <span class="nc">Tasks</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+            <span class="c1"># task_id = md5(X_train, y_train, X_test, y_test, splitter, metric)</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">metric</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">ml_task</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">specific_task_token</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="c1"># Xy_train</span>
+            <span class="n">Xy_train_hash</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">Xy_train_bin</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BitField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># Xy_test</span>
+            <span class="n">Xy_test_hash</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BitField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+                <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">Tasks</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Tasks</span></div>
+
+<div class="viewcode-block" id="ResourceManager.insert_to_tasks_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Scorer</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">specific_task_token</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
+        <span class="n">Xy_train_hash</span> <span class="o">=</span> <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
+        <span class="n">Xy_test_hash</span> <span class="o">=</span> <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span><span class="p">)</span>
+        <span class="n">metric_str</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">splitter_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">splitter</span><span class="p">)</span>
+        <span class="n">ml_task_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
+        <span class="c1"># ---task_id----------------------------------------------------</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+        <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">get_hash_of_str</span><span class="p">(</span><span class="n">metric_str</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">get_hash_of_str</span><span class="p">(</span><span class="n">splitter_str</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">get_hash_of_str</span><span class="p">(</span><span class="n">ml_task_str</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">get_hash_of_str</span><span class="p">(</span><span class="n">specific_task_token</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">task_hash</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">task_hash</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)</span>
+        <span class="c1"># ---store_task_record----------------------------------------------------</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># ---store_datasets----------------------------------------------------</span>
+            <span class="n">Xy_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">]</span>
+            <span class="n">Xy_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+                <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span>
+                                                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{Xy_train_hash}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_train_path</span><span class="p">)</span>
+                <span class="n">Xy_train_bin</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">Xy_train_bin</span> <span class="o">=</span> <span class="n">Xy_train</span>
+            <span class="k">if</span> <span class="n">Xy_test_hash</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+                    <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span>
+                                                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{Xy_test_hash}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">Xy_test</span><span class="p">,</span> <span class="n">Xy_test_path</span><span class="p">)</span>
+                    <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="n">Xy_test</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="c1"># if len(records) == 0:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">metric_str</span><span class="p">,</span>
+                <span class="n">splitter</span><span class="o">=</span><span class="n">splitter_str</span><span class="p">,</span>
+                <span class="n">ml_task</span><span class="o">=</span><span class="n">ml_task_str</span><span class="p">,</span>
+                <span class="n">specific_task_token</span><span class="o">=</span><span class="n">specific_task_token</span><span class="p">,</span>
+                <span class="c1"># Xy_train</span>
+                <span class="n">Xy_train_hash</span><span class="o">=</span><span class="n">Xy_train_hash</span><span class="p">,</span>
+                <span class="n">Xy_train_path</span><span class="o">=</span><span class="n">Xy_train_path</span><span class="p">,</span>
+                <span class="n">Xy_train_bin</span><span class="o">=</span><span class="n">Xy_train_bin</span><span class="p">,</span>
+                <span class="c1"># Xy_test</span>
+                <span class="n">Xy_test_hash</span><span class="o">=</span><span class="n">Xy_test_hash</span><span class="p">,</span>
+                <span class="n">Xy_test_path</span><span class="o">=</span><span class="n">Xy_test_path</span><span class="p">,</span>
+                <span class="n">Xy_test_bin</span><span class="o">=</span><span class="n">Xy_test_bin</span><span class="p">,</span>
+
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span></div>
+
+<div class="viewcode-block" id="ResourceManager.init_tasks_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.init_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_records_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tasks_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResourceManager.close_tasks_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.close_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="c1"># ----------hdls_model------------------------------------------------------------------</span>
+<div class="viewcode-block" id="ResourceManager.get_hdls_model"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_hdls_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdls_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+        <span class="k">class</span> <span class="nc">HDLs</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+            <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">hdl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+
+            <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+                <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">HDLs</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">HDLs</span></div>
+
+<div class="viewcode-block" id="ResourceManager.insert_to_hdls_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_hdls_table</span><span class="p">()</span>
+        <span class="n">hdl_hash</span> <span class="o">=</span> <span class="n">get_hash_of_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+        <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_hash</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">==</span> <span class="n">hdl_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">hdl_id</span><span class="o">=</span><span class="n">hdl_id</span><span class="p">,</span>
+                <span class="n">hdl</span><span class="o">=</span><span class="n">hdl</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_id</span></div>
+
+<div class="viewcode-block" id="ResourceManager.init_hdls_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.init_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_tasks_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hdls_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResourceManager.close_hdls_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.close_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="c1"># ----------trials_model------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ResourceManager.get_trials_model"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.get_trials_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_trials_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+        <span class="k">class</span> <span class="nc">Trials</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+            <span class="n">trial_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">config_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">65535</span><span class="p">)</span>
+            <span class="n">losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">test_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">all_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">all_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">test_all_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">models_bin</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">models_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">y_true_indexes</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_preds</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_test_true</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">smac_hyper_param</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dict_hyper_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>  <span class="c1"># todo: json field</span>
+            <span class="n">cost_time</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">65535</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">)</span>
+            <span class="n">failed_info</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">warning_info</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">intermediate_result_bin</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">getuser</span><span class="p">)</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">)</span>
+
+            <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+                <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">Trials</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Trials</span></div>
+
+<div class="viewcode-block" id="ResourceManager.init_trials_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.init_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_tasks_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trials_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ResourceManager.close_trials_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.close_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ResourceManager.insert_to_trials_table"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.insert_to_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="n">config_id</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config_id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+            <span class="c1"># todo: 考虑更特殊的情况，不同的任务下，相同的配置</span>
+            <span class="n">models_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">persistent_evaluated_model</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">config_id</span><span class="p">)</span>
+            <span class="n">models_bin</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">intermediate_result_bin</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">models_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">models_bin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">]</span>
+            <span class="n">intermediate_result_bin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;intermediate_result&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">config_id</span><span class="o">=</span><span class="n">config_id</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span>
+            <span class="n">hdl_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span><span class="p">,</span>
+            <span class="n">experiment_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">,</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;estimator&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mi">65535</span><span class="p">),</span>
+            <span class="n">losses</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+            <span class="n">test_loss</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_loss&quot;</span><span class="p">,</span> <span class="mi">65535</span><span class="p">),</span>
+            <span class="n">all_score</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_score&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="n">all_scores</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_scores&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+            <span class="n">test_all_score</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_all_score&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="n">models_bin</span><span class="o">=</span><span class="n">models_bin</span><span class="p">,</span>
+            <span class="n">models_path</span><span class="o">=</span><span class="n">models_path</span><span class="p">,</span>
+            <span class="n">y_true_indexes</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_true_indexes&quot;</span><span class="p">),</span>
+            <span class="n">y_preds</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_preds&quot;</span><span class="p">),</span>
+            <span class="n">y_test_true</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_test_true&quot;</span><span class="p">),</span>
+            <span class="n">y_test_pred</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_test_pred&quot;</span><span class="p">),</span>
+            <span class="n">smac_hyper_param</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;program_hyper_param&quot;</span><span class="p">),</span>
+            <span class="n">dict_hyper_param</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dict_hyper_param&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="n">cost_time</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cost_time&quot;</span><span class="p">,</span> <span class="mi">65535</span><span class="p">),</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;failed&quot;</span><span class="p">),</span>
+            <span class="n">failed_info</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;failed_info&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">warning_info</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;warning_info&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">intermediate_result_path</span><span class="o">=</span><span class="n">intermediate_result_path</span><span class="p">,</span>
+            <span class="n">intermediate_result_bin</span><span class="o">=</span><span class="n">intermediate_result_bin</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ResourceManager.delete_models"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.delete_models">[docs]</a>    <span class="k">def</span> <span class="nf">delete_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;sync_dict&quot;</span><span class="p">):</span>
+            <span class="n">exit_processes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exit_processes&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">records</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">records</span> <span class="o">+=</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="n">records</span> <span class="o">&gt;=</span> <span class="n">exit_processes</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># master segment</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_master</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="n">estimators</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span><span class="p">):</span>
+            <span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">estimators</span><span class="p">:</span>
+            <span class="n">should_delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span> <span class="o">==</span> <span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_persistent_estimators</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">should_delete</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">should_delete</span><span class="p">:</span>
+                        <span class="n">models_path</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">models_path</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Delete expire Model in path : </span><span class="si">{models_path}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">models_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">should_delete</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="p">)))</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">rm</span> <span class="o">=</span> <span class="n">ResourceManager</span><span class="p">(</span><span class="s2">&quot;/home/tqc/PycharmProjects/hyperflow/test/test_db&quot;</span><span class="p">)</span>
+    <span class="n">rm</span><span class="o">.</span><span class="n">init_dataset_path</span><span class="p">(</span><span class="s2">&quot;default_dataset_name&quot;</span><span class="p">)</span>
+    <span class="n">rm</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+    <span class="n">estimators</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span><span class="p">):</span>
+        <span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">estimators</span><span class="p">:</span>
+        <span class="n">should_delete</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span> <span class="o">==</span> <span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">should_delete</span><span class="p">:</span>
+            <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">should_delete</span><span class="p">))</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

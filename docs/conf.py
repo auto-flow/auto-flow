@@ -33,6 +33,14 @@ sys.path.insert(0, os.path.abspath('../'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.duration',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.githubpages',
+    'sphinx.ext.graphviz',
+    'sphinx.ext.linkcode',
+    'sphinx.ext.inheritance_diagram',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',

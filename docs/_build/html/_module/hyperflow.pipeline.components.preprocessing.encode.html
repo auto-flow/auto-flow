@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hyperflow.pipeline.components.preprocessing.encode package &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: ''
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="simple">
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>hyperflow.pipeline.components.preprocessing.encode package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.encode.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hyperflow-pipeline-components-preprocessing-encode-package">
+<h1>hyperflow.pipeline.components.preprocessing.encode package<a class="headerlink" href="#hyperflow-pipeline-components-preprocessing-encode-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.base">
+<span id="hyperflow-pipeline-components-preprocessing-encode-base-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.base module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.base.</code><code class="descname">BaseEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/base.html#BaseEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder.core_fit">
+<code class="descname">core_fit</code><span class="sig-paren">(</span><em>estimator</em>, <em>X</em>, <em>y</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>feature_groups=None</em>, <em>columns_metadata=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder.core_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.binary">
+<span id="hyperflow-pipeline-components-preprocessing-encode-binary-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.binary module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.binary" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.binary.BinaryEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.binary.</code><code class="descname">BinaryEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/binary.html#BinaryEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.binary.BinaryEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.binary.BinaryEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'BinaryEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.binary.BinaryEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.binary.BinaryEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.binary.BinaryEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.cat_boost">
+<span id="hyperflow-pipeline-components-preprocessing-encode-cat-boost-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.cat_boost module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.cat_boost" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.cat_boost.</code><code class="descname">CatBoostEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/cat_boost.html#CatBoostEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'CatBoostEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.cat_boost.CatBoostEncoder.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.hash">
+<span id="hyperflow-pipeline-components-preprocessing-encode-hash-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.hash module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.hash" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.hash.</code><code class="descname">HashingEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/hash.html#HashingEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'HashingEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X_train</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/hash.html#HashingEncoder.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.hash.HashingEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.label">
+<span id="hyperflow-pipeline-components-preprocessing-encode-label-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.label module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.label" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.label.LabelEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.label.</code><code class="descname">LabelEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/label.html#LabelEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.label.LabelEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.label.LabelEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'LabelEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.label.LabelEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.label.LabelEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'hyperflow.feature_engineer.encode.label_encode'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.label.LabelEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.leave_one_out">
+<span id="hyperflow-pipeline-components-preprocessing-encode-leave-one-out-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.leave_one_out module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.leave_one_out" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.leave_one_out.</code><code class="descname">LeaveOneOutEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/leave_one_out.html#LeaveOneOutEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'LeaveOneOutEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.leave_one_out.LeaveOneOutEncoder.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.one_hot">
+<span id="hyperflow-pipeline-components-preprocessing-encode-one-hot-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.one_hot module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.one_hot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.one_hot.OneHotEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.one_hot.</code><code class="descname">OneHotEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/one_hot.html#OneHotEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.one_hot.OneHotEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.one_hot.OneHotEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'OneHotEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.one_hot.OneHotEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.one_hot.OneHotEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.one_hot.OneHotEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.target">
+<span id="hyperflow-pipeline-components-preprocessing-encode-target-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.target module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.target" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.target.</code><code class="descname">TargetEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/target.html#TargetEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'TargetEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.target.TargetEncoder.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence">
+<span id="hyperflow-pipeline-components-preprocessing-encode-weight-of-evidence-module"></span><h2>hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder">
+<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.</code><code class="descname">WOEEncoder</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/encode/weight_of_evidence.html#WOEEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder" title="hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.encode.base.BaseEncoder</span></code></a></p>
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder.class__">
+<code class="descname">class__</code><em class="property"> = 'WOEEncoder'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder.class__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder.module__">
+<code class="descname">module__</code><em class="property"> = 'category_encoders'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder.module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder.need_y">
+<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence.WOEEncoder.need_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hyperflow.pipeline.components.preprocessing.encode">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.encode" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
