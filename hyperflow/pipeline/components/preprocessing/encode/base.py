@@ -9,7 +9,8 @@ class BaseEncoder(HyperFlowFeatureEngineerAlgorithm):
         if X is None:
             return None
         else:
-            trans = self.estimator.transform(X)
+            X_ = X.astype(str)
+            trans = self.estimator.transform(X_)
             trans[pd.DataFrame(X) == -999] = -999  # todo: 有没有更优化的解决办法
             return trans
 

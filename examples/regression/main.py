@@ -11,8 +11,8 @@ train_df = pd.read_csv("../data/train_regression.csv")
 train_df.replace("NA", np.nan, inplace=True)
 test_df = pd.read_csv("../data/test_regression.csv")
 test_df.replace("NA", np.nan, inplace=True)
-trained_pipeline = HyperFlowRegressor(initial_runs=5, run_limit=10, n_jobs=1, included_regressors=["lightgbm"],
-                                      per_run_time_limit=60)
+trained_pipeline = HyperFlowRegressor(initial_runs=50, run_limit=5, n_jobs=1, included_regressors=["lightgbm"],
+                                      per_run_time_limit=60,debug=True)
 column_descriptions = {
     "id": "Id",
     "target": "SalePrice",
