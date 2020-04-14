@@ -8,7 +8,8 @@ import sys
 
 from setuptools import setup, find_packages
 
-from hyperflow.__version__ import __version__
+with open("hyperflow/__version__.py") as fh:
+    version = fh.readlines()[-1].split()[-1].strip("\"'")
 
 
 def read(fname):
@@ -26,7 +27,7 @@ if sys.version_info < (3, 5):
         '3.6 or higher.' % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
     )
 
-with open('README.md') as fh:
+with open('README.rst') as fh:
     long_description = fh.read()
 
 GIT_PATTERN = re.compile(r"git\+https://github\.com/(.*?)/(.*?)\.git")
@@ -68,12 +69,12 @@ needed_suffixes = ['.json', '.txt', '.yml', '.yaml']
 
 setup(
     name='HyperFlow',
-    version=__version__,
+    version=version,
     author='qichun tang',
     author_email='tqichun@gmail.com',
     description='HyperFlow: Automatic machine learning workflow modeling platform.',
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type='text/x-rst',
     license='BSD',
     url='https://github.com/Hyper-Flow/HyperFlow',
     packages=find_packages("./", exclude=['test', 'examples']),
