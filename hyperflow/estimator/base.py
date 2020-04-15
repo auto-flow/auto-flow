@@ -176,32 +176,9 @@ class HyperFlowEstimator(BaseEstimator):
             result = self.start_tuner(tuner, hdl)
             if result["is_manual"] == True:
                 break
-
             if step == n_step - 1:
-                if isinstance(fit_ensemble_params, str):
-                    if fit_ensemble_params == "auto":
-                        self.logger.info(f"'fit_ensemble_params' is 'auto', use default params to fit_ensemble_params.")
-                        self.estimator = self.fit_ensemble()
-                    else:
-                        raise NotImplementedError
-                elif isinstance(fit_ensemble_params, bool):
-                    if fit_ensemble_params:
-                        self.logger.info(f"'fit_ensemble_params' is True, use default params to fit_ensemble_params.")
-                        self.estimator = self.fit_ensemble()
-                    else:
-                        self.logger.info(
-                            f"'fit_ensemble_params' is False, don't fit_ensemble but use best trial as result.")
-                        self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
-                elif isinstance(fit_ensemble_params, dict):
-                    self.logger.info(
-                        f"'fit_ensemble_params' is specific: {fit_ensemble_params}.")
-                    self.estimator = self.fit_ensemble(**fit_ensemble_params)
-                elif fit_ensemble_params is None:
-                    self.logger.info(
-                        f"'fit_ensemble_params' is None, don't fit_ensemble but use best trial as result.")
-                    self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
-                else:
-                    raise NotImplementedError
+                self.start_final_step(fit_ensemble_params)
+
         return self
 
     def start_tuner(self, tuner: Tuner, hdl: dict):
@@ -234,6 +211,7 @@ class HyperFlowEstimator(BaseEstimator):
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
         tuners = [deepcopy(tuner) for i in range(n_jobs)]
         processes = []
+        # todo: 重构 sync_dict
         for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in \
                 zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states):
             args = (tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict)
@@ -251,6 +229,32 @@ class HyperFlowEstimator(BaseEstimator):
 
         return {"is_manual": False}
 
+    def start_final_step(self, fit_ensemble_params):
+        if isinstance(fit_ensemble_params, str):
+            if fit_ensemble_params == "auto":
+                self.logger.info(f"'fit_ensemble_params' is 'auto', use default params to fit_ensemble_params.")
+                self.estimator = self.fit_ensemble()
+            else:
+                raise NotImplementedError
+        elif isinstance(fit_ensemble_params, bool):
+            if fit_ensemble_params:
+                self.logger.info(f"'fit_ensemble_params' is True, use default params to fit_ensemble_params.")
+                self.estimator = self.fit_ensemble()
+            else:
+                self.logger.info(
+                    f"'fit_ensemble_params' is False, don't fit_ensemble but use best trial as result.")
+                self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
+        elif isinstance(fit_ensemble_params, dict):
+            self.logger.info(
+                f"'fit_ensemble_params' is specific: {fit_ensemble_params}.")
+            self.estimator = self.fit_ensemble(**fit_ensemble_params)
+        elif fit_ensemble_params is None:
+            self.logger.info(
+                f"'fit_ensemble_params' is None, don't fit_ensemble but use best trial as result.")
+            self.estimator = self.resource_manager.load_best_estimator(self.ml_task)
+        else:
+            raise NotImplementedError
+
     def run(self, tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict=None):
         if sync_dict:
             sync_dict[os.getpid()] = 0
@@ -261,6 +265,7 @@ class HyperFlowEstimator(BaseEstimator):
         tuner.random_state = random_state
         tuner.run_limit = run_limit
         tuner.set_resource_manager(resource_manager)
+        # 替换搜索空间中的 random_state
         replace_phps(tuner.shps, "random_state", int(random_state))
         tuner.shps.seed(random_state)
         # todo : 增加 n_jobs ? 调研默认值

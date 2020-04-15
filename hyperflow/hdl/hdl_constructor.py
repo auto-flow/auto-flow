@@ -8,11 +8,12 @@ from hyperflow.constants import PHASE1, PHASE2
 from hyperflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from hyperflow.utils.dict import add_prefix_in_dict_keys
 from hyperflow.utils.graphviz import ColorSelector
+from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.math import get_int_length
 
 
-class HDL_Constructor():
+class HDL_Constructor(StrSignatureMixin):
     def __init__(
             self,
             DAG_workflow: Union[str, Dict[str, Any]] = "generic_recommend",
@@ -57,21 +58,6 @@ class HDL_Constructor():
         self.ml_task = None
         self.data_manager = None
 
-    def __str__(self):
-        return f"hyperflow.HDL_Constructor(" \
-            f"DAG_descriptions={repr(self.DAG_workflow)}, " \
-            f"hdl_bank_path={repr(self.hdl_bank_path)}, " \
-            f"hdl_bank={repr(self.hdl_bank)}, " \
-            f"included_classifiers={repr(self.included_classifiers)}, " \
-            f"included_regressors={repr(self.included_regressors)}, " \
-            f"included_highR_nan_imputers={repr(self.included_highR_nan_imputers)}, " \
-            f"included_cat_nan_imputers={repr(self.included_cat_nan_imputers)}, " \
-            f"included_num_nan_imputers={repr(self.included_num_nan_imputers)}, " \
-            f"included_highR_cat_encoders={repr(self.included_highR_cat_encoders)}, " \
-            f"included_lowR_cat_encoders={repr(self.included_lowR_cat_encoders)}" \
-            f")"
-
-    __repr__ = __str__
 
     def parse_item(self, value: Union[dict, str]) -> Tuple[str, dict, bool]:
         if isinstance(value, dict):
@@ -247,7 +233,6 @@ class HDL_Constructor():
             sub_dict = {}
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
-                addition_dict.update({"random_state": self.random_state})  # fixme
                 params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE1, mainTask)
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)

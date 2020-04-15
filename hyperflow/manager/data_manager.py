@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from copy import deepcopy
 from typing import Union, Any, Dict, Sequence
 
 import numpy as np
@@ -8,11 +9,12 @@ from hyperflow.pipeline.components.utils import stack_Xs
 from hyperflow.pipeline.dataframe import GenericDataFrame
 from hyperflow.utils.data import is_nan, is_cat, is_highR_nan
 from hyperflow.utils.dataframe import pop_if_exists
+from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.ml_task import MLTask, get_ml_task_from_y
 
 
-class DataManager():
+class DataManager(StrSignatureMixin):
 
     def __init__(
             self,
@@ -39,6 +41,10 @@ class DataManager():
         dataset_metadata = dict(dataset_metadata)
         self.highR_nan_threshold = highR_nan_threshold
         self.dataset_metadata = dataset_metadata
+        X_train = deepcopy(X_train)
+        y_train = deepcopy(y_train)
+        X_test = deepcopy(X_test)
+        y_test = deepcopy(y_test)
         X_train, y_train, X_test, y_test, feature_groups, column2feature_groups = self.parse_column_descriptions(
             column_descriptions, X_train, y_train, X_test, y_test
         )
@@ -163,8 +169,6 @@ class DataManager():
     #         self.logger.error(f"'{X}' don't exist in file system.")
     #         raise FileNotFoundError
     #     return self.resource_manager.file_system.load_csv(X)
-
-
 
     def process_X(self, X):
         if X is None:

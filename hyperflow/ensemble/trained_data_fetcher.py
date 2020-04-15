@@ -1,10 +1,11 @@
 from typing import List, Tuple
 from numpy import ndarray
 from hyperflow.manager.resource_manager import ResourceManager
+from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.typing import GenericEstimator
 
 
-class TrainedDataFetcher():
+class TrainedDataFetcher(StrSignatureMixin):
     def __init__(
             self,
             task_id: str,

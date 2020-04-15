@@ -19,13 +19,14 @@ from hyperflow.ensemble.vote.classifier import VoteClassifier
 from hyperflow.manager.data_manager import DataManager
 from hyperflow.metrics import Scorer
 from hyperflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
+from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.ml_task import MLTask
 from hyperflow.utils.packages import find_components
 from hyperflow.utils.peewee import PickleFiled
 
 
-class ResourceManager():
+class ResourceManager(StrSignatureMixin):
     '''
     ResourceManager: file_system and data_base
     '''

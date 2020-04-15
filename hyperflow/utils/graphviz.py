@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
-class ColorSelector():
+from hyperflow.utils.klass import StrSignatureMixin
+
+
+class ColorSelector(StrSignatureMixin):
     def __init__(self, colors):
         self.colors = colors
         self.N = len(self.colors)

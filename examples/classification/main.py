@@ -36,6 +36,9 @@ if not os.path.exists("hyperflow_classification.bz2"):
     )
     # finally , the best model will be serialize and store in local file system for subsequent use
     joblib.dump(trained_pipeline, "hyperflow_classification.bz2")
+    # if you want to see the workflow HyperFlow is searching, you can use `draw_workflow_space` to visualize
+    hdl_constructor = trained_pipeline.hdl_constructors[0]
+    hdl_constructor.draw_workflow_space()
 # suppose you are processing predict procedure, firstly, you should load serialized model from file system
 predict_pipeline = joblib.load("hyperflow_classification.bz2")
 # secondly, use loaded model to do predicting

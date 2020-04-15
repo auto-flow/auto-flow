@@ -12,6 +12,7 @@ from ConfigSpace import InCondition, EqualsCondition
 from hyperopt import fmin, tpe, hp
 
 import hyperflow.hdl.smac as smac_hdl
+from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.ml_task import MLTask
 from hyperflow.constants import PHASE2
 from hyperflow.hdl.utils import is_hdl_bottom
@@ -23,7 +24,7 @@ class RelyModels:
     info = []
 
 
-class HDL2SHPS():
+class HDL2SHPS(StrSignatureMixin):
     def __init__(self):
         self.ml_task = None
         self.logger = get_logger(__name__)

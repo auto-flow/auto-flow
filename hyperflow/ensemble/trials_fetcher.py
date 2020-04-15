@@ -1,7 +1,8 @@
 from hyperflow.manager.resource_manager import ResourceManager
+from hyperflow.utils.klass import StrSignatureMixin
 
 
-class TrialsFetcher():
+class TrialsFetcher(StrSignatureMixin):
     def __init__(
             self,
             resource_manager: ResourceManager,

@@ -1,9 +1,10 @@
 from typing import List
 
 from hyperflow.hdl.smac import _decode
+from hyperflow.utils.klass import StrSignatureMixin
 
 
-class SHP2DHP():
+class SHP2DHP(StrSignatureMixin):
     def set_kv(self, dict_: dict, key_path: list, value):
         tmp = dict_
         for i, key in enumerate(key_path):

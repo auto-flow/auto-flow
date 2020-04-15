@@ -1,3 +1,6 @@
+from copy import deepcopy
+from typing import Dict
+
 from hyperflow.pipeline.components.classification_base import HyperFlowClassificationAlgorithm
 from hyperflow.pipeline.components.utils import get_categorical_features_indices
 
@@ -13,7 +16,7 @@ class CatBoostRegressor(HyperFlowClassificationAlgorithm):
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None, columns_metadata=None):
-        categorical_features_indices = get_categorical_features_indices(X,columns_metadata)
+        categorical_features_indices = get_categorical_features_indices(X, columns_metadata)
         if (X_valid is not None) and (y_valid is not None):
             eval_set = (X_valid, y_valid)
         else:
@@ -22,3 +25,9 @@ class CatBoostRegressor(HyperFlowClassificationAlgorithm):
             X, y, cat_features=categorical_features_indices,
             eval_set=eval_set, silent=True
         )
+
+    def after_process_hyperparams(self, hyperparams) -> Dict:
+        hyperparams = deepcopy(hyperparams)
+        if "n_jobs" in hyperparams:
+            hyperparams["thread_count"] = hyperparams.pop("n_jobs")
+        return hyperparams

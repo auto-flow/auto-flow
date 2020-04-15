@@ -1,3 +1,6 @@
+from copy import deepcopy
+from typing import Dict
+
 from hyperflow.pipeline.components.classification_base import HyperFlowClassificationAlgorithm
 from hyperflow.pipeline.components.utils import get_categorical_features_indices
 
@@ -22,3 +25,9 @@ class CatBoostClassifier(HyperFlowClassificationAlgorithm):
             X, y, cat_features=categorical_features_indices,
             eval_set=eval_set, silent=True
         )
+
+    def after_process_hyperparams(self, hyperparams) -> Dict:
+        hyperparams = deepcopy(hyperparams)
+        if "n_jobs" in hyperparams:
+            hyperparams["thread_count"] = hyperparams.pop("n_jobs")
+        return hyperparams

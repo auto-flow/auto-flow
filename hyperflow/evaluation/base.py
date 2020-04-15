@@ -1,7 +1,9 @@
 from ConfigSpace import Configuration
 
+from hyperflow.utils.klass import StrSignatureMixin
 
-class BaseEvaluator():
+
+class BaseEvaluator(StrSignatureMixin):
     def init_data(self,**kwargs):
         pass
 

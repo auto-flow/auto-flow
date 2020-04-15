@@ -67,7 +67,7 @@ Manual Installation
 Quick Start
 --------------
 
-Titanic is perhaps the most familiar machine learning task for data scientists. 
+`Titanic <https://www.kaggle.com/c/titanic>`_ is perhaps the most familiar machine learning task for data scientists. 
 For tutorial purposes, you can find titanic dataset in ``examples/data/train_classification.csv`` and
 ``examples/data/test_classification.csv`` . 
 You can use HyperFlow to finish this ML task instead of manually exploring all the features of the dataset. DO IT !

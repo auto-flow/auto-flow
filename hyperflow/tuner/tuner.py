@@ -15,11 +15,12 @@ from hyperflow.manager.data_manager import DataManager
 from hyperflow.manager.resource_manager import ResourceManager
 from hyperflow.utils.concurrence import parse_n_jobs
 from hyperflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
+from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.ml_task import MLTask
 
 
-class Tuner():
+class Tuner(StrSignatureMixin):
     def __init__(
             self,
             evaluator: Union[Callable, str] = "TrainEvaluator",
@@ -77,19 +78,7 @@ class Tuner():
             exit_processes = max(self.n_jobs // 3, 1)
         self.exit_processes = exit_processes
 
-    def __str__(self):
-        return (
-            f"hyperflow.Tuner("
-            f"evaluator={repr(self.evaluator_prototype.__name__)}, "
-            f"search_method={repr(self.search_method)}, "
-            f"run_limit={repr(self.run_limit)}, "
-            f"initial_runs={repr(self.initial_runs)}, "
-            f"search_method_params={repr(self.search_method_params)}, "
-            f"n_jobs={repr(self.n_jobs)}, "
-            f"exit_processes={repr(self.exit_processes)}"
-            f")")
 
-    __repr__ = __str__
 
     def set_random_state(self, random_state):
         self.random_state = random_state
