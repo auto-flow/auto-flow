@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.array &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.array &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.array</li>
+      <li>autoflow.utils.array</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.array</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.array</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># @Author  : qichun tang</span>
@@ -173,7 +173,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="sanitize_array"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.array.sanitize_array">[docs]</a><span class="k">def</span> <span class="nf">sanitize_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<div class="viewcode-block" id="sanitize_array"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.array.sanitize_array">[docs]</a><span class="k">def</span> <span class="nf">sanitize_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Replace NaN and Inf (there should not be any!)</span>
 <span class="sd">    :param array:</span>
@@ -189,7 +189,7 @@
     <span class="k">return</span> <span class="n">array</span></div>
 
 
-<div class="viewcode-block" id="binarization"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.array.binarization">[docs]</a><span class="k">def</span> <span class="nf">binarization</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<div class="viewcode-block" id="binarization"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.array.binarization">[docs]</a><span class="k">def</span> <span class="nf">binarization</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
     <span class="c1"># Takes a binary-class datafile and turn the max value (positive class)</span>
     <span class="c1"># into 1 and the min into 0</span>
     <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># conversion needed to use np.inf</span>
@@ -205,7 +205,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="multilabel_to_multiclass"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.array.multilabel_to_multiclass">[docs]</a><span class="k">def</span> <span class="nf">multilabel_to_multiclass</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<div class="viewcode-block" id="multilabel_to_multiclass"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.array.multilabel_to_multiclass">[docs]</a><span class="k">def</span> <span class="nf">multilabel_to_multiclass</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
     <span class="n">array</span> <span class="o">=</span> <span class="n">binarization</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">))])</span></div>
 </pre></div>

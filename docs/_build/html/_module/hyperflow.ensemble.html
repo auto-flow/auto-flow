@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.ensemble package &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.ensemble package &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> HyperFlow
+            <a href="../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">HyperFlow</a>
+          <a href="../index.html">AutoFlow</a>
         
       </nav>
 
@@ -148,7 +148,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>hyperflow.ensemble package</li>
+      <li>autoflow.ensemble package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -167,116 +167,94 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="hyperflow-ensemble-package">
-<h1>hyperflow.ensemble package<a class="headerlink" href="#hyperflow-ensemble-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="autoflow-ensemble-package">
+<h1>autoflow.ensemble package<a class="headerlink" href="#autoflow-ensemble-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="hyperflow.ensemble.mean.html">hyperflow.ensemble.mean package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.mean.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.mean.html#module-hyperflow.ensemble.mean.regressor">hyperflow.ensemble.mean.regressor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.mean.html#module-hyperflow.ensemble.mean">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="hyperflow.ensemble.stack.html">hyperflow.ensemble.stack package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.stack.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.stack.html#module-hyperflow.ensemble.stack.base">hyperflow.ensemble.stack.base module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.stack.html#module-hyperflow.ensemble.stack.classifier">hyperflow.ensemble.stack.classifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.stack.html#module-hyperflow.ensemble.stack.regressor">hyperflow.ensemble.stack.regressor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.stack.html#module-hyperflow.ensemble.stack">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="hyperflow.ensemble.vote.html">hyperflow.ensemble.vote package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.vote.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.vote.html#module-hyperflow.ensemble.vote.classifier">hyperflow.ensemble.vote.classifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hyperflow.ensemble.vote.html#module-hyperflow.ensemble.vote">Module contents</a></li>
-</ul>
-</li>
-</ul>
 </div>
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-hyperflow.ensemble.base">
-<span id="hyperflow-ensemble-base-module"></span><h2>hyperflow.ensemble.base module<a class="headerlink" href="#module-hyperflow.ensemble.base" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.base">
+<span id="autoflow-ensemble-base-module"></span><h2>autoflow.ensemble.base module<a class="headerlink" href="#module-autoflow.ensemble.base" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.ensemble.base.EnsembleEstimator">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.base.</code><code class="sig-name descname">EnsembleEstimator</code><a class="reference internal" href="../_modules/hyperflow/ensemble/base.html#EnsembleEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.base.EnsembleEstimator" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.base.EnsembleEstimator">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.base.</code><code class="sig-name descname">EnsembleEstimator</code><a class="reference internal" href="../_modules/autoflow/ensemble/base.html#EnsembleEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.base.EnsembleEstimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <dl class="py method">
-<dt id="hyperflow.ensemble.base.EnsembleEstimator.build_prediction_list">
-<code class="sig-name descname">build_prediction_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/base.html#EnsembleEstimator.build_prediction_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.base.EnsembleEstimator.build_prediction_list" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.base.EnsembleEstimator.build_prediction_list">
+<code class="sig-name descname">build_prediction_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/base.html#EnsembleEstimator.build_prediction_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.base.EnsembleEstimator.build_prediction_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.base.EnsembleEstimator.fit_trained_data">
-<code class="sig-name descname">fit_trained_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimators_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.typing.GenericEstimator" title="hyperflow.utils.typing.GenericEstimator">hyperflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true_indexes_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_preds_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/base.html#EnsembleEstimator.fit_trained_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.base.EnsembleEstimator.fit_trained_data" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.base.EnsembleEstimator.fit_trained_data">
+<code class="sig-name descname">fit_trained_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimators_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#autoflow.utils.typing.GenericEstimator" title="autoflow.utils.typing.GenericEstimator">autoflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true_indexes_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_preds_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/base.html#EnsembleEstimator.fit_trained_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.base.EnsembleEstimator.fit_trained_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="hyperflow.ensemble.base.EnsembleEstimator.mainTask">
-<code class="sig-name descname">mainTask</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.ensemble.base.EnsembleEstimator.mainTask" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.base.EnsembleEstimator.mainTask">
+<code class="sig-name descname">mainTask</code><em class="property"> = None</em><a class="headerlink" href="#autoflow.ensemble.base.EnsembleEstimator.mainTask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble.trained_data_fetcher">
-<span id="hyperflow-ensemble-trained-data-fetcher-module"></span><h2>hyperflow.ensemble.trained_data_fetcher module<a class="headerlink" href="#module-hyperflow.ensemble.trained_data_fetcher" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.trained_data_fetcher">
+<span id="autoflow-ensemble-trained-data-fetcher-module"></span><h2>autoflow.ensemble.trained_data_fetcher module<a class="headerlink" href="#module-autoflow.ensemble.trained_data_fetcher" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.ensemble.trained_data_fetcher.TrainedDataFetcher">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.trained_data_fetcher.</code><code class="sig-name descname">TrainedDataFetcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">hdl_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">trial_ids</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#hyperflow.manager.resource_manager.ResourceManager" title="hyperflow.manager.resource_manager.ResourceManager">hyperflow.manager.resource_manager.ResourceManager</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/trained_data_fetcher.html#TrainedDataFetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.trained_data_fetcher.TrainedDataFetcher" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.klass.StrSignatureMixin" title="hyperflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.utils.klass.StrSignatureMixin</span></code></a></p>
+<dt id="autoflow.ensemble.trained_data_fetcher.TrainedDataFetcher">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.trained_data_fetcher.</code><code class="sig-name descname">TrainedDataFetcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">hdl_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">trial_ids</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#autoflow.manager.resource_manager.ResourceManager" title="autoflow.manager.resource_manager.ResourceManager">autoflow.manager.resource_manager.ResourceManager</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/trained_data_fetcher.html#TrainedDataFetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.trained_data_fetcher.TrainedDataFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 <dl class="py method">
-<dt id="hyperflow.ensemble.trained_data_fetcher.TrainedDataFetcher.fetch">
-<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.typing.GenericEstimator" title="hyperflow.utils.typing.GenericEstimator">hyperflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span><span class="p">, </span>List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span><span class="p">, </span>List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="reference internal" href="../_modules/hyperflow/ensemble/trained_data_fetcher.html#TrainedDataFetcher.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.trained_data_fetcher.TrainedDataFetcher.fetch" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.trained_data_fetcher.TrainedDataFetcher.fetch">
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#autoflow.utils.typing.GenericEstimator" title="autoflow.utils.typing.GenericEstimator">autoflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span><span class="p">, </span>List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span><span class="p">, </span>List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/ensemble/trained_data_fetcher.html#TrainedDataFetcher.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.trained_data_fetcher.TrainedDataFetcher.fetch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble.trials_fetcher">
-<span id="hyperflow-ensemble-trials-fetcher-module"></span><h2>hyperflow.ensemble.trials_fetcher module<a class="headerlink" href="#module-hyperflow.ensemble.trials_fetcher" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.trials_fetcher">
+<span id="autoflow-ensemble-trials-fetcher-module"></span><h2>autoflow.ensemble.trials_fetcher module<a class="headerlink" href="#module-autoflow.ensemble.trials_fetcher" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.ensemble.trials_fetcher.GetBestK">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.trials_fetcher.</code><code class="sig-name descname">GetBestK</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#hyperflow.manager.resource_manager.ResourceManager" title="hyperflow.manager.resource_manager.ResourceManager">hyperflow.manager.resource_manager.ResourceManager</a></span></em>, <em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">hdl_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">k</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/trials_fetcher.html#GetBestK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.trials_fetcher.GetBestK" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.trials_fetcher.TrialsFetcher" title="hyperflow.ensemble.trials_fetcher.TrialsFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.trials_fetcher.TrialsFetcher</span></code></a></p>
+<dt id="autoflow.ensemble.trials_fetcher.GetBestK">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.trials_fetcher.</code><code class="sig-name descname">GetBestK</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#autoflow.manager.resource_manager.ResourceManager" title="autoflow.manager.resource_manager.ResourceManager">autoflow.manager.resource_manager.ResourceManager</a></span></em>, <em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">hdl_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">k</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/trials_fetcher.html#GetBestK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.trials_fetcher.GetBestK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autoflow.ensemble.trials_fetcher.TrialsFetcher" title="autoflow.ensemble.trials_fetcher.TrialsFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.ensemble.trials_fetcher.TrialsFetcher</span></code></a></p>
 <dl class="py method">
-<dt id="hyperflow.ensemble.trials_fetcher.GetBestK.fetch">
-<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/trials_fetcher.html#GetBestK.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.trials_fetcher.GetBestK.fetch" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.trials_fetcher.GetBestK.fetch">
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/trials_fetcher.html#GetBestK.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.trials_fetcher.GetBestK.fetch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="hyperflow.ensemble.trials_fetcher.TrialsFetcher">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.trials_fetcher.</code><code class="sig-name descname">TrialsFetcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#hyperflow.manager.resource_manager.ResourceManager" title="hyperflow.manager.resource_manager.ResourceManager">hyperflow.manager.resource_manager.ResourceManager</a></span></em>, <em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">hdl_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/trials_fetcher.html#TrialsFetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.trials_fetcher.TrialsFetcher" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.klass.StrSignatureMixin" title="hyperflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.utils.klass.StrSignatureMixin</span></code></a></p>
+<dt id="autoflow.ensemble.trials_fetcher.TrialsFetcher">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.trials_fetcher.</code><code class="sig-name descname">TrialsFetcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#autoflow.manager.resource_manager.ResourceManager" title="autoflow.manager.resource_manager.ResourceManager">autoflow.manager.resource_manager.ResourceManager</a></span></em>, <em class="sig-param"><span class="n">task_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">hdl_id</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/trials_fetcher.html#TrialsFetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.trials_fetcher.TrialsFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 <dl class="py method">
-<dt id="hyperflow.ensemble.trials_fetcher.TrialsFetcher.fetch">
-<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/trials_fetcher.html#TrialsFetcher.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.trials_fetcher.TrialsFetcher.fetch" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.trials_fetcher.TrialsFetcher.fetch">
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/trials_fetcher.html#TrialsFetcher.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.trials_fetcher.TrialsFetcher.fetch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble.utils">
-<span id="hyperflow-ensemble-utils-module"></span><h2>hyperflow.ensemble.utils module<a class="headerlink" href="#module-hyperflow.ensemble.utils" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.utils">
+<span id="autoflow-ensemble-utils-module"></span><h2>autoflow.ensemble.utils module<a class="headerlink" href="#module-autoflow.ensemble.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="hyperflow.ensemble.utils.mean_predicts">
-<code class="sig-prename descclassname">hyperflow.ensemble.utils.</code><code class="sig-name descname">mean_predicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicts</span><span class="p">:</span> <span class="n">List<span class="p">[</span>numpy.ndarray<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/utils.html#mean_predicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.utils.mean_predicts" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.utils.mean_predicts">
+<code class="sig-prename descclassname">autoflow.ensemble.utils.</code><code class="sig-name descname">mean_predicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicts</span><span class="p">:</span> <span class="n">List<span class="p">[</span>numpy.ndarray<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/utils.html#mean_predicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.utils.mean_predicts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="hyperflow.ensemble.utils.vote_predicts">
-<code class="sig-prename descclassname">hyperflow.ensemble.utils.</code><code class="sig-name descname">vote_predicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicts</span><span class="p">:</span> <span class="n">List<span class="p">[</span>numpy.ndarray<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/utils.html#vote_predicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.utils.vote_predicts" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.utils.vote_predicts">
+<code class="sig-prename descclassname">autoflow.ensemble.utils.</code><code class="sig-name descname">vote_predicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicts</span><span class="p">:</span> <span class="n">List<span class="p">[</span>numpy.ndarray<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/utils.html#vote_predicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.utils.vote_predicts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.ensemble" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow.ensemble" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

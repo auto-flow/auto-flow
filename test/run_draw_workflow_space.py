@@ -3,13 +3,13 @@ from pathlib import Path
 
 import pandas as pd
 
-import hyperflow
-from hyperflow import HyperFlowClassifier, DataManager
+import autoflow
+from autoflow import AutoFlowClassifier, DataManager
 
-examples_path = Path(hyperflow.__file__).parent.parent / "examples"
+examples_path = Path(autoflow.__file__).parent.parent / "examples"
 train_df = pd.read_csv(examples_path / "data/train_classification.csv")
 test_df = pd.read_csv(examples_path / "data/test_classification.csv")
-pipe = HyperFlowClassifier(initial_runs=5, run_limit=10, n_jobs=1, included_classifiers=["lightgbm"])
+pipe = AutoFlowClassifier(initial_runs=5, run_limit=10, n_jobs=1, included_classifiers=["lightgbm"])
 column_descriptions = {
     "id": "PassengerId",
     "target": "Survived",

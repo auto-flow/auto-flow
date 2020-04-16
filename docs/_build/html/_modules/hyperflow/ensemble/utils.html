@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.ensemble.utils &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.ensemble.utils &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.ensemble.utils</li>
+      <li>autoflow.ensemble.utils</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.ensemble.utils</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.ensemble.utils</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># @Author  : qichun tang</span>
@@ -175,13 +175,13 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="vote_predicts"><a class="viewcode-back" href="../../../_module/hyperflow.ensemble.html#hyperflow.ensemble.utils.vote_predicts">[docs]</a><span class="k">def</span> <span class="nf">vote_predicts</span><span class="p">(</span><span class="n">predicts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
+<div class="viewcode-block" id="vote_predicts"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.utils.vote_predicts">[docs]</a><span class="k">def</span> <span class="nf">vote_predicts</span><span class="p">(</span><span class="n">predicts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
     <span class="n">probas_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predicts</span><span class="p">)</span>
     <span class="n">proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">probas_arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">proba</span></div>
 
 
-<div class="viewcode-block" id="mean_predicts"><a class="viewcode-back" href="../../../_module/hyperflow.ensemble.html#hyperflow.ensemble.utils.mean_predicts">[docs]</a><span class="k">def</span> <span class="nf">mean_predicts</span><span class="p">(</span><span class="n">predicts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
+<div class="viewcode-block" id="mean_predicts"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.utils.mean_predicts">[docs]</a><span class="k">def</span> <span class="nf">mean_predicts</span><span class="p">(</span><span class="n">predicts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
     <span class="n">probas_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predicts</span><span class="p">)</span>
     <span class="n">proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">probas_arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">proba</span></div>

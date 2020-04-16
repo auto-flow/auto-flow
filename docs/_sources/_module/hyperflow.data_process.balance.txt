@@ -1,10 +1,10 @@
-hyperflow.data\_process.balance package
+autoflow.data\_process.balance package
 =======================================
 
 Module contents
 ---------------
 
-.. automodule:: hyperflow.data_process.balance
+.. automodule:: autoflow.data_process.balance
    :members:
    :undoc-members:
    :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.hdl.smac &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.hdl.smac &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.hdl.smac</li>
+      <li>autoflow.hdl.smac</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,14 +165,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.hdl.smac</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.hdl.smac</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">CategoricalHyperparameter</span><span class="p">,</span> \
     <span class="n">UniformFloatHyperparameter</span><span class="p">,</span> <span class="n">UniformIntegerHyperparameter</span><span class="p">,</span> <span class="n">Constant</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.utils.math</span> <span class="kn">import</span> <span class="n">float_gcd</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.math</span> <span class="kn">import</span> <span class="n">float_gcd</span>
 
 
 <span class="k">def</span> <span class="nf">_encode</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -193,10 +193,10 @@
         <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">value_</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="choice"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.choice">[docs]</a><span class="k">def</span> <span class="nf">choice</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="choice"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.choice">[docs]</a><span class="k">def</span> <span class="nf">choice</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Constant</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">_encode</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>  <span class="c1"># fixme: if declare probability in here?</span>
-    <span class="c1"># fixme: copy from hyperflow/hdl2shps/hdl2shps.py:354</span>
+    <span class="c1"># fixme: copy from autoflow/hdl2shps/hdl2shps.py:354</span>
     <span class="n">choice2proba</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">not_specific_proba_choices</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">sum_proba</span> <span class="o">=</span> <span class="mi">0</span>
@@ -235,7 +235,7 @@
     <span class="k">return</span> <span class="n">hp</span></div>
 
 
-<div class="viewcode-block" id="int_quniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.int_quniform">[docs]</a><span class="k">def</span> <span class="nf">int_quniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="int_quniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.int_quniform">[docs]</a><span class="k">def</span> <span class="nf">int_quniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span><span class="p">:</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -244,14 +244,14 @@
     <span class="k">return</span> <span class="n">UniformIntegerHyperparameter</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="int_uniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.int_uniform">[docs]</a><span class="k">def</span> <span class="nf">int_uniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="int_uniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.int_uniform">[docs]</a><span class="k">def</span> <span class="nf">int_uniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">default</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default_value&#39;</span><span class="p">:</span> <span class="n">default</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">UniformIntegerHyperparameter</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="quniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.quniform">[docs]</a><span class="k">def</span> <span class="nf">quniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="quniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.quniform">[docs]</a><span class="k">def</span> <span class="nf">quniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span><span class="p">:</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">float_gcd</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -260,7 +260,7 @@
     <span class="k">return</span> <span class="n">UniformFloatHyperparameter</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="uniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.uniform">[docs]</a><span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="uniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.uniform">[docs]</a><span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">default</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default_value&#39;</span><span class="p">:</span> <span class="n">default</span><span class="p">})</span>
@@ -268,7 +268,7 @@
 
 
 <span class="c1"># fixme: have some bug in practice</span>
-<div class="viewcode-block" id="qloguniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.qloguniform">[docs]</a><span class="k">def</span> <span class="nf">qloguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="qloguniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.qloguniform">[docs]</a><span class="k">def</span> <span class="nf">qloguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span><span class="p">:</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">float_gcd</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
@@ -277,14 +277,14 @@
     <span class="k">return</span> <span class="n">UniformFloatHyperparameter</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="loguniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.loguniform">[docs]</a><span class="k">def</span> <span class="nf">loguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="loguniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.loguniform">[docs]</a><span class="k">def</span> <span class="nf">loguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">default</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default_value&#39;</span><span class="p">:</span> <span class="n">default</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">UniformFloatHyperparameter</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="int_qloguniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.int_qloguniform">[docs]</a><span class="k">def</span> <span class="nf">int_qloguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="int_qloguniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.int_qloguniform">[docs]</a><span class="k">def</span> <span class="nf">int_qloguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span><span class="p">:</span>
         <span class="n">q</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
@@ -293,7 +293,7 @@
     <span class="k">return</span> <span class="n">UniformIntegerHyperparameter</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="int_loguniform"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.smac.html#hyperflow.hdl.smac.int_loguniform">[docs]</a><span class="k">def</span> <span class="nf">int_loguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="int_loguniform"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.int_loguniform">[docs]</a><span class="k">def</span> <span class="nf">int_loguniform</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">default</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default_value&#39;</span><span class="p">:</span> <span class="n">default</span><span class="p">})</span>

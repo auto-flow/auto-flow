@@ -1,13 +1,13 @@
-hyperflow.feature_engineer.operate package
+autoflow.feature_engineer.operate package
 ==========================================
 
 Submodules
 ----------
 
-hyperflow.feature_engineer.operate.drop_all module
+autoflow.feature_engineer.operate.drop_all module
 --------------------------------------------------
 
-.. automodule:: hyperflow.feature_engineer.operate.drop_all
+.. automodule:: autoflow.feature_engineer.operate.drop_all
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.feature_engineer.operate.drop_all module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.feature_engineer.operate
+.. automodule:: autoflow.feature_engineer.operate
     :members:
     :undoc-members:
     :show-inheritance:

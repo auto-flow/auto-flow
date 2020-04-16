@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.estimator.regressor &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.estimator.regressor &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.estimator.regressor</li>
+      <li>autoflow.estimator.regressor</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,18 +165,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.estimator.regressor</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.estimator.regressor</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">RegressorMixin</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.estimator.base</span> <span class="kn">import</span> <span class="n">HyperFlowEstimator</span>
+<span class="kn">from</span> <span class="nn">autoflow.estimator.base</span> <span class="kn">import</span> <span class="n">AutoFlowEstimator</span>
 
 
-<div class="viewcode-block" id="HyperFlowRegressor"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.regressor.HyperFlowRegressor">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowRegressor</span><span class="p">(</span><span class="n">HyperFlowEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowRegressor"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.regressor.AutoFlowRegressor">[docs]</a><span class="k">class</span> <span class="nc">AutoFlowRegressor</span><span class="p">(</span><span class="n">AutoFlowEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
     <span class="n">checked_mainTask</span> <span class="o">=</span> <span class="s2">&quot;regression&quot;</span>
 
-<div class="viewcode-block" id="HyperFlowRegressor.predict"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.regressor.HyperFlowRegressor.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+<div class="viewcode-block" id="AutoFlowRegressor.predict"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.regressor.AutoFlowRegressor.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">X_test</span><span class="p">,</span>
             <span class="n">task_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

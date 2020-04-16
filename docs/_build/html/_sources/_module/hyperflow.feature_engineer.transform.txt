@@ -1,13 +1,13 @@
-hyperflow.feature_engineer.transform package
+autoflow.feature_engineer.transform package
 ============================================
 
 Submodules
 ----------
 
-hyperflow.feature_engineer.transform.guassion_tranform module
+autoflow.feature_engineer.transform.guassion_tranform module
 -------------------------------------------------------------
 
-.. automodule:: hyperflow.feature_engineer.transform.guassion_tranform
+.. automodule:: autoflow.feature_engineer.transform.guassion_tranform
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.feature_engineer.transform.guassion_tranform module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.feature_engineer.transform
+.. automodule:: autoflow.feature_engineer.transform
     :members:
     :undoc-members:
     :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.components.regression.lightgbm &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.components.regression.lightgbm &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../../index.html">HyperFlow</a>
+          <a href="../../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.components.regression.lightgbm</li>
+      <li>autoflow.pipeline.components.regression.lightgbm</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,22 +165,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.components.regression.lightgbm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.classification_base</span> <span class="kn">import</span> <span class="n">HyperFlowClassificationAlgorithm</span>
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">get_categorical_features_indices</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.data</span> <span class="kn">import</span> <span class="n">to_array</span>
+  <h1>Source code for autoflow.pipeline.components.regression.lightgbm</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">autoflow.pipeline.components.classification_base</span> <span class="kn">import</span> <span class="n">AutoFlowClassificationAlgorithm</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">get_categorical_features_indices</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.data</span> <span class="kn">import</span> <span class="n">to_array</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="LGBMRegressor"><a class="viewcode-back" href="../../../../../_module/hyperflow.pipeline.components.regression.html#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor">[docs]</a><span class="k">class</span> <span class="nc">LGBMRegressor</span><span class="p">(</span><span class="n">HyperFlowClassificationAlgorithm</span><span class="p">):</span>
+<div class="viewcode-block" id="LGBMRegressor"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.regression.html#autoflow.pipeline.components.regression.lightgbm.LGBMRegressor">[docs]</a><span class="k">class</span> <span class="nc">LGBMRegressor</span><span class="p">(</span><span class="n">AutoFlowClassificationAlgorithm</span><span class="p">):</span>
     <span class="n">class__</span> <span class="o">=</span> <span class="s2">&quot;LGBMRegressor&quot;</span>
     <span class="n">module__</span> <span class="o">=</span> <span class="s2">&quot;lightgbm&quot;</span>
 
     <span class="n">boost_model</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">tree_model</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="LGBMRegressor.core_fit"><a class="viewcode-back" href="../../../../../_module/hyperflow.pipeline.components.regression.html#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.core_fit">[docs]</a>    <span class="k">def</span> <span class="nf">core_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="LGBMRegressor.core_fit"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.regression.html#autoflow.pipeline.components.regression.lightgbm.LGBMRegressor.core_fit">[docs]</a>    <span class="k">def</span> <span class="nf">core_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">categorical_features_indices</span> <span class="o">=</span> <span class="n">get_categorical_features_indices</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="p">)</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">to_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -194,7 +194,7 @@
             <span class="n">eval_set</span><span class="o">=</span><span class="n">eval_set</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="LGBMRegressor.before_pred_X"><a class="viewcode-back" href="../../../../../_module/hyperflow.pipeline.components.regression.html#hyperflow.pipeline.components.regression.lightgbm.LGBMRegressor.before_pred_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_pred_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="LGBMRegressor.before_pred_X"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.regression.html#autoflow.pipeline.components.regression.lightgbm.LGBMRegressor.before_pred_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_pred_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">X</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">to_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div></div>
 </pre></div>
 

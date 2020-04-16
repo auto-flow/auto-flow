@@ -1,4 +1,4 @@
-hyperflow.pipeline.components.preprocessing.operate package
+autoflow.pipeline.components.preprocessing.operate package
 ===========================================================
 
 Subpackages
@@ -6,23 +6,23 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.pipeline.components.preprocessing.operate.split
+    autoflow.pipeline.components.preprocessing.operate.split
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.preprocessing.operate.drop module
+autoflow.pipeline.components.preprocessing.operate.drop module
 ---------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.drop
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.drop
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.operate.merge module
+autoflow.pipeline.components.preprocessing.operate.merge module
 ----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.merge
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.merge
     :members:
     :undoc-members:
     :show-inheritance:
@@ -31,7 +31,7 @@ hyperflow.pipeline.components.preprocessing.operate.merge module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate
+.. automodule:: autoflow.pipeline.components.preprocessing.operate
     :members:
     :undoc-members:
     :show-inheritance:

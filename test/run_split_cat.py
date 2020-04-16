@@ -3,10 +3,10 @@ import logging
 import pandas as pd
 
 
-from hyperflow.pipeline.components.preprocessing.operate.drop import DropAll
-from hyperflow.pipeline.components.preprocessing.operate.split.cat import SplitCat
-from hyperflow.pipeline.dataframe import GenericDataFrame
-from hyperflow.pipeline.pipeline import GenericPipeline
+from autoflow.pipeline.components.preprocessing.operate.drop import DropAll
+from autoflow.pipeline.components.preprocessing.operate.split.cat import SplitCat
+from autoflow.pipeline.dataframe import GenericDataFrame
+from autoflow.pipeline.pipeline import GenericPipeline
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 y = df.pop("Survived").values

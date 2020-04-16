@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.dict &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.dict &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.dict</li>
+      <li>autoflow.utils.dict</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,22 +165,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.dict</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.dict</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.utils.list</span> <span class="kn">import</span> <span class="n">remove_suffix_in_list</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.list</span> <span class="kn">import</span> <span class="n">remove_suffix_in_list</span>
 
 
-<div class="viewcode-block" id="add_prefix_in_dict_keys"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.add_prefix_in_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="add_prefix_in_dict_keys"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.add_prefix_in_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">result</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{prefix}{key}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="group_dict_items_before_first_dot"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.group_dict_items_before_first_dot">[docs]</a><span class="k">def</span> <span class="nf">group_dict_items_before_first_dot</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="viewcode-block" id="group_dict_items_before_first_dot"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.group_dict_items_before_first_dot">[docs]</a><span class="k">def</span> <span class="nf">group_dict_items_before_first_dot</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">packages</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">:</span>
@@ -194,7 +194,7 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="replace_kv"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.replace_kv">[docs]</a><span class="k">def</span> <span class="nf">replace_kv</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">rv</span><span class="p">):</span>
+<div class="viewcode-block" id="replace_kv"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.replace_kv">[docs]</a><span class="k">def</span> <span class="nf">replace_kv</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">rv</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">replace_kv</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">rv</span><span class="p">)</span>
@@ -202,7 +202,7 @@
             <span class="n">dict_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv</span></div>
 
 
-<div class="viewcode-block" id="sort_dict"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.sort_dict">[docs]</a><span class="k">def</span> <span class="nf">sort_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<div class="viewcode-block" id="sort_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.sort_dict">[docs]</a><span class="k">def</span> <span class="nf">sort_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -215,7 +215,7 @@
         <span class="k">return</span> <span class="n">obj</span></div>
 
 
-<div class="viewcode-block" id="GlobalList"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.GlobalList">[docs]</a><span class="k">class</span> <span class="nc">GlobalList</span><span class="p">:</span>
+<div class="viewcode-block" id="GlobalList"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.GlobalList">[docs]</a><span class="k">class</span> <span class="nc">GlobalList</span><span class="p">:</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 
@@ -231,25 +231,25 @@
             <span class="n">_find_token_in_dict</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
 
-<div class="viewcode-block" id="find_token_in_dict"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.find_token_in_dict">[docs]</a><span class="k">def</span> <span class="nf">find_token_in_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<div class="viewcode-block" id="find_token_in_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.find_token_in_dict">[docs]</a><span class="k">def</span> <span class="nf">find_token_in_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
     <span class="n">GlobalList</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">_find_token_in_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">GlobalList</span><span class="o">.</span><span class="n">data</span></div>
 
 
-<div class="viewcode-block" id="read_dict_in_path_mode"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.read_dict_in_path_mode">[docs]</a><span class="k">def</span> <span class="nf">read_dict_in_path_mode</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<div class="viewcode-block" id="read_dict_in_path_mode"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.read_dict_in_path_mode">[docs]</a><span class="k">def</span> <span class="nf">read_dict_in_path_mode</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
         <span class="n">dict_</span> <span class="o">=</span> <span class="n">dict_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">dict_</span></div>
 
 
-<div class="viewcode-block" id="write_dict_in_path_mode"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.write_dict_in_path_mode">[docs]</a><span class="k">def</span> <span class="nf">write_dict_in_path_mode</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="write_dict_in_path_mode"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.write_dict_in_path_mode">[docs]</a><span class="k">def</span> <span class="nf">write_dict_in_path_mode</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
         <span class="n">dict_</span> <span class="o">=</span> <span class="n">dict_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="n">dict_</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
-<div class="viewcode-block" id="update_placeholder_from_other_dict"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dict.update_placeholder_from_other_dict">[docs]</a><span class="k">def</span> <span class="nf">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">ignored_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(choice)&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="update_placeholder_from_other_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.update_placeholder_from_other_dict">[docs]</a><span class="k">def</span> <span class="nf">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">ignored_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(choice)&quot;</span><span class="p">):</span>
     <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span>
     <span class="n">updated</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">should_update</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">find_token_in_dict</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>

@@ -87,9 +87,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/HyperFlow.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/AutoFlow.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/HyperFlow.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/AutoFlow.qhc"
 
 applehelp:
 	$(SPHINXBUILD) -b applehelp $(ALLSPHINXOPTS) $(BUILDDIR)/applehelp
@@ -104,8 +104,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/HyperFlow"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/HyperFlow"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/AutoFlow"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/AutoFlow"
 	@echo "# devhelp"
 
 epub:
@@ -192,7 +192,7 @@ pseudoxml:
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
 
 apidoc:
-	sphinx-apidoc -o _module ../hyperflow -f
+	sphinx-apidoc -o _module ../autoflow -f
 
 view:
 	google-chrome _build/html/index.html

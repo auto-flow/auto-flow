@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.tuner.tuner &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.tuner.tuner &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.tuner.tuner</li>
+      <li>autoflow.tuner.tuner</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.tuner.tuner</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.tuner.tuner</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
@@ -176,18 +176,18 @@
 
 <span class="kn">from</span> <span class="nn">dsmac.facade.smac_hpo_facade</span> <span class="kn">import</span> <span class="n">SMAC4HPO</span>
 <span class="kn">from</span> <span class="nn">dsmac.scenario.scenario</span> <span class="kn">import</span> <span class="n">Scenario</span>
-<span class="kn">from</span> <span class="nn">hyperflow.evaluation.ensemble_evaluator</span> <span class="kn">import</span> <span class="n">EnsembleEvaluator</span>
-<span class="kn">from</span> <span class="nn">hyperflow.evaluation.train_evaluator</span> <span class="kn">import</span> <span class="n">TrainEvaluator</span>
-<span class="kn">from</span> <span class="nn">hyperflow.hdl2shps.hdl2shps</span> <span class="kn">import</span> <span class="n">HDL2SHPS</span>
-<span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
-<span class="kn">from</span> <span class="nn">hyperflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">parse_n_jobs</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.config_space</span> <span class="kn">import</span> <span class="n">get_random_initial_configs</span><span class="p">,</span> <span class="n">get_grid_initial_configs</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
+<span class="kn">from</span> <span class="nn">autoflow.evaluation.ensemble_evaluator</span> <span class="kn">import</span> <span class="n">EnsembleEvaluator</span>
+<span class="kn">from</span> <span class="nn">autoflow.evaluation.train_evaluator</span> <span class="kn">import</span> <span class="n">TrainEvaluator</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl2shps.hdl2shps</span> <span class="kn">import</span> <span class="n">HDL2SHPS</span>
+<span class="kn">from</span> <span class="nn">autoflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
+<span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">parse_n_jobs</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.config_space</span> <span class="kn">import</span> <span class="n">get_random_initial_configs</span><span class="p">,</span> <span class="n">get_grid_initial_configs</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
 
-<div class="viewcode-block" id="Tuner"><a class="viewcode-back" href="../../../api.html#hyperflow.tuner.tuner.Tuner">[docs]</a><span class="k">class</span> <span class="nc">Tuner</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner"><a class="viewcode-back" href="../../../api.html#autoflow.tuner.tuner.Tuner">[docs]</a><span class="k">class</span> <span class="nc">Tuner</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    ``Tuner`` if class who agent an abstract search process.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -220,7 +220,7 @@
 <span class="sd">                * ``loss``, you can think of it as negative reward.</span>
 <span class="sd">                * ``status``, a string , ``SUCCESS`` means fine, ``FAILED`` means crashed.</span>
 
-<span class="sd">            As default,  &quot;TrainEvaluator&quot; is the string-indicator of :class:`hyperflow.evaluation.train_evaluator.TrainEvaluator` .</span>
+<span class="sd">            As default,  &quot;TrainEvaluator&quot; is the string-indicator of :class:`autoflow.evaluation.train_evaluator.TrainEvaluator` .</span>
 
 <span class="sd">        search_method: str</span>
 <span class="sd">            Specific searching method, ``random``, ``smac``, ``grid`` are available.</span>
@@ -315,35 +315,35 @@
 
 
 
-<div class="viewcode-block" id="Tuner.set_random_state"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_random_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.set_random_state"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.set_random_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span></div>
 
     <span class="c1"># def set_addition_info(self, addition_info):</span>
     <span class="c1">#     self.addition_info = addition_info</span>
 
-<div class="viewcode-block" id="Tuner.hdl2shps"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.hdl2shps">[docs]</a>    <span class="k">def</span> <span class="nf">hdl2shps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.hdl2shps"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.hdl2shps">[docs]</a>    <span class="k">def</span> <span class="nf">hdl2shps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="n">hdl2shps</span> <span class="o">=</span> <span class="n">HDL2SHPS</span><span class="p">()</span>
         <span class="n">hdl2shps</span><span class="o">.</span><span class="n">set_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">hdl2shps</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Tuner.set_hdl"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">set_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.set_hdl"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.set_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">set_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span> <span class="o">=</span> <span class="n">hdl</span>
         <span class="c1"># todo: 泛化ML管线后，可能存在多个preprocessing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl2shps</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Tuner.set_resource_manager"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_resource_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_resource_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.set_resource_manager"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.set_resource_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_resource_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">resource_manager</span></div>
         <span class="c1"># self.evaluator.set_resource_manager(resource_manager)</span>
 
-<div class="viewcode-block" id="Tuner.set_task"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_task">[docs]</a>    <span class="k">def</span> <span class="nf">set_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.set_task"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.set_task">[docs]</a>    <span class="k">def</span> <span class="nf">set_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">ml_task</span></div>
 
-<div class="viewcode-block" id="Tuner.set_data_manager"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.set_data_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_data_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.set_data_manager"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.set_data_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_data_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">data_manager</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span></div>
 
-<div class="viewcode-block" id="Tuner.design_initial_configs"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.design_initial_configs">[docs]</a>    <span class="k">def</span> <span class="nf">design_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.design_initial_configs"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.design_initial_configs">[docs]</a>    <span class="k">def</span> <span class="nf">design_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;smac&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">get_random_initial_configs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_runs</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
@@ -353,13 +353,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Tuner.get_run_limit"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.get_run_limit">[docs]</a>    <span class="k">def</span> <span class="nf">get_run_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Tuner.get_run_limit"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.get_run_limit">[docs]</a>    <span class="k">def</span> <span class="nf">get_run_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;smac&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_limit</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="Tuner.run"><a class="viewcode-back" href="../../../_module/hyperflow.tuner.html#hyperflow.tuner.tuner.Tuner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<div class="viewcode-block" id="Tuner.run"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.tuner.Tuner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">initial_configs</span><span class="p">,</span>
             <span class="n">evaluator_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.concurrence &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.concurrence &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.concurrence</li>
+      <li>autoflow.utils.concurrence</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,11 +165,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.concurrence</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.concurrence</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 
 
-<div class="viewcode-block" id="parse_n_jobs"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.concurrence.parse_n_jobs">[docs]</a><span class="k">def</span> <span class="nf">parse_n_jobs</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_n_jobs"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.concurrence.parse_n_jobs">[docs]</a><span class="k">def</span> <span class="nf">parse_n_jobs</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">n_jobs</span>
     <span class="k">elif</span> <span class="n">n_jobs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -178,7 +178,7 @@
         <span class="k">return</span> <span class="mi">1</span></div>
 
 
-<div class="viewcode-block" id="get_chunks"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.concurrence.get_chunks">[docs]</a><span class="k">def</span> <span class="nf">get_chunks</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="get_chunks"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.concurrence.get_chunks">[docs]</a><span class="k">def</span> <span class="nf">get_chunks</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="c1"># This is from http://stackoverflow.com/a/2136090/2073595</span>
     <span class="n">lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">lst</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">chunks</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">chunks</span><span class="p">)]</span></div>

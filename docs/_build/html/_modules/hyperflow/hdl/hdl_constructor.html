@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.hdl.hdl_constructor &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.hdl.hdl_constructor &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.hdl.hdl_constructor</li>
+      <li>autoflow.hdl.hdl_constructor</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,23 +165,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.hdl.hdl_constructor</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.hdl.hdl_constructor</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span>
-<span class="kn">from</span> <span class="nn">hyperflow.hdl.utils</span> <span class="kn">import</span> <span class="n">get_hdl_bank</span><span class="p">,</span> <span class="n">get_default_hdl_bank</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.dict</span> <span class="kn">import</span> <span class="n">add_prefix_in_dict_keys</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.graphviz</span> <span class="kn">import</span> <span class="n">ColorSelector</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.math</span> <span class="kn">import</span> <span class="n">get_int_length</span>
+<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl.utils</span> <span class="kn">import</span> <span class="n">get_hdl_bank</span><span class="p">,</span> <span class="n">get_default_hdl_bank</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">add_prefix_in_dict_keys</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.graphviz</span> <span class="kn">import</span> <span class="n">ColorSelector</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.math</span> <span class="kn">import</span> <span class="n">get_int_length</span>
 
 
-<div class="viewcode-block" id="HDL_Constructor"><a class="viewcode-back" href="../../../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor">[docs]</a><span class="k">class</span> <span class="nc">HDL_Constructor</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor">[docs]</a><span class="k">class</span> <span class="nc">HDL_Constructor</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    ``HDL`` is abbreviation of Hyper-parameter Descriptions Language.</span>
 <span class="sd">    It describes an abstract hyperparametric space that independent with concrete implementation.</span>
@@ -233,7 +233,7 @@
 
 <span class="sd">            ``hdl_bank`` is a json file which contains  all the hyper-parameters of the algorithm.</span>
 
-<span class="sd">            ``hdl_bank_path`` is this file&#39;s path. If it is None, ``hyperflow/hdl/hdl_bank.json`` will be choosed.</span>
+<span class="sd">            ``hdl_bank_path`` is this file&#39;s path. If it is None, ``autoflow/hdl/hdl_bank.json`` will be choosed.</span>
 
 <span class="sd">        hdl_bank: dict, default=None</span>
 
@@ -313,9 +313,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        random_state: int</span>
 
-<span class="sd">        ml_task: :class:`hyperflow.utils.ml_task.MLTask`</span>
+<span class="sd">        ml_task: :class:`autoflow.utils.ml_task.MLTask`</span>
 
-<span class="sd">        data_manager: :class:`hyperflow.manager.data_manager.DataManager`</span>
+<span class="sd">        data_manager: :class:`autoflow.manager.data_manager.DataManager`</span>
 
 <span class="sd">        hdl: dict</span>
 <span class="sd">            construct by :meth:`run`</span>
@@ -323,8 +323,8 @@
 <span class="sd">        Examples</span>
 <span class="sd">        ----------</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        &gt;&gt;&gt; from hyperflow.manager.data_manager import DataManager</span>
-<span class="sd">        &gt;&gt;&gt; from hyperflow.hdl.hdl_constructor import  HDL_Constructor</span>
+<span class="sd">        &gt;&gt;&gt; from autoflow.manager.data_manager import DataManager</span>
+<span class="sd">        &gt;&gt;&gt; from autoflow.hdl.hdl_constructor import  HDL_Constructor</span>
 <span class="sd">        &gt;&gt;&gt; hdl_constructor = HDL_Constructor(DAG_workflow={&quot;num-&gt;target&quot;:[&quot;lightgbm&quot;]},</span>
 <span class="sd">        ...   hdl_bank={&quot;classification&quot;:{&quot;lightgbm&quot;:{&quot;boosting_type&quot;:  {&quot;_type&quot;: &quot;choice&quot;, &quot;_value&quot;:[&quot;gbdt&quot;,&quot;dart&quot;,&quot;goss&quot;]}}}})</span>
 <span class="sd">        &gt;&gt;&gt; data_manager = DataManager(X_train=np.random.rand(3,3), y_train=np.arange(3))</span>
@@ -357,7 +357,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="HDL_Constructor.parse_item"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.parse_item">[docs]</a>    <span class="k">def</span> <span class="nf">parse_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<div class="viewcode-block" id="HDL_Constructor.parse_item"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.parse_item">[docs]</a>    <span class="k">def</span> <span class="nf">parse_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">packages</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_name&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;_vanilla&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
@@ -377,7 +377,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">return</span> <span class="n">packages</span><span class="p">,</span> <span class="n">addition_dict</span><span class="p">,</span> <span class="n">is_vanilla</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.purify_DAG_describe"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.purify_DAG_describe">[docs]</a>    <span class="k">def</span> <span class="nf">purify_DAG_describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor.purify_DAG_describe"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.purify_DAG_describe">[docs]</a>    <span class="k">def</span> <span class="nf">purify_DAG_describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">DAG_describe</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
@@ -391,7 +391,7 @@
             <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">return</span> <span class="n">result</span>
 
-<div class="viewcode-block" id="HDL_Constructor.get_params_in_dict"><a class="viewcode-back" href="../../../_module/hyperflow.hdl.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.get_params_in_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_params_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl_bank</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">packages</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mainTask</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor.get_params_in_dict"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.get_params_in_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_params_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl_bank</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">packages</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mainTask</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">(</span><span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">)</span>
         <span class="n">packages</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
         <span class="n">params_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_params_in_dict</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">[</span><span class="n">PHASE1</span><span class="p">],</span> <span class="n">package</span><span class="p">)</span> <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span>
@@ -408,7 +408,7 @@
                 <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.generic_recommend"><a class="viewcode-back" href="../../../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">[docs]</a>    <span class="k">def</span> <span class="nf">generic_recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
+<div class="viewcode-block" id="HDL_Constructor.generic_recommend"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">[docs]</a>    <span class="k">def</span> <span class="nf">generic_recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Recommend a generic DAG workflow space back.</span>
 
@@ -448,7 +448,7 @@
         <span class="c1"># todo: 如果特征多，做特征选择或者降维。如果特征少，做增维</span>
         <span class="k">return</span> <span class="n">DAG_workflow</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.draw_workflow_space"><a class="viewcode-back" href="../../../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space">[docs]</a>    <span class="k">def</span> <span class="nf">draw_workflow_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor.draw_workflow_space"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space">[docs]</a>    <span class="k">def</span> <span class="nf">draw_workflow_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        Notes</span>
@@ -520,12 +520,12 @@
         <span class="n">graph</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;WorkFlow Space&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">graph</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.run"><a class="viewcode-back" href="../../../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">highR_cat_threshold</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor.run"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">highR_cat_threshold</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        data_manager: :class:`hyperflow.manager.data_manager.DataManager`</span>
+<span class="sd">        data_manager: :class:`autoflow.manager.data_manager.DataManager`</span>
 <span class="sd">        random_state: int</span>
 <span class="sd">        highR_cat_threshold: float</span>
 
@@ -585,7 +585,7 @@
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span> <span class="o">=</span> <span class="n">final_dict</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.get_hdl"><a class="viewcode-back" href="../../../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor.get_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="HDL_Constructor.get_hdl"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.get_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        Returns</span>

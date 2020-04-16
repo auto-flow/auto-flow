@@ -1,8 +1,8 @@
 import pandas as pd
 
-from hyperflow.estimator.base import HyperFlowEstimator
-from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from hyperflow.tuner.tuner import Tuner
+from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.tuner.tuner import Tuner
 
 df = pd.read_csv("../data/QSAR.csv")
 
@@ -19,12 +19,12 @@ tuner = Tuner(
     search_method="smac",
     n_jobs=1
 )
-hyperflow_pipeline = HyperFlowEstimator(tuner, hdl_constructor)
+autoflow_pipeline = AutoFlowEstimator(tuner, hdl_constructor)
 column_descriptions = {
     "id": "Name",
     "target": "labels"
 }
 
-hyperflow_pipeline.fit(
+autoflow_pipeline.fit(
     X_train=df, column_descriptions=column_descriptions
 )

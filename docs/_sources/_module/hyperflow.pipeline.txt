@@ -1,4 +1,4 @@
-hyperflow.pipeline package
+autoflow.pipeline package
 ==========================
 
 Subpackages
@@ -6,23 +6,23 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.pipeline.components
+    autoflow.pipeline.components
 
 Submodules
 ----------
 
-hyperflow.pipeline.dataframe module
+autoflow.pipeline.dataframe module
 -----------------------------------
 
-.. automodule:: hyperflow.pipeline.dataframe
+.. automodule:: autoflow.pipeline.dataframe
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.pipeline module
+autoflow.pipeline.pipeline module
 ----------------------------------
 
-.. automodule:: hyperflow.pipeline.pipeline
+.. automodule:: autoflow.pipeline.pipeline
     :members:
     :undoc-members:
     :show-inheritance:
@@ -31,7 +31,7 @@ hyperflow.pipeline.pipeline module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline
+.. automodule:: autoflow.pipeline
     :members:
     :undoc-members:
     :show-inheritance:

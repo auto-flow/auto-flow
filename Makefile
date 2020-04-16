@@ -1,4 +1,4 @@
 reinstall:
-	pip uninstall HyperFlow -y
+	pip uninstall auto-flow -y
 	rm -rf build dist *.egg-info
 	python setup.py install

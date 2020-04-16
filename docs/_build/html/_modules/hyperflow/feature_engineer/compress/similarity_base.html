@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.feature_engineer.compress.similarity_base &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.feature_engineer.compress.similarity_base &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.feature_engineer.compress.similarity_base</li>
+      <li>autoflow.feature_engineer.compress.similarity_base</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.feature_engineer.compress.similarity_base</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.feature_engineer.compress.similarity_base</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
@@ -174,10 +174,10 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 
-<div class="viewcode-block" id="get_start_end_tuples"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.similarity_base.get_start_end_tuples">[docs]</a><span class="k">def</span> <span class="nf">get_start_end_tuples</span><span class="p">(</span><span class="n">threads</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<div class="viewcode-block" id="get_start_end_tuples"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.similarity_base.get_start_end_tuples">[docs]</a><span class="k">def</span> <span class="nf">get_start_end_tuples</span><span class="p">(</span><span class="n">threads</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
     <span class="n">chunks</span> <span class="o">=</span> <span class="n">N</span> <span class="o">//</span> <span class="n">threads</span>
     <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
@@ -197,7 +197,7 @@
     <span class="k">return</span> <span class="n">start_end_tuples</span></div>
 
 
-<div class="viewcode-block" id="SimilarityBase"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase">[docs]</a><span class="k">class</span> <span class="nc">SimilarityBase</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+<div class="viewcode-block" id="SimilarityBase"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.similarity_base.SimilarityBase">[docs]</a><span class="k">class</span> <span class="nc">SimilarityBase</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_delete</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_delete</span> <span class="o">=</span> <span class="n">max_delete</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">to_delete</span> <span class="o">=</span> <span class="p">[]</span>
@@ -208,10 +208,10 @@
 
     <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="SimilarityBase.core_func"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.core_func">[docs]</a>    <span class="k">def</span> <span class="nf">core_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<div class="viewcode-block" id="SimilarityBase.core_func"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.similarity_base.SimilarityBase.core_func">[docs]</a>    <span class="k">def</span> <span class="nf">core_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SimilarityBase.fit"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SimilarityBase.fit"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.similarity_base.SimilarityBase.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;ndarray&quot;</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -236,7 +236,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;use time:&quot;</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="SimilarityBase.transform"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SimilarityBase.transform"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.similarity_base.SimilarityBase.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;DataFrame&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">_type</span> <span class="o">=</span> <span class="s2">&quot;ndarray&quot;</span>

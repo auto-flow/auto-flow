@@ -1,13 +1,13 @@
-hyperflow.ensemble.vote package
+autoflow.ensemble.vote package
 ===============================
 
 Submodules
 ----------
 
-hyperflow.ensemble.vote.classifier module
+autoflow.ensemble.vote.classifier module
 -----------------------------------------
 
-.. automodule:: hyperflow.ensemble.vote.classifier
+.. automodule:: autoflow.ensemble.vote.classifier
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.ensemble.vote.classifier module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.ensemble.vote
+.. automodule:: autoflow.ensemble.vote
     :members:
     :undoc-members:
     :show-inheritance:

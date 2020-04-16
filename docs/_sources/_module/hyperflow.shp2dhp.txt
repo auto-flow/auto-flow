@@ -1,13 +1,13 @@
-hyperflow.shp2dhp package
+autoflow.shp2dhp package
 =========================
 
 Submodules
 ----------
 
-hyperflow.shp2dhp.shp2dhp module
+autoflow.shp2dhp.shp2dhp module
 --------------------------------
 
-.. automodule:: hyperflow.shp2dhp.shp2dhp
+.. automodule:: autoflow.shp2dhp.shp2dhp
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.shp2dhp.shp2dhp module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.shp2dhp
+.. automodule:: autoflow.shp2dhp
     :members:
     :undoc-members:
     :show-inheritance:

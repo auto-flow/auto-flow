@@ -1,4 +1,4 @@
-hyperflow.data_process package
+autoflow.data_process package
 ==============================
 
 Subpackages
@@ -6,14 +6,14 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.data_process.abnormal
-    hyperflow.data_process.balance
-    hyperflow.data_process.impute
+    autoflow.data_process.abnormal
+    autoflow.data_process.balance
+    autoflow.data_process.impute
 
 Module contents
 ---------------
 
-.. automodule:: hyperflow.data_process
+.. automodule:: autoflow.data_process
     :members:
     :undoc-members:
     :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.feature_engineer.compress.pearson &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.feature_engineer.compress.pearson &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.feature_engineer.compress.pearson</li>
+      <li>autoflow.feature_engineer.compress.pearson</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,15 +165,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.feature_engineer.compress.pearson</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.feature_engineer.compress.pearson</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">pearsonr</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.feature_engineer.compress.similarity_base</span> <span class="kn">import</span> <span class="n">SimilarityBase</span>
+<span class="kn">from</span> <span class="nn">autoflow.feature_engineer.compress.similarity_base</span> <span class="kn">import</span> <span class="n">SimilarityBase</span>
 
-<div class="viewcode-block" id="Pearson"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.pearson.Pearson">[docs]</a><span class="k">class</span> <span class="nc">Pearson</span><span class="p">(</span><span class="n">SimilarityBase</span><span class="p">):</span>
+<div class="viewcode-block" id="Pearson"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.pearson.Pearson">[docs]</a><span class="k">class</span> <span class="nc">Pearson</span><span class="p">(</span><span class="n">SimilarityBase</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;pearson and f1_score&quot;</span>
 
-<div class="viewcode-block" id="Pearson.core_func"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.compress.html#hyperflow.feature_engineer.compress.pearson.Pearson.core_func">[docs]</a>    <span class="k">def</span> <span class="nf">core_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<div class="viewcode-block" id="Pearson.core_func"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.compress.html#autoflow.feature_engineer.compress.pearson.Pearson.core_func">[docs]</a>    <span class="k">def</span> <span class="nf">core_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
         <span class="c1"># X_是全局变量</span>
         <span class="n">to_del</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.ml_task &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.ml_task &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.ml_task</li>
+      <li>autoflow.utils.ml_task</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.ml_task</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.ml_task</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># @Author  : qichun tang</span>
@@ -175,12 +175,12 @@
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
 
 
-<div class="viewcode-block" id="MLTask"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.ml_task.MLTask">[docs]</a><span class="k">class</span> <span class="nc">MLTask</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Task&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mainTask&quot;</span><span class="p">,</span> <span class="s2">&quot;subTask&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">])):</span>
+<div class="viewcode-block" id="MLTask"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.ml_task.MLTask">[docs]</a><span class="k">class</span> <span class="nc">MLTask</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Task&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mainTask&quot;</span><span class="p">,</span> <span class="s2">&quot;subTask&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">])):</span>
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="get_ml_task_from_y"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.ml_task.get_ml_task_from_y">[docs]</a><span class="k">def</span> <span class="nf">get_ml_task_from_y</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">binary_classification_task</span><span class="p">,</span> <span class="n">multiclass_classification_task</span><span class="p">,</span> \
+<div class="viewcode-block" id="get_ml_task_from_y"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.ml_task.get_ml_task_from_y">[docs]</a><span class="k">def</span> <span class="nf">get_ml_task_from_y</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">binary_classification_task</span><span class="p">,</span> <span class="n">multiclass_classification_task</span><span class="p">,</span> \
         <span class="n">multilabel_classification_task</span><span class="p">,</span> <span class="n">regression_task</span>
     <span class="n">y_type</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>

@@ -1,61 +1,61 @@
-hyperflow.pipeline.components.preprocessing.select package
+autoflow.pipeline.components.preprocessing.select package
 ==========================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.preprocessing.select.base module
+autoflow.pipeline.components.preprocessing.select.base module
 --------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.base
+.. automodule:: autoflow.pipeline.components.preprocessing.select.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.select.from_model_clf module
+autoflow.pipeline.components.preprocessing.select.from_model_clf module
 ------------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.from_model_clf
+.. automodule:: autoflow.pipeline.components.preprocessing.select.from_model_clf
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.select.from_model_reg module
+autoflow.pipeline.components.preprocessing.select.from_model_reg module
 ------------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.from_model_reg
+.. automodule:: autoflow.pipeline.components.preprocessing.select.from_model_reg
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.select.rfe_clf module
+autoflow.pipeline.components.preprocessing.select.rfe_clf module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.rfe_clf
+.. automodule:: autoflow.pipeline.components.preprocessing.select.rfe_clf
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.select.rfe_reg module
+autoflow.pipeline.components.preprocessing.select.rfe_reg module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.rfe_reg
+.. automodule:: autoflow.pipeline.components.preprocessing.select.rfe_reg
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.select.univar_clf module
+autoflow.pipeline.components.preprocessing.select.univar_clf module
 --------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.univar_clf
+.. automodule:: autoflow.pipeline.components.preprocessing.select.univar_clf
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.select.univar_reg module
+autoflow.pipeline.components.preprocessing.select.univar_reg module
 --------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select.univar_reg
+.. automodule:: autoflow.pipeline.components.preprocessing.select.univar_reg
     :members:
     :undoc-members:
     :show-inheritance:
@@ -64,7 +64,7 @@ hyperflow.pipeline.components.preprocessing.select.univar_reg module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.select
+.. automodule:: autoflow.pipeline.components.preprocessing.select
     :members:
     :undoc-members:
     :show-inheritance:

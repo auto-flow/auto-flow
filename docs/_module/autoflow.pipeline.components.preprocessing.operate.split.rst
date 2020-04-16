@@ -1,0 +1,46 @@
+autoflow.pipeline.components.preprocessing.operate.split package
+================================================================
+
+Submodules
+----------
+
+autoflow.pipeline.components.preprocessing.operate.split.base module
+--------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.operate.split.cat module
+-------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.cat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.operate.split.cat\_num module
+------------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.cat_num
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.operate.split.nan module
+-------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.nan
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split
+   :members:
+   :undoc-members:
+   :show-inheritance:

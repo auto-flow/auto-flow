@@ -3,9 +3,9 @@ import pandas as pd
 from sklearn.datasets import load_boston
 from sklearn.model_selection import ShuffleSplit
 
-from hyperflow.estimator.base import HyperFlowEstimator
-from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from hyperflow.tuner.tuner import Tuner
+from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.tuner.tuner import Tuner
 
 boston = load_boston()
 data = boston.data
@@ -21,7 +21,7 @@ tuner = Tuner(
     initial_runs=5,
     run_limit=12,
 )
-hyperflow_pipeline = HyperFlowEstimator(tuner, HDL_Constructor(
+autoflow_pipeline = AutoFlowEstimator(tuner, HDL_Constructor(
     DAG_workflow={
         "num->num": [
             "select.from_model_reg","select.univar_reg","select.rfe_reg"#,None
@@ -34,6 +34,6 @@ hyperflow_pipeline = HyperFlowEstimator(tuner, HDL_Constructor(
 column_descriptions = {
     "target": "target"
 }
-hyperflow_pipeline.fit(
+autoflow_pipeline.fit(
     X_train=df_train, X_test=df_test, column_descriptions=column_descriptions, n_jobs=1
 )

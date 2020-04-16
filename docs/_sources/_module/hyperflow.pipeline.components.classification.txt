@@ -1,141 +1,141 @@
-hyperflow.pipeline.components.classification package
+autoflow.pipeline.components.classification package
 ====================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.classification.adaboost module
+autoflow.pipeline.components.classification.adaboost module
 ------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.adaboost
+.. automodule:: autoflow.pipeline.components.classification.adaboost
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.bernoulli_nb module
+autoflow.pipeline.components.classification.bernoulli_nb module
 ----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.bernoulli_nb
+.. automodule:: autoflow.pipeline.components.classification.bernoulli_nb
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.catboost module
+autoflow.pipeline.components.classification.catboost module
 ------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.catboost
+.. automodule:: autoflow.pipeline.components.classification.catboost
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.decision_tree module
+autoflow.pipeline.components.classification.decision_tree module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.decision_tree
+.. automodule:: autoflow.pipeline.components.classification.decision_tree
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.extra_trees module
+autoflow.pipeline.components.classification.extra_trees module
 ---------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.extra_trees
+.. automodule:: autoflow.pipeline.components.classification.extra_trees
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.gaussian_nb module
+autoflow.pipeline.components.classification.gaussian_nb module
 ---------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.gaussian_nb
+.. automodule:: autoflow.pipeline.components.classification.gaussian_nb
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.gradient_boosting module
+autoflow.pipeline.components.classification.gradient_boosting module
 ---------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.gradient_boosting
+.. automodule:: autoflow.pipeline.components.classification.gradient_boosting
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.k_nearest_neighbors module
+autoflow.pipeline.components.classification.k_nearest_neighbors module
 -----------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.k_nearest_neighbors
+.. automodule:: autoflow.pipeline.components.classification.k_nearest_neighbors
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.lda module
+autoflow.pipeline.components.classification.lda module
 -------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.lda
+.. automodule:: autoflow.pipeline.components.classification.lda
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.liblinear_svc module
+autoflow.pipeline.components.classification.liblinear_svc module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.liblinear_svc
+.. automodule:: autoflow.pipeline.components.classification.liblinear_svc
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.libsvm_svc module
+autoflow.pipeline.components.classification.libsvm_svc module
 --------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.libsvm_svc
+.. automodule:: autoflow.pipeline.components.classification.libsvm_svc
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.lightgbm module
+autoflow.pipeline.components.classification.lightgbm module
 ------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.lightgbm
+.. automodule:: autoflow.pipeline.components.classification.lightgbm
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.logistic_regression module
+autoflow.pipeline.components.classification.logistic_regression module
 -----------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.logistic_regression
+.. automodule:: autoflow.pipeline.components.classification.logistic_regression
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.multinomial_nb module
+autoflow.pipeline.components.classification.multinomial_nb module
 ------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.multinomial_nb
+.. automodule:: autoflow.pipeline.components.classification.multinomial_nb
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.qda module
+autoflow.pipeline.components.classification.qda module
 -------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.qda
+.. automodule:: autoflow.pipeline.components.classification.qda
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.random_forest module
+autoflow.pipeline.components.classification.random_forest module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.random_forest
+.. automodule:: autoflow.pipeline.components.classification.random_forest
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.classification.sgd module
+autoflow.pipeline.components.classification.sgd module
 -------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.classification.sgd
+.. automodule:: autoflow.pipeline.components.classification.sgd
     :members:
     :undoc-members:
     :show-inheritance:
@@ -144,7 +144,7 @@ hyperflow.pipeline.components.classification.sgd module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.classification
+.. automodule:: autoflow.pipeline.components.classification
     :members:
     :undoc-members:
     :show-inheritance:

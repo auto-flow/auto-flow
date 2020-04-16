@@ -1,13 +1,13 @@
-hyperflow.metrics package
+autoflow.metrics package
 =========================
 
 Submodules
 ----------
 
-hyperflow.metrics.classification_metrics module
+autoflow.metrics.classification_metrics module
 -----------------------------------------------
 
-.. automodule:: hyperflow.metrics.classification_metrics
+.. automodule:: autoflow.metrics.classification_metrics
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.metrics.classification_metrics module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.metrics
+.. automodule:: autoflow.metrics
     :members:
     :undoc-members:
     :show-inheritance:

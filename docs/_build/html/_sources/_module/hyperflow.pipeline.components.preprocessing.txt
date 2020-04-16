@@ -1,4 +1,4 @@
-hyperflow.pipeline.components.preprocessing package
+autoflow.pipeline.components.preprocessing package
 ===================================================
 
 Subpackages
@@ -6,22 +6,22 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.pipeline.components.preprocessing.abnormal
-    hyperflow.pipeline.components.preprocessing.balance
-    hyperflow.pipeline.components.preprocessing.compress
-    hyperflow.pipeline.components.preprocessing.encode
-    hyperflow.pipeline.components.preprocessing.expand
-    hyperflow.pipeline.components.preprocessing.impute
-    hyperflow.pipeline.components.preprocessing.operate
-    hyperflow.pipeline.components.preprocessing.reduce
-    hyperflow.pipeline.components.preprocessing.scale
-    hyperflow.pipeline.components.preprocessing.select
-    hyperflow.pipeline.components.preprocessing.transform
+    autoflow.pipeline.components.preprocessing.abnormal
+    autoflow.pipeline.components.preprocessing.balance
+    autoflow.pipeline.components.preprocessing.compress
+    autoflow.pipeline.components.preprocessing.encode
+    autoflow.pipeline.components.preprocessing.expand
+    autoflow.pipeline.components.preprocessing.impute
+    autoflow.pipeline.components.preprocessing.operate
+    autoflow.pipeline.components.preprocessing.reduce
+    autoflow.pipeline.components.preprocessing.scale
+    autoflow.pipeline.components.preprocessing.select
+    autoflow.pipeline.components.preprocessing.transform
 
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing
+.. automodule:: autoflow.pipeline.components.preprocessing
     :members:
     :undoc-members:
     :show-inheritance:

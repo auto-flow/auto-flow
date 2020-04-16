@@ -1,7 +1,7 @@
-hyperflow
-=========
+autoflow
+========
 
 .. toctree::
    :maxdepth: 4
 
-   hyperflow
+   autoflow

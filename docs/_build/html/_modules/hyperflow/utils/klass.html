@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.klass &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.klass &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.klass</li>
+      <li>autoflow.utils.klass</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.klass</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.klass</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># @Author  : qichun tang</span>
@@ -174,7 +174,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
 
 
-<div class="viewcode-block" id="StrSignatureMixin"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.klass.StrSignatureMixin">[docs]</a><span class="k">class</span> <span class="nc">StrSignatureMixin</span><span class="p">():</span>
+<div class="viewcode-block" id="StrSignatureMixin"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.StrSignatureMixin">[docs]</a><span class="k">class</span> <span class="nc">StrSignatureMixin</span><span class="p">():</span>
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{self.__class__.__name__}</span><span class="s2">(&quot;</span>
         <span class="n">valid_params</span> <span class="o">=</span> <span class="p">[]</span>
@@ -198,7 +198,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_valid_params_in_kwargs"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.klass.get_valid_params_in_kwargs">[docs]</a><span class="k">def</span> <span class="nf">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<div class="viewcode-block" id="get_valid_params_in_kwargs"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.get_valid_params_in_kwargs">[docs]</a><span class="k">def</span> <span class="nf">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
     <span class="n">validated</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">klass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -206,7 +206,7 @@
     <span class="k">return</span> <span class="n">validated</span></div>
 
 
-<div class="viewcode-block" id="instancing"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.klass.instancing">[docs]</a><span class="k">def</span> <span class="nf">instancing</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="instancing"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.instancing">[docs]</a><span class="k">def</span> <span class="nf">instancing</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">variable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="o">**</span><span class="n">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -221,7 +221,7 @@
     <span class="k">return</span> <span class="n">variable</span></div>
 
 
-<div class="viewcode-block" id="sequencing"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.klass.sequencing">[docs]</a><span class="k">def</span> <span class="nf">sequencing</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">klass</span><span class="p">):</span>
+<div class="viewcode-block" id="sequencing"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.sequencing">[docs]</a><span class="k">def</span> <span class="nf">sequencing</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">klass</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="p">[</span><span class="n">variable</span><span class="p">]</span>
     <span class="n">variables</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">klass</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>

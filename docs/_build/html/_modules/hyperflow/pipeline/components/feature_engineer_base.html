@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.components.feature_engineer_base &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.components.feature_engineer_base &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.components.feature_engineer_base</li>
+      <li>autoflow.pipeline.components.feature_engineer_base</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,23 +165,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.components.feature_engineer_base</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.pipeline.components.feature_engineer_base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.base</span> <span class="kn">import</span> <span class="n">HyperFlowComponent</span>
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">stack_Xs</span>
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.data</span> <span class="kn">import</span> <span class="n">densify</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.components.base</span> <span class="kn">import</span> <span class="n">AutoFlowComponent</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">stack_Xs</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.data</span> <span class="kn">import</span> <span class="n">densify</span>
 
 
-<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowFeatureEngineerAlgorithm</span><span class="p">(</span><span class="n">HyperFlowComponent</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowFeatureEngineerAlgorithm"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">AutoFlowFeatureEngineerAlgorithm</span><span class="p">(</span><span class="n">AutoFlowComponent</span><span class="p">):</span>
     <span class="n">need_y</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.fit_transform"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="AutoFlowFeatureEngineerAlgorithm.fit_transform"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.transform"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowFeatureEngineerAlgorithm.transform"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_or_trans</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_transform_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
@@ -214,10 +214,10 @@
             <span class="s2">&quot;X_test&quot;</span><span class="p">:</span> <span class="n">X_test</span><span class="p">,</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.before_trans_X"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.before_trans_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_trans_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowFeatureEngineerAlgorithm.before_trans_X"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm.before_trans_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_trans_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">X</span></div>
 
-<div class="viewcode-block" id="HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_X_to_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowFeatureEngineerAlgorithm.prepare_X_to_fit"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm.prepare_X_to_fit">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_X_to_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_y</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">stack_Xs</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

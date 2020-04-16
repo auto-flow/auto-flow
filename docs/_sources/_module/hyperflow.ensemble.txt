@@ -1,4 +1,4 @@
-hyperflow.ensemble package
+autoflow.ensemble package
 ==========================
 
 Subpackages
@@ -6,41 +6,41 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.ensemble.mean
-    hyperflow.ensemble.stack
-    hyperflow.ensemble.vote
+    autoflow.ensemble.mean
+    autoflow.ensemble.stack
+    autoflow.ensemble.vote
 
 Submodules
 ----------
 
-hyperflow.ensemble.base module
+autoflow.ensemble.base module
 ------------------------------
 
-.. automodule:: hyperflow.ensemble.base
+.. automodule:: autoflow.ensemble.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.ensemble.trained_data_fetcher module
+autoflow.ensemble.trained_data_fetcher module
 ----------------------------------------------
 
-.. automodule:: hyperflow.ensemble.trained_data_fetcher
+.. automodule:: autoflow.ensemble.trained_data_fetcher
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.ensemble.trials_fetcher module
+autoflow.ensemble.trials_fetcher module
 ----------------------------------------
 
-.. automodule:: hyperflow.ensemble.trials_fetcher
+.. automodule:: autoflow.ensemble.trials_fetcher
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.ensemble.utils module
+autoflow.ensemble.utils module
 -------------------------------
 
-.. automodule:: hyperflow.ensemble.utils
+.. automodule:: autoflow.ensemble.utils
     :members:
     :undoc-members:
     :show-inheritance:
@@ -49,7 +49,7 @@ hyperflow.ensemble.utils module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.ensemble
+.. automodule:: autoflow.ensemble
     :members:
     :undoc-members:
     :show-inheritance:

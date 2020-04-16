@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.config_space &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.config_space &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.config_space</li>
+      <li>autoflow.utils.config_space</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.config_space</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.config_space</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
@@ -174,11 +174,11 @@
 <span class="kn">from</span> <span class="nn">ConfigSpace</span> <span class="kn">import</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">CategoricalHyperparameter</span><span class="p">,</span> <span class="n">OrdinalHyperparameter</span><span class="p">,</span> <span class="n">Constant</span><span class="p">,</span> \
     <span class="n">UniformFloatHyperparameter</span><span class="p">,</span> <span class="n">UniformIntegerHyperparameter</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span><span class="n">PHASE2</span>
-<span class="kn">from</span> <span class="nn">hyperflow.hdl.smac</span> <span class="kn">import</span> <span class="n">_encode</span>
+<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span><span class="n">PHASE2</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl.smac</span> <span class="kn">import</span> <span class="n">_encode</span>
 
 
-<div class="viewcode-block" id="get_random_initial_configs"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.get_random_initial_configs">[docs]</a><span class="k">def</span> <span class="nf">get_random_initial_configs</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">n_configs</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_random_initial_configs"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.get_random_initial_configs">[docs]</a><span class="k">def</span> <span class="nf">get_random_initial_configs</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">n_configs</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]:</span>
     <span class="n">None_name</span> <span class="o">=</span> <span class="s2">&quot;None:NoneType&quot;</span>
     <span class="n">shps</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">shps</span><span class="p">)</span>
     <span class="n">shps</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
@@ -201,13 +201,13 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="replace_phps"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.replace_phps">[docs]</a><span class="k">def</span> <span class="nf">replace_phps</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="replace_phps"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.replace_phps">[docs]</a><span class="k">def</span> <span class="nf">replace_phps</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">hp</span> <span class="ow">in</span> <span class="n">shps</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">hp</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Constant&quot;</span> <span class="ow">and</span> <span class="n">hp</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
             <span class="n">hp</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_encode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_grid_initial_configs"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.get_grid_initial_configs">[docs]</a><span class="k">def</span> <span class="nf">get_grid_initial_configs</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">n_configs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">):</span>
+<div class="viewcode-block" id="get_grid_initial_configs"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.get_grid_initial_configs">[docs]</a><span class="k">def</span> <span class="nf">get_grid_initial_configs</span><span class="p">(</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="n">n_configs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">):</span>
     <span class="n">grid_phps</span> <span class="o">=</span> <span class="n">ConfigSpaceGrid</span><span class="p">(</span><span class="n">shps</span><span class="p">)</span>
     <span class="n">grid_configs</span> <span class="o">=</span> <span class="n">grid_phps</span><span class="o">.</span><span class="n">generate_grid</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">n_configs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -216,19 +216,19 @@
     <span class="k">return</span> <span class="n">grid_configs</span></div>
 
 
-<div class="viewcode-block" id="estimate_config_space_numbers"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.estimate_config_space_numbers">[docs]</a><span class="k">def</span> <span class="nf">estimate_config_space_numbers</span><span class="p">(</span><span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">):</span>
+<div class="viewcode-block" id="estimate_config_space_numbers"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.estimate_config_space_numbers">[docs]</a><span class="k">def</span> <span class="nf">estimate_config_space_numbers</span><span class="p">(</span><span class="n">cs</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">):</span>
     <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">cs</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
         <span class="n">result</span> <span class="o">*=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get_num_neighbors</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="ConfigSpaceGrid"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.ConfigSpaceGrid">[docs]</a><span class="k">class</span> <span class="nc">ConfigSpaceGrid</span><span class="p">:</span>
+<div class="viewcode-block" id="ConfigSpaceGrid"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.ConfigSpaceGrid">[docs]</a><span class="k">class</span> <span class="nc">ConfigSpaceGrid</span><span class="p">:</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration_space</span><span class="p">:</span> <span class="n">ConfigurationSpace</span><span class="p">,</span> <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span> <span class="o">=</span> <span class="n">configuration_space</span>
 
-<div class="viewcode-block" id="ConfigSpaceGrid.generate_grid"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.ConfigSpaceGrid.generate_grid">[docs]</a>    <span class="k">def</span> <span class="nf">generate_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="ConfigSpaceGrid.generate_grid"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.ConfigSpaceGrid.generate_grid">[docs]</a>    <span class="k">def</span> <span class="nf">generate_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                       <span class="n">num_steps_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -293,7 +293,7 @@
 
         <span class="k">return</span> <span class="n">checked_grid_pts</span></div>
 
-<div class="viewcode-block" id="ConfigSpaceGrid.get_value_set"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.ConfigSpaceGrid.get_value_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_value_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps_dict</span><span class="p">,</span> <span class="n">hp_name</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfigSpaceGrid.get_value_set"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.ConfigSpaceGrid.get_value_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_value_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps_dict</span><span class="p">,</span> <span class="n">hp_name</span><span class="p">):</span>
         <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space</span><span class="o">.</span><span class="n">get_hyperparameter</span><span class="p">(</span><span class="n">hp_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="p">(</span><span class="n">CategoricalHyperparameter</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">param</span><span class="o">.</span><span class="n">choices</span>
@@ -354,7 +354,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unknown hyperparameter type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">param</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ConfigSpaceGrid.get_cartesian_product"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.config_space.ConfigSpaceGrid.get_cartesian_product">[docs]</a>    <span class="k">def</span> <span class="nf">get_cartesian_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_sets</span><span class="p">,</span> <span class="n">hp_names</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfigSpaceGrid.get_cartesian_product"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.config_space.ConfigSpaceGrid.get_cartesian_product">[docs]</a>    <span class="k">def</span> <span class="nf">get_cartesian_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_sets</span><span class="p">,</span> <span class="n">hp_names</span><span class="p">):</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="kn">import</span> <span class="nn">itertools</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">value_sets</span><span class="p">)):</span>

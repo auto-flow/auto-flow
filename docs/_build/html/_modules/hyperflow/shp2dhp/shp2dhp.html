@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.shp2dhp.shp2dhp &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.shp2dhp.shp2dhp &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.shp2dhp.shp2dhp</li>
+      <li>autoflow.shp2dhp.shp2dhp</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,15 +165,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.shp2dhp.shp2dhp</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.shp2dhp.shp2dhp</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.hdl.smac</span> <span class="kn">import</span> <span class="n">_decode</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl.smac</span> <span class="kn">import</span> <span class="n">_decode</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
 
 
-<div class="viewcode-block" id="SHP2DHP"><a class="viewcode-back" href="../../../_module/hyperflow.shp2dhp.html#hyperflow.shp2dhp.shp2dhp.SHP2DHP">[docs]</a><span class="k">class</span> <span class="nc">SHP2DHP</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
-<div class="viewcode-block" id="SHP2DHP.set_kv"><a class="viewcode-back" href="../../../_module/hyperflow.shp2dhp.html#hyperflow.shp2dhp.shp2dhp.SHP2DHP.set_kv">[docs]</a>    <span class="k">def</span> <span class="nf">set_kv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SHP2DHP"><a class="viewcode-back" href="../../../_module/autoflow.shp2dhp.html#autoflow.shp2dhp.shp2dhp.SHP2DHP">[docs]</a><span class="k">class</span> <span class="nc">SHP2DHP</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="SHP2DHP.set_kv"><a class="viewcode-back" href="../../../_module/autoflow.shp2dhp.html#autoflow.shp2dhp.shp2dhp.SHP2DHP.set_kv">[docs]</a>    <span class="k">def</span> <span class="nf">set_kv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">dict_</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">key_path</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
@@ -186,7 +186,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tmp</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="SHP2DHP.split_key"><a class="viewcode-back" href="../../../_module/hyperflow.shp2dhp.html#hyperflow.shp2dhp.shp2dhp.SHP2DHP.split_key">[docs]</a>    <span class="k">def</span> <span class="nf">split_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;]&quot;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="SHP2DHP.split_key"><a class="viewcode-back" href="../../../_module/autoflow.shp2dhp.html#autoflow.shp2dhp.shp2dhp.SHP2DHP.split_key">[docs]</a>    <span class="k">def</span> <span class="nf">split_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;]&quot;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">L</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="n">stack</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>

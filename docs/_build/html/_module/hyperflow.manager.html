@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.manager package &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.manager package &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> HyperFlow
+            <a href="../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">HyperFlow</a>
+          <a href="../index.html">AutoFlow</a>
         
       </nav>
 
@@ -148,7 +148,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>hyperflow.manager package</li>
+      <li>autoflow.manager package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -167,17 +167,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="hyperflow-manager-package">
-<h1>hyperflow.manager package<a class="headerlink" href="#hyperflow-manager-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="autoflow-manager-package">
+<h1>autoflow.manager package<a class="headerlink" href="#autoflow-manager-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-hyperflow.manager.data_manager">
-<span id="hyperflow-manager-data-manager-module"></span><h2>hyperflow.manager.data_manager module<a class="headerlink" href="#module-hyperflow.manager.data_manager" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.manager.data_manager">
+<span id="autoflow-manager-data-manager-module"></span><h2>autoflow.manager.data_manager module<a class="headerlink" href="#module-autoflow.manager.data_manager" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.manager.data_manager.DataManager">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.manager.data_manager.</code><code class="sig-name descname">DataManager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="p">:</span> <span class="n">Union[pandas.core.frame.DataFrame, numpy.ndarray, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="p">:</span> <span class="n">Union[pandas.core.series.Series, numpy.ndarray, str, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="p">:</span> <span class="n">Union[pandas.core.frame.DataFrame, numpy.ndarray, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="p">:</span> <span class="n">Union[pandas.core.series.Series, numpy.ndarray, str, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">frozenset({})</span></em>, <em class="sig-param"><span class="n">column_descriptions</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Union<span class="p">[</span>List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">highR_nan_threshold</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></span> <span class="o">=</span> <span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.klass.StrSignatureMixin" title="hyperflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.utils.klass.StrSignatureMixin</span></code></a></p>
+<dt id="autoflow.manager.data_manager.DataManager">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.manager.data_manager.</code><code class="sig-name descname">DataManager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="p">:</span> <span class="n">Union[pandas.core.frame.DataFrame, numpy.ndarray, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="p">:</span> <span class="n">Union[pandas.core.series.Series, numpy.ndarray, str, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="p">:</span> <span class="n">Union[pandas.core.frame.DataFrame, numpy.ndarray, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="p">:</span> <span class="n">Union[pandas.core.series.Series, numpy.ndarray, str, None]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">frozenset({})</span></em>, <em class="sig-param"><span class="n">column_descriptions</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Union<span class="p">[</span>List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">highR_nan_threshold</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></span> <span class="o">=</span> <span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/data_manager.html#DataManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.data_manager.DataManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 <p>DataManager is a Dataset manager to store the pattern of dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -199,57 +199,57 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">cat</span></code>      - categorical features, such as [“a”, “b”, “c”].</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">num_nan</span></code>  - numerical features contains missing values. such as [1, 2, NaN].</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cat_nan</span></code>  - categorical features contains missing values. such as [“a”, “b”, NaN].</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">highR_nan</span></code>  - highly ratio NaN. You can find explain in <a class="reference internal" href="../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">lowR_nan</span></code>   - lowly ratio NaN. You can find explain in <a class="reference internal" href="../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">highR_cat</span></code>  - highly cardinality ratio categorical. You can find explain in <a class="reference internal" href="../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">lowR_cat</span></code>  -  lowly cardinality ratio categorical. You can find explain in <a class="reference internal" href="../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">highR_nan</span></code>  - highly ratio NaN. You can find explain in <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lowR_nan</span></code>   - lowly ratio NaN. You can find explain in <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">highR_cat</span></code>  - highly cardinality ratio categorical. You can find explain in <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lowR_cat</span></code>  -  lowly cardinality ratio categorical. You can find explain in <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>highR_nan_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – high ratio NaN threshold, you can find examples and practice in <a class="reference internal" href="../api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
+<li><p><strong>highR_nan_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – high ratio NaN threshold, you can find examples and practice in <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="hyperflow.manager.data_manager.DataManager.parse_column_descriptions">
-<code class="sig-name descname">parse_column_descriptions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">column_descriptions</span></em>, <em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span></em>, <em class="sig-param"><span class="n">X_test</span></em>, <em class="sig-param"><span class="n">y_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager.parse_column_descriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.parse_column_descriptions" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.data_manager.DataManager.parse_column_descriptions">
+<code class="sig-name descname">parse_column_descriptions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">column_descriptions</span></em>, <em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span></em>, <em class="sig-param"><span class="n">X_test</span></em>, <em class="sig-param"><span class="n">y_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/data_manager.html#DataManager.parse_column_descriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.data_manager.DataManager.parse_column_descriptions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.data_manager.DataManager.parse_feature_groups">
-<code class="sig-name descname">parse_feature_groups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager.parse_feature_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.parse_feature_groups" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.data_manager.DataManager.parse_feature_groups">
+<code class="sig-name descname">parse_feature_groups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/data_manager.html#DataManager.parse_feature_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.data_manager.DataManager.parse_feature_groups" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.data_manager.DataManager.process_X">
-<code class="sig-name descname">process_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager.process_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.process_X" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.data_manager.DataManager.process_X">
+<code class="sig-name descname">process_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/data_manager.html#DataManager.process_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.data_manager.DataManager.process_X" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.data_manager.DataManager.set_data">
-<code class="sig-name descname">set_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.set_data" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.data_manager.DataManager.set_data">
+<code class="sig-name descname">set_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/data_manager.html#DataManager.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.data_manager.DataManager.set_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.data_manager.DataManager.type_check">
-<code class="sig-name descname">type_check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/data_manager.html#DataManager.type_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.data_manager.DataManager.type_check" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.data_manager.DataManager.type_check">
+<code class="sig-name descname">type_check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/data_manager.html#DataManager.type_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.data_manager.DataManager.type_check" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.manager.resource_manager">
-<span id="hyperflow-manager-resource-manager-module"></span><h2>hyperflow.manager.resource_manager module<a class="headerlink" href="#module-hyperflow.manager.resource_manager" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.manager.resource_manager">
+<span id="autoflow-manager-resource-manager-module"></span><h2>autoflow.manager.resource_manager module<a class="headerlink" href="#module-autoflow.manager.resource_manager" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.manager.resource_manager.ResourceManager">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.manager.resource_manager.</code><code class="sig-name descname">ResourceManager</code><span class="sig-paren">(</span><em class="sig-param">store_path='~/hyperflow'</em>, <em class="sig-param">file_system='local'</em>, <em class="sig-param">file_system_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">db_type='sqlite'</em>, <em class="sig-param">db_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">redis_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">max_persistent_estimators=50</em>, <em class="sig-param">persistent_mode='fs'</em>, <em class="sig-param">compress_suffix='bz2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.klass.StrSignatureMixin" title="hyperflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.utils.klass.StrSignatureMixin</span></code></a></p>
+<dt id="autoflow.manager.resource_manager.ResourceManager">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.manager.resource_manager.</code><code class="sig-name descname">ResourceManager</code><span class="sig-paren">(</span><em class="sig-param">store_path='~/autoflow'</em>, <em class="sig-param">file_system='local'</em>, <em class="sig-param">file_system_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">db_type='sqlite'</em>, <em class="sig-param">db_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">redis_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">max_persistent_estimators=50</em>, <em class="sig-param">persistent_mode='fs'</em>, <em class="sig-param">compress_suffix='bz2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 <p><code class="docutils literal notranslate"><span class="pre">ResourceManager</span></code> is a class manager computer resources such like <code class="docutils literal notranslate"><span class="pre">file_system</span></code> and <code class="docutils literal notranslate"><span class="pre">data_base</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>store_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A path store files, such as metadata and model file and database file, which belong to HyperFlow.</p></li>
+<li><p><strong>store_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A path store files, such as metadata and model file and database file, which belong to AutoFlow.</p></li>
 <li><p><strong>file_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <p>Indicator-string about which file system or storage system will be used.</p>
 <dl class="simple">
 <dt>Available options list below:</dt><dd><ul>
@@ -293,210 +293,210 @@
 </dd>
 </dl>
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.clear_pid_list">
-<code class="sig-name descname">clear_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.clear_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.clear_pid_list" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.clear_pid_list">
+<code class="sig-name descname">clear_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.clear_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.clear_pid_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.close_experiments_table">
-<code class="sig-name descname">close_experiments_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_experiments_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.close_experiments_table">
+<code class="sig-name descname">close_experiments_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.close_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.close_experiments_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.close_hdls_table">
-<code class="sig-name descname">close_hdls_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_hdls_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.close_hdls_table">
+<code class="sig-name descname">close_hdls_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.close_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.close_hdls_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.close_redis">
-<code class="sig-name descname">close_redis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_redis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_redis" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.close_redis">
+<code class="sig-name descname">close_redis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.close_redis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.close_redis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.close_tasks_table">
-<code class="sig-name descname">close_tasks_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_tasks_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.close_tasks_table">
+<code class="sig-name descname">close_tasks_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.close_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.close_tasks_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.close_trials_table">
-<code class="sig-name descname">close_trials_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.close_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.close_trials_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.close_trials_table">
+<code class="sig-name descname">close_trials_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.close_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.close_trials_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.connect_redis">
-<code class="sig-name descname">connect_redis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.connect_redis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.connect_redis" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.connect_redis">
+<code class="sig-name descname">connect_redis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.connect_redis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.connect_redis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.current_tasks_db_name">
-<em class="property">property </em><code class="sig-name descname">current_tasks_db_name</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.current_tasks_db_name" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.current_tasks_db_name">
+<em class="property">property </em><code class="sig-name descname">current_tasks_db_name</code><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.current_tasks_db_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.delete_models">
-<code class="sig-name descname">delete_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.delete_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.delete_models" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.delete_models">
+<code class="sig-name descname">delete_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.delete_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.delete_models" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.estimate_new_id">
-<code class="sig-name descname">estimate_new_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">id_field</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.estimate_new_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.estimate_new_id" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.estimate_new_id">
+<code class="sig-name descname">estimate_new_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">id_field</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.estimate_new_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.estimate_new_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_best_k_trials">
-<code class="sig-name descname">get_best_k_trials</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_best_k_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_best_k_trials" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_best_k_trials">
+<code class="sig-name descname">get_best_k_trials</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_best_k_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_best_k_trials" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info">
-<code class="sig-name descname">get_ensemble_needed_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em>, <em class="sig-param"><span class="n">hdl_id</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.ml_task.MLTask" title="hyperflow.utils.ml_task.MLTask">hyperflow.utils.ml_task.MLTask</a><span class="p">, </span>Any<span class="p">, </span>Any<span class="p">]</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_ensemble_needed_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info">
+<code class="sig-name descname">get_ensemble_needed_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em>, <em class="sig-param"><span class="n">hdl_id</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#autoflow.utils.ml_task.MLTask" title="autoflow.utils.ml_task.MLTask">autoflow.utils.ml_task.MLTask</a><span class="p">, </span>Any<span class="p">, </span>Any<span class="p">]</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_ensemble_needed_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id">
-<code class="sig-name descname">get_experiment_id_by_task_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_experiment_id_by_task_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id">
+<code class="sig-name descname">get_experiment_id_by_task_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_experiment_id_by_task_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_experiments_model">
-<code class="sig-name descname">get_experiments_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_experiments_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_experiments_model" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_experiments_model">
+<code class="sig-name descname">get_experiments_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_experiments_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_experiments_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_hdls_model">
-<code class="sig-name descname">get_hdls_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_hdls_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_hdls_model" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_hdls_model">
+<code class="sig-name descname">get_hdls_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_hdls_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_hdls_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_pid_list">
-<code class="sig-name descname">get_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_pid_list" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_pid_list">
+<code class="sig-name descname">get_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_pid_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_tasks_model">
-<code class="sig-name descname">get_tasks_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_tasks_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_tasks_model" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_tasks_model">
+<code class="sig-name descname">get_tasks_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_tasks_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_tasks_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.get_trials_model">
-<code class="sig-name descname">get_trials_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.get_trials_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.get_trials_model" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.get_trials_model">
+<code class="sig-name descname">get_trials_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; peewee.Model<a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.get_trials_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.get_trials_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.init_experiments_table">
-<code class="sig-name descname">init_experiments_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_experiments_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.init_experiments_table">
+<code class="sig-name descname">init_experiments_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.init_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.init_experiments_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.init_hdls_table">
-<code class="sig-name descname">init_hdls_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_hdls_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.init_hdls_table">
+<code class="sig-name descname">init_hdls_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.init_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.init_hdls_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.init_tasks_table">
-<code class="sig-name descname">init_tasks_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_tasks_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.init_tasks_table">
+<code class="sig-name descname">init_tasks_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.init_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.init_tasks_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.init_trials_table">
-<code class="sig-name descname">init_trials_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.init_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.init_trials_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.init_trials_table">
+<code class="sig-name descname">init_trials_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.init_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.init_trials_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">
-<code class="sig-name descname">insert_to_experiments_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">general_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">current_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">hdl_constructors</span></em>, <em class="sig-param"><span class="n">hdl_constructor</span></em>, <em class="sig-param"><span class="n">raw_hdl</span></em>, <em class="sig-param"><span class="n">hdl</span></em>, <em class="sig-param"><span class="n">tuners</span></em>, <em class="sig-param"><span class="n">tuner</span></em>, <em class="sig-param"><span class="n">should_calc_all_metric</span></em>, <em class="sig-param"><span class="n">data_manager</span></em>, <em class="sig-param"><span class="n">column_descriptions</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">should_store_intermediate_result</span></em>, <em class="sig-param"><span class="n">fit_ensemble_params</span></em>, <em class="sig-param"><span class="n">additional_info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_experiments_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">
+<code class="sig-name descname">insert_to_experiments_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">general_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">current_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">hdl_constructors</span></em>, <em class="sig-param"><span class="n">hdl_constructor</span></em>, <em class="sig-param"><span class="n">raw_hdl</span></em>, <em class="sig-param"><span class="n">hdl</span></em>, <em class="sig-param"><span class="n">tuners</span></em>, <em class="sig-param"><span class="n">tuner</span></em>, <em class="sig-param"><span class="n">should_calc_all_metric</span></em>, <em class="sig-param"><span class="n">data_manager</span></em>, <em class="sig-param"><span class="n">column_descriptions</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">should_store_intermediate_result</span></em>, <em class="sig-param"><span class="n">fit_ensemble_params</span></em>, <em class="sig-param"><span class="n">additional_info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">
-<code class="sig-name descname">insert_to_hdls_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_hdls_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">
+<code class="sig-name descname">insert_to_hdls_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">
-<code class="sig-name descname">insert_to_tasks_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#hyperflow.manager.data_manager.DataManager" title="hyperflow.manager.data_manager.DataManager">hyperflow.manager.data_manager.DataManager</a></span></em>, <em class="sig-param"><span class="n">metric</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.metrics.html#hyperflow.metrics.Scorer" title="hyperflow.metrics.Scorer">hyperflow.metrics.Scorer</a></span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">specific_task_token</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_tasks_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">
+<code class="sig-name descname">insert_to_tasks_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager">autoflow.manager.data_manager.DataManager</a></span></em>, <em class="sig-param"><span class="n">metric</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.metrics.html#autoflow.metrics.Scorer" title="autoflow.metrics.Scorer">autoflow.metrics.Scorer</a></span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">specific_task_token</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.insert_to_trials_table">
-<code class="sig-name descname">insert_to_trials_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.insert_to_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.insert_to_trials_table" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_trials_table">
+<code class="sig-name descname">insert_to_trials_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_trials_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_trials_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.load_best_dhp">
-<code class="sig-name descname">load_best_dhp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_best_dhp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_best_dhp" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.load_best_dhp">
+<code class="sig-name descname">load_best_dhp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.load_best_dhp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.load_best_dhp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.load_best_estimator">
-<code class="sig-name descname">load_best_estimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ml_task</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.ml_task.MLTask" title="hyperflow.utils.ml_task.MLTask">hyperflow.utils.ml_task.MLTask</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_best_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_best_estimator" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.load_best_estimator">
+<code class="sig-name descname">load_best_estimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ml_task</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.utils.html#autoflow.utils.ml_task.MLTask" title="autoflow.utils.ml_task.MLTask">autoflow.utils.ml_task.MLTask</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.load_best_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.load_best_estimator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id">
-<code class="sig-name descname">load_data_manager_by_experiment_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_data_manager_by_experiment_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id">
+<code class="sig-name descname">load_data_manager_by_experiment_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.load_data_manager_by_experiment_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.load_estimators_in_trials">
-<code class="sig-name descname">load_estimators_in_trials</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trials</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">, </span>Tuple<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">, </span>List<span class="p">, </span>List<span class="p">]</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.load_estimators_in_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.load_estimators_in_trials" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.load_estimators_in_trials">
+<code class="sig-name descname">load_estimators_in_trials</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trials</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">, </span>Tuple<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">, </span>List<span class="p">, </span>List<span class="p">]</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.load_estimators_in_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.load_estimators_in_trials" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.meta_records_db_name">
-<em class="property">property </em><code class="sig-name descname">meta_records_db_name</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.meta_records_db_name" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.meta_records_db_name">
+<em class="property">property </em><code class="sig-name descname">meta_records_db_name</code><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.meta_records_db_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">
-<code class="sig-name descname">persistent_evaluated_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">trial_id</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.persistent_evaluated_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.persistent_evaluated_model" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">
+<code class="sig-name descname">persistent_evaluated_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">trial_id</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.persistent_evaluated_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.push_pid_list">
-<code class="sig-name descname">push_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.push_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.push_pid_list" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.push_pid_list">
+<code class="sig-name descname">push_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.push_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.push_pid_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.redis_delete">
-<code class="sig-name descname">redis_delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.redis_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.redis_delete" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.redis_delete">
+<code class="sig-name descname">redis_delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.redis_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.redis_delete" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.redis_get">
-<code class="sig-name descname">redis_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.redis_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.redis_get" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.redis_get">
+<code class="sig-name descname">redis_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.redis_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.redis_get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.redis_set">
-<code class="sig-name descname">redis_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">ex</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">px</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">xx</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.redis_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.redis_set" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.redis_set">
+<code class="sig-name descname">redis_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">ex</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">px</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nx</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">xx</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.redis_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.redis_set" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.runhistory_db_params">
-<em class="property">property </em><code class="sig-name descname">runhistory_db_params</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.runhistory_db_params" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.runhistory_db_params">
+<em class="property">property </em><code class="sig-name descname">runhistory_db_params</code><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.runhistory_db_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.runhistory_table_name">
-<em class="property">property </em><code class="sig-name descname">runhistory_table_name</code><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.runhistory_table_name" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.runhistory_table_name">
+<em class="property">property </em><code class="sig-name descname">runhistory_table_name</code><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.runhistory_table_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.set_is_master">
-<code class="sig-name descname">set_is_master</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">is_master</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.set_is_master"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.set_is_master" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.set_is_master">
+<code class="sig-name descname">set_is_master</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">is_master</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.set_is_master"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.set_is_master" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.manager.resource_manager.ResourceManager.update_db_params">
-<code class="sig-name descname">update_db_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">database</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/manager/resource_manager.html#ResourceManager.update_db_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.manager.resource_manager.ResourceManager.update_db_params" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.update_db_params">
+<code class="sig-name descname">update_db_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">database</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.update_db_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.update_db_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.manager">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.manager" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.manager">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow.manager" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

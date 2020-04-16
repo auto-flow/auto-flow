@@ -1,4 +1,4 @@
-hyperflow.hdl package
+autoflow.hdl package
 =====================
 
 Subpackages
@@ -6,23 +6,23 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.hdl.smac
+    autoflow.hdl.smac
 
 Submodules
 ----------
 
-hyperflow.hdl.hdl_constructor module
+autoflow.hdl.hdl_constructor module
 ------------------------------------
 
-.. automodule:: hyperflow.hdl.hdl_constructor
+.. automodule:: autoflow.hdl.hdl_constructor
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.hdl.utils module
+autoflow.hdl.utils module
 --------------------------
 
-.. automodule:: hyperflow.hdl.utils
+.. automodule:: autoflow.hdl.utils
     :members:
     :undoc-members:
     :show-inheritance:
@@ -31,7 +31,7 @@ hyperflow.hdl.utils module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.hdl
+.. automodule:: autoflow.hdl
     :members:
     :undoc-members:
     :show-inheritance:

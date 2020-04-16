@@ -25,12 +25,12 @@ Except the columns that cannot provide entity specific properties, like ``id``,
 the remaining columns are called ``features``.
 
 .. note::
-    You can find ``column_descriptions``'s definition in :class:`hyperflow.manager.data_manager.DataManager`
+    You can find ``column_descriptions``'s definition in :class:`autoflow.manager.data_manager.DataManager`
 
 If some ``features`` have similar properties, they are containing in a same ``feature group``.
 
 .. note::
-    You can find some ``feature group``'s examples and practices in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+    You can find some ``feature group``'s examples and practices in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
 
 
 nan
@@ -169,7 +169,7 @@ Instance In Titanic
 You may be curious about the ``workflow space`` picture above, want to know how it work.
 Let me introduce the processing details step by step.
 
-**First step**, data manager(:class:`hyperflow.manager.data_manager.DataManager`) split raw data into three
+**First step**, data manager(:class:`autoflow.manager.data_manager.DataManager`) split raw data into three
 ``feature group``: :ref:`nan`, :ref:`highR_nan`, :ref:`cat` and :ref:`num`. like this:
 
 .. csv-table:: First Step : Split By Data Manager

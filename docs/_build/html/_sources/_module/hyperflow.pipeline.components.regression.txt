@@ -1,125 +1,125 @@
-hyperflow.pipeline.components.regression package
+autoflow.pipeline.components.regression package
 ================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.regression.adaboost module
+autoflow.pipeline.components.regression.adaboost module
 --------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.adaboost
+.. automodule:: autoflow.pipeline.components.regression.adaboost
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.ard_regression module
+autoflow.pipeline.components.regression.ard_regression module
 --------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.ard_regression
+.. automodule:: autoflow.pipeline.components.regression.ard_regression
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.bayesian_ridge module
+autoflow.pipeline.components.regression.bayesian_ridge module
 --------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.bayesian_ridge
+.. automodule:: autoflow.pipeline.components.regression.bayesian_ridge
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.catboost module
+autoflow.pipeline.components.regression.catboost module
 --------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.catboost
+.. automodule:: autoflow.pipeline.components.regression.catboost
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.decision_tree module
+autoflow.pipeline.components.regression.decision_tree module
 -------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.decision_tree
+.. automodule:: autoflow.pipeline.components.regression.decision_tree
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.elasticnet module
+autoflow.pipeline.components.regression.elasticnet module
 ----------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.elasticnet
+.. automodule:: autoflow.pipeline.components.regression.elasticnet
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.extra_trees module
+autoflow.pipeline.components.regression.extra_trees module
 -----------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.extra_trees
+.. automodule:: autoflow.pipeline.components.regression.extra_trees
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.gaussian_process module
+autoflow.pipeline.components.regression.gaussian_process module
 ----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.gaussian_process
+.. automodule:: autoflow.pipeline.components.regression.gaussian_process
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.gradient_boosting module
+autoflow.pipeline.components.regression.gradient_boosting module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.gradient_boosting
+.. automodule:: autoflow.pipeline.components.regression.gradient_boosting
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.k_nearest_neighbors module
+autoflow.pipeline.components.regression.k_nearest_neighbors module
 -------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.k_nearest_neighbors
+.. automodule:: autoflow.pipeline.components.regression.k_nearest_neighbors
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.kernel_ridge module
+autoflow.pipeline.components.regression.kernel_ridge module
 ------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.kernel_ridge
+.. automodule:: autoflow.pipeline.components.regression.kernel_ridge
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.liblinear_svr module
+autoflow.pipeline.components.regression.liblinear_svr module
 -------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.liblinear_svr
+.. automodule:: autoflow.pipeline.components.regression.liblinear_svr
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.lightgbm module
+autoflow.pipeline.components.regression.lightgbm module
 --------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.lightgbm
+.. automodule:: autoflow.pipeline.components.regression.lightgbm
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.random_forest module
+autoflow.pipeline.components.regression.random_forest module
 -------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.random_forest
+.. automodule:: autoflow.pipeline.components.regression.random_forest
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.regression.sgd module
+autoflow.pipeline.components.regression.sgd module
 ---------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.regression.sgd
+.. automodule:: autoflow.pipeline.components.regression.sgd
     :members:
     :undoc-members:
     :show-inheritance:
@@ -128,7 +128,7 @@ hyperflow.pipeline.components.regression.sgd module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.regression
+.. automodule:: autoflow.pipeline.components.regression
     :members:
     :undoc-members:
     :show-inheritance:

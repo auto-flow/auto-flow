@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.manager.data_manager &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.manager.data_manager &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.manager.data_manager</li>
+      <li>autoflow.manager.data_manager</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.manager.data_manager</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.manager.data_manager</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- encoding: utf-8 -*-</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">List</span>
@@ -173,16 +173,16 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">stack_Xs</span>
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.data</span> <span class="kn">import</span> <span class="n">is_nan</span><span class="p">,</span> <span class="n">is_cat</span><span class="p">,</span> <span class="n">is_highR_nan</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.dataframe</span> <span class="kn">import</span> <span class="n">pop_if_exists</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span><span class="p">,</span> <span class="n">get_ml_task_from_y</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.components.utils</span> <span class="kn">import</span> <span class="n">stack_Xs</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.data</span> <span class="kn">import</span> <span class="n">is_nan</span><span class="p">,</span> <span class="n">is_cat</span><span class="p">,</span> <span class="n">is_highR_nan</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.dataframe</span> <span class="kn">import</span> <span class="n">pop_if_exists</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span><span class="p">,</span> <span class="n">get_ml_task_from_y</span>
 
 
-<div class="viewcode-block" id="DataManager"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager">[docs]</a><span class="k">class</span> <span class="nc">DataManager</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="DataManager"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager">[docs]</a><span class="k">class</span> <span class="nc">DataManager</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    DataManager is a Dataset manager to store the pattern of dataset.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -219,13 +219,13 @@
 <span class="sd">                * ``cat``      - categorical features, such as [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;].</span>
 <span class="sd">                * ``num_nan``  - numerical features contains missing values. such as [1, 2, NaN].</span>
 <span class="sd">                * ``cat_nan``  - categorical features contains missing values. such as [&quot;a&quot;, &quot;b&quot;, NaN].</span>
-<span class="sd">                * ``highR_nan``  - highly ratio NaN. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
-<span class="sd">                * ``lowR_nan``   - lowly ratio NaN. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
-<span class="sd">                * ``highR_cat``  - highly cardinality ratio categorical. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
-<span class="sd">                * ``lowR_cat``  -  lowly cardinality ratio categorical. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">                * ``highR_nan``  - highly ratio NaN. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">                * ``lowR_nan``   - lowly ratio NaN. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">                * ``highR_cat``  - highly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">                * ``lowR_cat``  -  lowly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
 
 <span class="sd">        highR_nan_threshold: float</span>
-<span class="sd">            high ratio NaN threshold, you can find examples and practice in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">            high ratio NaN threshold, you can find examples and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">dataset_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_metadata</span><span class="p">)</span>
@@ -257,7 +257,7 @@
                              <span class="s1">&#39;datapoints, but have </span><span class="si">%d</span><span class="s1"> and </span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                   <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
-<div class="viewcode-block" id="DataManager.parse_feature_groups"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager.parse_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">parse_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<div class="viewcode-block" id="DataManager.parse_feature_groups"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager.parse_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">parse_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_nan</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">is_highR_nan</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">highR_nan_threshold</span><span class="p">):</span>
                 <span class="k">return</span> <span class="s2">&quot;highR_nan&quot;</span>
@@ -268,7 +268,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;num&quot;</span></div>
 
-<div class="viewcode-block" id="DataManager.type_check"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager.type_check">[docs]</a>    <span class="k">def</span> <span class="nf">type_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="DataManager.type_check"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager.type_check">[docs]</a>    <span class="k">def</span> <span class="nf">type_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">):</span>
             <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -281,7 +281,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">return</span> <span class="n">X</span></div>
 
-<div class="viewcode-block" id="DataManager.parse_column_descriptions"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager.parse_column_descriptions">[docs]</a>    <span class="k">def</span> <span class="nf">parse_column_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
+<div class="viewcode-block" id="DataManager.parse_column_descriptions"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager.parse_column_descriptions">[docs]</a>    <span class="k">def</span> <span class="nf">parse_column_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
         <span class="c1"># todo: 校验X是否存在重名列</span>
         <span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_check</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
         <span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_check</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
@@ -355,7 +355,7 @@
         <span class="n">X_train</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">feature_groups</span><span class="p">,</span> <span class="n">column2feature_groups</span></div>
 
-<div class="viewcode-block" id="DataManager.process_X"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager.process_X">[docs]</a>    <span class="k">def</span> <span class="nf">process_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="DataManager.process_X"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager.process_X">[docs]</a>    <span class="k">def</span> <span class="nf">process_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_check</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -369,7 +369,7 @@
         <span class="n">X</span> <span class="o">=</span> <span class="n">GenericDataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">feature_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">X</span></div>
 
-<div class="viewcode-block" id="DataManager.set_data"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DataManager.set_data"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_X</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_X</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span>

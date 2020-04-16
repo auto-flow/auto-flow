@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Examples &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>Examples &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> HyperFlow
+            <a href="index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -123,7 +123,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">HyperFlow</a>
+          <a href="index.html">AutoFlow</a>
         
       </nav>
 
@@ -188,7 +188,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow</span> <span class="kn">import</span> <span class="n">HyperFlowClassifier</span>
+<span class="kn">from</span> <span class="nn">autoflow</span> <span class="kn">import</span> <span class="n">AutoFlowClassifier</span>
 </pre></div>
 </div>
 <p><strong>Second step</strong>, load data from CSV.</p>
@@ -196,22 +196,22 @@
 <span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/test_classification.csv&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Third step</strong>, define a <code class="docutils literal notranslate"><span class="pre">HyperFlowClassifier</span></code>.</p>
+<p><strong>Third step</strong>, define a <code class="docutils literal notranslate"><span class="pre">AutoFlowClassifier</span></code>.</p>
 <dl class="simple">
 <dt>Here are some key parameters:</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">initial_runs</span></code>  are totally random search, to provide experience for SMAC algorithm.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">run_limit</span></code> is the maximum number of runs.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> defines how many search processes are started.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">included_classifiers</span></code> restrict the search space . In here <code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> is the only classifier that needs to be selected. You can use <code class="docutils literal notranslate"><span class="pre">included_classifiers=[&quot;lightgbm&quot;,</span> <span class="pre">&quot;random_forest&quot;]</span></code> to define other selected classifiers. You can find all classifiers HyperFlow supported in <a class="reference internal" href="api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">included_classifiers</span></code> restrict the search space . In here <code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> is the only classifier that needs to be selected. You can use <code class="docutils literal notranslate"><span class="pre">included_classifiers=[&quot;lightgbm&quot;,</span> <span class="pre">&quot;random_forest&quot;]</span></code> to define other selected classifiers. You can find all classifiers AutoFlow supported in <a class="reference internal" href="api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">per_run_time_limit</span></code> restrict the run time. if a trial during 60 seconds, it is expired, should be killed.</p></li>
 </ul>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">HyperFlowClassifier</span><span class="p">(</span><span class="n">initial_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">included_classifiers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lightgbm&quot;</span><span class="p">],</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">AutoFlowClassifier</span><span class="p">(</span><span class="n">initial_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">included_classifiers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lightgbm&quot;</span><span class="p">],</span>
                                        <span class="n">per_run_time_limit</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Fifth step</strong>, define columns descriptions, you can find .You can find the full definition in <a class="reference internal" href="_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager" title="hyperflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.manager.data_manager.DataManager</span></code></a> .</p>
+<p><strong>Fifth step</strong>, define columns descriptions, you can find .You can find the full definition in <a class="reference internal" href="_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a> .</p>
 <dl class="simple">
 <dt>Here are some columns descriptions:</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> is a column name means unique descriptor of each rows.</p></li>
@@ -227,7 +227,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>Sixth step</strong>, auto do fitting. you can find full document in <a class="reference internal" href="_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.fit" title="hyperflow.estimator.base.HyperFlowEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hyperflow.estimator.base.HyperFlowEstimator.fit()</span></code></a> .</p>
+<p><strong>Sixth step</strong>, auto do fitting. you can find full document in <a class="reference internal" href="_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit" title="autoflow.estimator.base.AutoFlowEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator.fit()</span></code></a> .</p>
 <p>Passing data params <code class="docutils literal notranslate"><span class="pre">train_df</span></code>, <code class="docutils literal notranslate"><span class="pre">test_df</span></code> and <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code> to classifier.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">fit_ensemble_params</span></code> is “auto” or True, the top 10 models will be integrated by stacking ensemble.</p>
 <p><code class="docutils literal notranslate"><span class="pre">splitter</span></code> is train-valid-dataset splitter,now is set to <code class="docutils literal notranslate"><span class="pre">KFold(3,</span> <span class="pre">True,</span> <span class="pre">42)</span></code> to do 3-Fold Cross-Validation.</p>
@@ -240,18 +240,18 @@
 </pre></div>
 </div>
 <p><strong>Finally</strong>, the best model will be serialize and store in local file system for subsequent use.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">trained_pipeline</span><span class="p">,</span> <span class="s2">&quot;hyperflow_classification.bz2&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">trained_pipeline</span><span class="p">,</span> <span class="s2">&quot;autoflow_classification.bz2&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Additionally</strong>, if you want to see what the workflow HyperFlow is searching,
-you can use <code class="xref py py-meth docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor#draw_workflow_space()</span></code> to visualize.</p>
+<p><strong>Additionally</strong>, if you want to see what the workflow AutoFlow is searching,
+you can use <code class="xref py py-meth docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor#draw_workflow_space()</span></code> to visualize.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hdl_constructor</span> <span class="o">=</span> <span class="n">trained_pipeline</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hdl_constructor</span><span class="o">.</span><span class="n">draw_workflow_space</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/workflow_space.png" src="_images/workflow_space.png" />
 <p><strong>For Reproducibility purpose</strong>, you can load serialized model from file system.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">predict_pipeline</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;hyperflow_classification.bz2&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">predict_pipeline</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;autoflow_classification.bz2&quot;</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">predict_pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_df</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -269,28 +269,28 @@ you can use <code class="xref py py-meth docutils literal notranslate"><span cla
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow</span> <span class="kn">import</span> <span class="n">HyperFlowRegressor</span>
+<span class="kn">from</span> <span class="nn">autoflow</span> <span class="kn">import</span> <span class="n">AutoFlowRegressor</span>
 
 <span class="n">train_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/train_regression.csv&quot;</span><span class="p">)</span>
 <span class="n">train_df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/test_regression.csv&quot;</span><span class="p">)</span>
 <span class="n">test_df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">HyperFlowRegressor</span><span class="p">(</span><span class="n">initial_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">included_regressors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lightgbm&quot;</span><span class="p">],</span>
+<span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">AutoFlowRegressor</span><span class="p">(</span><span class="n">initial_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">included_regressors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lightgbm&quot;</span><span class="p">],</span>
                                       <span class="n">per_run_time_limit</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 <span class="n">column_descriptions</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Id&quot;</span><span class="p">,</span>
     <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;SalePrice&quot;</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;hyperflow_regression.bz2&quot;</span><span class="p">):</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;autoflow_regression.bz2&quot;</span><span class="p">):</span>
     <span class="n">trained_pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
         <span class="n">X_train</span><span class="o">=</span><span class="n">train_df</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">test_df</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="o">=</span><span class="n">column_descriptions</span><span class="p">,</span>
         <span class="n">splitter</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">fit_ensemble_params</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
-    <span class="c1"># if you want to see the workflow HyperFlow is searching, you can use `draw_workflow_space` to visualize</span>
+    <span class="c1"># if you want to see the workflow AutoFlow is searching, you can use `draw_workflow_space` to visualize</span>
     <span class="n">hdl_constructor</span> <span class="o">=</span> <span class="n">trained_pipeline</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">hdl_constructor</span><span class="o">.</span><span class="n">draw_workflow_space</span><span class="p">()</span>
-    <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">trained_pipeline</span><span class="p">,</span> <span class="s2">&quot;hyperflow_regression.bz2&quot;</span><span class="p">)</span>
-<span class="n">predict_pipeline</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;hyperflow_regression.bz2&quot;</span><span class="p">)</span>
+    <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">trained_pipeline</span><span class="p">,</span> <span class="s2">&quot;autoflow_regression.bz2&quot;</span><span class="p">)</span>
+<span class="n">predict_pipeline</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;autoflow_regression.bz2&quot;</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">predict_pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_df</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>

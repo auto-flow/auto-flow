@@ -3,8 +3,8 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 
-from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from hyperflow.manager.data_manager import DataManager
+from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.manager.data_manager import DataManager
 import numpy as np
 
 data_manager = DataManager(X_train=np.random.rand(3,3), y_train=np.arange(3))

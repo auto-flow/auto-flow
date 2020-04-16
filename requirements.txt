@@ -3,7 +3,7 @@ numpy==1.18.1
 pandas==1.0.1
 scipy==1.3.0
 pyrfr==0.8.0
-git+https://github.com/Hyper-Flow/ConfigSpace.git
+ConfigSpace==0.4.12
 joblib==0.13.2
 mlxtend==0.17.0
 category_encoders==2.0.0

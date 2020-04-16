@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from hyperflow.pipeline.dataframe import GenericDataFrame
+from autoflow.pipeline.dataframe import GenericDataFrame
 
 
 class TestGeneralDataFrame(unittest.TestCase):

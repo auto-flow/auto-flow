@@ -6,7 +6,7 @@ Installation
 System Requirements
 ------------
 
-HyperFlow has the following system requirements:
+AutoFlow has the following system requirements:
 
   * Linux operating system (for example Ubuntu),
   * Python (>=3.6).
@@ -34,12 +34,12 @@ prevent compilation errors:
 
 Installation from pypi
 ----------------------
-To install HyperFlow from pypi, please use the following command on the command
+To install AutoFlow from pypi, please use the following command on the command
 line:
 
 .. code-block:: bash
 
-    pip install HyperFlow
+    pip install AutoFlow
     
 If you want to install it in the user space (e.g., because of missing
 permissions), please add the option :code:`--user` or create a virtualenv.
@@ -48,11 +48,11 @@ permissions), please add the option :code:`--user` or create a virtualenv.
 
 Manual Installation
 -------------------
-To install HyperFlow from command line, please type the following commands on the
+To install AutoFlow from command line, please type the following commands on the
 command line:
 
 .. code-block:: bash
 
-    git clone https://github.com/Hyper-Flow/HyperFlow.git
-    cd HyperFlow
+    git clone https://github.com/Hyper-Flow/AutoFlow.git
+    cd AutoFlow
     python setup.py install

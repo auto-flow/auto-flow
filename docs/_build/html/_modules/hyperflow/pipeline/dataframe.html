@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.dataframe &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.dataframe &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.dataframe</li>
+      <li>autoflow.pipeline.dataframe</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.dataframe</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.pipeline.dataframe</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -174,12 +174,12 @@
 <span class="kn">from</span> <span class="nn">pandas._typing</span> <span class="kn">import</span> <span class="n">FrameOrSeries</span>
 <span class="kn">from</span> <span class="nn">pandas.core.generic</span> <span class="kn">import</span> <span class="n">bool_t</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="GenericDataFrame"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame">[docs]</a><span class="k">class</span> <span class="nc">GenericDataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericDataFrame"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame">[docs]</a><span class="k">class</span> <span class="nc">GenericDataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># self.</span>
         <span class="k">if</span> <span class="s2">&quot;feature_groups&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -208,16 +208,16 @@
     <span class="k">def</span> <span class="nf">columns_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;columns_metadata&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="GenericDataFrame.set_feature_groups"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.set_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">set_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_groups</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericDataFrame.set_feature_groups"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.set_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">set_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_groups</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;feature_groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_groups</span></div>
 
-<div class="viewcode-block" id="GenericDataFrame.set_columns_metadata"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.set_columns_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_columns_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericDataFrame.set_columns_metadata"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.set_columns_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_columns_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;columns_metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns_metadata</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">GenericDataFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;feature_groups: &quot;</span><span class="o">+</span><span class="nb">repr</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">))</span>
 
-<div class="viewcode-block" id="GenericDataFrame.filter_feature_groups"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.filter_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">filter_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">isin</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>  <span class="c1"># , inplace=False</span>
+<div class="viewcode-block" id="GenericDataFrame.filter_feature_groups"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.filter_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">filter_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">isin</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>  <span class="c1"># , inplace=False</span>
         <span class="k">if</span> <span class="n">feature_group</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>  <span class="c1"># todo 用正则表达式判断</span>
             <span class="n">feature_group</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="c1"># 用于过滤feature_groups</span>
@@ -237,7 +237,7 @@
         <span class="n">loc_df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">loc</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">GenericDataFrame</span><span class="p">(</span><span class="n">loc_df</span><span class="p">,</span> <span class="n">feature_groups</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">columns_metadata</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GenericDataFrame.concat_two"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.concat_two">[docs]</a>    <span class="k">def</span> <span class="nf">concat_two</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericDataFrame.concat_two"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.concat_two">[docs]</a>    <span class="k">def</span> <span class="nf">concat_two</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">)</span>
 
@@ -247,7 +247,7 @@
         <span class="n">new_columns_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="o">.</span><span class="n">columns_metadata</span><span class="p">,</span> <span class="n">df2</span><span class="o">.</span><span class="n">columns_metadata</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">GenericDataFrame</span><span class="p">(</span><span class="n">new_df</span><span class="p">,</span> <span class="n">feature_groups</span><span class="o">=</span><span class="n">new_feature_groups</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="o">=</span><span class="n">new_columns_metadata</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GenericDataFrame.replace_feature_groups"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.replace_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">replace_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_feature_group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
+<div class="viewcode-block" id="GenericDataFrame.replace_feature_groups"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.replace_feature_groups">[docs]</a>    <span class="k">def</span> <span class="nf">replace_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_feature_group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
                                <span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
                                <span class="n">new_feature_group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
                                <span class="n">new_columns_metadata</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -283,7 +283,7 @@
         <span class="n">new_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">deleted_df</span><span class="o">.</span><span class="n">index</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_two</span><span class="p">(</span><span class="n">deleted_df</span><span class="p">,</span> <span class="n">new_df</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GenericDataFrame.split"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;iloc&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericDataFrame.split"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;iloc&quot;</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;loc&quot;</span><span class="p">,</span> <span class="s2">&quot;iloc&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;iloc&quot;</span><span class="p">:</span>
@@ -293,7 +293,7 @@
                 <span class="k">yield</span> <span class="n">GenericDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:],</span> <span class="n">feature_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">,</span>
                                        <span class="n">columns_metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_metadata</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GenericDataFrame.copy"><a class="viewcode-back" href="../../../_module/hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">FrameOrSeries</span><span class="p">,</span> <span class="n">deep</span><span class="p">:</span> <span class="n">bool_t</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FrameOrSeries</span><span class="p">:</span>
+<div class="viewcode-block" id="GenericDataFrame.copy"><a class="viewcode-back" href="../../../_module/autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">FrameOrSeries</span><span class="p">,</span> <span class="n">deep</span><span class="p">:</span> <span class="n">bool_t</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FrameOrSeries</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">GenericDataFrame</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">GenericDataFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="n">deep</span><span class="p">),</span> <span class="n">feature_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_groups</span><span class="p">,</span>
                                 <span class="n">columns_metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_metadata</span><span class="p">)</span></div>
 
@@ -314,7 +314,7 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">logging</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;/home/tqc/PycharmProjects/HyperFlow/examples/classification/train_classification.csv&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;/home/tqc/PycharmProjects/AutoFlow/examples/classification/train_classification.csv&quot;</span><span class="p">)</span>
     <span class="n">suffix</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
     <span class="n">feature_groups</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">suffix</span>
 

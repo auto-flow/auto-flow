@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.ensemble.stack.regressor &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.ensemble.stack.regressor &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.ensemble.stack.regressor</li>
+      <li>autoflow.ensemble.stack.regressor</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,18 +165,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.ensemble.stack.regressor</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.ensemble.stack.regressor</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">RegressorMixin</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.ensemble.stack.base</span> <span class="kn">import</span> <span class="n">StackEstimator</span>
+<span class="kn">from</span> <span class="nn">autoflow.ensemble.stack.base</span> <span class="kn">import</span> <span class="n">StackEstimator</span>
 
 <span class="n">__all__</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;StackRegressor&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="StackRegressor"><a class="viewcode-back" href="../../../../_module/hyperflow.ensemble.stack.html#hyperflow.ensemble.stack.regressor.StackRegressor">[docs]</a><span class="k">class</span> <span class="nc">StackRegressor</span><span class="p">(</span><span class="n">StackEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="StackRegressor"><a class="viewcode-back" href="../../../../_module/autoflow.ensemble.stack.html#autoflow.ensemble.stack.regressor.StackRegressor">[docs]</a><span class="k">class</span> <span class="nc">StackRegressor</span><span class="p">(</span><span class="n">StackEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
     <span class="n">ml_task</span> <span class="o">=</span> <span class="s2">&quot;regression&quot;</span>
 
-<div class="viewcode-block" id="StackRegressor.predict_meta_features"><a class="viewcode-back" href="../../../../_module/hyperflow.ensemble.stack.html#hyperflow.ensemble.stack.regressor.StackRegressor.predict_meta_features">[docs]</a>    <span class="k">def</span> <span class="nf">predict_meta_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">is_train</span><span class="p">):</span>
+<div class="viewcode-block" id="StackRegressor.predict_meta_features"><a class="viewcode-back" href="../../../../_module/autoflow.ensemble.stack.html#autoflow.ensemble.stack.regressor.StackRegressor.predict_meta_features">[docs]</a>    <span class="k">def</span> <span class="nf">predict_meta_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">is_train</span><span class="p">):</span>
 
         <span class="n">per_model_preds</span> <span class="o">=</span> <span class="p">[]</span>
 

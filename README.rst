@@ -1,8 +1,8 @@
 ==========
-HyperFlow
+AutoFlow
 ==========
 
-``HyperFlow`` : **Automatic machine learning workflow modeling platform**
+``AutoFlow`` : **Automatic machine learning workflow modeling platform**
 
 
 Introduction
@@ -32,7 +32,7 @@ In other words, it can implement AutoML for tabular data.
 Documentation
 --------------
 
-The documentation can be found `here <https://hyper-flow.github.io/HyperFlow/>`_.
+The documentation can be found `here <https://hyper-flow.github.io/AutoFlow/>`_.
 
 Installation
 --------------
@@ -59,14 +59,14 @@ On Arch Linux (or any distribution with swig4 as default implementation):
     pacman -Syu swig3
     ln -s /usr/bin/swig-3 /usr/bin/swig
 
-HyperFlow requires `Python <https://www.python.org/>`_ 3.6 or higher.
+AutoFlow requires `Python <https://www.python.org/>`_ 3.6 or higher.
 
 Installation via pip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-    pip install HyperFlow
+    pip install auto-flow
 
 
 Manual Installation
@@ -74,7 +74,7 @@ Manual Installation
 
 ::
 
-    git clone https://github.com/Hyper-Flow/HyperFlow.git && cd HyperFlow
+    git clone https://github.com/auto-flow/autoflow.git && cd autoflow
     python setup.py install
 
 Quick Start
@@ -83,7 +83,7 @@ Quick Start
 `Titanic <https://www.kaggle.com/c/titanic>`_ is perhaps the most familiar machine learning task for data scientists. 
 For tutorial purposes, you can find titanic dataset in ``examples/data/train_classification.csv`` and
 ``examples/data/test_classification.csv`` . 
-You can use HyperFlow to finish this ML task instead of manually exploring all the features of the dataset. DO IT !
+You can use AutoFlow to finish this ML task instead of manually exploring all the features of the dataset. DO IT !
 
 .. code-block:: bash
 
@@ -97,7 +97,7 @@ You can use HyperFlow to finish this ML task instead of manually exploring all t
     import pandas as pd
     from sklearn.model_selection import KFold
 
-    from hyperflow import HyperFlowClassifier
+    from autoflow import AutoFlowClassifier
 
     # load data from csv file
     train_df = pd.read_csv("../data/train_classification.csv")
@@ -107,7 +107,7 @@ You can use HyperFlow to finish this ML task instead of manually exploring all t
     # n_jobs        -- defines how many search processes are started.
     # included_classifiers -- restrict the search space . lightgbm is the only classifier that needs to be selected
     # per_run_time_limit -- restrict the run time. if a trial during 60 seconds, it is expired, should be killed.
-    trained_pipeline = HyperFlowClassifier(initial_runs=5, run_limit=10, n_jobs=1, included_classifiers=["lightgbm"],
+    trained_pipeline = AutoFlowClassifier(initial_runs=5, run_limit=10, n_jobs=1, included_classifiers=["lightgbm"],
                                         per_run_time_limit=60)
     # describing meaning of columns. `id`, `target` and `ignore` all has specific meaning
     # `id` is a column name means unique descriptor of each rows,
@@ -118,7 +118,7 @@ You can use HyperFlow to finish this ML task instead of manually exploring all t
         "target": "Survived",
         "ignore": "Name"
     }
-    if not os.path.exists("hyperflow_classification.bz2"):
+    if not os.path.exists("autoflow_classification.bz2"):
         # pass `train_df`, `test_df` and `column_descriptions` to classifier,
         # if param `fit_ensemble_params` set as "auto", Stack Ensemble will be used
         # ``splitter`` is train-valid-dataset splitter, in here it is set as 3-Fold Cross Validation
@@ -128,12 +128,12 @@ You can use HyperFlow to finish this ML task instead of manually exploring all t
             splitter=KFold(n_splits=3, shuffle=True, random_state=42),
         )
         # finally , the best model will be serialize and store in local file system for subsequent use
-        joblib.dump(trained_pipeline, "hyperflow_classification.bz2")
-        # if you want to see what the workflow HyperFlow is searching, you can use `draw_workflow_space` to visualize
+        joblib.dump(trained_pipeline, "autoflow_classification.bz2")
+        # if you want to see what the workflow AutoFlow is searching, you can use `draw_workflow_space` to visualize
         hdl_constructor = trained_pipeline.hdl_constructors[0]
         hdl_constructor.draw_workflow_space()
     # suppose you are processing predict procedure, firstly, you should load serialized model from file system
-    predict_pipeline = joblib.load("hyperflow_classification.bz2")
+    predict_pipeline = joblib.load("autoflow_classification.bz2")
     # secondly, use loaded model to do predicting
     result = predict_pipeline.predict(test_df)
     print(result)

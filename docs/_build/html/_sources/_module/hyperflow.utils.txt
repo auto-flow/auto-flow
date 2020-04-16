@@ -1,149 +1,149 @@
-hyperflow.utils package
+autoflow.utils package
 =======================
 
 Submodules
 ----------
 
-hyperflow.utils.array module
+autoflow.utils.array module
 ----------------------------
 
-.. automodule:: hyperflow.utils.array
+.. automodule:: autoflow.utils.array
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.concurrence module
+autoflow.utils.concurrence module
 ----------------------------------
 
-.. automodule:: hyperflow.utils.concurrence
+.. automodule:: autoflow.utils.concurrence
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.config_space module
+autoflow.utils.config_space module
 -----------------------------------
 
-.. automodule:: hyperflow.utils.config_space
+.. automodule:: autoflow.utils.config_space
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.data module
+autoflow.utils.data module
 ---------------------------
 
-.. automodule:: hyperflow.utils.data
+.. automodule:: autoflow.utils.data
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.dataframe module
+autoflow.utils.dataframe module
 --------------------------------
 
-.. automodule:: hyperflow.utils.dataframe
+.. automodule:: autoflow.utils.dataframe
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.dict module
+autoflow.utils.dict module
 ---------------------------
 
-.. automodule:: hyperflow.utils.dict
+.. automodule:: autoflow.utils.dict
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.graphviz module
+autoflow.utils.graphviz module
 -------------------------------
 
-.. automodule:: hyperflow.utils.graphviz
+.. automodule:: autoflow.utils.graphviz
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.hash module
+autoflow.utils.hash module
 ---------------------------
 
-.. automodule:: hyperflow.utils.hash
+.. automodule:: autoflow.utils.hash
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.klass module
+autoflow.utils.klass module
 ----------------------------
 
-.. automodule:: hyperflow.utils.klass
+.. automodule:: autoflow.utils.klass
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.list module
+autoflow.utils.list module
 ---------------------------
 
-.. automodule:: hyperflow.utils.list
+.. automodule:: autoflow.utils.list
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.logging module
+autoflow.utils.logging module
 ------------------------------
 
-.. automodule:: hyperflow.utils.logging
+.. automodule:: autoflow.utils.logging
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.math module
+autoflow.utils.math module
 ---------------------------
 
-.. automodule:: hyperflow.utils.math
+.. automodule:: autoflow.utils.math
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.ml_task module
+autoflow.utils.ml_task module
 ------------------------------
 
-.. automodule:: hyperflow.utils.ml_task
+.. automodule:: autoflow.utils.ml_task
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.packages module
+autoflow.utils.packages module
 -------------------------------
 
-.. automodule:: hyperflow.utils.packages
+.. automodule:: autoflow.utils.packages
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.peewee module
+autoflow.utils.peewee module
 -----------------------------
 
-.. automodule:: hyperflow.utils.peewee
+.. automodule:: autoflow.utils.peewee
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.pipeline module
+autoflow.utils.pipeline module
 -------------------------------
 
-.. automodule:: hyperflow.utils.pipeline
+.. automodule:: autoflow.utils.pipeline
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.sys module
+autoflow.utils.sys module
 --------------------------
 
-.. automodule:: hyperflow.utils.sys
+.. automodule:: autoflow.utils.sys
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.utils.typing module
+autoflow.utils.typing module
 -----------------------------
 
-.. automodule:: hyperflow.utils.typing
+.. automodule:: autoflow.utils.typing
     :members:
     :undoc-members:
     :show-inheritance:
@@ -152,7 +152,7 @@ hyperflow.utils.typing module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.utils
+.. automodule:: autoflow.utils
     :members:
     :undoc-members:
     :show-inheritance:

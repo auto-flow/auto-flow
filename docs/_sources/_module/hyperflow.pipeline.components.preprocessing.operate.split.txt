@@ -1,37 +1,37 @@
-hyperflow.pipeline.components.preprocessing.operate.split package
+autoflow.pipeline.components.preprocessing.operate.split package
 =================================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.preprocessing.operate.split.base module
+autoflow.pipeline.components.preprocessing.operate.split.base module
 ---------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.split.base
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.operate.split.cat module
+autoflow.pipeline.components.preprocessing.operate.split.cat module
 --------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.split.cat
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.cat
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.operate.split.cat_num module
+autoflow.pipeline.components.preprocessing.operate.split.cat_num module
 ------------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.split.cat_num
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.cat_num
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.operate.split.nan module
+autoflow.pipeline.components.preprocessing.operate.split.nan module
 --------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.split.nan
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split.nan
     :members:
     :undoc-members:
     :show-inheritance:
@@ -40,7 +40,7 @@ hyperflow.pipeline.components.preprocessing.operate.split.nan module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.operate.split
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.split
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,5 +1,5 @@
 from hash_problem import get_hash_of_Xy
-from hyperflow import DataManager
+from autoflow import DataManager
 import pandas as pd
 
 df = pd.read_csv("../examples/classification/train_classification.csv")

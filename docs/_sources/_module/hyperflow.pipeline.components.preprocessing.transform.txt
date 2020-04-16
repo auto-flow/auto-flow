@@ -1,21 +1,21 @@
-hyperflow.pipeline.components.preprocessing.transform package
+autoflow.pipeline.components.preprocessing.transform package
 =============================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.preprocessing.transform.power module
+autoflow.pipeline.components.preprocessing.transform.power module
 ------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.transform.power
+.. automodule:: autoflow.pipeline.components.preprocessing.transform.power
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.transform.quantile module
+autoflow.pipeline.components.preprocessing.transform.quantile module
 ---------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.transform.quantile
+.. automodule:: autoflow.pipeline.components.preprocessing.transform.quantile
     :members:
     :undoc-members:
     :show-inheritance:
@@ -24,7 +24,7 @@ hyperflow.pipeline.components.preprocessing.transform.quantile module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.transform
+.. automodule:: autoflow.pipeline.components.preprocessing.transform
     :members:
     :undoc-members:
     :show-inheritance:

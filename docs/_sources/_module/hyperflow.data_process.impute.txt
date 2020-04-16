@@ -1,13 +1,13 @@
-hyperflow.data_process.impute package
+autoflow.data_process.impute package
 =====================================
 
 Submodules
 ----------
 
-hyperflow.data_process.impute.delete_nan module
+autoflow.data_process.impute.delete_nan module
 -----------------------------------------------
 
-.. automodule:: hyperflow.data_process.impute.delete_nan
+.. automodule:: autoflow.data_process.impute.delete_nan
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.data_process.impute.delete_nan module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.data_process.impute
+.. automodule:: autoflow.data_process.impute
     :members:
     :undoc-members:
     :show-inheritance:

@@ -4,12 +4,12 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from hyperflow.ensemble.mean.regressor import MeanRegressor
+from autoflow.ensemble.mean.regressor import MeanRegressor
 
-from hyperflow.estimator.base import HyperFlowEstimator
-from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.tuner.tuner import Tuner
+from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.manager.resource_manager import ResourceManager
+from autoflow.tuner.tuner import Tuner
 
 path = ("../data/Molecule_prediction_20200312/test_noLabel_0312.csv")
 

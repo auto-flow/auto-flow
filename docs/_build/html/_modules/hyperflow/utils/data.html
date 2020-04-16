@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.data &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.data &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.data</li>
+      <li>autoflow.utils.data</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.data</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.data</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- encoding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -173,7 +173,7 @@
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
 
 
-<div class="viewcode-block" id="convert_to_num"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.convert_to_num">[docs]</a><span class="k">def</span> <span class="nf">convert_to_num</span><span class="p">(</span><span class="n">Ybin</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_to_num"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.convert_to_num">[docs]</a><span class="k">def</span> <span class="nf">convert_to_num</span><span class="p">(</span><span class="n">Ybin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert binary targets to numeric vector</span>
 <span class="sd">    typically classification target values</span>
@@ -186,7 +186,7 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="convert_to_bin"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.convert_to_bin">[docs]</a><span class="k">def</span> <span class="nf">convert_to_bin</span><span class="p">(</span><span class="n">Ycont</span><span class="p">,</span> <span class="n">nval</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_to_bin"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.convert_to_bin">[docs]</a><span class="k">def</span> <span class="nf">convert_to_bin</span><span class="p">(</span><span class="n">Ycont</span><span class="p">,</span> <span class="n">nval</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># Convert numeric vector to binary (typically classification target values)</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="k">pass</span>
@@ -198,7 +198,7 @@
     <span class="k">return</span> <span class="n">Ybin</span></div>
 
 
-<div class="viewcode-block" id="predict_RAM_usage"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.predict_RAM_usage">[docs]</a><span class="k">def</span> <span class="nf">predict_RAM_usage</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">categorical</span><span class="p">):</span>
+<div class="viewcode-block" id="predict_RAM_usage"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.predict_RAM_usage">[docs]</a><span class="k">def</span> <span class="nf">predict_RAM_usage</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">categorical</span><span class="p">):</span>
     <span class="c1"># Return estimated RAM usage of dataset after OneHotEncoding in bytes.</span>
     <span class="n">estimated_columns</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">categorical</span><span class="p">):</span>
@@ -212,7 +212,7 @@
     <span class="k">return</span> <span class="n">estimated_ram</span></div>
 
 
-<div class="viewcode-block" id="softmax"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.softmax">[docs]</a><span class="k">def</span> <span class="nf">softmax</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<div class="viewcode-block" id="softmax"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.softmax">[docs]</a><span class="k">def</span> <span class="nf">softmax</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">df</span><span class="p">[</span><span class="n">df</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
         <span class="n">df</span><span class="p">[</span><span class="n">df</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">20</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">20</span>
@@ -228,7 +228,7 @@
         <span class="k">return</span> <span class="n">tmp</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="densify"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.densify">[docs]</a><span class="k">def</span> <span class="nf">densify</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="densify"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.densify">[docs]</a><span class="k">def</span> <span class="nf">densify</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">X</span>
     <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
@@ -237,7 +237,7 @@
         <span class="k">return</span> <span class="n">X</span></div>
 
 
-<div class="viewcode-block" id="is_cat"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.is_cat">[docs]</a><span class="k">def</span> <span class="nf">is_cat</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<div class="viewcode-block" id="is_cat"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_cat">[docs]</a><span class="k">def</span> <span class="nf">is_cat</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
             <span class="k">continue</span>
@@ -246,15 +246,15 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="is_highR_nan"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.is_highR_nan">[docs]</a><span class="k">def</span> <span class="nf">is_highR_nan</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+<div class="viewcode-block" id="is_highR_nan"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_highR_nan">[docs]</a><span class="k">def</span> <span class="nf">is_highR_nan</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">threshold</span></div>
 
 
-<div class="viewcode-block" id="is_nan"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.is_nan">[docs]</a><span class="k">def</span> <span class="nf">is_nan</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<div class="viewcode-block" id="is_nan"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_nan">[docs]</a><span class="k">def</span> <span class="nf">is_nan</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="to_array"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.data.to_array">[docs]</a><span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="to_array"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.to_array">[docs]</a><span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span>
     <span class="k">return</span> <span class="n">X</span></div>

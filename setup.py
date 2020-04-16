@@ -8,7 +8,7 @@ import sys
 
 from setuptools import setup, find_packages
 
-with open("hyperflow/__version__.py") as fh:
+with open("autoflow/__version__.py") as fh:
     version = fh.readlines()[-1].split()[-1].strip("\"'")
 
 
@@ -23,7 +23,7 @@ if os.name != 'posix':
 
 if sys.version_info < (3, 5):
     raise ValueError(
-        'Unsupported Python version %d.%d.%d found. HyperFlow requires Python '
+        'Unsupported Python version %d.%d.%d found. AutoFlow requires Python '
         '3.6 or higher.' % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
     )
 
@@ -68,22 +68,22 @@ def get_package_data(name, suffixes):
 needed_suffixes = ['.json', '.txt', '.yml', '.yaml']
 
 setup(
-    name='HyperFlow',
+    name='auto-flow',
     version=version,
     author='qichun tang',
     author_email='tqichun@gmail.com',
-    description='HyperFlow: Automatic machine learning workflow modeling platform.',
+    description='AutoFlow: Automatic machine learning workflow modeling platform.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     license='BSD',
-    url='https://github.com/Hyper-Flow/HyperFlow',
+    url='https://github.com/auto-flow/autoflow',
     packages=find_packages("./", exclude=['test', 'examples']),
     package_dir={
-        'hyperflow': './hyperflow',
+        'autoflow': './autoflow',
         'dsmac': './dsmac',
         'generic_fs': './generic_fs'
     },
-    package_data={'hyperflow': get_package_data('hyperflow', needed_suffixes),
+    package_data={'autoflow': get_package_data('autoflow', needed_suffixes),
                   'dsmac': get_package_data('dsmac', needed_suffixes)},
     python_requires='>=3.6.*',
     install_requires=install_requires,

@@ -1,13 +1,13 @@
-hyperflow.ensemble.mean package
+autoflow.ensemble.mean package
 ===============================
 
 Submodules
 ----------
 
-hyperflow.ensemble.mean.regressor module
+autoflow.ensemble.mean.regressor module
 ----------------------------------------
 
-.. automodule:: hyperflow.ensemble.mean.regressor
+.. automodule:: autoflow.ensemble.mean.regressor
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.ensemble.mean.regressor module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.ensemble.mean
+.. automodule:: autoflow.ensemble.mean
     :members:
     :undoc-members:
     :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.components.base &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.components.base &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.components.base</li>
+      <li>autoflow.pipeline.components.base</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.components.base</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.pipeline.components.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
@@ -177,14 +177,14 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.data</span> <span class="kn">import</span> <span class="n">densify</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.dataframe</span> <span class="kn">import</span> <span class="n">rectify_dtypes</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.hash</span> <span class="kn">import</span> <span class="n">get_hash_of_Xy</span><span class="p">,</span> <span class="n">get_hash_of_dict</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.data</span> <span class="kn">import</span> <span class="n">densify</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.dataframe</span> <span class="kn">import</span> <span class="n">rectify_dtypes</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.hash</span> <span class="kn">import</span> <span class="n">get_hash_of_Xy</span><span class="p">,</span> <span class="n">get_hash_of_dict</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 
-<div class="viewcode-block" id="HyperFlowComponent"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowComponent</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent">[docs]</a><span class="k">class</span> <span class="nc">AutoFlowComponent</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
     <span class="n">module__</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">class__</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">classification_only</span> <span class="o">=</span> <span class="kc">False</span>
@@ -218,11 +218,11 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">module__</span>
 
-<div class="viewcode-block" id="HyperFlowComponent.get_estimator_class"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.get_estimator_class"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.get_estimator_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module_</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.after_process_hyperparams"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.after_process_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<div class="viewcode-block" id="AutoFlowComponent.after_process_hyperparams"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.after_process_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="n">hyperparams</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">hyperparams</span><span class="p">)</span>
         <span class="n">hyperparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_parse_escape_hyperparameters</span><span class="p">(</span><span class="n">hyperparams</span><span class="p">)</span>
         <span class="n">should_pop</span> <span class="o">=</span> <span class="p">[]</span>
@@ -239,21 +239,21 @@
         <span class="n">hyperparams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">updated</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">hyperparams</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.after_process_estimator"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.after_process_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="AutoFlowComponent.after_process_estimator"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.after_process_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">estimator</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.before_fit_X"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_fit_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.before_fit_X"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.before_fit_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_fit_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">X</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.before_fit_y"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_y">[docs]</a>    <span class="k">def</span> <span class="nf">before_fit_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.before_fit_y"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.before_fit_y">[docs]</a>    <span class="k">def</span> <span class="nf">before_fit_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">y</span></div>
 
     <span class="k">def</span> <span class="nf">_pred_or_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train_</span><span class="p">,</span> <span class="n">X_valid_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-<div class="viewcode-block" id="HyperFlowComponent.pred_or_trans"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.pred_or_trans">[docs]</a>    <span class="k">def</span> <span class="nf">pred_or_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.pred_or_trans"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.pred_or_trans">[docs]</a>    <span class="k">def</span> <span class="nf">pred_or_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">X_train_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
         <span class="n">X_valid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
         <span class="n">X_test_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
@@ -261,7 +261,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pred_or_trans</span><span class="p">(</span><span class="n">X_train_</span><span class="p">,</span> <span class="n">X_valid_</span><span class="p">,</span> <span class="n">X_test_</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.filter_invalid"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.filter_invalid">[docs]</a>    <span class="k">def</span> <span class="nf">filter_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<div class="viewcode-block" id="AutoFlowComponent.filter_invalid"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.filter_invalid">[docs]</a>    <span class="k">def</span> <span class="nf">filter_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="n">hyperparams</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">hyperparams</span><span class="p">)</span>
         <span class="n">validated</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hyperparams</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -271,13 +271,13 @@
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="n">validated</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.preprocess_data"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.preprocess_data">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GenericDataFrame</span><span class="p">],</span> <span class="n">extract_info</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.preprocess_data"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.preprocess_data">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GenericDataFrame</span><span class="p">],</span> <span class="n">extract_info</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># todo 考虑在这                                                                                                                                                                                    里多densify</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.feature_engineer_base</span> <span class="kn">import</span> <span class="n">HyperFlowFeatureEngineerAlgorithm</span>
-            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">HyperFlowFeatureEngineerAlgorithm</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">autoflow.pipeline.components.feature_engineer_base</span> <span class="kn">import</span> <span class="n">AutoFlowFeatureEngineerAlgorithm</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">AutoFlowFeatureEngineerAlgorithm</span><span class="p">):</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_feature_groups</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">X</span>
@@ -293,7 +293,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.build_proxy_estimator"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.build_proxy_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">build_proxy_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.build_proxy_estimator"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.build_proxy_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">build_proxy_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># 默认采用代理模式（但可以颠覆这种模式，完全重写这个类）</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_estimator_class</span><span class="p">()</span>
         <span class="c1"># 根据构造函数构造代理估计器</span>
@@ -304,7 +304,7 @@
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_params</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.fit"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="AutoFlowComponent.fit"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？</span>
@@ -340,7 +340,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Component: </span><span class="si">{self.__class__.__name__}</span><span class="s2"> is fitting a empty data.</span><span class="se">\n</span><span class="s2">Shape of X_train_ = </span><span class="si">{X_train_.shape}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.prepare_X_to_fit"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.prepare_X_to_fit">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_X_to_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.prepare_X_to_fit"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.prepare_X_to_fit">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_X_to_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">X_train</span></div>
 
     <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -369,26 +369,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># avoid can not pickle error</span>
         <span class="k">return</span> <span class="n">fitted_estimator</span>
 
-<div class="viewcode-block" id="HyperFlowComponent.core_fit"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.core_fit">[docs]</a>    <span class="k">def</span> <span class="nf">core_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="AutoFlowComponent.core_fit"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.core_fit">[docs]</a>    <span class="k">def</span> <span class="nf">core_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.set_addition_info"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.set_addition_info">[docs]</a>    <span class="k">def</span> <span class="nf">set_addition_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.set_addition_info"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.set_addition_info">[docs]</a>    <span class="k">def</span> <span class="nf">set_addition_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.update_hyperparams"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.update_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">update_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hp</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.update_hyperparams"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.update_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">update_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hp</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;set default hyperparameters in init&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_addition_info</span><span class="p">(</span><span class="n">hp</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.get_estimator"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.get_estimator"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.get_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.before_parse_escape_hyperparameters"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.before_parse_escape_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">before_parse_escape_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.before_parse_escape_hyperparameters"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.before_parse_escape_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">before_parse_escape_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">hyperparams</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.parse_escape_hyperparameters"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.parse_escape_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">parse_escape_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indicator</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.parse_escape_hyperparameters"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.parse_escape_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">parse_escape_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indicator</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">indicator</span> <span class="o">==</span> <span class="s2">&quot;lr_ratio&quot;</span><span class="p">:</span>
             <span class="n">lr</span> <span class="o">=</span> <span class="n">hyperparams</span><span class="p">[</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">]</span>
             <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">lr</span><span class="p">)),</span> <span class="mi">10</span><span class="p">)</span>
@@ -441,7 +441,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="HyperFlowComponent.before_pred_X"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.base.HyperFlowComponent.before_pred_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_pred_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.before_pred_X"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.before_pred_X">[docs]</a>    <span class="k">def</span> <span class="nf">before_pred_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">X</span>
         <span class="k">return</span> <span class="n">X</span></div></div>

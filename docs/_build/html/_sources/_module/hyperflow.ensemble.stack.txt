@@ -1,29 +1,29 @@
-hyperflow.ensemble.stack package
+autoflow.ensemble.stack package
 ================================
 
 Submodules
 ----------
 
-hyperflow.ensemble.stack.base module
+autoflow.ensemble.stack.base module
 ------------------------------------
 
-.. automodule:: hyperflow.ensemble.stack.base
+.. automodule:: autoflow.ensemble.stack.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.ensemble.stack.classifier module
+autoflow.ensemble.stack.classifier module
 ------------------------------------------
 
-.. automodule:: hyperflow.ensemble.stack.classifier
+.. automodule:: autoflow.ensemble.stack.classifier
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.ensemble.stack.regressor module
+autoflow.ensemble.stack.regressor module
 -----------------------------------------
 
-.. automodule:: hyperflow.ensemble.stack.regressor
+.. automodule:: autoflow.ensemble.stack.regressor
     :members:
     :undoc-members:
     :show-inheritance:
@@ -32,7 +32,7 @@ hyperflow.ensemble.stack.regressor module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.ensemble.stack
+.. automodule:: autoflow.ensemble.stack
     :members:
     :undoc-members:
     :show-inheritance:

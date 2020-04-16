@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.feature_engineer.operate.drop_all &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.feature_engineer.operate.drop_all &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.feature_engineer.operate.drop_all</li>
+      <li>autoflow.feature_engineer.operate.drop_all</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,23 +165,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.feature_engineer.operate.drop_all</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.feature_engineer.operate.drop_all</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
 
 <span class="n">__all__</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DropAll&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="DropAll"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.operate.html#hyperflow.feature_engineer.operate.drop_all.DropAll">[docs]</a><span class="k">class</span> <span class="nc">DropAll</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+<div class="viewcode-block" id="DropAll"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.operate.html#autoflow.feature_engineer.operate.drop_all.DropAll">[docs]</a><span class="k">class</span> <span class="nc">DropAll</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
 
 
-<div class="viewcode-block" id="DropAll.fit"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.operate.html#hyperflow.feature_engineer.operate.drop_all.DropAll.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DropAll.fit"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.operate.html#autoflow.feature_engineer.operate.drop_all.DropAll.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="DropAll.transform"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.operate.html#hyperflow.feature_engineer.operate.drop_all.DropAll.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DropAll.transform"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.operate.html#autoflow.feature_engineer.operate.drop_all.DropAll.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="DropAll.fit_transform"><a class="viewcode-back" href="../../../../_module/hyperflow.feature_engineer.operate.html#hyperflow.feature_engineer.operate.drop_all.DropAll.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">):</span>
+<div class="viewcode-block" id="DropAll.fit_transform"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.operate.html#autoflow.feature_engineer.operate.drop_all.DropAll.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span></div></div>
 </pre></div>

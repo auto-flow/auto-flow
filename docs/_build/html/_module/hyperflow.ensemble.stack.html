@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.ensemble.stack package &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.ensemble.stack package &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> HyperFlow
+            <a href="../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">HyperFlow</a>
+          <a href="../index.html">AutoFlow</a>
         
       </nav>
 
@@ -148,7 +148,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>hyperflow.ensemble.stack package</li>
+      <li>autoflow.ensemble.stack package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -167,90 +167,90 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="hyperflow-ensemble-stack-package">
-<h1>hyperflow.ensemble.stack package<a class="headerlink" href="#hyperflow-ensemble-stack-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="autoflow-ensemble-stack-package">
+<h1>autoflow.ensemble.stack package<a class="headerlink" href="#autoflow-ensemble-stack-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-hyperflow.ensemble.stack.base">
-<span id="hyperflow-ensemble-stack-base-module"></span><h2>hyperflow.ensemble.stack.base module<a class="headerlink" href="#module-hyperflow.ensemble.stack.base" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.stack.base">
+<span id="autoflow-ensemble-stack-base-module"></span><h2>autoflow.ensemble.stack.base module<a class="headerlink" href="#module-autoflow.ensemble.stack.base" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.ensemble.stack.base.StackEstimator">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.stack.base.</code><code class="sig-name descname">StackEstimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.ensemble.html#hyperflow.ensemble.base.EnsembleEstimator" title="hyperflow.ensemble.base.EnsembleEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.base.EnsembleEstimator</span></code></a></p>
+<dt id="autoflow.ensemble.stack.base.StackEstimator">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.stack.base.</code><code class="sig-name descname">StackEstimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/base.html#StackEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.base.StackEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.ensemble.html#autoflow.ensemble.base.EnsembleEstimator" title="autoflow.ensemble.base.EnsembleEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.ensemble.base.EnsembleEstimator</span></code></a></p>
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.base.StackEstimator.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.base.StackEstimator.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/base.html#StackEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.base.StackEstimator.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.base.StackEstimator.fit_trained_data">
-<code class="sig-name descname">fit_trained_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimators_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.typing.GenericEstimator" title="hyperflow.utils.typing.GenericEstimator">hyperflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_preds_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true_indexes_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.fit_trained_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.fit_trained_data" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.base.StackEstimator.fit_trained_data">
+<code class="sig-name descname">fit_trained_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimators_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#autoflow.utils.typing.GenericEstimator" title="autoflow.utils.typing.GenericEstimator">autoflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_preds_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true_indexes_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/base.html#StackEstimator.fit_trained_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.base.StackEstimator.fit_trained_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.base.StackEstimator.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.predict" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.base.StackEstimator.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/base.html#StackEstimator.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.base.StackEstimator.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.base.StackEstimator.predict_meta_features">
-<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.predict_meta_features" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.base.StackEstimator.predict_meta_features">
+<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/base.html#StackEstimator.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.base.StackEstimator.predict_meta_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble.stack.classifier">
-<span id="hyperflow-ensemble-stack-classifier-module"></span><h2>hyperflow.ensemble.stack.classifier module<a class="headerlink" href="#module-hyperflow.ensemble.stack.classifier" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.stack.classifier">
+<span id="autoflow-ensemble-stack-classifier-module"></span><h2>autoflow.ensemble.stack.classifier module<a class="headerlink" href="#module-autoflow.ensemble.stack.classifier" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.ensemble.stack.classifier.StackClassifier">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.stack.classifier.</code><code class="sig-name descname">StackClassifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">drop_last_proba</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_probas</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.stack.base.StackEstimator" title="hyperflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
+<dt id="autoflow.ensemble.stack.classifier.StackClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.stack.classifier.</code><code class="sig-name descname">StackClassifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">drop_last_proba</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_probas</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/classifier.html#StackClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.classifier.StackClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autoflow.ensemble.stack.base.StackEstimator" title="autoflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.classifier.StackClassifier.decision_function">
-<code class="sig-name descname">decision_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.decision_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.decision_function" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.classifier.StackClassifier.decision_function">
+<code class="sig-name descname">decision_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/classifier.html#StackClassifier.decision_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.classifier.StackClassifier.decision_function" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="hyperflow.ensemble.stack.classifier.StackClassifier.mainTask">
-<code class="sig-name descname">mainTask</code><em class="property"> = 'classification'</em><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.mainTask" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.classifier.StackClassifier.mainTask">
+<code class="sig-name descname">mainTask</code><em class="property"> = 'classification'</em><a class="headerlink" href="#autoflow.ensemble.stack.classifier.StackClassifier.mainTask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.classifier.StackClassifier.predict_meta_features">
-<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.predict_meta_features" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.classifier.StackClassifier.predict_meta_features">
+<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/classifier.html#StackClassifier.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.classifier.StackClassifier.predict_meta_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.classifier.StackClassifier.predict_proba">
-<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.classifier.StackClassifier.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/classifier.html#StackClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.classifier.StackClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble.stack.regressor">
-<span id="hyperflow-ensemble-stack-regressor-module"></span><h2>hyperflow.ensemble.stack.regressor module<a class="headerlink" href="#module-hyperflow.ensemble.stack.regressor" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.stack.regressor">
+<span id="autoflow-ensemble-stack-regressor-module"></span><h2>autoflow.ensemble.stack.regressor module<a class="headerlink" href="#module-autoflow.ensemble.stack.regressor" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="hyperflow.ensemble.stack.regressor.StackRegressor">
-<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.stack.regressor.</code><code class="sig-name descname">StackRegressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/regressor.html#StackRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.stack.base.StackEstimator" title="hyperflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
+<dt id="autoflow.ensemble.stack.regressor.StackRegressor">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.ensemble.stack.regressor.</code><code class="sig-name descname">StackRegressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/regressor.html#StackRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.regressor.StackRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autoflow.ensemble.stack.base.StackEstimator" title="autoflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
 <dl class="py attribute">
-<dt id="hyperflow.ensemble.stack.regressor.StackRegressor.ml_task">
-<code class="sig-name descname">ml_task</code><em class="property"> = 'regression'</em><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor.ml_task" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.regressor.StackRegressor.ml_task">
+<code class="sig-name descname">ml_task</code><em class="property"> = 'regression'</em><a class="headerlink" href="#autoflow.ensemble.stack.regressor.StackRegressor.ml_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="hyperflow.ensemble.stack.regressor.StackRegressor.predict_meta_features">
-<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/regressor.html#StackRegressor.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor.predict_meta_features" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.ensemble.stack.regressor.StackRegressor.predict_meta_features">
+<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/ensemble/stack/regressor.html#StackRegressor.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.ensemble.stack.regressor.StackRegressor.predict_meta_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-hyperflow.ensemble.stack">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hyperflow.ensemble.stack" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-autoflow.ensemble.stack">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow.ensemble.stack" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

@@ -1,29 +1,29 @@
-hyperflow.evaluation package
+autoflow.evaluation package
 ============================
 
 Submodules
 ----------
 
-hyperflow.evaluation.base module
+autoflow.evaluation.base module
 --------------------------------
 
-.. automodule:: hyperflow.evaluation.base
+.. automodule:: autoflow.evaluation.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.evaluation.ensemble_evaluator module
+autoflow.evaluation.ensemble_evaluator module
 ----------------------------------------------
 
-.. automodule:: hyperflow.evaluation.ensemble_evaluator
+.. automodule:: autoflow.evaluation.ensemble_evaluator
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.evaluation.train_evaluator module
+autoflow.evaluation.train_evaluator module
 -------------------------------------------
 
-.. automodule:: hyperflow.evaluation.train_evaluator
+.. automodule:: autoflow.evaluation.train_evaluator
     :members:
     :undoc-members:
     :show-inheritance:
@@ -32,7 +32,7 @@ hyperflow.evaluation.train_evaluator module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.evaluation
+.. automodule:: autoflow.evaluation
     :members:
     :undoc-members:
     :show-inheritance:

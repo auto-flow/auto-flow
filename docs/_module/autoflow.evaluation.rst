@@ -1,0 +1,38 @@
+autoflow.evaluation package
+===========================
+
+Submodules
+----------
+
+autoflow.evaluation.base module
+-------------------------------
+
+.. automodule:: autoflow.evaluation.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.evaluation.ensemble\_evaluator module
+----------------------------------------------
+
+.. automodule:: autoflow.evaluation.ensemble_evaluator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.evaluation.train\_evaluator module
+-------------------------------------------
+
+.. automodule:: autoflow.evaluation.train_evaluator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: autoflow.evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:

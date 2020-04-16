@@ -1,0 +1,10 @@
+autoflow.hdl.smac package
+=========================
+
+Module contents
+---------------
+
+.. automodule:: autoflow.hdl.smac
+   :members:
+   :undoc-members:
+   :show-inheritance:

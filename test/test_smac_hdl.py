@@ -1,6 +1,6 @@
 import logging
 import unittest
-from hyperflow.hdl import smac as smac_hdl
+from autoflow.hdl import smac as smac_hdl
 
 class TestSmacHDL(unittest.TestCase):
     def test_encode(self):

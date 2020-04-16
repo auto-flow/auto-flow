@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.estimator.classifier &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.estimator.classifier &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.estimator.classifier</li>
+      <li>autoflow.estimator.classifier</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,18 +165,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.estimator.classifier</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.estimator.classifier</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.estimator.base</span> <span class="kn">import</span> <span class="n">HyperFlowEstimator</span>
+<span class="kn">from</span> <span class="nn">autoflow.estimator.base</span> <span class="kn">import</span> <span class="n">AutoFlowEstimator</span>
 
 
-<div class="viewcode-block" id="HyperFlowClassifier"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.classifier.HyperFlowClassifier">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowClassifier</span><span class="p">(</span><span class="n">HyperFlowEstimator</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowClassifier"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.classifier.AutoFlowClassifier">[docs]</a><span class="k">class</span> <span class="nc">AutoFlowClassifier</span><span class="p">(</span><span class="n">AutoFlowEstimator</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">):</span>
     <span class="n">checked_mainTask</span> <span class="o">=</span> <span class="s2">&quot;classification&quot;</span>
 
-<div class="viewcode-block" id="HyperFlowClassifier.predict"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.classifier.HyperFlowClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+<div class="viewcode-block" id="AutoFlowClassifier.predict"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.classifier.AutoFlowClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">X_test</span><span class="p">,</span>
             <span class="n">task_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -188,7 +188,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="p">,</span> <span class="n">highR_nan_threshold</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowClassifier.predict_proba"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.classifier.HyperFlowClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span>
+<div class="viewcode-block" id="AutoFlowClassifier.predict_proba"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.classifier.AutoFlowClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">X_test</span><span class="p">,</span>
             <span class="n">task_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

@@ -5,37 +5,37 @@ Estimators
 Classifier
 -----------
 
-.. autoclass:: hyperflow.estimator.classifier.HyperFlowClassifier
+.. autoclass:: autoflow.estimator.classifier.AutoFlowClassifier
     :members:
 
 Regressor
 -----------
 
-.. autoclass:: hyperflow.estimator.regressor.HyperFlowRegressor
+.. autoclass:: autoflow.estimator.regressor.AutoFlowRegressor
     :members:
 
 HDL(Hyper-param Description Language)
 ============================================
 
-.. autoclass:: hyperflow.hdl.hdl_constructor.HDL_Constructor
+.. autoclass:: autoflow.hdl.hdl_constructor.HDL_Constructor
     :members:
 
 Data Manager
 ===============
 
-.. autoclass:: hyperflow.manager.data_manager.DataManager
+.. autoclass:: autoflow.manager.data_manager.DataManager
     :members:
 
 Resource Manager
 =================
 
-.. autoclass:: hyperflow.manager.resource_manager.ResourceManager
+.. autoclass:: autoflow.manager.resource_manager.ResourceManager
     :members:
 
 Tuner
 =================
 
-.. autoclass:: hyperflow.tuner.tuner.Tuner
+.. autoclass:: autoflow.tuner.tuner.Tuner
     :members:
 
 

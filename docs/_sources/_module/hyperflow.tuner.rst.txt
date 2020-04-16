@@ -1,13 +1,13 @@
-hyperflow.tuner package
+autoflow.tuner package
 =======================
 
 Submodules
 ----------
 
-hyperflow.tuner.tuner module
+autoflow.tuner.tuner module
 ----------------------------
 
-.. automodule:: hyperflow.tuner.tuner
+.. automodule:: autoflow.tuner.tuner
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ hyperflow.tuner.tuner module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.tuner
+.. automodule:: autoflow.tuner
     :members:
     :undoc-members:
     :show-inheritance:

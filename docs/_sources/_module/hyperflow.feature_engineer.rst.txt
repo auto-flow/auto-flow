@@ -1,4 +1,4 @@
-hyperflow.feature_engineer package
+autoflow.feature_engineer package
 ==================================
 
 Subpackages
@@ -6,15 +6,15 @@ Subpackages
 
 .. toctree::
 
-    hyperflow.feature_engineer.compress
-    hyperflow.feature_engineer.encode
-    hyperflow.feature_engineer.operate
-    hyperflow.feature_engineer.transform
+    autoflow.feature_engineer.compress
+    autoflow.feature_engineer.encode
+    autoflow.feature_engineer.operate
+    autoflow.feature_engineer.transform
 
 Module contents
 ---------------
 
-.. automodule:: hyperflow.feature_engineer
+.. automodule:: autoflow.feature_engineer
     :members:
     :undoc-members:
     :show-inheritance:

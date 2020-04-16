@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.dataframe &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.dataframe &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.dataframe</li>
+      <li>autoflow.utils.dataframe</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,14 +165,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.dataframe</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.dataframe</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
-<div class="viewcode-block" id="pop_if_exists"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dataframe.pop_if_exists">[docs]</a><span class="k">def</span> <span class="nf">pop_if_exists</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<div class="viewcode-block" id="pop_if_exists"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.pop_if_exists">[docs]</a><span class="k">def</span> <span class="nf">pop_if_exists</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -181,7 +181,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="rectify_dtypes"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dataframe.rectify_dtypes">[docs]</a><span class="k">def</span> <span class="nf">rectify_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<div class="viewcode-block" id="rectify_dtypes"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.rectify_dtypes">[docs]</a><span class="k">def</span> <span class="nf">rectify_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
     <span class="c1"># make sure: only (str, int, float, bool) is valid</span>
     <span class="n">object_columns</span> <span class="o">=</span> <span class="n">get_object_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">object_column</span> <span class="ow">in</span> <span class="n">object_columns</span><span class="p">:</span>
@@ -192,11 +192,11 @@
                 <span class="n">df</span><span class="p">[</span><span class="n">object_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">object_column</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_object_columns"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dataframe.get_object_columns">[docs]</a><span class="k">def</span> <span class="nf">get_object_columns</span><span class="p">(</span><span class="n">df_</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_object_columns"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.get_object_columns">[docs]</a><span class="k">def</span> <span class="nf">get_object_columns</span><span class="p">(</span><span class="n">df_</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">df_</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">==</span> <span class="nb">object</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DataFrameValuesWrapper"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dataframe.DataFrameValuesWrapper">[docs]</a><span class="k">class</span> <span class="nc">DataFrameValuesWrapper</span><span class="p">():</span>
+<div class="viewcode-block" id="DataFrameValuesWrapper"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.DataFrameValuesWrapper">[docs]</a><span class="k">class</span> <span class="nc">DataFrameValuesWrapper</span><span class="p">():</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span>
@@ -207,7 +207,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
 
-<div class="viewcode-block" id="DataFrameValuesWrapper.wrap_to_dataframe"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.dataframe.DataFrameValuesWrapper.wrap_to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">wrap_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+<div class="viewcode-block" id="DataFrameValuesWrapper.wrap_to_dataframe"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.DataFrameValuesWrapper.wrap_to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">wrap_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div></div>
 
 

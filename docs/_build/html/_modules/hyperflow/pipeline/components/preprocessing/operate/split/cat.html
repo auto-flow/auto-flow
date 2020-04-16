@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.components.preprocessing.operate.split.cat &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.components.preprocessing.operate.split.cat &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../../../../index.html">HyperFlow</a>
+          <a href="../../../../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.components.preprocessing.operate.split.cat</li>
+      <li>autoflow.pipeline.components.preprocessing.operate.split.cat</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,16 +165,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.components.preprocessing.operate.split.cat</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.pipeline.components.preprocessing.operate.split.cat</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.preprocessing.operate.split.base</span> <span class="kn">import</span> <span class="n">BaseSplit</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.components.preprocessing.operate.split.base</span> <span class="kn">import</span> <span class="n">BaseSplit</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SplitCat&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="SplitCat"><a class="viewcode-back" href="../../../../../../../_module/hyperflow.pipeline.components.preprocessing.operate.split.html#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat">[docs]</a><span class="k">class</span> <span class="nc">SplitCat</span><span class="p">(</span><span class="n">BaseSplit</span><span class="p">):</span>
-<div class="viewcode-block" id="SplitCat.calc_R"><a class="viewcode-back" href="../../../../../../../_module/hyperflow.pipeline.components.preprocessing.operate.split.html#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R">[docs]</a>    <span class="k">def</span> <span class="nf">calc_R</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitCat"><a class="viewcode-back" href="../../../../../../../_module/autoflow.pipeline.components.preprocessing.operate.split.html#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat">[docs]</a><span class="k">class</span> <span class="nc">SplitCat</span><span class="p">(</span><span class="n">BaseSplit</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitCat.calc_R"><a class="viewcode-back" href="../../../../../../../_module/autoflow.pipeline.components.preprocessing.operate.split.html#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R">[docs]</a>    <span class="k">def</span> <span class="nf">calc_R</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">rows</span></div>
 
     <span class="n">key1_hp_name</span> <span class="o">=</span> <span class="s2">&quot;highR&quot;</span>

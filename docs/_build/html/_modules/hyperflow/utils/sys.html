@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.sys &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.sys &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.sys</li>
+      <li>autoflow.utils.sys</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.sys</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.sys</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">cgitb</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -173,26 +173,26 @@
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Global"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.Global">[docs]</a><span class="k">class</span> <span class="nc">Global</span><span class="p">:</span>
+<div class="viewcode-block" id="Global"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.Global">[docs]</a><span class="k">class</span> <span class="nc">Global</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    跨文件全局变量类</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="Global.get"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.Global.get">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Global.get"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.Global.get">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="get_log_dir"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.get_log_dir">[docs]</a><span class="k">def</span> <span class="nf">get_log_dir</span><span class="p">():</span>
+<div class="viewcode-block" id="get_log_dir"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.get_log_dir">[docs]</a><span class="k">def</span> <span class="nf">get_log_dir</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Global</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_dir&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SAVEDPATH&#39;</span><span class="p">,</span> <span class="s1">&#39;/home/tqc/Desktop&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/log_dir&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_trance_back_msg"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.get_trance_back_msg">[docs]</a><span class="k">def</span> <span class="nf">get_trance_back_msg</span><span class="p">():</span>
+<div class="viewcode-block" id="get_trance_back_msg"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.get_trance_back_msg">[docs]</a><span class="k">def</span> <span class="nf">get_trance_back_msg</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">txt</span> <span class="o">=</span> <span class="n">cgitb</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">(),</span> <span class="n">context</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e2</span><span class="p">:</span>
@@ -202,12 +202,12 @@
     <span class="k">return</span> <span class="n">txt</span></div>
 
 
-<div class="viewcode-block" id="HandleException"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.HandleException">[docs]</a><span class="k">class</span> <span class="nc">HandleException</span><span class="p">():</span>
+<div class="viewcode-block" id="HandleException"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.HandleException">[docs]</a><span class="k">class</span> <span class="nc">HandleException</span><span class="p">():</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    异常处理记录类</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="HandleException.handle"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.HandleException.handle">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="HandleException.handle"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.HandleException.handle">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">):</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">log_dir</span> <span class="o">=</span> <span class="n">get_log_dir</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error: &#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
@@ -224,12 +224,12 @@
         <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">log_file</span><span class="p">))</span></div></div>
 
 
-<div class="viewcode-block" id="get_info"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.get_info">[docs]</a><span class="k">def</span> <span class="nf">get_info</span><span class="p">():</span>
+<div class="viewcode-block" id="get_info"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.get_info">[docs]</a><span class="k">def</span> <span class="nf">get_info</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="print_run"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.sys.print_run">[docs]</a><span class="k">def</span> <span class="nf">print_run</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+<div class="viewcode-block" id="print_run"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.sys.print_run">[docs]</a><span class="k">def</span> <span class="nf">print_run</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 </pre></div>

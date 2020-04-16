@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.ensemble.trained_data_fetcher &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.ensemble.trained_data_fetcher &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.ensemble.trained_data_fetcher</li>
+      <li>autoflow.ensemble.trained_data_fetcher</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,15 +165,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.ensemble.trained_data_fetcher</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.ensemble.trained_data_fetcher</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ndarray</span>
-<span class="kn">from</span> <span class="nn">hyperflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.typing</span> <span class="kn">import</span> <span class="n">GenericEstimator</span>
+<span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.typing</span> <span class="kn">import</span> <span class="n">GenericEstimator</span>
 
 
-<div class="viewcode-block" id="TrainedDataFetcher"><a class="viewcode-back" href="../../../_module/hyperflow.ensemble.html#hyperflow.ensemble.trained_data_fetcher.TrainedDataFetcher">[docs]</a><span class="k">class</span> <span class="nc">TrainedDataFetcher</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="TrainedDataFetcher"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.trained_data_fetcher.TrainedDataFetcher">[docs]</a><span class="k">class</span> <span class="nc">TrainedDataFetcher</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -186,7 +186,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span>
 
-<div class="viewcode-block" id="TrainedDataFetcher.fetch"><a class="viewcode-back" href="../../../_module/hyperflow.ensemble.html#hyperflow.ensemble.trained_data_fetcher.TrainedDataFetcher.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Tuple</span><span class="p">[</span>
+<div class="viewcode-block" id="TrainedDataFetcher.fetch"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.trained_data_fetcher.TrainedDataFetcher.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Tuple</span><span class="p">[</span>
         <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">GenericEstimator</span><span class="p">]],</span>
         <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]]</span>

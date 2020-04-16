@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.packages &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.packages &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.packages</li>
+      <li>autoflow.utils.packages</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.packages</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.packages</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">pkgutil</span>
@@ -174,7 +174,7 @@
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
 
 
-<div class="viewcode-block" id="get_class_name_of_module"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.packages.get_class_name_of_module">[docs]</a><span class="k">def</span> <span class="nf">get_class_name_of_module</span><span class="p">(</span><span class="n">input_module</span><span class="p">):</span>
+<div class="viewcode-block" id="get_class_name_of_module"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.packages.get_class_name_of_module">[docs]</a><span class="k">def</span> <span class="nf">get_class_name_of_module</span><span class="p">(</span><span class="n">input_module</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_module</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
         <span class="n">_module</span><span class="o">=</span><span class="n">import_module</span><span class="p">(</span><span class="n">input_module</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -184,8 +184,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">_module</span><span class="p">,</span><span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="get_class_object_in_pipeline_components"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.packages.get_class_object_in_pipeline_components">[docs]</a><span class="k">def</span> <span class="nf">get_class_object_in_pipeline_components</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="p">):</span>
-    <span class="n">module_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hyperflow.pipeline.components.</span><span class="si">{key1}</span><span class="s2">.</span><span class="si">{key2}</span><span class="s2">&quot;</span>
+<div class="viewcode-block" id="get_class_object_in_pipeline_components"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.packages.get_class_object_in_pipeline_components">[docs]</a><span class="k">def</span> <span class="nf">get_class_object_in_pipeline_components</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="p">):</span>
+    <span class="n">module_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;autoflow.pipeline.components.</span><span class="si">{key1}</span><span class="s2">.</span><span class="si">{key2}</span><span class="s2">&quot;</span>
     <span class="n">_class</span> <span class="o">=</span> <span class="n">get_class_name_of_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span>
         <span class="n">module_path</span>
@@ -195,7 +195,7 @@
     <span class="k">return</span> <span class="bp">cls</span></div>
 
 
-<div class="viewcode-block" id="find_components"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.packages.find_components">[docs]</a><span class="k">def</span> <span class="nf">find_components</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">base_class</span><span class="p">):</span>
+<div class="viewcode-block" id="find_components"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.packages.find_components">[docs]</a><span class="k">def</span> <span class="nf">find_components</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">base_class</span><span class="p">):</span>
     <span class="n">components</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">module_loader</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">ispkg</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">iter_modules</span><span class="p">([</span><span class="n">directory</span><span class="p">]):</span>

@@ -5,14 +5,14 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from hyperflow.estimator.base import HyperFlowEstimator
-from hyperflow.hdl.hdl_constructor import HDL_Constructor
-from hyperflow.manager.resource_manager import ResourceManager
-from hyperflow.tuner.tuner import Tuner
+from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.manager.resource_manager import ResourceManager
+from autoflow.tuner.tuner import Tuner
 
 path = ("../data/train_0312.csv")
 
-HyperFlowEstimator()
+AutoFlowEstimator()
 # data preprocessing
 def data_preprocessing():
     train_data_path = path
@@ -68,9 +68,9 @@ hdl_constructor = HDL_Constructor(
     }
 )
 resource_manager = ResourceManager(os.getcwd() + "/for_hxw_result")
-hyperflow_pipeline = HyperFlowEstimator(tuner, hdl_constructor, ensemble_builder=False)
+autoflow_pipeline = AutoFlowEstimator(tuner, hdl_constructor, ensemble_builder=False)
 
-hyperflow_pipeline.fit(
+autoflow_pipeline.fit(
     X_train=x_train, y_train=y_train, n_jobs=3
 )
-joblib.dump(hyperflow_pipeline, "hyperflow_pipeline_for_hxw.bz")
+joblib.dump(autoflow_pipeline, "autoflow_pipeline_for_hxw.bz")

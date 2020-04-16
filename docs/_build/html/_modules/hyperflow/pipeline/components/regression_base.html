@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.components.regression_base &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.components.regression_base &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">HyperFlow</a>
+          <a href="../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.components.regression_base</li>
+      <li>autoflow.pipeline.components.regression_base</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,11 +165,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.components.regression_base</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.base</span> <span class="kn">import</span> <span class="n">HyperFlowComponent</span>
+  <h1>Source code for autoflow.pipeline.components.regression_base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">autoflow.pipeline.components.base</span> <span class="kn">import</span> <span class="n">AutoFlowComponent</span>
 
 
-<div class="viewcode-block" id="HyperFlowRegressionAlgorithm"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowRegressionAlgorithm</span><span class="p">(</span><span class="n">HyperFlowComponent</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowRegressionAlgorithm"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.regression_base.AutoFlowRegressionAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">AutoFlowRegressionAlgorithm</span><span class="p">(</span><span class="n">AutoFlowComponent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Provide an abstract interface for regression algorithms in</span>
 <span class="sd">    auto-sklearn.</span>
 
@@ -181,10 +181,10 @@
                        <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_pred_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">before_pred_X</span><span class="p">(</span><span class="n">X_train_</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="HyperFlowRegressionAlgorithm.predict"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowRegressionAlgorithm.predict"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.regression_base.AutoFlowRegressionAlgorithm.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_or_trans</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HyperFlowRegressionAlgorithm.after_pred_y"><a class="viewcode-back" href="../../../../_module/hyperflow.pipeline.components.html#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.after_pred_y">[docs]</a>    <span class="k">def</span> <span class="nf">after_pred_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowRegressionAlgorithm.after_pred_y"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.regression_base.AutoFlowRegressionAlgorithm.after_pred_y">[docs]</a>    <span class="k">def</span> <span class="nf">after_pred_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">y</span></div></div>
 </pre></div>
 

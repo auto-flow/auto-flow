@@ -1,77 +1,77 @@
-hyperflow.pipeline.components.preprocessing.encode package
+autoflow.pipeline.components.preprocessing.encode package
 ==========================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.preprocessing.encode.base module
+autoflow.pipeline.components.preprocessing.encode.base module
 --------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.base
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.binary module
+autoflow.pipeline.components.preprocessing.encode.binary module
 ----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.binary
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.binary
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.cat_boost module
+autoflow.pipeline.components.preprocessing.encode.cat_boost module
 -------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.cat_boost
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.cat_boost
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.hash module
+autoflow.pipeline.components.preprocessing.encode.hash module
 --------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.hash
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.hash
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.label module
+autoflow.pipeline.components.preprocessing.encode.label module
 ---------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.label
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.label
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.leave_one_out module
+autoflow.pipeline.components.preprocessing.encode.leave_one_out module
 -----------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.leave_one_out
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.leave_one_out
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.one_hot module
+autoflow.pipeline.components.preprocessing.encode.one_hot module
 -----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.one_hot
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.one_hot
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.target module
+autoflow.pipeline.components.preprocessing.encode.target module
 ----------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.target
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.target
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence module
+autoflow.pipeline.components.preprocessing.encode.weight_of_evidence module
 ----------------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence
+.. automodule:: autoflow.pipeline.components.preprocessing.encode.weight_of_evidence
     :members:
     :undoc-members:
     :show-inheritance:
@@ -80,7 +80,7 @@ hyperflow.pipeline.components.preprocessing.encode.weight_of_evidence module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.encode
+.. automodule:: autoflow.pipeline.components.preprocessing.encode
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,11 +1,11 @@
-.. HyperFlow documentation master file, created by
+.. AutoFlow documentation master file, created by
    sphinx-quickstart on Sat Apr 11 12:14:41 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-HyperFlow documentation!
+AutoFlow documentation!
 =====================================
-HyperFlow is a automatic machine learning workflow modeling platform.
+AutoFlow is a automatic machine learning workflow modeling platform.
 
 
 .. toctree::

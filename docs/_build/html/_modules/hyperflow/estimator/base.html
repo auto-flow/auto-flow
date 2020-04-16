@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.estimator.base &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.estimator.base &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.estimator.base</li>
+      <li>autoflow.estimator.base</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,7 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.estimator.base</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.estimator.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
@@ -182,25 +182,25 @@
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow</span> <span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">hyperflow.ensemble.base</span> <span class="kn">import</span> <span class="n">EnsembleEstimator</span>
-<span class="kn">from</span> <span class="nn">hyperflow.ensemble.trained_data_fetcher</span> <span class="kn">import</span> <span class="n">TrainedDataFetcher</span>
-<span class="kn">from</span> <span class="nn">hyperflow.ensemble.trials_fetcher</span> <span class="kn">import</span> <span class="n">TrialsFetcher</span>
-<span class="kn">from</span> <span class="nn">hyperflow.hdl.hdl_constructor</span> <span class="kn">import</span> <span class="n">HDL_Constructor</span>
-<span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
-<span class="kn">from</span> <span class="nn">hyperflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
-<span class="kn">from</span> <span class="nn">hyperflow.metrics</span> <span class="kn">import</span> <span class="n">r2</span><span class="p">,</span> <span class="n">accuracy</span>
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
-<span class="kn">from</span> <span class="nn">hyperflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">get_chunks</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.config_space</span> <span class="kn">import</span> <span class="n">replace_phps</span><span class="p">,</span> <span class="n">estimate_config_space_numbers</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_placeholder_from_other_dict</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">instancing</span><span class="p">,</span> <span class="n">sequencing</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">setup_logger</span>
-<span class="kn">from</span> <span class="nn">hyperflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_name_of_module</span>
+<span class="kn">from</span> <span class="nn">autoflow</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">autoflow.ensemble.base</span> <span class="kn">import</span> <span class="n">EnsembleEstimator</span>
+<span class="kn">from</span> <span class="nn">autoflow.ensemble.trained_data_fetcher</span> <span class="kn">import</span> <span class="n">TrainedDataFetcher</span>
+<span class="kn">from</span> <span class="nn">autoflow.ensemble.trials_fetcher</span> <span class="kn">import</span> <span class="n">TrialsFetcher</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl.hdl_constructor</span> <span class="kn">import</span> <span class="n">HDL_Constructor</span>
+<span class="kn">from</span> <span class="nn">autoflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
+<span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">autoflow.metrics</span> <span class="kn">import</span> <span class="n">r2</span><span class="p">,</span> <span class="n">accuracy</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
+<span class="kn">from</span> <span class="nn">autoflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">get_chunks</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.config_space</span> <span class="kn">import</span> <span class="n">replace_phps</span><span class="p">,</span> <span class="n">estimate_config_space_numbers</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_placeholder_from_other_dict</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">instancing</span><span class="p">,</span> <span class="n">sequencing</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">setup_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_name_of_module</span>
 
 
-<div class="viewcode-block" id="HyperFlowEstimator"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator">[docs]</a><span class="k">class</span> <span class="nc">HyperFlowEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowEstimator"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator">[docs]</a><span class="k">class</span> <span class="nc">AutoFlowEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
     <span class="n">checked_mainTask</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -218,33 +218,33 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        tuner: :class:`hyperflow.tuner.tuner.Tuner` or None</span>
+<span class="sd">        tuner: :class:`autoflow.tuner.tuner.Tuner` or None</span>
 <span class="sd">            ``Tuner`` if class who agent an abstract search process.</span>
 
-<span class="sd">        hdl_constructor: :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor` or None</span>
+<span class="sd">        hdl_constructor: :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or None</span>
 <span class="sd">            ``HDL`` is abbreviation of Hyper-parameter Descriptions Language.</span>
 
 <span class="sd">            It describes an abstract hyperparametric space that independent with concrete implementation.</span>
 
 <span class="sd">            ``HDL_Constructor`` is a class who is responsible for translating dict-type ``DAG-workflow`` into ``H.D.L`` .</span>
 
-<span class="sd">        resource_manager: :class:`hyperflow.manager.resource_manager.ResourceManager` or None</span>
+<span class="sd">        resource_manager: :class:`autoflow.manager.resource_manager.ResourceManager` or None</span>
 <span class="sd">            ``ResourceManager`` is a class manager computer resources such like ``file_system`` and ``data_base``.</span>
 
 <span class="sd">        random_state: int</span>
 <span class="sd">            random state</span>
 
 <span class="sd">        log_file: path</span>
-<span class="sd">            which file to store log, if is None, ``hyperflow.log`` will be used.</span>
+<span class="sd">            which file to store log, if is None, ``autoflow.log`` will be used.</span>
 
 <span class="sd">        log_config: dict</span>
 <span class="sd">            logging configuration</span>
 
 <span class="sd">        highR_nan_threshold: float</span>
-<span class="sd">            high ratio NaN threshold, you can find example and practice in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">            high ratio NaN threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
 
 <span class="sd">        highR_cat_threshold: float</span>
-<span class="sd">            high ratio categorical feature&#39;s cardinality threshold, you can find example and practice in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`</span>
+<span class="sd">            high ratio categorical feature&#39;s cardinality threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
 
 <span class="sd">        kwargs: dict</span>
 <span class="sd">            if parameters like ``tuner`` or ``hdl_constructor`` and ``resource_manager`` are passing None,</span>
@@ -254,15 +254,15 @@
 <span class="sd">        Examples</span>
 <span class="sd">        ---------</span>
 <span class="sd">        In this example, you can see a trick to seed kwargs parameters with out initializing</span>
-<span class="sd">        :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor` or other class.</span>
+<span class="sd">        :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or other class.</span>
 
 <span class="sd">        In following example, user pass ``DAG_workflow`` and ``hdl_bank`` by key-work arguments method.</span>
 <span class="sd">        And we can see  hdl_constructor is instanced by kwargs implicitly.</span>
 
-<span class="sd">        &gt;&gt;&gt; from hyperflow import HyperFlowClassifier</span>
-<span class="sd">        &gt;&gt;&gt; classifier = HyperFlowClassifier(DAG_workflow={&quot;num-&gt;target&quot;:[&quot;lightgbm&quot;]},</span>
+<span class="sd">        &gt;&gt;&gt; from autoflow import AutoFlowClassifier</span>
+<span class="sd">        &gt;&gt;&gt; classifier = AutoFlowClassifier(DAG_workflow={&quot;num-&gt;target&quot;:[&quot;lightgbm&quot;]},</span>
 <span class="sd">        ...   hdl_bank={&quot;classification&quot;:{&quot;lightgbm&quot;:{&quot;boosting_type&quot;:  {&quot;_type&quot;: &quot;choice&quot;, &quot;_value&quot;:[&quot;gbdt&quot;,&quot;dart&quot;,&quot;goss&quot;]}}}})</span>
-<span class="sd">        HyperFlowClassifier(hdl_constructor=HDL_Constructor(</span>
+<span class="sd">        AutoFlowClassifier(hdl_constructor=HDL_Constructor(</span>
 <span class="sd">            DAG_workflow={&#39;num-&gt;target&#39;: [&#39;lightgbm&#39;]}</span>
 <span class="sd">            hdl_bank_path=None</span>
 <span class="sd">            hdl_bank={&#39;classification&#39;: {&#39;lightgbm&#39;: {&#39;boosting_type&#39;: {&#39;_type&#39;: &#39;choice&#39;, &#39;_value&#39;: [&#39;gbdt&#39;, &#39;dart&#39;, &#39;goss&#39;]}}}}</span>
@@ -294,7 +294,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="HyperFlowEstimator.fit"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span>
+<div class="viewcode-block" id="AutoFlowEstimator.fit"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">X_train</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">],</span>
             <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -320,15 +320,15 @@
 <span class="sd">        X_test: :class:`numpy.ndarray` or :class:`pandas.DataFrame`</span>
 <span class="sd">        y_test: :class:`numpy.ndarray` or str or None</span>
 <span class="sd">        column_descriptions: dict</span>
-<span class="sd">            Description about each columns&#39; feature_group, you can find full definition in :class:`hyperflow.manager.data_manager.DataManager` .</span>
+<span class="sd">            Description about each columns&#39; feature_group, you can find full definition in :class:`autoflow.manager.data_manager.DataManager` .</span>
 <span class="sd">        dataset_metadata: dict</span>
 <span class="sd">            Dataset&#39;s metadata</span>
-<span class="sd">        metric: :class:`hyperflow.metrics.Scorer` or None</span>
+<span class="sd">        metric: :class:`autoflow.metrics.Scorer` or None</span>
 <span class="sd">            If ``metric`` is None:</span>
 
-<span class="sd">            if it&#39;s classification task, :obj:`hyperflow.metrics.accuracy` will be used by default.</span>
+<span class="sd">            if it&#39;s classification task, :obj:`autoflow.metrics.accuracy` will be used by default.</span>
 
-<span class="sd">            if it&#39;s regressor task, :obj:`hyperflow.metrics.r2` will be used by default.</span>
+<span class="sd">            if it&#39;s regressor task, :obj:`autoflow.metrics.r2` will be used by default.</span>
 <span class="sd">        should_calc_all_metrics: bool</span>
 <span class="sd">            If ``True``, all the metrics supported in current task will be calculated, result will be store in databbase.</span>
 <span class="sd">        splitter: object</span>
@@ -420,7 +420,7 @@
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="HyperFlowEstimator.start_tuner"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.start_tuner">[docs]</a>    <span class="k">def</span> <span class="nf">start_tuner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">:</span> <span class="n">Tuner</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowEstimator.start_tuner"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.start_tuner">[docs]</a>    <span class="k">def</span> <span class="nf">start_tuner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">:</span> <span class="n">Tuner</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start fine tune task, </span><span class="se">\n</span><span class="s2">which HDL(Hyperparams Descriptions Language) is:</span><span class="se">\n</span><span class="si">{hdl}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;which Tuner is:</span><span class="se">\n</span><span class="si">{tuner}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">tuner</span><span class="o">.</span><span class="n">set_data_manager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">)</span>
@@ -468,7 +468,7 @@
 
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;is_manual&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="HyperFlowEstimator.start_final_step"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.start_final_step">[docs]</a>    <span class="k">def</span> <span class="nf">start_final_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_ensemble_params</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowEstimator.start_final_step"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.start_final_step">[docs]</a>    <span class="k">def</span> <span class="nf">start_final_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_ensemble_params</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fit_ensemble_params</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">fit_ensemble_params</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;fit_ensemble_params&#39; is &#39;auto&#39;, use default params to fit_ensemble_params.&quot;</span><span class="p">)</span>
@@ -494,7 +494,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="HyperFlowEstimator.run"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">,</span> <span class="n">run_limit</span><span class="p">,</span> <span class="n">initial_configs</span><span class="p">,</span> <span class="n">is_master</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">sync_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowEstimator.run"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">,</span> <span class="n">run_limit</span><span class="p">,</span> <span class="n">initial_configs</span><span class="p">,</span> <span class="n">is_master</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">sync_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">sync_dict</span><span class="p">:</span>
             <span class="n">sync_dict</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">resource_manager</span><span class="o">.</span><span class="n">sync_dict</span> <span class="o">=</span> <span class="n">sync_dict</span>
@@ -527,7 +527,7 @@
         <span class="k">if</span> <span class="n">sync_dict</span><span class="p">:</span>
             <span class="n">sync_dict</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()]</span> <span class="o">=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="HyperFlowEstimator.fit_ensemble"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span>
+<div class="viewcode-block" id="AutoFlowEstimator.fit_ensemble"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">task_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">hdl_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -544,7 +544,7 @@
         <span class="c1">#     assert hasattr(self.resource_manager, &quot;hdl_id&quot;) and self.resource_manager.hdl_id is not None</span>
         <span class="c1">#     hdl_id = self.resource_manager.hdl_id</span>
         <span class="n">trials_fetcher_name</span> <span class="o">=</span> <span class="n">trials_fetcher</span>
-        <span class="kn">from</span> <span class="nn">hyperflow.ensemble</span> <span class="kn">import</span> <span class="n">trials_fetcher</span>
+        <span class="kn">from</span> <span class="nn">autoflow.ensemble</span> <span class="kn">import</span> <span class="n">trials_fetcher</span>
         <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">trials_fetcher</span><span class="p">,</span> <span class="n">trials_fetcher_name</span><span class="p">)</span>
         <span class="n">trials_fetcher_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">trials_fetcher</span><span class="p">,</span> <span class="n">trials_fetcher_name</span><span class="p">)</span>
         <span class="n">trials_fetcher</span><span class="p">:</span> <span class="n">TrialsFetcher</span> <span class="o">=</span> <span class="n">trials_fetcher_cls</span><span class="p">(</span><span class="n">resource_manager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
@@ -555,7 +555,7 @@
             <span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">,</span> <span class="n">trial_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
         <span class="n">ml_task</span><span class="p">,</span> <span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">get_ensemble_needed_info</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">)</span>
         <span class="n">y_true</span> <span class="o">=</span> <span class="n">Xy_train</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">ensemble_estimator_package_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hyperflow.ensemble.</span><span class="si">{ensemble_type}</span><span class="s2">.</span><span class="si">{ml_task.role}</span><span class="s2">&quot;</span>
+        <span class="n">ensemble_estimator_package_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;autoflow.ensemble.</span><span class="si">{ensemble_type}</span><span class="s2">.</span><span class="si">{ml_task.role}</span><span class="s2">&quot;</span>
         <span class="n">ensemble_estimator_package</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">ensemble_estimator_package_name</span><span class="p">)</span>
         <span class="n">ensemble_estimator_class_name</span> <span class="o">=</span> <span class="n">get_class_name_of_module</span><span class="p">(</span><span class="n">ensemble_estimator_package_name</span><span class="p">)</span>
         <span class="n">ensemble_estimator_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ensemble_estimator_package</span><span class="p">,</span> <span class="n">ensemble_estimator_class_name</span><span class="p">)</span>
@@ -567,7 +567,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span></div>
 
-<div class="viewcode-block" id="HyperFlowEstimator.auto_fit_ensemble"><a class="viewcode-back" href="../../../_module/hyperflow.estimator.html#hyperflow.estimator.base.HyperFlowEstimator.auto_fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">auto_fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowEstimator.auto_fit_ensemble"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.auto_fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">auto_fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span>
@@ -582,7 +582,7 @@
         <span class="n">is_set_X_test</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data_manager&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;&#39;data_manager&#39; is existing in HyperFlowEstimator, will not load it from database or create it.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;&#39;data_manager&#39; is existing in AutoFlowEstimator, will not load it from database or create it.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">task_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">_experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">get_experiment_id_by_task_id</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>

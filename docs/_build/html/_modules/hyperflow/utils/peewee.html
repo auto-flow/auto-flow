@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.utils.peewee &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.utils.peewee &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">HyperFlow</a>
+          <a href="../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.utils.peewee</li>
+      <li>autoflow.utils.peewee</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,18 +165,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.utils.peewee</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.utils.peewee</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pickle</span>
 
 <span class="kn">import</span> <span class="nn">peewee</span> <span class="k">as</span> <span class="nn">pw</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="PickleFiled"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.peewee.PickleFiled">[docs]</a><span class="k">class</span> <span class="nc">PickleFiled</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">BitField</span><span class="p">):</span>
-<div class="viewcode-block" id="PickleFiled.db_value"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.peewee.PickleFiled.db_value">[docs]</a>    <span class="k">def</span> <span class="nf">db_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="PickleFiled"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.peewee.PickleFiled">[docs]</a><span class="k">class</span> <span class="nc">PickleFiled</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">BitField</span><span class="p">):</span>
+<div class="viewcode-block" id="PickleFiled.db_value"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.peewee.PickleFiled.db_value">[docs]</a>    <span class="k">def</span> <span class="nf">db_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> \
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> \
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> \
@@ -184,7 +184,7 @@
             <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PickleFiled.python_value"><a class="viewcode-back" href="../../../_module/hyperflow.utils.html#hyperflow.utils.peewee.PickleFiled.python_value">[docs]</a>    <span class="k">def</span> <span class="nf">python_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="PickleFiled.python_value"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.peewee.PickleFiled.python_value">[docs]</a>    <span class="k">def</span> <span class="nf">python_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>

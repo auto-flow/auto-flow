@@ -1,45 +1,45 @@
-hyperflow.pipeline.components.preprocessing.scale package
+autoflow.pipeline.components.preprocessing.scale package
 =========================================================
 
 Submodules
 ----------
 
-hyperflow.pipeline.components.preprocessing.scale.minmax module
+autoflow.pipeline.components.preprocessing.scale.minmax module
 ---------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.scale.minmax
+.. automodule:: autoflow.pipeline.components.preprocessing.scale.minmax
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.scale.normalize module
+autoflow.pipeline.components.preprocessing.scale.normalize module
 ------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.scale.normalize
+.. automodule:: autoflow.pipeline.components.preprocessing.scale.normalize
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.scale.quantile_transformer module
+autoflow.pipeline.components.preprocessing.scale.quantile_transformer module
 -----------------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.scale.quantile_transformer
+.. automodule:: autoflow.pipeline.components.preprocessing.scale.quantile_transformer
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.scale.robust_scaler module
+autoflow.pipeline.components.preprocessing.scale.robust_scaler module
 ----------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.scale.robust_scaler
+.. automodule:: autoflow.pipeline.components.preprocessing.scale.robust_scaler
     :members:
     :undoc-members:
     :show-inheritance:
 
-hyperflow.pipeline.components.preprocessing.scale.standardize module
+autoflow.pipeline.components.preprocessing.scale.standardize module
 --------------------------------------------------------------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.scale.standardize
+.. automodule:: autoflow.pipeline.components.preprocessing.scale.standardize
     :members:
     :undoc-members:
     :show-inheritance:
@@ -48,7 +48,7 @@ hyperflow.pipeline.components.preprocessing.scale.standardize module
 Module contents
 ---------------
 
-.. automodule:: hyperflow.pipeline.components.preprocessing.scale
+.. automodule:: autoflow.pipeline.components.preprocessing.scale
     :members:
     :undoc-members:
     :show-inheritance:

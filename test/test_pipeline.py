@@ -4,14 +4,14 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, KFold
 
-from hyperflow import constants
-from hyperflow.pipeline.components.classification.sgd import SGD
-from hyperflow.pipeline.components.preprocessing.encode.one_hot import OneHotEncoder
-from hyperflow.pipeline.components.preprocessing.impute.fill_cat import FillCat
-from hyperflow.pipeline.components.preprocessing.impute.fill_num import FillNum
-from hyperflow.pipeline.dataframe import GenericDataFrame
-from hyperflow.pipeline.pipeline import GenericPipeline
-from hyperflow.utils.logging import get_logger
+from autoflow import constants
+from autoflow.pipeline.components.classification.sgd import SGD
+from autoflow.pipeline.components.preprocessing.encode.one_hot import OneHotEncoder
+from autoflow.pipeline.components.preprocessing.impute.fill_cat import FillCat
+from autoflow.pipeline.components.preprocessing.impute.fill_num import FillNum
+from autoflow.pipeline.dataframe import GenericDataFrame
+from autoflow.pipeline.pipeline import GenericPipeline
+from autoflow.utils.logging import get_logger
 
 
 class TestPipeline(unittest.TestCase):

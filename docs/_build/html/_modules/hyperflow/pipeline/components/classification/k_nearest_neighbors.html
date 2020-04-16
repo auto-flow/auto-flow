@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hyperflow.pipeline.components.classification.k_nearest_neighbors &mdash; HyperFlow 0.1.0 documentation</title>
+  <title>autoflow.pipeline.components.classification.k_nearest_neighbors &mdash; AutoFlow 0.1.0 documentation</title>
   
 
   
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../../../../../index.html" class="icon icon-home"> HyperFlow
+            <a href="../../../../../index.html" class="icon icon-home"> AutoFlow
           
 
           
@@ -117,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../../index.html">HyperFlow</a>
+          <a href="../../../../../index.html">AutoFlow</a>
         
       </nav>
 
@@ -150,7 +150,7 @@
         
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
         
-      <li>hyperflow.pipeline.components.classification.k_nearest_neighbors</li>
+      <li>autoflow.pipeline.components.classification.k_nearest_neighbors</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,21 +165,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for hyperflow.pipeline.components.classification.k_nearest_neighbors</h1><div class="highlight"><pre>
+  <h1>Source code for autoflow.pipeline.components.classification.k_nearest_neighbors</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 
-<span class="kn">from</span> <span class="nn">hyperflow.pipeline.components.classification_base</span> <span class="kn">import</span> <span class="n">HyperFlowClassificationAlgorithm</span>
+<span class="kn">from</span> <span class="nn">autoflow.pipeline.components.classification_base</span> <span class="kn">import</span> <span class="n">AutoFlowClassificationAlgorithm</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;KNearestNeighborsClassifier&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="KNearestNeighborsClassifier"><a class="viewcode-back" href="../../../../../_module/hyperflow.pipeline.components.classification.html#hyperflow.pipeline.components.classification.k_nearest_neighbors.KNearestNeighborsClassifier">[docs]</a><span class="k">class</span> <span class="nc">KNearestNeighborsClassifier</span><span class="p">(</span><span class="n">HyperFlowClassificationAlgorithm</span><span class="p">):</span>
+<div class="viewcode-block" id="KNearestNeighborsClassifier"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.classification.html#autoflow.pipeline.components.classification.k_nearest_neighbors.KNearestNeighborsClassifier">[docs]</a><span class="k">class</span> <span class="nc">KNearestNeighborsClassifier</span><span class="p">(</span><span class="n">AutoFlowClassificationAlgorithm</span><span class="p">):</span>
     <span class="n">class__</span> <span class="o">=</span> <span class="s2">&quot;KNeighborsClassifier&quot;</span>
     <span class="n">module__</span> <span class="o">=</span> <span class="s2">&quot;sklearn.neighbors&quot;</span>
 
     <span class="c1"># fixme ovr</span>
 
-<div class="viewcode-block" id="KNearestNeighborsClassifier.after_process_hyperparams"><a class="viewcode-back" href="../../../../../_module/hyperflow.pipeline.components.classification.html#hyperflow.pipeline.components.classification.k_nearest_neighbors.KNearestNeighborsClassifier.after_process_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<div class="viewcode-block" id="KNearestNeighborsClassifier.after_process_hyperparams"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.classification.html#autoflow.pipeline.components.classification.k_nearest_neighbors.KNearestNeighborsClassifier.after_process_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="n">hyperparams</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">KNearestNeighborsClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_process_hyperparams</span><span class="p">(</span><span class="n">hyperparams</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;n_neighbors&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span><span class="p">:</span>
             <span class="n">hyperparams</span><span class="p">[</span><span class="s2">&quot;n_neighbors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">[</span><span class="s2">&quot;n_neighbors&quot;</span><span class="p">])</span>
