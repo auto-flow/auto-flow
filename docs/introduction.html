@@ -322,7 +322,7 @@ I want to introduce a concept: <code class="docutils literal notranslate"><span 
 the remaining columns are called <code class="docutils literal notranslate"><span class="pre">features</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can find <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code>’s definition in <a class="reference internal" href="_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a></p>
+<p>You can find <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code>’s definition in <a class="reference internal" href="api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a></p>
 </div>
 <p>If some <code class="docutils literal notranslate"><span class="pre">features</span></code> have similar properties, they are containing in a same <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>.</p>
 <div class="admonition note">
@@ -449,7 +449,7 @@ Some computer scientists said, <code class="docutils literal notranslate"><span 
 <h3>Instance In Titanic<a class="headerlink" href="#instance-in-titanic" title="Permalink to this headline">¶</a></h3>
 <p>You may be curious about the <code class="docutils literal notranslate"><span class="pre">workflow</span> <span class="pre">space</span></code> picture above, want to know how it work.
 Let me introduce the processing details step by step.</p>
-<p><strong>First step</strong>, data manager(<a class="reference internal" href="_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a>) split raw data into three
+<p><strong>First step</strong>, data manager(<a class="reference internal" href="api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a>) split raw data into three
 <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>: <a class="reference internal" href="#nan"><span class="std std-ref">nan</span></a>, <a class="reference internal" href="#highr-nan"><span class="std std-ref">highR_nan</span></a>, <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a> and <a class="reference internal" href="#num"><span class="std std-ref">num</span></a>. like this:</p>
 <table class="docutils align-default" id="id3">
 <caption><span class="caption-text">First Step : Split By Data Manager</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>

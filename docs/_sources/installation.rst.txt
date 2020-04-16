@@ -39,7 +39,7 @@ line:
 
 .. code-block:: bash
 
-    pip install AutoFlow
+    pip install auto-flow
     
 If you want to install it in the user space (e.g., because of missing
 permissions), please add the option :code:`--user` or create a virtualenv.
@@ -53,6 +53,6 @@ command line:
 
 .. code-block:: bash
 
-    git clone https://github.com/Hyper-Flow/AutoFlow.git
-    cd AutoFlow
+    git clone https://github.com/auto-flow/autoflow.git
+    cd autoflow
     python setup.py install

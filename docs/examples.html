@@ -211,7 +211,7 @@
                                        <span class="n">per_run_time_limit</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Fifth step</strong>, define columns descriptions, you can find .You can find the full definition in <a class="reference internal" href="_module/autoflow.manager.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a> .</p>
+<p><strong>Fifth step</strong>, define columns descriptions, you can find .You can find the full definition in <a class="reference internal" href="api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a> .</p>
 <dl class="simple">
 <dt>Here are some columns descriptions:</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> is a column name means unique descriptor of each rows.</p></li>
@@ -227,7 +227,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>Sixth step</strong>, auto do fitting. you can find full document in <a class="reference internal" href="_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit" title="autoflow.estimator.base.AutoFlowEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator.fit()</span></code></a> .</p>
+<p><strong>Sixth step</strong>, auto do fitting. you can find full document in <a class="reference internal" href="_module/hyperflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit" title="autoflow.estimator.base.AutoFlowEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator.fit()</span></code></a> .</p>
 <p>Passing data params <code class="docutils literal notranslate"><span class="pre">train_df</span></code>, <code class="docutils literal notranslate"><span class="pre">test_df</span></code> and <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code> to classifier.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">fit_ensemble_params</span></code> is “auto” or True, the top 10 models will be integrated by stacking ensemble.</p>
 <p><code class="docutils literal notranslate"><span class="pre">splitter</span></code> is train-valid-dataset splitter,now is set to <code class="docutils literal notranslate"><span class="pre">KFold(3,</span> <span class="pre">True,</span> <span class="pre">42)</span></code> to do 3-Fold Cross-Validation.</p>

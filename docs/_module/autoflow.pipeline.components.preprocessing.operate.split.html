@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>autoflow.pipeline.components.preprocessing.operate.split package &mdash; AutoFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> AutoFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">AutoFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>autoflow.pipeline.components.preprocessing.operate.split package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/autoflow.pipeline.components.preprocessing.operate.split.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="autoflow-pipeline-components-preprocessing-operate-split-package">
+<h1>autoflow.pipeline.components.preprocessing.operate.split package<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-operate-split-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-autoflow.pipeline.components.preprocessing.operate.split.base">
+<span id="autoflow-pipeline-components-preprocessing-operate-split-base-module"></span><h2>autoflow.pipeline.components.preprocessing.operate.split.base module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.operate.split.base" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.operate.split.base.</code><code class="sig-name descname">BaseSplit</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm" title="autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.calc_R">
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.calc_R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.default_threshold">
+<code class="sig-name descname">default_threshold</code><em class="property"> = 0.5</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.default_threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="p">:</span> <span class="n"><a class="reference internal" href="autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame" title="autoflow.pipeline.dataframe.GenericDataFrame">autoflow.pipeline.dataframe.GenericDataFrame</a></span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.judge_keyname">
+<code class="sig-name descname">judge_keyname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.judge_keyname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.judge_keyname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1">
+<code class="sig-name descname">key1</code><em class="property"> = 'highR'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_default_name">
+<code class="sig-name descname">key1_default_name</code><em class="property"> = None</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_hp_name">
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = None</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2">
+<code class="sig-name descname">key2</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_default_name">
+<code class="sig-name descname">key2_default_name</code><em class="property"> = None</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_hp_name">
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = None</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_origin</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame" title="autoflow.pipeline.dataframe.GenericDataFrame">autoflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference internal" href="autoflow.pipeline.html#autoflow.pipeline.dataframe.GenericDataFrame" title="autoflow.pipeline.dataframe.GenericDataFrame">autoflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-autoflow.pipeline.components.preprocessing.operate.split.cat">
+<span id="autoflow-pipeline-components-preprocessing-operate-split-cat-module"></span><h2>autoflow.pipeline.components.preprocessing.operate.split.cat module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.operate.split.cat" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.operate.split.cat.</code><code class="sig-name descname">SplitCat</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/cat.html#SplitCat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R">
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/cat.html#SplitCat.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_default_name">
+<code class="sig-name descname">key1_default_name</code><em class="property"> = 'highR_cat'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_hp_name">
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = 'highR'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_default_name">
+<code class="sig-name descname">key2_default_name</code><em class="property"> = 'lowR_cat'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_hp_name">
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-autoflow.pipeline.components.preprocessing.operate.split.cat_num">
+<span id="autoflow-pipeline-components-preprocessing-operate-split-cat-num-module"></span><h2>autoflow.pipeline.components.preprocessing.operate.split.cat_num module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.operate.split.cat_num" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.operate.split.cat_num.</code><code class="sig-name descname">SplitCatNum</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.calc_R">
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.calc_R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.judge_keyname">
+<code class="sig-name descname">judge_keyname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum.judge_keyname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.judge_keyname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1">
+<code class="sig-name descname">key1</code><em class="property"> = 'cat'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_default_name">
+<code class="sig-name descname">key1_default_name</code><em class="property"> = 'cat'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_hp_name">
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = 'cat_name'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2">
+<code class="sig-name descname">key2</code><em class="property"> = 'num'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_default_name">
+<code class="sig-name descname">key2_default_name</code><em class="property"> = 'num'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_hp_name">
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = 'num_name'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-autoflow.pipeline.components.preprocessing.operate.split.nan">
+<span id="autoflow-pipeline-components-preprocessing-operate-split-nan-module"></span><h2>autoflow.pipeline.components.preprocessing.operate.split.nan module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.operate.split.nan" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan">
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.operate.split.nan.</code><code class="sig-name descname">SplitNan</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/nan.html#SplitNan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
+<dl class="py method">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.calc_R">
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/operate/split/nan.html#SplitNan.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.calc_R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_default_name">
+<code class="sig-name descname">key1_default_name</code><em class="property"> = 'highR_nan'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_hp_name">
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = 'highR'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_default_name">
+<code class="sig-name descname">key2_default_name</code><em class="property"> = 'lowR_nan'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_hp_name">
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-autoflow.pipeline.components.preprocessing.operate.split">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.operate.split" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

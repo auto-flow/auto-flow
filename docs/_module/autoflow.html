@@ -1,0 +1,428 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>autoflow package &mdash; AutoFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> AutoFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">AutoFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>autoflow package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_module/autoflow.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="autoflow-package">
+<h1>autoflow package<a class="headerlink" href="#autoflow-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.data_process.html">autoflow.data_process package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.data_process.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.data_process.abnormal.html">autoflow.data_process.abnormal package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.data_process.abnormal.html#module-autoflow.data_process.abnormal">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.data_process.balance.html">autoflow.data_process.balance package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.data_process.balance.html#module-autoflow.data_process.balance">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.data_process.impute.html">autoflow.data_process.impute package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.data_process.impute.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.data_process.impute.html#module-autoflow.data_process.impute.delete_nan">autoflow.data_process.impute.delete_nan module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.data_process.impute.html#module-autoflow.data_process.impute">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.data_process.html#module-autoflow.data_process">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.ensemble.html">autoflow.ensemble package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.ensemble.mean.html">autoflow.ensemble.mean package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.mean.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.mean.html#module-autoflow.ensemble.mean.regressor">autoflow.ensemble.mean.regressor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.mean.html#module-autoflow.ensemble.mean">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.ensemble.stack.html">autoflow.ensemble.stack package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.stack.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.stack.html#module-autoflow.ensemble.stack.base">autoflow.ensemble.stack.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.stack.html#module-autoflow.ensemble.stack.classifier">autoflow.ensemble.stack.classifier module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.stack.html#module-autoflow.ensemble.stack.regressor">autoflow.ensemble.stack.regressor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.stack.html#module-autoflow.ensemble.stack">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.ensemble.vote.html">autoflow.ensemble.vote package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.vote.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.vote.html#module-autoflow.ensemble.vote.classifier">autoflow.ensemble.vote.classifier module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.ensemble.vote.html#module-autoflow.ensemble.vote">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#module-autoflow.ensemble.base">autoflow.ensemble.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#module-autoflow.ensemble.trained_data_fetcher">autoflow.ensemble.trained_data_fetcher module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#module-autoflow.ensemble.trials_fetcher">autoflow.ensemble.trials_fetcher module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#module-autoflow.ensemble.utils">autoflow.ensemble.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.ensemble.html#module-autoflow.ensemble">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.estimator.html">autoflow.estimator package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.estimator.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.estimator.html#module-autoflow.estimator.base">autoflow.estimator.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.estimator.html#module-autoflow.estimator.classifier">autoflow.estimator.classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.estimator.html#module-autoflow.estimator.regressor">autoflow.estimator.regressor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.estimator.html#module-autoflow.estimator.transformer">autoflow.estimator.transformer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.estimator.html#module-autoflow.estimator">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.evaluation.html">autoflow.evaluation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.evaluation.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.evaluation.html#module-autoflow.evaluation.base">autoflow.evaluation.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.evaluation.html#module-autoflow.evaluation.ensemble_evaluator">autoflow.evaluation.ensemble_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.evaluation.html#module-autoflow.evaluation.train_evaluator">autoflow.evaluation.train_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.evaluation.html#module-autoflow.evaluation">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.feature_engineer.html">autoflow.feature_engineer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.feature_engineer.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.feature_engineer.compress.html">autoflow.feature_engineer.compress package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.compress.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.compress.html#module-autoflow.feature_engineer.compress.f1_score">autoflow.feature_engineer.compress.f1_score module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.compress.html#module-autoflow.feature_engineer.compress.pearson">autoflow.feature_engineer.compress.pearson module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.compress.html#module-autoflow.feature_engineer.compress.similarity_base">autoflow.feature_engineer.compress.similarity_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.compress.html#module-autoflow.feature_engineer.compress.variance">autoflow.feature_engineer.compress.variance module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.compress.html#module-autoflow.feature_engineer.compress">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.feature_engineer.encode.html">autoflow.feature_engineer.encode package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.encode.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.encode.html#module-autoflow.feature_engineer.encode.label_encode">autoflow.feature_engineer.encode.label_encode module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.encode.html#module-autoflow.feature_engineer.encode">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.feature_engineer.operate.html">autoflow.feature_engineer.operate package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.operate.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.operate.html#module-autoflow.feature_engineer.operate.drop_all">autoflow.feature_engineer.operate.drop_all module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.operate.html#module-autoflow.feature_engineer.operate">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.feature_engineer.transform.html">autoflow.feature_engineer.transform package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.transform.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.transform.html#module-autoflow.feature_engineer.transform.guassion_tranform">autoflow.feature_engineer.transform.guassion_tranform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.feature_engineer.transform.html#module-autoflow.feature_engineer.transform">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.feature_engineer.html#module-autoflow.feature_engineer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.hdl.html">autoflow.hdl package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.hdl.smac.html">autoflow.hdl.smac package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.hdl.smac.html#module-autoflow.hdl.smac">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl.html#module-autoflow.hdl.hdl_constructor">autoflow.hdl.hdl_constructor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl.html#module-autoflow.hdl.utils">autoflow.hdl.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl.html#module-autoflow.hdl">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.hdl2shps.html">autoflow.hdl2shps package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl2shps.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl2shps.html#module-autoflow.hdl2shps.hdl2shps">autoflow.hdl2shps.hdl2shps module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.hdl2shps.html#module-autoflow.hdl2shps">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.manager.html">autoflow.manager package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.manager.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.manager.html#module-autoflow.manager.data_manager">autoflow.manager.data_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.manager.html#module-autoflow.manager.resource_manager">autoflow.manager.resource_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.manager.html#module-autoflow.manager">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.metrics.html">autoflow.metrics package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.metrics.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.metrics.html#module-autoflow.metrics.classification_metrics">autoflow.metrics.classification_metrics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.metrics.html#module-autoflow.metrics">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.pipeline.html">autoflow.pipeline package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.pipeline.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoflow.pipeline.components.html">autoflow.pipeline.components package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components.base">autoflow.pipeline.components.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components.classification_base">autoflow.pipeline.components.classification_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components.data_process_base">autoflow.pipeline.components.data_process_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components.feature_engineer_base">autoflow.pipeline.components.feature_engineer_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components.regression_base">autoflow.pipeline.components.regression_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components.utils">autoflow.pipeline.components.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoflow.pipeline.components.html#module-autoflow.pipeline.components">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.pipeline.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.pipeline.html#module-autoflow.pipeline.dataframe">autoflow.pipeline.dataframe module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.pipeline.html#module-autoflow.pipeline.pipeline">autoflow.pipeline.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.pipeline.html#module-autoflow.pipeline">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.shp2dhp.html">autoflow.shp2dhp package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.shp2dhp.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.shp2dhp.html#module-autoflow.shp2dhp.shp2dhp">autoflow.shp2dhp.shp2dhp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.shp2dhp.html#module-autoflow.shp2dhp">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.splitter.html">autoflow.splitter package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.splitter.html#module-autoflow.splitter">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.tuner.html">autoflow.tuner package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.tuner.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.tuner.html#module-autoflow.tuner.tuner">autoflow.tuner.tuner module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.tuner.html#module-autoflow.tuner">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoflow.utils.html">autoflow.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.array">autoflow.utils.array module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.concurrence">autoflow.utils.concurrence module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.config_space">autoflow.utils.config_space module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.data">autoflow.utils.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.dataframe">autoflow.utils.dataframe module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.dict">autoflow.utils.dict module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.graphviz">autoflow.utils.graphviz module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.hash">autoflow.utils.hash module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.klass">autoflow.utils.klass module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.list">autoflow.utils.list module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.logging">autoflow.utils.logging module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.math">autoflow.utils.math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.ml_task">autoflow.utils.ml_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.packages">autoflow.utils.packages module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.peewee">autoflow.utils.peewee module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.pipeline">autoflow.utils.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.sys">autoflow.utils.sys module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils.typing">autoflow.utils.typing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autoflow.utils.html#module-autoflow.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-autoflow.constants">
+<span id="autoflow-constants-module"></span><h2>autoflow.constants module<a class="headerlink" href="#module-autoflow.constants" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-autoflow">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

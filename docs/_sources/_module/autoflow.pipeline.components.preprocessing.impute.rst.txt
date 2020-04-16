@@ -1,0 +1,54 @@
+autoflow.pipeline.components.preprocessing.impute package
+=========================================================
+
+Submodules
+----------
+
+autoflow.pipeline.components.preprocessing.impute.delete module
+---------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.impute.delete
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.impute.fill\_abnormal module
+-----------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.impute.fill_abnormal
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.impute.fill\_cat module
+------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.impute.fill_cat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.impute.fill\_num module
+------------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.impute.fill_num
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoflow.pipeline.components.preprocessing.impute.knn module
+------------------------------------------------------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.impute.knn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: autoflow.pipeline.components.preprocessing.impute
+   :members:
+   :undoc-members:
+   :show-inheritance:
