@@ -7,7 +7,6 @@ HyperFlow documentation!
 =====================================
 HyperFlow is a automatic machine learning workflow modeling platform.
 
-Contents:
 
 .. toctree::
    :maxdepth: 1
