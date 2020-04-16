@@ -48,22 +48,57 @@ class HyperFlowEstimator(BaseEstimator):
             **kwargs
     ):
         '''
-
         Parameters
         ----------
-        tuner: dict
-            tuner is a object to fine tune the hyper-parameters.
-        hdl_constructor: int
-            ``H.D.L.`` is a abbreviation of Hyperparams Descriptions Language.
-            hdl_constructor is a object to build HDL by seeding specific parameters.
-        resource_manager: str
-            resource_manager is a object to manager the resources, such like database connections and file-systems.
-        random_state
-        log_file
-        log_config
-        highR_nan_threshold
-        highR_cat_threshold
-        kwargs
+        tuner: :class:`hyperflow.tuner.tuner.Tuner` or None
+            ``Tuner`` if class who agent an abstract search process.
+
+        hdl_constructor: :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor` or None
+            ``HDL`` is abbreviation of Hyper-parameter Descriptions Language.
+
+            It describes an abstract hyperparametric space that independent with concrete implementation.
+
+            ``HDL_Constructor`` is a class who is responsible for translating dict-type ``DAG-workflow`` into ``H.D.L`` .
+
+        resource_manager: :class:`hyperflow.manager.resource_manager.ResourceManager` or None
+            ``ResourceManager`` is a class manager computer resources such like ``file_system`` and ``data_base``.
+
+        random_state: int
+            random state
+
+        log_file: path
+            which file to store log, if is None, ``hyperflow.log`` will be used.
+
+        log_config: dict
+            logging configuration
+
+        highR_nan_threshold: float
+            high ratio NaN threshold, you can find example and practice in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+
+        highR_cat_threshold: float
+            high ratio categorical feature's cardinality threshold, you can find example and practice in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+
+        kwargs: dict
+            if parameters like ``tuner`` or ``hdl_constructor`` and ``resource_manager`` are passing None,
+
+            you can passing kwargs to make passed parameter work. See the following example.
+
+        Examples
+        ---------
+        In this example, you can see a trick to seed kwargs parameters with out initializing
+        :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor` or other class.
+
+        In following example, user pass ``DAG_workflow`` and ``hdl_bank`` by key-work arguments method.
+        And we can see  hdl_constructor is instanced by kwargs implicitly.
+
+        >>> from hyperflow import HyperFlowClassifier
+        >>> classifier = HyperFlowClassifier(DAG_workflow={"num->target":["lightgbm"]},
+        ...   hdl_bank={"classification":{"lightgbm":{"boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"]}}}})
+        HyperFlowClassifier(hdl_constructor=HDL_Constructor(
+            DAG_workflow={'num->target': ['lightgbm']}
+            hdl_bank_path=None
+            hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
+            included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
         self.log_config = log_config
         self.highR_nan_threshold = highR_nan_threshold
@@ -79,10 +114,12 @@ class HyperFlowEstimator(BaseEstimator):
         tuner = instancing(tuner, Tuner, kwargs)
         # ---tuners-----------------------------------
         self.tuners = sequencing(tuner, Tuner)
+        self.tuner = self.tuners[0]
         # ---hdl_constructor--------------------------
         hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
         # ---hdl_constructors-------------------------
         self.hdl_constructors = sequencing(hdl_constructor, HDL_Constructor)
+        self.hdl_constructor=self.hdl_constructors[0]
         # ---resource_manager-----------------------------------
         self.resource_manager = instancing(resource_manager, ResourceManager, kwargs)
         # ---member_variable------------------------------------
@@ -106,6 +143,40 @@ class HyperFlowEstimator(BaseEstimator):
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
 
     ):
+        '''
+
+        Parameters
+        ----------
+        X_train: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
+        y_train: :class:`numpy.ndarray` or str
+        X_test: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
+        y_test: :class:`numpy.ndarray` or str or None
+        column_descriptions: dict
+            Description about each columns' feature_group, you can find full definition in :class:`hyperflow.manager.data_manager.DataManager` .
+        dataset_metadata: dict
+            Dataset's metadata
+        metric: :class:`hyperflow.metrics.Scorer` or None
+            If ``metric`` is None:
+
+            if it's classification task, :obj:`hyperflow.metrics.accuracy` will be used by default.
+
+            if it's regressor task, :obj:`hyperflow.metrics.r2` will be used by default.
+        should_calc_all_metrics: bool
+            If ``True``, all the metrics supported in current task will be calculated, result will be store in databbase.
+        splitter: object
+            Default is ``KFold(5, True, 42)`` object. You can pass this param defined by yourself or other package,
+            like :class:`sklearn.model_selection.StratifiedKFold`.
+        specific_task_token: str
+        should_store_intermediate_result: bool
+        additional_info: dict
+        fit_ensemble_params: str, dict, None, bool
+            If this param is None, program will not do ensemble.
+
+            If this param is "auto" or True, the top 10 models will be integrated by stacking ensemble.
+        Returns
+        -------
+        self
+        '''
 
         self.should_store_intermediate_result = should_store_intermediate_result
         dataset_metadata = dict(dataset_metadata)

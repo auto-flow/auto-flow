@@ -28,7 +28,7 @@ from hyperflow.utils.peewee import PickleFiled
 
 class ResourceManager(StrSignatureMixin):
     '''
-    ResourceManager: file_system and data_base
+    ``ResourceManager`` is a class manager computer resources such like ``file_system`` and ``data_base``.
     '''
 
     def __init__(
@@ -41,10 +41,54 @@ class ResourceManager(StrSignatureMixin):
             redis_params=frozendict(),
             max_persistent_estimators=50,
             persistent_mode="fs",
-            store_intermediate=True,
             compress_suffix="bz2"
 
     ):
+        '''
+
+        Parameters
+        ----------
+        store_path: str
+            A path store files, such as metadata and model file and database file, which belong to HyperFlow.
+        file_system: str
+            Indicator-string about which file system or storage system will be used.
+
+            Available options list below:
+                * ``local``
+                * ``hdfs``
+                * ``s3``
+
+            ``local`` is default value.
+        file_system_params: dict
+            Specific file_system configuration.
+        db_type: str
+            Indicator-string about which file system or storage system will be used.
+
+            Available options list below:
+                * ``sqlite``
+                * ``postgresql``
+                * ``mysql``
+
+            ``sqlite`` is default value.
+        db_params: dict
+            Specific database configuration.
+        redis_params: dict
+            Redis configuration.
+        max_persistent_estimators: int
+            Maximal number of models can persistent in single task.
+
+            If more than this number, the The worst performing model file will be delete,
+
+            the corresponding database record will also be deleted.
+        persistent_mode: str
+            Indicator-string about which persistent mode will be used.
+
+            Available options list below:
+                * ``db`` - serialize entity to bytes and store in database directly.
+                * ``fs`` - serialize entity to bytes and form a pickle file upload to storage system or save in local.
+        compress_suffix: str
+            compress file's suffix, default is bz2
+        '''
         # --logger-------------------
         self.logger = get_logger(self)
         # --preprocessing------------
@@ -74,8 +118,6 @@ class ResourceManager(StrSignatureMixin):
         # ---persistent_mode-------
         self.persistent_mode = persistent_mode
         assert self.persistent_mode in ("fs", "db")
-        # ---store_intermediate-------
-        self.store_intermediate = store_intermediate
         # ---compress_suffix------------
         self.compress_suffix = compress_suffix
         # ---post_process------------

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from copy import deepcopy
-from typing import Union, Any, Dict, Sequence
+from typing import Union, Any, Dict, Sequence, List
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,9 @@ from hyperflow.utils.ml_task import MLTask, get_ml_task_from_y
 
 
 class DataManager(StrSignatureMixin):
-
+    '''
+    DataManager is a Dataset manager to store the pattern of dataset.
+    '''
     def __init__(
             self,
             X_train: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
@@ -23,19 +25,39 @@ class DataManager(StrSignatureMixin):
             X_test: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
             y_test: Union[pd.Series, np.ndarray, str, None] = None,
             dataset_metadata: Dict[str, Any] = frozenset(),
-            column_descriptions: Dict[str, str] = None,
+            column_descriptions: Dict[str, Union[List[str],str]] = None,
             highR_nan_threshold: float = 0.5,
     ):
         '''
-        DataManager is a Dataset manager to store the pattern of dataset.
 
-        :param X_train:
-        :param y_train:
-        :param X_test:
-        :param y_test:
-        :param dataset_metadata:
-        :param column_descriptions:
-        :param highR_nan_threshold:
+        Parameters
+        ----------
+        X_train: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
+        y_train: :class:`numpy.ndarray`
+        X_test: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
+        y_test: :class:`numpy.ndarray`
+        dataset_metadata: dict
+        column_descriptions: dict
+            ``column_descriptions`` is a dict, key is ``feature_group``,
+
+            value is column (column name) or columns (list of column names).
+
+            This is a list of some frequently-used built-in ``feature_group``
+                * ``id``       - id of this table.
+                * ``ignore``   - some columns which contains irrelevant information.
+                * ``target``   - column in the dataset is what your model will learn to predict.
+                * ``nan``      - Not a Number, a column contain missing values.
+                * ``num``      - numerical features, such as [1, 2, 3].
+                * ``cat``      - categorical features, such as ["a", "b", "c"].
+                * ``num_nan``  - numerical features contains missing values. such as [1, 2, NaN].
+                * ``cat_nan``  - categorical features contains missing values. such as ["a", "b", NaN].
+                * ``highR_nan``  - highly ratio NaN. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+                * ``lowR_nan``   - lowly ratio NaN. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+                * ``highR_cat``  - highly cardinality ratio categorical. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+                * ``lowR_cat``  -  lowly cardinality ratio categorical. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+
+        highR_nan_threshold: float
+            high ratio NaN threshold, you can find examples and practice in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
         '''
         self.logger = get_logger(self)
         dataset_metadata = dict(dataset_metadata)
@@ -84,6 +106,8 @@ class DataManager(StrSignatureMixin):
         elif isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
         elif isinstance(X, pd.DataFrame):
+            pass
+        elif X is None:
             pass
         else:
             raise TypeError
@@ -162,13 +186,6 @@ class DataManager(StrSignatureMixin):
             X_test.index = range(L1, L1 + L2)
         X_train.index = range(L1)
         return X_train, y_train, X_test, y_test, feature_groups, column2feature_groups
-
-    # def load_from_path(self,X:str):
-    #     self.logger.info(f"'{X}' will be parsing as a csv path to load data into data_manager.")
-    #     if not self.resource_manager.file_system.exists(X):
-    #         self.logger.error(f"'{X}' don't exist in file system.")
-    #         raise FileNotFoundError
-    #     return self.resource_manager.file_system.load_csv(X)
 
     def process_X(self, X):
         if X is None:

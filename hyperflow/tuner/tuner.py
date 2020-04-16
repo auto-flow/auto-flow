@@ -19,8 +19,10 @@ from hyperflow.utils.klass import StrSignatureMixin
 from hyperflow.utils.logging import get_logger
 from hyperflow.utils.ml_task import MLTask
 
-
 class Tuner(StrSignatureMixin):
+    '''
+    ``Tuner`` if class who agent an abstract search process.
+    '''
     def __init__(
             self,
             evaluator: Union[Callable, str] = "TrainEvaluator",
@@ -36,6 +38,71 @@ class Tuner(StrSignatureMixin):
             time_left_for_this_task: float = None,
             debug=False
     ):
+        '''
+
+        Parameters
+        ----------
+        evaluator: callable, str
+            ``evaluator`` is a function or callable class (implement magic method ``__call__``) or string-indicator.
+
+            ``evaluator`` can receive a shp(SMAC Hyper Param, :class:`ConfigSpace.ConfigurationSpace`),
+
+            and return a dict ,which contains such keys:
+
+                * ``loss``, you can think of it as negative reward.
+                * ``status``, a string , ``SUCCESS`` means fine, ``FAILED`` means crashed.
+
+            As default,  "TrainEvaluator" is the string-indicator of :class:`hyperflow.evaluation.train_evaluator.TrainEvaluator` .
+
+        search_method: str
+            Specific searching method, ``random``, ``smac``, ``grid`` are available.
+
+                * ``random`` Random Search Algorithm,
+                * ``grid``   Grid   Search Algorithm,
+                * ``smac``   Bayes Search by SMAC Algorithm.
+
+        run_limit: int
+            Limitation of running step.
+
+        initial_runs: int
+            If you choose ``smac`` algorithm,
+
+            you should realize the SMAC algorithm has a initialize procedure,
+
+            The algorithm needs enough initial runs to get enough experience.
+
+            This param will be omitted if ``random`` or ``grid`` is selected.
+
+        search_method_params: dict
+            Configuration for specific search method.
+
+        n_jobs: int
+            ``n_jobs`` searching process will start.
+
+        exit_processes: int
+        limit_resource: bool
+            If ``limit_resource = True``, a searching trial will be killed if it use more CPU times or memory.
+
+        per_run_time_limit: float
+            will active if ``limit_resource = True``.
+
+            a searching trial will be killed if it use CPU times more than ``per_run_time_limit``.
+
+        per_run_memory_limit: float
+            will active if ``limit_resource = True``.
+
+            a searching trial will be killed if it use memory more than ``per_run_memory_limit``.
+
+        time_left_for_this_task: float
+            will active if ``limit_resource = True``.
+
+            a searching task will be killed if it's totally run time more than ``time_left_for_this_task``.
+
+        debug: bool
+            For debug mode.
+
+            Exception will be re-raised if ``debug = True``
+        '''
         self.debug = debug
         self.per_run_memory_limit = per_run_memory_limit
         self.time_left_for_this_task = time_left_for_this_task

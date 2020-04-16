@@ -96,7 +96,7 @@ setup(
         "Intended Audience :: Information Technology",
         "License :: OSI Approved :: BSD License",
         "Natural Language :: English",
-        "Operating System :: Linux",
+        "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Topic :: Scientific/Engineering :: Information Analysis",
         'Programming Language :: Python :: 3.6',

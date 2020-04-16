@@ -24,7 +24,7 @@ class GenericDataFrame(pd.DataFrame):
             columns_metadata = None
         super(GenericDataFrame, self).__init__(*args, **kwargs)
         if feature_groups is None:
-            logger.warning("feature_groups is None, set it all to 'cat' feature group.")
+            logger.debug("feature_groups is None, set it all to 'cat' feature group.")
             feature_groups = ["cat"] * self.shape[1]
         assert (len(feature_groups) == self.shape[1])
         self.set_feature_groups(pd.Series(feature_groups))
