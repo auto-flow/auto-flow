@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.tuner.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.tuner.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -162,53 +174,102 @@
 </div>
 <div class="section" id="module-hyperflow.tuner.tuner">
 <span id="hyperflow-tuner-tuner-module"></span><h2>hyperflow.tuner.tuner module<a class="headerlink" href="#module-hyperflow.tuner.tuner" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.tuner.tuner.Tuner">
-<em class="property">class </em><code class="descclassname">hyperflow.tuner.tuner.</code><code class="descname">Tuner</code><span class="sig-paren">(</span><em>evaluator: Union[Callable</em>, <em>str]='TrainEvaluator'</em>, <em>search_method: str='smac'</em>, <em>run_limit: int=100</em>, <em>initial_runs: int=20</em>, <em>search_method_params: dict=&lt;frozendict {}&gt;</em>, <em>n_jobs: int=1</em>, <em>exit_processes: Union[int</em>, <em>NoneType]=None</em>, <em>limit_resource: bool=True</em>, <em>per_run_time_limit: float=60</em>, <em>per_run_memory_limit: float=3072</em>, <em>time_left_for_this_task: float=None</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.tuner.tuner.</code><code class="sig-name descname">Tuner</code><span class="sig-paren">(</span><em class="sig-param">evaluator: Union[Callable</em>, <em class="sig-param">str] = 'TrainEvaluator'</em>, <em class="sig-param">search_method: str = 'smac'</em>, <em class="sig-param">run_limit: int = 100</em>, <em class="sig-param">initial_runs: int = 20</em>, <em class="sig-param">search_method_params: dict = &lt;frozendict {}&gt;</em>, <em class="sig-param">n_jobs: int = 1</em>, <em class="sig-param">exit_processes: Optional[int] = None</em>, <em class="sig-param">limit_resource: bool = True</em>, <em class="sig-param">per_run_time_limit: float = 60</em>, <em class="sig-param">per_run_memory_limit: float = 3072</em>, <em class="sig-param">time_left_for_this_task: float = None</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.klass.StrSignatureMixin" title="hyperflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.utils.klass.StrSignatureMixin</span></code></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">Tuner</span></code> if class who agent an abstract search process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>evaluator</strong> (<em>callable</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <p><code class="docutils literal notranslate"><span class="pre">evaluator</span></code> is a function or callable class (implement magic method <code class="docutils literal notranslate"><span class="pre">__call__</span></code>) or string-indicator.</p>
+<p><code class="docutils literal notranslate"><span class="pre">evaluator</span></code> can receive a shp(SMAC Hyper Param, <code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigSpace.ConfigurationSpace</span></code>),</p>
+<p>and return a dict ,which contains such keys:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">loss</span></code>, you can think of it as negative reward.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code>, a string , <code class="docutils literal notranslate"><span class="pre">SUCCESS</span></code> means fine, <code class="docutils literal notranslate"><span class="pre">FAILED</span></code> means crashed.</p></li>
+</ul>
+</div></blockquote>
+<p>As default,  “TrainEvaluator” is the string-indicator of <a class="reference internal" href="hyperflow.evaluation.html#hyperflow.evaluation.train_evaluator.TrainEvaluator" title="hyperflow.evaluation.train_evaluator.TrainEvaluator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.evaluation.train_evaluator.TrainEvaluator</span></code></a> .</p>
+</p></li>
+<li><p><strong>search_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <p>Specific searching method, <code class="docutils literal notranslate"><span class="pre">random</span></code>, <code class="docutils literal notranslate"><span class="pre">smac</span></code>, <code class="docutils literal notranslate"><span class="pre">grid</span></code> are available.</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">random</span></code> Random Search Algorithm,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid</span></code>   Grid   Search Algorithm,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">smac</span></code>   Bayes Search by SMAC Algorithm.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>run_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Limitation of running step.</p></li>
+<li><p><strong>initial_runs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>If you choose <code class="docutils literal notranslate"><span class="pre">smac</span></code> algorithm,</p>
+<p>you should realize the SMAC algorithm has a initialize procedure,</p>
+<p>The algorithm needs enough initial runs to get enough experience.</p>
+<p>This param will be omitted if <code class="docutils literal notranslate"><span class="pre">random</span></code> or <code class="docutils literal notranslate"><span class="pre">grid</span></code> is selected.</p>
+</p></li>
+<li><p><strong>search_method_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Configuration for specific search method.</p></li>
+<li><p><strong>n_jobs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> searching process will start.</p></li>
+<li><p><strong>exit_processes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>limit_resource</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">limit_resource</span> <span class="pre">=</span> <span class="pre">True</span></code>, a searching trial will be killed if it use more CPU times or memory.</p></li>
+<li><p><strong>per_run_time_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <p>will active if <code class="docutils literal notranslate"><span class="pre">limit_resource</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+<p>a searching trial will be killed if it use CPU times more than <code class="docutils literal notranslate"><span class="pre">per_run_time_limit</span></code>.</p>
+</p></li>
+<li><p><strong>per_run_memory_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <p>will active if <code class="docutils literal notranslate"><span class="pre">limit_resource</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+<p>a searching trial will be killed if it use memory more than <code class="docutils literal notranslate"><span class="pre">per_run_memory_limit</span></code>.</p>
+</p></li>
+<li><p><strong>time_left_for_this_task</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <p>will active if <code class="docutils literal notranslate"><span class="pre">limit_resource</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+<p>a searching task will be killed if it’s totally run time more than <code class="docutils literal notranslate"><span class="pre">time_left_for_this_task</span></code>.</p>
+</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <p>For debug mode.</p>
+<p>Exception will be re-raised if <code class="docutils literal notranslate"><span class="pre">debug</span> <span class="pre">=</span> <span class="pre">True</span></code></p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.design_initial_configs">
-<code class="descname">design_initial_configs</code><span class="sig-paren">(</span><em>n_jobs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.design_initial_configs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.design_initial_configs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">design_initial_configs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_jobs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.design_initial_configs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.design_initial_configs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.get_run_limit">
-<code class="descname">get_run_limit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.get_run_limit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.get_run_limit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_run_limit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.get_run_limit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.get_run_limit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.hdl2shps">
-<code class="descname">hdl2shps</code><span class="sig-paren">(</span><em>hdl: Dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.hdl2shps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.hdl2shps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">hdl2shps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.hdl2shps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.hdl2shps" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>initial_configs</em>, <em>evaluator_params=&lt;frozendict {}&gt;</em>, <em>instance_id=''</em>, <em>rh_db_type='sqlite'</em>, <em>rh_db_params=&lt;frozendict {}&gt;</em>, <em>rh_db_table_name='runhistory'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">initial_configs</em>, <em class="sig-param">evaluator_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">instance_id=''</em>, <em class="sig-param">rh_db_type='sqlite'</em>, <em class="sig-param">rh_db_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">rh_db_table_name='runhistory'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.set_data_manager">
-<code class="descname">set_data_manager</code><span class="sig-paren">(</span><em>data_manager: hyperflow.manager.data_manager.DataManager</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_data_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_data_manager" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_data_manager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#hyperflow.manager.data_manager.DataManager" title="hyperflow.manager.data_manager.DataManager">hyperflow.manager.data_manager.DataManager</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_data_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_data_manager" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.set_hdl">
-<code class="descname">set_hdl</code><span class="sig-paren">(</span><em>hdl: Dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_hdl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_hdl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_hdl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_hdl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_hdl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.set_random_state">
-<code class="descname">set_random_state</code><span class="sig-paren">(</span><em>random_state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_random_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_random_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_random_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">random_state</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_random_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_random_state" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.set_resource_manager">
-<code class="descname">set_resource_manager</code><span class="sig-paren">(</span><em>resource_manager: hyperflow.manager.resource_manager.ResourceManager</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_resource_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_resource_manager" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_resource_manager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#hyperflow.manager.resource_manager.ResourceManager" title="hyperflow.manager.resource_manager.ResourceManager">hyperflow.manager.resource_manager.ResourceManager</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_resource_manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_resource_manager" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.tuner.tuner.Tuner.set_task">
-<code class="descname">set_task</code><span class="sig-paren">(</span><em>ml_task: hyperflow.utils.ml_task.MLTask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ml_task</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.ml_task.MLTask" title="hyperflow.utils.ml_task.MLTask">hyperflow.utils.ml_task.MLTask</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/tuner/tuner.html#Tuner.set_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.tuner.tuner.Tuner.set_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

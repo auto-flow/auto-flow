@@ -52,6 +52,14 @@ hyperflow.utils.dict module
     :undoc-members:
     :show-inheritance:
 
+hyperflow.utils.graphviz module
+-------------------------------
+
+.. automodule:: hyperflow.utils.graphviz
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 hyperflow.utils.hash module
 ---------------------------
 

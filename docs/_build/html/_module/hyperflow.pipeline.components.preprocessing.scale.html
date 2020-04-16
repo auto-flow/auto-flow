@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.scale.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.scale.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -162,18 +174,18 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.scale.minmax">
 <span id="hyperflow-pipeline-components-preprocessing-scale-minmax-module"></span><h2>hyperflow.pipeline.components.preprocessing.scale.minmax module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.scale.minmax" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.scale.minmax.</code><code class="descname">MinMaxScaler</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/minmax.html#MinMaxScaler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="attribute">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.scale.minmax.</code><code class="sig-name descname">MinMaxScaler</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/minmax.html#MinMaxScaler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler.class__">
-<code class="descname">class__</code><em class="property"> = 'MinMaxScaler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = 'MinMaxScaler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler.module__">
-<code class="descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.minmax.MinMaxScaler.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -181,18 +193,18 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.scale.normalize">
 <span id="hyperflow-pipeline-components-preprocessing-scale-normalize-module"></span><h2>hyperflow.pipeline.components.preprocessing.scale.normalize module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.scale.normalize" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.scale.normalize.</code><code class="descname">NormalizerComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/normalize.html#NormalizerComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="attribute">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.scale.normalize.</code><code class="sig-name descname">NormalizerComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/normalize.html#NormalizerComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent.class__">
-<code class="descname">class__</code><em class="property"> = 'Normalizer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = 'Normalizer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent.module__">
-<code class="descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.normalize.NormalizerComponent.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -200,23 +212,23 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.scale.quantile_transformer">
 <span id="hyperflow-pipeline-components-preprocessing-scale-quantile-transformer-module"></span><h2>hyperflow.pipeline.components.preprocessing.scale.quantile_transformer module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.scale.quantile_transformer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.</code><code class="descname">QuantileTransformerComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/quantile_transformer.html#QuantileTransformerComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.</code><code class="sig-name descname">QuantileTransformerComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/quantile_transformer.html#QuantileTransformerComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.after_process_hyperparams">
-<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/quantile_transformer.html#QuantileTransformerComponent.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">after_process_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/quantile_transformer.html#QuantileTransformerComponent.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.class__">
-<code class="descname">class__</code><em class="property"> = 'QuantileTransformer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = 'QuantileTransformer'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.module__">
-<code class="descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.quantile_transformer.QuantileTransformerComponent.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -224,23 +236,23 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.scale.robust_scaler">
 <span id="hyperflow-pipeline-components-preprocessing-scale-robust-scaler-module"></span><h2>hyperflow.pipeline.components.preprocessing.scale.robust_scaler module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.scale.robust_scaler" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.scale.robust_scaler.</code><code class="descname">RobustScalerComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/robust_scaler.html#RobustScalerComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.scale.robust_scaler.</code><code class="sig-name descname">RobustScalerComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/robust_scaler.html#RobustScalerComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.after_process_hyperparams">
-<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/robust_scaler.html#RobustScalerComponent.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">after_process_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/robust_scaler.html#RobustScalerComponent.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.class__">
-<code class="descname">class__</code><em class="property"> = 'RobustScaler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = 'RobustScaler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.module__">
-<code class="descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.robust_scaler.RobustScalerComponent.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -248,18 +260,18 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.scale.standardize">
 <span id="hyperflow-pipeline-components-preprocessing-scale-standardize-module"></span><h2>hyperflow.pipeline.components.preprocessing.scale.standardize module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.scale.standardize" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.scale.standardize.</code><code class="descname">StandardScaler</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/standardize.html#StandardScaler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="attribute">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.scale.standardize.</code><code class="sig-name descname">StandardScaler</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/scale/standardize.html#StandardScaler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler.class__">
-<code class="descname">class__</code><em class="property"> = 'StandardScaler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = 'StandardScaler'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler.module__">
-<code class="descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.preprocessing'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.scale.standardize.StandardScaler.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

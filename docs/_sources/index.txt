@@ -3,13 +3,36 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to HyperFlow's documentation!
+HyperFlow documentation!
 =====================================
+HyperFlow is a automatic machine learning workflow modeling platform.
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Tutorials
+   :hidden:
+
+   introduction
+   installation
+   examples
+
+.. toctree::
+   :maxdepth: 3
+   :caption: API
+   :hidden:
+
+   api
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contribution
+   :hidden:
+
+   contact
+   license
+
 
 
 

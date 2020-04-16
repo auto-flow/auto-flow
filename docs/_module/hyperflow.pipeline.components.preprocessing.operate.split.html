@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.operate.split.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.operate.split.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -162,68 +174,68 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.operate.split.base">
 <span id="hyperflow-pipeline-components-preprocessing-operate-split-base-module"></span><h2>hyperflow.pipeline.components.preprocessing.operate.split.base module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.operate.split.base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.operate.split.base.</code><code class="descname">BaseSplit</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.operate.split.base.</code><code class="sig-name descname">BaseSplit</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.calc_R">
-<code class="descname">calc_R</code><span class="sig-paren">(</span><em>col</em>, <em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.calc_R" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.calc_R" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.default_threshold">
-<code class="descname">default_threshold</code><em class="property"> = 0.5</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.default_threshold" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">default_threshold</code><em class="property"> = 0.5</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.default_threshold" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X_train: hyperflow.pipeline.dataframe.GenericDataFrame</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a></span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.judge_keyname">
-<code class="descname">judge_keyname</code><span class="sig-paren">(</span><em>col</em>, <em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.judge_keyname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.judge_keyname" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">judge_keyname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.judge_keyname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.judge_keyname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1">
-<code class="descname">key1</code><em class="property"> = 'highR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1</code><em class="property"> = 'highR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_default_name">
-<code class="descname">key1_default_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_default_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_hp_name">
-<code class="descname">key1_hp_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key1_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2">
-<code class="descname">key2</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_default_name">
-<code class="descname">key2_default_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_default_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_hp_name">
-<code class="descname">key2_hp_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.key2_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.process">
-<code class="descname">process</code><span class="sig-paren">(</span><em>X_origin: Union[hyperflow.pipeline.dataframe.GenericDataFrame, NoneType]</em><span class="sig-paren">)</span> &rarr; Union[hyperflow.pipeline.dataframe.GenericDataFrame, NoneType]<a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.process" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_origin</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.process" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>X_valid=None</em>, <em>X_test=None</em>, <em>y_train=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/base.html#BaseSplit.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit.transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -231,33 +243,33 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.operate.split.cat">
 <span id="hyperflow-pipeline-components-preprocessing-operate-split-cat-module"></span><h2>hyperflow.pipeline.components.preprocessing.operate.split.cat module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.operate.split.cat" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.operate.split.cat.</code><code class="descname">SplitCat</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat.html#SplitCat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.operate.split.cat.</code><code class="sig-name descname">SplitCat</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat.html#SplitCat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R">
-<code class="descname">calc_R</code><span class="sig-paren">(</span><em>col</em>, <em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat.html#SplitCat.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat.html#SplitCat.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.calc_R" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_default_name">
-<code class="descname">key1_default_name</code><em class="property"> = 'highR_cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_default_name</code><em class="property"> = 'highR_cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_hp_name">
-<code class="descname">key1_hp_name</code><em class="property"> = 'highR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = 'highR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key1_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_default_name">
-<code class="descname">key2_default_name</code><em class="property"> = 'lowR_cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_default_name</code><em class="property"> = 'lowR_cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_hp_name">
-<code class="descname">key2_hp_name</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat.SplitCat.key2_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -265,48 +277,48 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.operate.split.cat_num">
 <span id="hyperflow-pipeline-components-preprocessing-operate-split-cat-num-module"></span><h2>hyperflow.pipeline.components.preprocessing.operate.split.cat_num module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.operate.split.cat_num" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.operate.split.cat_num.</code><code class="descname">SplitCatNum</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.operate.split.cat_num.</code><code class="sig-name descname">SplitCatNum</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.calc_R">
-<code class="descname">calc_R</code><span class="sig-paren">(</span><em>col</em>, <em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.calc_R" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.calc_R" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.judge_keyname">
-<code class="descname">judge_keyname</code><span class="sig-paren">(</span><em>col: pandas.core.series.Series</em>, <em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum.judge_keyname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.judge_keyname" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">judge_keyname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/cat_num.html#SplitCatNum.judge_keyname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.judge_keyname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1">
-<code class="descname">key1</code><em class="property"> = 'cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1</code><em class="property"> = 'cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_default_name">
-<code class="descname">key1_default_name</code><em class="property"> = 'cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_default_name</code><em class="property"> = 'cat'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_hp_name">
-<code class="descname">key1_hp_name</code><em class="property"> = 'cat_name'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = 'cat_name'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key1_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2">
-<code class="descname">key2</code><em class="property"> = 'num'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2</code><em class="property"> = 'num'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_default_name">
-<code class="descname">key2_default_name</code><em class="property"> = 'num'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_default_name</code><em class="property"> = 'num'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_hp_name">
-<code class="descname">key2_hp_name</code><em class="property"> = 'num_name'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = 'num_name'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.cat_num.SplitCatNum.key2_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -314,33 +326,33 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.operate.split.nan">
 <span id="hyperflow-pipeline-components-preprocessing-operate-split-nan-module"></span><h2>hyperflow.pipeline.components.preprocessing.operate.split.nan module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.operate.split.nan" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.operate.split.nan.</code><code class="descname">SplitNan</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/nan.html#SplitNan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.operate.split.nan.</code><code class="sig-name descname">SplitNan</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/nan.html#SplitNan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit" title="hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.preprocessing.operate.split.base.BaseSplit</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.calc_R">
-<code class="descname">calc_R</code><span class="sig-paren">(</span><em>col</em>, <em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/nan.html#SplitNan.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.calc_R" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calc_R</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/split/nan.html#SplitNan.calc_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.calc_R" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_default_name">
-<code class="descname">key1_default_name</code><em class="property"> = 'highR_nan'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_default_name</code><em class="property"> = 'highR_nan'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_hp_name">
-<code class="descname">key1_hp_name</code><em class="property"> = 'highR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key1_hp_name</code><em class="property"> = 'highR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key1_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_default_name">
-<code class="descname">key2_default_name</code><em class="property"> = 'lowR_nan'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_default_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_default_name</code><em class="property"> = 'lowR_nan'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_default_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_hp_name">
-<code class="descname">key2_hp_name</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_hp_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">key2_hp_name</code><em class="property"> = 'lowR'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.split.nan.SplitNan.key2_hp_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

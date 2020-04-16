@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.ensemble.stack.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.ensemble.stack.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -162,28 +174,28 @@
 </div>
 <div class="section" id="module-hyperflow.ensemble.stack.base">
 <span id="hyperflow-ensemble-stack-base-module"></span><h2>hyperflow.ensemble.stack.base module<a class="headerlink" href="#module-hyperflow.ensemble.stack.base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.ensemble.stack.base.StackEstimator">
-<em class="property">class </em><code class="descclassname">hyperflow.ensemble.stack.base.</code><code class="descname">StackEstimator</code><span class="sig-paren">(</span><em>meta_learner=None</em>, <em>use_features_in_secondary=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.ensemble.html#hyperflow.ensemble.base.EnsembleEstimator" title="hyperflow.ensemble.base.EnsembleEstimator"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.ensemble.base.EnsembleEstimator</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.stack.base.</code><code class="sig-name descname">StackEstimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.ensemble.html#hyperflow.ensemble.base.EnsembleEstimator" title="hyperflow.ensemble.base.EnsembleEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.base.EnsembleEstimator</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.base.StackEstimator.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.base.StackEstimator.fit_trained_data">
-<code class="descname">fit_trained_data</code><span class="sig-paren">(</span><em>estimators_list: List[List[hyperflow.utils.GenericEstimator]], y_preds_list: List[List[numpy.ndarray]], y_true_indexes_list: List[List[numpy.ndarray]], y_true: numpy.ndarray</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.fit_trained_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_trained_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimators_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="hyperflow.utils.html#hyperflow.utils.typing.GenericEstimator" title="hyperflow.utils.typing.GenericEstimator">hyperflow.utils.typing.GenericEstimator</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_preds_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true_indexes_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>List<span class="p">[</span>numpy.ndarray<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y_true</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.fit_trained_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.fit_trained_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.base.StackEstimator.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.base.StackEstimator.predict_meta_features">
-<code class="descname">predict_meta_features</code><span class="sig-paren">(</span><em>X</em>, <em>is_train</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.predict_meta_features" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/base.html#StackEstimator.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.base.StackEstimator.predict_meta_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -191,28 +203,28 @@
 </div>
 <div class="section" id="module-hyperflow.ensemble.stack.classifier">
 <span id="hyperflow-ensemble-stack-classifier-module"></span><h2>hyperflow.ensemble.stack.classifier module<a class="headerlink" href="#module-hyperflow.ensemble.stack.classifier" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.ensemble.stack.classifier.StackClassifier">
-<em class="property">class </em><code class="descclassname">hyperflow.ensemble.stack.classifier.</code><code class="descname">StackClassifier</code><span class="sig-paren">(</span><em>meta_learner=None</em>, <em>use_features_in_secondary=False</em>, <em>drop_last_proba=False</em>, <em>use_probas=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.stack.base.StackEstimator" title="hyperflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.stack.classifier.</code><code class="sig-name descname">StackClassifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">drop_last_proba</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_probas</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.stack.base.StackEstimator" title="hyperflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.classifier.StackClassifier.decision_function">
-<code class="descname">decision_function</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.decision_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.decision_function" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">decision_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.decision_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.decision_function" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.ensemble.stack.classifier.StackClassifier.mainTask">
-<code class="descname">mainTask</code><em class="property"> = 'classification'</em><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.mainTask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mainTask</code><em class="property"> = 'classification'</em><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.mainTask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.classifier.StackClassifier.predict_meta_features">
-<code class="descname">predict_meta_features</code><span class="sig-paren">(</span><em>X</em>, <em>is_train</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.predict_meta_features" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.predict_meta_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.classifier.StackClassifier.predict_proba">
-<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/classifier.html#StackClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.classifier.StackClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -220,18 +232,18 @@
 </div>
 <div class="section" id="module-hyperflow.ensemble.stack.regressor">
 <span id="hyperflow-ensemble-stack-regressor-module"></span><h2>hyperflow.ensemble.stack.regressor module<a class="headerlink" href="#module-hyperflow.ensemble.stack.regressor" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.ensemble.stack.regressor.StackRegressor">
-<em class="property">class </em><code class="descclassname">hyperflow.ensemble.stack.regressor.</code><code class="descname">StackRegressor</code><span class="sig-paren">(</span><em>meta_learner=None</em>, <em>use_features_in_secondary=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/regressor.html#StackRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.stack.base.StackEstimator" title="hyperflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
-<dl class="attribute">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.ensemble.stack.regressor.</code><code class="sig-name descname">StackRegressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_learner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_features_in_secondary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/regressor.html#StackRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.ensemble.stack.base.StackEstimator" title="hyperflow.ensemble.stack.base.StackEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.ensemble.stack.base.StackEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
+<dl class="py attribute">
 <dt id="hyperflow.ensemble.stack.regressor.StackRegressor.ml_task">
-<code class="descname">ml_task</code><em class="property"> = 'regression'</em><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor.ml_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ml_task</code><em class="property"> = 'regression'</em><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor.ml_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.ensemble.stack.regressor.StackRegressor.predict_meta_features">
-<code class="descname">predict_meta_features</code><span class="sig-paren">(</span><em>X</em>, <em>is_train</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/regressor.html#StackRegressor.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor.predict_meta_features" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict_meta_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">is_train</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/ensemble/stack/regressor.html#StackRegressor.predict_meta_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.ensemble.stack.regressor.StackRegressor.predict_meta_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

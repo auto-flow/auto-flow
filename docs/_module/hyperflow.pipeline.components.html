@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.pipeline.components.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.pipeline.components.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -358,153 +370,153 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.base">
 <span id="hyperflow-pipeline-components-base-module"></span><h2>hyperflow.pipeline.components.base module<a class="headerlink" href="#module-hyperflow.pipeline.components.base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.base.</code><code class="descname">HyperFlowComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.base.</code><code class="sig-name descname">HyperFlowComponent</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.after_process_estimator">
-<code class="descname">after_process_estimator</code><span class="sig-paren">(</span><em>estimator</em>, <em>X_train</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.after_process_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.after_process_estimator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">after_process_estimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimator</span></em>, <em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.after_process_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.after_process_estimator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.after_process_hyperparams">
-<code class="descname">after_process_hyperparams</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">after_process_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_X">
-<code class="descname">before_fit_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_fit_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_X" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">before_fit_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_fit_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_X" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_y">
-<code class="descname">before_fit_y</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_fit_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">before_fit_y</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_fit_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_fit_y" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.before_parse_escape_hyperparameters">
-<code class="descname">before_parse_escape_hyperparameters</code><span class="sig-paren">(</span><em>hyperparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_parse_escape_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_parse_escape_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">before_parse_escape_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_parse_escape_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_parse_escape_hyperparameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.before_pred_X">
-<code class="descname">before_pred_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_pred_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_pred_X" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">before_pred_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.before_pred_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.before_pred_X" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.boost_model">
-<code class="descname">boost_model</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.boost_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">boost_model</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.boost_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.build_proxy_estimator">
-<code class="descname">build_proxy_estimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.build_proxy_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.build_proxy_estimator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">build_proxy_estimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.build_proxy_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.build_proxy_estimator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.class_">
-<code class="descname">class_</code><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.class_" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">class_</code><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.class_" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.class__">
-<code class="descname">class__</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.classification_only">
-<code class="descname">classification_only</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.classification_only" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">classification_only</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.classification_only" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.core_fit">
-<code class="descname">core_fit</code><span class="sig-paren">(</span><em>estimator</em>, <em>X</em>, <em>y</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em>, <em>feature_groups=None</em>, <em>columns_metadata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.core_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.core_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">core_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimator</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_groups</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columns_metadata</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.core_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.core_fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.filter_invalid">
-<code class="descname">filter_invalid</code><span class="sig-paren">(</span><em>cls</em>, <em>hyperparams: Dict</em><span class="sig-paren">)</span> &rarr; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.filter_invalid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.filter_invalid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">filter_invalid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">hyperparams</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.filter_invalid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.filter_invalid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X_train</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator">
-<code class="descname">get_estimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.get_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_estimator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.get_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator_class">
-<code class="descname">get_estimator_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.get_estimator_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator_class" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_estimator_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.get_estimator_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.get_estimator_class" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.is_fit">
-<code class="descname">is_fit</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.is_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_fit</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.is_fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.module_">
-<code class="descname">module_</code><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.module_" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">module_</code><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.module_" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.module__">
-<code class="descname">module__</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.parse_escape_hyperparameters">
-<code class="descname">parse_escape_hyperparameters</code><span class="sig-paren">(</span><em>indicator</em>, <em>hyperparams</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.parse_escape_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.parse_escape_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse_escape_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indicator</span></em>, <em class="sig-param"><span class="n">hyperparams</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.parse_escape_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.parse_escape_hyperparameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.pred_or_trans">
-<code class="descname">pred_or_trans</code><span class="sig-paren">(</span><em>X_train</em>, <em>X_valid=None</em>, <em>X_test=None</em>, <em>y_train=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.pred_or_trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.pred_or_trans" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pred_or_trans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.pred_or_trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.pred_or_trans" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.prepare_X_to_fit">
-<code class="descname">prepare_X_to_fit</code><span class="sig-paren">(</span><em>X_train</em>, <em>X_valid=None</em>, <em>X_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.prepare_X_to_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.prepare_X_to_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">prepare_X_to_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.prepare_X_to_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.prepare_X_to_fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.preprocess_data">
-<code class="descname">preprocess_data</code><span class="sig-paren">(</span><em>X: Union[hyperflow.pipeline.dataframe.GenericDataFrame, NoneType], extract_info=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.preprocess_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.preprocess_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">preprocess_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">extract_info</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.preprocess_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.preprocess_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.regression_only">
-<code class="descname">regression_only</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.regression_only" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">regression_only</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.regression_only" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.set_addition_info">
-<code class="descname">set_addition_info</code><span class="sig-paren">(</span><em>dict_: dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.set_addition_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.set_addition_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_addition_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.set_addition_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.set_addition_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.store_intermediate">
-<code class="descname">store_intermediate</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.store_intermediate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">store_intermediate</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.store_intermediate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.suspend_other_processes">
-<code class="descname">suspend_other_processes</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.suspend_other_processes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">suspend_other_processes</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.suspend_other_processes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.tree_model">
-<code class="descname">tree_model</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.tree_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tree_model</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.tree_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.base.HyperFlowComponent.update_hyperparams">
-<code class="descname">update_hyperparams</code><span class="sig-paren">(</span><em>hp: dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.update_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.update_hyperparams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hp</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/base.html#HyperFlowComponent.update_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.base.HyperFlowComponent.update_hyperparams" title="Permalink to this definition">¶</a></dt>
 <dd><p>set default hyperparameters in init</p>
 </dd></dl>
 
@@ -513,41 +525,41 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.classification_base">
 <span id="hyperflow-pipeline-components-classification-base-module"></span><h2>hyperflow.pipeline.components.classification_base module<a class="headerlink" href="#module-hyperflow.pipeline.components.classification_base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.classification_base.</code><code class="descname">HyperFlowClassificationAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.classification_base.</code><code class="sig-name descname">HyperFlowClassificationAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
 <p>Provide an abstract interface for classification algorithms in
 auto-sklearn.</p>
 <p>See <span class="xref std std-ref">extending</span> for more information.</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.OVR__">
-<code class="descname">OVR__</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.OVR__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">OVR__</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.OVR__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.after_process_estimator">
-<code class="descname">after_process_estimator</code><span class="sig-paren">(</span><em>estimator</em>, <em>X_train</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.after_process_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.after_process_estimator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">after_process_estimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimator</span></em>, <em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.after_process_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.after_process_estimator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.isOVR">
-<code class="descname">isOVR</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.isOVR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.isOVR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">isOVR</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.isOVR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.isOVR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.predict_proba">
-<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.predict_proba" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.predict_proba" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.score">
-<code class="descname">score</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.score" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/classification_base.html#HyperFlowClassificationAlgorithm.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.classification_base.HyperFlowClassificationAlgorithm.score" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -555,28 +567,28 @@ auto-sklearn.</p>
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.data_process_base">
 <span id="hyperflow-pipeline-components-data-process-base-module"></span><h2>hyperflow.pipeline.components.data_process_base module<a class="headerlink" href="#module-hyperflow.pipeline.components.data_process_base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.data_process_base.</code><code class="descname">HyperFlowDataProcessAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.data_process_base.</code><code class="sig-name descname">HyperFlowDataProcessAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X_train</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.need_y">
-<code class="descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.need_y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.need_y" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X_train: hyperflow.pipeline.dataframe.GenericDataFrame=None</em>, <em>X_valid=None</em>, <em>X_test=None</em>, <em>y_train=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/data_process_base.html#HyperFlowDataProcessAlgorithm.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.data_process_base.HyperFlowDataProcessAlgorithm.transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -584,33 +596,33 @@ auto-sklearn.</p>
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.feature_engineer_base">
 <span id="hyperflow-pipeline-components-feature-engineer-base-module"></span><h2>hyperflow.pipeline.components.feature_engineer_base module<a class="headerlink" href="#module-hyperflow.pipeline.components.feature_engineer_base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.feature_engineer_base.</code><code class="descname">HyperFlowFeatureEngineerAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.feature_engineer_base.</code><code class="sig-name descname">HyperFlowFeatureEngineerAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.before_trans_X">
-<code class="descname">before_trans_X</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.before_trans_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.before_trans_X" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">before_trans_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.before_trans_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.before_trans_X" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.need_y">
-<code class="descname">need_y</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.need_y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">need_y</code><em class="property"> = False</em><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.need_y" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit">
-<code class="descname">prepare_X_to_fit</code><span class="sig-paren">(</span><em>X_train</em>, <em>X_valid=None</em>, <em>X_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">prepare_X_to_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.prepare_X_to_fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>X_valid=None</em>, <em>X_test=None</em>, <em>y_train=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/feature_engineer_base.html#HyperFlowFeatureEngineerAlgorithm.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm.transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -618,22 +630,22 @@ auto-sklearn.</p>
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.regression_base">
 <span id="hyperflow-pipeline-components-regression-base-module"></span><h2>hyperflow.pipeline.components.regression_base module<a class="headerlink" href="#module-hyperflow.pipeline.components.regression_base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.regression_base.</code><code class="descname">HyperFlowRegressionAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression_base.html#HyperFlowRegressionAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.regression_base.</code><code class="sig-name descname">HyperFlowRegressionAlgorithm</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression_base.html#HyperFlowRegressionAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.pipeline.components.base.HyperFlowComponent" title="hyperflow.pipeline.components.base.HyperFlowComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.base.HyperFlowComponent</span></code></a></p>
 <p>Provide an abstract interface for regression algorithms in
 auto-sklearn.</p>
 <p>Make a subclass of this and put it into the directory
 <cite>autosklearn/pipeline/components/regression</cite> to make it available.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.after_pred_y">
-<code class="descname">after_pred_y</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression_base.html#HyperFlowRegressionAlgorithm.after_pred_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.after_pred_y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">after_pred_y</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression_base.html#HyperFlowRegressionAlgorithm.after_pred_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.after_pred_y" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression_base.html#HyperFlowRegressionAlgorithm.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/regression_base.html#HyperFlowRegressionAlgorithm.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.regression_base.HyperFlowRegressionAlgorithm.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -641,19 +653,19 @@ auto-sklearn.</p>
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.utils">
 <span id="hyperflow-pipeline-components-utils-module"></span><h2>hyperflow.pipeline.components.utils module<a class="headerlink" href="#module-hyperflow.pipeline.components.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="hyperflow.pipeline.components.utils.check_and_adjust_Xs_index">
-<code class="descclassname">hyperflow.pipeline.components.utils.</code><code class="descname">check_and_adjust_Xs_index</code><span class="sig-paren">(</span><em>Xs: List[pandas.core.frame.DataFrame]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/utils.html#check_and_adjust_Xs_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.utils.check_and_adjust_Xs_index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hyperflow.pipeline.components.utils.</code><code class="sig-name descname">check_and_adjust_Xs_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Xs</span><span class="p">:</span> <span class="n">List<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/utils.html#check_and_adjust_Xs_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.utils.check_and_adjust_Xs_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="hyperflow.pipeline.components.utils.get_categorical_features_indices">
-<code class="descclassname">hyperflow.pipeline.components.utils.</code><code class="descname">get_categorical_features_indices</code><span class="sig-paren">(</span><em>X</em>, <em>columns_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/utils.html#get_categorical_features_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.utils.get_categorical_features_indices" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hyperflow.pipeline.components.utils.</code><code class="sig-name descname">get_categorical_features_indices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">columns_metadata</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/utils.html#get_categorical_features_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.utils.get_categorical_features_indices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="hyperflow.pipeline.components.utils.stack_Xs">
-<code class="descclassname">hyperflow.pipeline.components.utils.</code><code class="descname">stack_Xs</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>X_valid=None</em>, <em>X_test=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/utils.html#stack_Xs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.utils.stack_Xs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hyperflow.pipeline.components.utils.</code><code class="sig-name descname">stack_Xs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/utils.html#stack_Xs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.utils.stack_Xs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

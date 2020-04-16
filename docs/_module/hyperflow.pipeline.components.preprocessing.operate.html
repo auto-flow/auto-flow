@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.operate.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.pipeline.components.preprocessing.operate.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -178,18 +190,18 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.operate.drop">
 <span id="hyperflow-pipeline-components-preprocessing-operate-drop-module"></span><h2>hyperflow.pipeline.components.preprocessing.operate.drop module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.operate.drop" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.drop.DropAll">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.operate.drop.</code><code class="descname">DropAll</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/drop.html#DropAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.drop.DropAll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="attribute">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.operate.drop.</code><code class="sig-name descname">DropAll</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/drop.html#DropAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.drop.DropAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.drop.DropAll.class__">
-<code class="descname">class__</code><em class="property"> = 'DropAll'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.drop.DropAll.class__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">class__</code><em class="property"> = 'DropAll'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.drop.DropAll.class__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.drop.DropAll.module__">
-<code class="descname">module__</code><em class="property"> = 'hyperflow.feature_engineer.operate.drop_all'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.drop.DropAll.module__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">module__</code><em class="property"> = 'hyperflow.feature_engineer.operate.drop_all'</em><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.drop.DropAll.module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -197,23 +209,23 @@
 </div>
 <div class="section" id="module-hyperflow.pipeline.components.preprocessing.operate.merge">
 <span id="hyperflow-pipeline-components-preprocessing-operate-merge-module"></span><h2>hyperflow.pipeline.components.preprocessing.operate.merge module<a class="headerlink" href="#module-hyperflow.pipeline.components.preprocessing.operate.merge" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.merge.Merge">
-<em class="property">class </em><code class="descclassname">hyperflow.pipeline.components.preprocessing.operate.merge.</code><code class="descname">Merge</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/merge.html#Merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.pipeline.components.preprocessing.operate.merge.</code><code class="sig-name descname">Merge</code><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/merge.html#Merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="hyperflow.pipeline.components.html#hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm" title="hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.pipeline.components.feature_engineer_base.HyperFlowFeatureEngineerAlgorithm</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.merge.Merge.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X_train: hyperflow.pipeline.dataframe.GenericDataFrame</em>, <em>y_train=None</em>, <em>X_valid=None</em>, <em>y_valid=None</em>, <em>X_test=None</em>, <em>y_test=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="p">:</span> <span class="n"><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a></span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/merge.html#Merge.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.merge.Merge.process">
-<code class="descname">process</code><span class="sig-paren">(</span><em>X_origin: Union[hyperflow.pipeline.dataframe.GenericDataFrame, NoneType]</em><span class="sig-paren">)</span> &rarr; Union[hyperflow.pipeline.dataframe.GenericDataFrame, NoneType]<a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge.process" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_origin</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference internal" href="hyperflow.pipeline.html#hyperflow.pipeline.dataframe.GenericDataFrame" title="hyperflow.pipeline.dataframe.GenericDataFrame">hyperflow.pipeline.dataframe.GenericDataFrame</a><span class="p">]</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/merge.html#Merge.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge.process" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.pipeline.components.preprocessing.operate.merge.Merge.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X_train=None</em>, <em>X_valid=None</em>, <em>X_test=None</em>, <em>y_train=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_valid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_train</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/pipeline/components/preprocessing/operate/merge.html#Merge.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.pipeline.components.preprocessing.operate.merge.Merge.transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

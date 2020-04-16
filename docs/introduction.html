@@ -1,0 +1,1261 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Intruduction &mdash; HyperFlow 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="HyperFlow documentation!" href="index.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> HyperFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Intruduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tabular-data-processing-workflow">Tabular Data-Processing Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#feature-group">Feature Group</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nan">nan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#num">num</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cat">cat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#num-nan">num_nan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cat-nan">cat_nan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#highr-nan">highR_nan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lowr-nan">lowR_nan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#highr-cat">highR_cat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lowr-cat">lowR_cat</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#work-flow">Work Flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instance-in-titanic">Instance In Titanic</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HyperFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Intruduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="intruduction">
+<h1>Intruduction<a class="headerlink" href="#intruduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tabular-data-processing-workflow">
+<h2>Tabular Data-Processing Workflow<a class="headerlink" href="#tabular-data-processing-workflow" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.kaggle.com/c/titanic">Titanic</a> is perhaps the most familiar machine learning task for data scientists.
+The sub table after sampling is shown below:</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Titanic Origin Data</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Age</p></td>
+<td><p>SibSp</p></td>
+<td><p>Ticket</p></td>
+<td><p>Fare</p></td>
+<td><p>Cabin</p></td>
+<td><p>Embarked</p></td>
+</tr>
+<tr class="row-even"><td><p>Braund, Mr. Owen Harris</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>A/5 21171</p></td>
+<td><p>7.25</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>PC 17599</p></td>
+<td><p>71.2833</p></td>
+<td><p>C85</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Heikkinen, Miss. Laina</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>STON/O2. 3101282</p></td>
+<td><p>7.925</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Futrelle, Mrs. Jacques Heath (Lily May Peel)</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>113803</p></td>
+<td><p>53.1</p></td>
+<td><p>C123</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Allen, Mr. William Henry</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>373450</p></td>
+<td><p>8.05</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Moran, Mr. James</p></td>
+<td><p>NaN</p></td>
+<td><p>0</p></td>
+<td><p>330877</p></td>
+<td><p>8.4583</p></td>
+<td><p>NaN</p></td>
+<td><p>NaN</p></td>
+</tr>
+<tr class="row-even"><td><p>McCarthy, Mr. Timothy J</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>17463</p></td>
+<td><p>51.8625</p></td>
+<td><p>E46</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Palsson, Master. Gosta Leonard</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>349909</p></td>
+<td><p>21.075</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>347742</p></td>
+<td><p>11.1333</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nasser, Mrs. Nicholas (Adele Achem)</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>237736</p></td>
+<td><p>30.0708</p></td>
+<td><p>NaN</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandstrom, Miss. Marguerite Rut</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>PP 9549</p></td>
+<td><p>16.7</p></td>
+<td><p>G6</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bonnell, Miss. Elizabeth</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>113783</p></td>
+<td><p>26.55</p></td>
+<td><p>C103</p></td>
+<td><p>S</p></td>
+</tr>
+</tbody>
+</table>
+<p>You must notice that such raw table cannot be used in data-mining or machine-learning.
+We should fill the missing value, encoding the category value, and so on.</p>
+<p>In order to introduce the practical problems this project wants to solve,
+I want to introduce a concept: <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>.</p>
+<div class="section" id="feature-group">
+<h3>Feature Group<a class="headerlink" href="#feature-group" title="Permalink to this headline">¶</a></h3>
+<p>Except the columns that cannot provide entity specific properties, like <code class="docutils literal notranslate"><span class="pre">id</span></code>,
+the remaining columns are called <code class="docutils literal notranslate"><span class="pre">features</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can find <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code>’s definition in <a class="reference internal" href="_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager" title="hyperflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.manager.data_manager.DataManager</span></code></a></p>
+</div>
+<p>If some <code class="docutils literal notranslate"><span class="pre">features</span></code> have similar properties, they are containing in a same <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can find some <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>’s examples and practices in <a class="reference internal" href="api.html#hyperflow.hdl.hdl_constructor.HDL_Constructor" title="hyperflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.hdl.hdl_constructor.HDL_Constructor</span></code></a></p>
+</div>
+<div class="section" id="nan">
+<h4>nan<a class="headerlink" href="#nan" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">nan</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">Not</span> <span class="pre">a</span> <span class="pre">Number</span></code>, indicating that this column has missing value, like this:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">NaN</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">NaN</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="num">
+<h4>num<a class="headerlink" href="#num" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">num</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">numerical</span></code>, indicating that this column are all numerical value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only <code class="docutils literal notranslate"><span class="pre">num</span></code> <cite>feature group</cite> can used in estimating phase</p>
+</div>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cat">
+<h4>cat<a class="headerlink" href="#cat" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">cat</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">categorical</span></code>, indicating  this column has <cite>any</cite> string-type value.</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="num-nan">
+<h4>num_nan<a class="headerlink" href="#num-nan" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">num_nan</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">numerical</span> <span class="pre">NaN</span></code>, indicating this column is full of numbers except for missing values.</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">NaN</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cat-nan">
+<h4>cat_nan<a class="headerlink" href="#cat-nan" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">cat_nan</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">categorical</span> <span class="pre">NaN</span></code>, indicating this  column has at least one string other than the missing value.</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">NaN</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="highr-nan">
+<h4>highR_nan<a class="headerlink" href="#highr-nan" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">highR_nan</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">ratio</span> <span class="pre">NaN</span></code>, indicating this  column has most of this column is missing.</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">NaN</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">column</span><span class="p">))</span> <span class="o">/</span> <span class="n">column</span><span class="o">.</span><span class="n">size</span>
+<span class="go">0.6</span>
+</pre></div>
+</div>
+<p>NaN ratio is 0.6, more than 0.5 (default highR_nan_threshold)</p>
+</div>
+<div class="section" id="lowr-nan">
+<h4>lowR_nan<a class="headerlink" href="#lowr-nan" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">highR_nan</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">ratio</span> <span class="pre">NaN</span></code>, indicating this this column has most of this column is missing.</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">NaN</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">column</span><span class="p">))</span> <span class="o">/</span> <span class="n">column</span><span class="o">.</span><span class="n">size</span>
+<span class="go">0.4</span>
+</pre></div>
+</div>
+<p>NaN ratio is 0.4, less than 0.5 (default <code class="docutils literal notranslate"><span class="pre">highR_nan_threshold</span></code>)</p>
+</div>
+<div class="section" id="highr-cat">
+<h4>highR_cat<a class="headerlink" href="#highr-cat" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">highR_cat</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">cardinality</span> <span class="pre">ratio</span> <span class="pre">categorical</span></code>, indicating this this column is a categorical column (see in <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a>),
+and the unique value of this column divided by the total number of this column is more than <code class="docutils literal notranslate"><span class="pre">highR_cat_threshold</span></code> .</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">column</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">rows</span>
+<span class="go">0.8</span>
+</pre></div>
+</div>
+<p>cardinality ratio is 0.8, more than 0.5 (default <code class="docutils literal notranslate"><span class="pre">highR_cat_threshold</span></code>)</p>
+</div>
+<div class="section" id="lowr-cat">
+<h4>lowR_cat<a class="headerlink" href="#lowr-cat" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">lowR_cat</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">low</span> <span class="pre">cardinality</span> <span class="pre">ratio</span> <span class="pre">categorical</span></code>, indicating this this column is a categorical column (see in <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a>),
+and the unique value of this column divided by the total number of this column is less than <code class="docutils literal notranslate"><span class="pre">lowR_cat_threshold</span></code> .</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">column</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">rows</span>
+<span class="go">0.4</span>
+</pre></div>
+</div>
+<p>cardinality ratio is 0.8, less than 0.5 (default <code class="docutils literal notranslate"><span class="pre">lowR_cat_threshold</span></code>)</p>
+</div>
+</div>
+<div class="section" id="work-flow">
+<h3>Work Flow<a class="headerlink" href="#work-flow" title="Permalink to this headline">¶</a></h3>
+<p>After defining a concept: <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>, <code class="docutils literal notranslate"><span class="pre">Workflow</span></code> is the next important concept.</p>
+<p>You can consider the whole machine-learning training and testing procedure as a directed acyclic graph(DAG),
+except ETL or other data prepare and feature extract procedure.</p>
+<p>In this graph , you can consider nodes as <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>,
+edges as <cite>data-processing or estimating algorithms</cite>.
+Each edges’ tail node is a <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code> <strong>before processing</strong>,
+each edges’ head node is a other <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code> <strong>after processing</strong>.</p>
+<p>You should keep in mind that, each edge represents <strong>one</strong> algorithm or <strong>a list of</strong>
+algorithms. For example, after a series of data-processing, single <a class="reference internal" href="#num"><span class="std std-ref">num</span></a> (numerical)
+<cite>feature group</cite> is reserved, we should do estimating(<cite>fit features to target column</cite>):</p>
+<div class="graphviz"><img src="_images/graphviz-0390110d20a42efc2935db5fc84ceae5d0b18694.png" alt="digraph estimating {
+   &quot;num&quot; -&gt; &quot;target&quot; [ label=&quot;{lightgbm, random_forest}&quot; ];
+}" class="graphviz" /></div>
+<p>In this figure we can see: <code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> and <code class="docutils literal notranslate"><span class="pre">random_forest</span></code> are candidate algorithms.
+Some computer scientists said, <code class="docutils literal notranslate"><span class="pre">AutoML</span></code> is a <code class="docutils literal notranslate"><span class="pre">CASH</span></code> problem (Combined Algorithm Selection and Hyper-parameter optimization problem).</p>
+<p>In fact, the algorithm selection on the edge allows this <code class="docutils literal notranslate"><span class="pre">workflow</span></code> to be called a <code class="docutils literal notranslate"><span class="pre">workflow</span> <span class="pre">space</span></code>.</p>
+<p>Hear is the <code class="docutils literal notranslate"><span class="pre">workflow</span> <span class="pre">space</span></code> figure for <a class="reference external" href="https://www.kaggle.com/c/titanic">Titanic</a>  task.</p>
+<img alt="_images/workflow_space.png" src="_images/workflow_space.png" />
+</div>
+<div class="section" id="instance-in-titanic">
+<h3>Instance In Titanic<a class="headerlink" href="#instance-in-titanic" title="Permalink to this headline">¶</a></h3>
+<p>You may be curious about the <code class="docutils literal notranslate"><span class="pre">workflow</span> <span class="pre">space</span></code> picture above, want to know how it work.
+Let me introduce the processing details step by step.</p>
+<p><strong>First step</strong>, data manager(<a class="reference internal" href="_module/hyperflow.manager.html#hyperflow.manager.data_manager.DataManager" title="hyperflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.manager.data_manager.DataManager</span></code></a>) split raw data into three
+<code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>: <a class="reference internal" href="#nan"><span class="std std-ref">nan</span></a>, <a class="reference internal" href="#highr-nan"><span class="std std-ref">highR_nan</span></a>, <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a> and <a class="reference internal" href="#num"><span class="std std-ref">num</span></a>. like this:</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">First Step : Split By Data Manager</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name(cat)</p></td>
+<td><p>Age(nan)</p></td>
+<td><p>SibSp(num)</p></td>
+<td><p>Ticket(cat)</p></td>
+<td><p>Fare(num)</p></td>
+<td><p>Cabin(highR_nan)</p></td>
+<td><p>Embarked(nan)</p></td>
+</tr>
+<tr class="row-even"><td><p>Braund, Mr. Owen Harris</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>A/5 21171</p></td>
+<td><p>7.25</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>PC 17599</p></td>
+<td><p>71.2833</p></td>
+<td><p>C85</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Heikkinen, Miss. Laina</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>STON/O2. 3101282</p></td>
+<td><p>7.925</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Futrelle, Mrs. Jacques Heath (Lily May Peel)</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>113803</p></td>
+<td><p>53.1</p></td>
+<td><p>C123</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Allen, Mr. William Henry</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>373450</p></td>
+<td><p>8.05</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Moran, Mr. James</p></td>
+<td><p>NaN</p></td>
+<td><p>0</p></td>
+<td><p>330877</p></td>
+<td><p>8.4583</p></td>
+<td><p>NaN</p></td>
+<td><p>NaN</p></td>
+</tr>
+<tr class="row-even"><td><p>McCarthy, Mr. Timothy J</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>17463</p></td>
+<td><p>51.8625</p></td>
+<td><p>E46</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Palsson, Master. Gosta Leonard</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>349909</p></td>
+<td><p>21.075</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>347742</p></td>
+<td><p>11.1333</p></td>
+<td><p>NaN</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nasser, Mrs. Nicholas (Adele Achem)</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>237736</p></td>
+<td><p>30.0708</p></td>
+<td><p>NaN</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandstrom, Miss. Marguerite Rut</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>PP 9549</p></td>
+<td><p>16.7</p></td>
+<td><p>G6</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bonnell, Miss. Elizabeth</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>113783</p></td>
+<td><p>26.55</p></td>
+<td><p>C103</p></td>
+<td><p>S</p></td>
+</tr>
+</tbody>
+</table>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-969a505b43def343320e5d8066997afc6fd3d46b.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+}" class="graphviz" /></div>
+<hr class="docutils" />
+<p><strong>Second step</strong>, <code class="docutils literal notranslate"><span class="pre">highR_nan_imputer</span></code> should process <a class="reference internal" href="#highr-nan"><span class="std std-ref">highR_nan</span></a> <cite>feature group</cite> to
+<a class="reference internal" href="#nan"><span class="std std-ref">nan</span></a>, <code class="docutils literal notranslate"><span class="pre">merge</span></code> (means don’t do any thing, just rename the <cite>feature group</cite>) and
+<code class="docutils literal notranslate"><span class="pre">drop</span></code> are candidate algorithms. in this case, we choose <code class="docutils literal notranslate"><span class="pre">drop</span></code> option.</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Second Step : process highR nan</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name(cat)</p></td>
+<td><p>Age(nan)</p></td>
+<td><p>SibSp(num)</p></td>
+<td><p>Ticket(cat)</p></td>
+<td><p>Fare(num)</p></td>
+<td><p>Embarked(nan)</p></td>
+</tr>
+<tr class="row-even"><td><p>Braund, Mr. Owen Harris</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>A/5 21171</p></td>
+<td><p>7.25</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>PC 17599</p></td>
+<td><p>71.2833</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Heikkinen, Miss. Laina</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>STON/O2. 3101282</p></td>
+<td><p>7.925</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Futrelle, Mrs. Jacques Heath (Lily May Peel)</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>113803</p></td>
+<td><p>53.1</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Allen, Mr. William Henry</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>373450</p></td>
+<td><p>8.05</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Moran, Mr. James</p></td>
+<td><p>NaN</p></td>
+<td><p>0</p></td>
+<td><p>330877</p></td>
+<td><p>8.4583</p></td>
+<td><p>NaN</p></td>
+</tr>
+<tr class="row-even"><td><p>McCarthy, Mr. Timothy J</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>17463</p></td>
+<td><p>51.8625</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Palsson, Master. Gosta Leonard</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>349909</p></td>
+<td><p>21.075</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>347742</p></td>
+<td><p>11.1333</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nasser, Mrs. Nicholas (Adele Achem)</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>237736</p></td>
+<td><p>30.0708</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandstrom, Miss. Marguerite Rut</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>PP 9549</p></td>
+<td><p>16.7</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bonnell, Miss. Elizabeth</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>113783</p></td>
+<td><p>26.55</p></td>
+<td><p>S</p></td>
+</tr>
+</tbody>
+</table>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-8e791b0e6131ff343aab8d552fda60b247e7d6e5.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+}" class="graphviz" /></div>
+<hr class="docutils" />
+<p><strong>Third step</strong>, using <code class="docutils literal notranslate"><span class="pre">operate.split.cat_num</span></code> algorithm to split <a class="reference internal" href="#nan"><span class="std std-ref">nan</span></a> to two
+feature groups: <a class="reference internal" href="#cat-nan"><span class="std std-ref">cat_nan</span></a> and <a class="reference internal" href="#num-nan"><span class="std std-ref">num_nan</span></a>.</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Third Step : Split Categorical and Numerical</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name(cat)</p></td>
+<td><p>Age(num_nan)</p></td>
+<td><p>SibSp(num_nan)</p></td>
+<td><p>Ticket(cat)</p></td>
+<td><p>Fare(num)</p></td>
+<td><p>Embarked(cat_nan)</p></td>
+</tr>
+<tr class="row-even"><td><p>Braund, Mr. Owen Harris</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>A/5 21171</p></td>
+<td><p>7.25</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>PC 17599</p></td>
+<td><p>71.2833</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Heikkinen, Miss. Laina</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>STON/O2. 3101282</p></td>
+<td><p>7.925</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Futrelle, Mrs. Jacques Heath (Lily May Peel)</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>113803</p></td>
+<td><p>53.1</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Allen, Mr. William Henry</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>373450</p></td>
+<td><p>8.05</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Moran, Mr. James</p></td>
+<td><p>NaN</p></td>
+<td><p>0</p></td>
+<td><p>330877</p></td>
+<td><p>8.4583</p></td>
+<td><p>NaN</p></td>
+</tr>
+<tr class="row-even"><td><p>McCarthy, Mr. Timothy J</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>17463</p></td>
+<td><p>51.8625</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Palsson, Master. Gosta Leonard</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>349909</p></td>
+<td><p>21.075</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>347742</p></td>
+<td><p>11.1333</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nasser, Mrs. Nicholas (Adele Achem)</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>237736</p></td>
+<td><p>30.0708</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandstrom, Miss. Marguerite Rut</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>PP 9549</p></td>
+<td><p>16.7</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bonnell, Miss. Elizabeth</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>113783</p></td>
+<td><p>26.55</p></td>
+<td><p>S</p></td>
+</tr>
+</tbody>
+</table>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-c698afc8974bf690ad6b1c1d1ca4b10d41e2e5ee.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
+   &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
+}" class="graphviz" /></div>
+<hr class="docutils" />
+<p><strong>Fourth step</strong>, fill <a class="reference internal" href="#cat-nan"><span class="std std-ref">cat_nan</span></a> to <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a>, fill <a class="reference internal" href="#num-nan"><span class="std std-ref">num_nan</span></a> to <a class="reference internal" href="#num"><span class="std std-ref">num</span></a>.</p>
+<table class="docutils align-default" id="id6">
+<caption><span class="caption-text">Fourth Step : Fill NaN</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name(cat)</p></td>
+<td><p>Age(num)</p></td>
+<td><p>SibSp(num)</p></td>
+<td><p>Ticket(cat)</p></td>
+<td><p>Fare(num)</p></td>
+<td><p>Embarked(cat)</p></td>
+</tr>
+<tr class="row-even"><td><p>Braund, Mr. Owen Harris</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>A/5 21171</p></td>
+<td><p>7.25</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>PC 17599</p></td>
+<td><p>71.2833</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Heikkinen, Miss. Laina</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>STON/O2. 3101282</p></td>
+<td><p>7.925</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Futrelle, Mrs. Jacques Heath (Lily May Peel)</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>113803</p></td>
+<td><p>53.1</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Allen, Mr. William Henry</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>373450</p></td>
+<td><p>8.05</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Moran, Mr. James</p></td>
+<td><p>26.25</p></td>
+<td><p>0</p></td>
+<td><p>330877</p></td>
+<td><p>8.4583</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>McCarthy, Mr. Timothy J</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>17463</p></td>
+<td><p>51.8625</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Palsson, Master. Gosta Leonard</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>349909</p></td>
+<td><p>21.075</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>347742</p></td>
+<td><p>11.1333</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nasser, Mrs. Nicholas (Adele Achem)</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>237736</p></td>
+<td><p>30.0708</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandstrom, Miss. Marguerite Rut</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>PP 9549</p></td>
+<td><p>16.7</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bonnell, Miss. Elizabeth</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>113783</p></td>
+<td><p>26.55</p></td>
+<td><p>S</p></td>
+</tr>
+</tbody>
+</table>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-b816e00685ffb762d4f067391946e64e2f368dde.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
+   &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
+   &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
+   &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
+}" class="graphviz" /></div>
+<hr class="docutils" />
+<p><strong>Fifth step</strong>, using <code class="docutils literal notranslate"><span class="pre">operate.split.cat</span></code> algorithm to split <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a> to two
+feature groups: <a class="reference internal" href="#highr-cat"><span class="std std-ref">highR_cat</span></a> and <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a>.</p>
+<table class="docutils align-default" id="id7">
+<caption><span class="caption-text">Fifth Step : Split Categorical to <a class="reference internal" href="#highr-cat"><span class="std std-ref">highR_cat</span></a> and <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a></span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name(highR_cat)</p></td>
+<td><p>Age(num)</p></td>
+<td><p>SibSp(num)</p></td>
+<td><p>Ticket(highR_cat)</p></td>
+<td><p>Fare(num)</p></td>
+<td><p>Embarked(lowR_cat)</p></td>
+</tr>
+<tr class="row-even"><td><p>Braund, Mr. Owen Harris</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>A/5 21171</p></td>
+<td><p>7.25</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>PC 17599</p></td>
+<td><p>71.2833</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Heikkinen, Miss. Laina</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>STON/O2. 3101282</p></td>
+<td><p>7.925</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Futrelle, Mrs. Jacques Heath (Lily May Peel)</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>113803</p></td>
+<td><p>53.1</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Allen, Mr. William Henry</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>373450</p></td>
+<td><p>8.05</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Moran, Mr. James</p></td>
+<td><p>26.25</p></td>
+<td><p>0</p></td>
+<td><p>330877</p></td>
+<td><p>8.4583</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>McCarthy, Mr. Timothy J</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>17463</p></td>
+<td><p>51.8625</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Palsson, Master. Gosta Leonard</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>349909</p></td>
+<td><p>21.075</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-even"><td><p>Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>347742</p></td>
+<td><p>11.1333</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nasser, Mrs. Nicholas (Adele Achem)</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>237736</p></td>
+<td><p>30.0708</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandstrom, Miss. Marguerite Rut</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>PP 9549</p></td>
+<td><p>16.7</p></td>
+<td><p>S</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bonnell, Miss. Elizabeth</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>113783</p></td>
+<td><p>26.55</p></td>
+<td><p>S</p></td>
+</tr>
+</tbody>
+</table>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-9b58d1359ed08c4a0477e9abe3fd51bb94ce9339.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
+   &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
+   &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
+   &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
+   &quot;cat&quot; -&gt; &quot;highR_cat&quot; [ label=&quot;operate.split.cat: highR_cat&quot; ];
+   &quot;cat&quot; -&gt; &quot;lowR_cat&quot; [ label=&quot;operate.split.cat: lowR_cat&quot; ];
+}" class="graphviz" /></div>
+<hr class="docutils" />
+<p><strong>Sixth step</strong>, we encode <a class="reference internal" href="#highr-cat"><span class="std std-ref">highR_cat</span></a> to <a class="reference internal" href="#num"><span class="std std-ref">num</span></a> by <code class="docutils literal notranslate"><span class="pre">label_encoder</span></code>,
+we encode <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a> to <a class="reference internal" href="#num"><span class="std std-ref">num</span></a> by <code class="docutils literal notranslate"><span class="pre">one_hot_encoder</span></code>,</p>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">Sixth Step : Encoding Categorical to Numerical</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name(num)</p></td>
+<td><p>Age(num)</p></td>
+<td><p>SibSp(num)</p></td>
+<td><p>Ticket(num)</p></td>
+<td><p>Fare(num)</p></td>
+<td><p>Embarked_1(num)</p></td>
+<td><p>Embarked_2(num)</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>22</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>7.25</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>38</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>71.2833</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>26</p></td>
+<td><p>0</p></td>
+<td><p>3</p></td>
+<td><p>7.925</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>35</p></td>
+<td><p>1</p></td>
+<td><p>4</p></td>
+<td><p>53.1</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>35</p></td>
+<td><p>0</p></td>
+<td><p>5</p></td>
+<td><p>8.05</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>26.25</p></td>
+<td><p>0</p></td>
+<td><p>6</p></td>
+<td><p>8.4583</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+<td><p>7</p></td>
+<td><p>51.8625</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+<td><p>8</p></td>
+<td><p>21.075</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p>27</p></td>
+<td><p>0</p></td>
+<td><p>9</p></td>
+<td><p>11.1333</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>10</p></td>
+<td><p>14</p></td>
+<td><p>1</p></td>
+<td><p>10</p></td>
+<td><p>30.0708</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>11</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>11</p></td>
+<td><p>16.7</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>12</p></td>
+<td><p>58</p></td>
+<td><p>0</p></td>
+<td><p>12</p></td>
+<td><p>26.55</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-31ddc3e69ba151c2f024d1a2c3fecaaf6a41557f.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
+   &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
+   &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
+   &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
+   &quot;cat&quot; -&gt; &quot;highR_cat&quot; [ label=&quot;operate.split.cat: highR_cat&quot; ];
+   &quot;highR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.label&quot; ];
+   &quot;cat&quot; -&gt; &quot;lowR_cat&quot; [ label=&quot;operate.split.cat: lowR_cat&quot; ];
+   &quot;lowR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.one_hot&quot; ];
+}" class="graphviz" /></div>
+<hr class="docutils" />
+<p><strong>Seventh step</strong>, finally, we finish all the data preprocessing phase,
+now we should do estimating. <code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> and <code class="docutils literal notranslate"><span class="pre">random_forest</span></code> are candidate algorithms.</p>
+<p>This corresponds to this figure:</p>
+<div class="graphviz"><img src="_images/graphviz-344210078541dbc212d985206995cf25f40145e9.png" alt="digraph estimating {
+   &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
+   &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
+   &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
+   &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
+   &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
+   &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
+   &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
+   &quot;cat&quot; -&gt; &quot;highR_cat&quot; [ label=&quot;operate.split.cat: highR_cat&quot; ];
+   &quot;highR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.label&quot; ];
+   &quot;cat&quot; -&gt; &quot;lowR_cat&quot; [ label=&quot;operate.split.cat: lowR_cat&quot; ];
+   &quot;lowR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.one_hot&quot; ];
+   &quot;num&quot; -&gt; &quot;target&quot; [ label=&quot;{lightgbm, random_forest}&quot; ];
+}" class="graphviz" /></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="HyperFlow documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, qichun tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

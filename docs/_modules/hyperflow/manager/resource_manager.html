@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../../../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
 </ul>
 
             
@@ -175,15 +187,16 @@
 <span class="kn">from</span> <span class="nn">hyperflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
 <span class="kn">from</span> <span class="nn">hyperflow.metrics</span> <span class="kn">import</span> <span class="n">Scorer</span>
 <span class="kn">from</span> <span class="nn">hyperflow.utils.hash</span> <span class="kn">import</span> <span class="n">get_hash_of_Xy</span><span class="p">,</span> <span class="n">get_hash_of_str</span><span class="p">,</span> <span class="n">get_hash_of_dict</span>
+<span class="kn">from</span> <span class="nn">hyperflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
 <span class="kn">from</span> <span class="nn">hyperflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 <span class="kn">from</span> <span class="nn">hyperflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
 <span class="kn">from</span> <span class="nn">hyperflow.utils.packages</span> <span class="kn">import</span> <span class="n">find_components</span>
 <span class="kn">from</span> <span class="nn">hyperflow.utils.peewee</span> <span class="kn">import</span> <span class="n">PickleFiled</span>
 
 
-<div class="viewcode-block" id="ResourceManager"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager">[docs]</a><span class="k">class</span> <span class="nc">ResourceManager</span><span class="p">():</span>
+<div class="viewcode-block" id="ResourceManager"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager">[docs]</a><span class="k">class</span> <span class="nc">ResourceManager</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    ResourceManager: file_system and data_base</span>
+<span class="sd">    ``ResourceManager`` is a class manager computer resources such like ``file_system`` and ``data_base``.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -196,10 +209,54 @@
             <span class="n">redis_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
             <span class="n">max_persistent_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
             <span class="n">persistent_mode</span><span class="o">=</span><span class="s2">&quot;fs&quot;</span><span class="p">,</span>
-            <span class="n">store_intermediate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">compress_suffix</span><span class="o">=</span><span class="s2">&quot;bz2&quot;</span>
 
     <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        store_path: str</span>
+<span class="sd">            A path store files, such as metadata and model file and database file, which belong to HyperFlow.</span>
+<span class="sd">        file_system: str</span>
+<span class="sd">            Indicator-string about which file system or storage system will be used.</span>
+
+<span class="sd">            Available options list below:</span>
+<span class="sd">                * ``local``</span>
+<span class="sd">                * ``hdfs``</span>
+<span class="sd">                * ``s3``</span>
+
+<span class="sd">            ``local`` is default value.</span>
+<span class="sd">        file_system_params: dict</span>
+<span class="sd">            Specific file_system configuration.</span>
+<span class="sd">        db_type: str</span>
+<span class="sd">            Indicator-string about which file system or storage system will be used.</span>
+
+<span class="sd">            Available options list below:</span>
+<span class="sd">                * ``sqlite``</span>
+<span class="sd">                * ``postgresql``</span>
+<span class="sd">                * ``mysql``</span>
+
+<span class="sd">            ``sqlite`` is default value.</span>
+<span class="sd">        db_params: dict</span>
+<span class="sd">            Specific database configuration.</span>
+<span class="sd">        redis_params: dict</span>
+<span class="sd">            Redis configuration.</span>
+<span class="sd">        max_persistent_estimators: int</span>
+<span class="sd">            Maximal number of models can persistent in single task.</span>
+
+<span class="sd">            If more than this number, the The worst performing model file will be delete,</span>
+
+<span class="sd">            the corresponding database record will also be deleted.</span>
+<span class="sd">        persistent_mode: str</span>
+<span class="sd">            Indicator-string about which persistent mode will be used.</span>
+
+<span class="sd">            Available options list below:</span>
+<span class="sd">                * ``db`` - serialize entity to bytes and store in database directly.</span>
+<span class="sd">                * ``fs`` - serialize entity to bytes and form a pickle file upload to storage system or save in local.</span>
+<span class="sd">        compress_suffix: str</span>
+<span class="sd">            compress file&#39;s suffix, default is bz2</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># --logger-------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="c1"># --preprocessing------------</span>
@@ -229,8 +286,6 @@
         <span class="c1"># ---persistent_mode-------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">=</span> <span class="n">persistent_mode</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;fs&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">)</span>
-        <span class="c1"># ---store_intermediate-------</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">store_intermediate</span> <span class="o">=</span> <span class="n">store_intermediate</span>
         <span class="c1"># ---compress_suffix------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress_suffix</span> <span class="o">=</span> <span class="n">compress_suffix</span>
         <span class="c1"># ---post_process------------</span>
@@ -282,7 +337,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="k">return</span> <span class="n">db_params</span></div>
 
-<div class="viewcode-block" id="ResourceManager.estimate_new_id"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.estimate_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span></div>
+<div class="viewcode-block" id="ResourceManager.estimate_new_id"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.estimate_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span>
         <span class="c1"># fixme : 用来预测下一个自增主键的ID，但是感觉有问题</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">records</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
@@ -296,7 +351,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database Error:</span><span class="se">\n</span><span class="si">{e}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">estimated_id</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">estimated_id</span>
+        <span class="k">return</span> <span class="n">estimated_id</span></div>
 
 <div class="viewcode-block" id="ResourceManager.persistent_evaluated_model"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">[docs]</a>    <span class="k">def</span> <span class="nf">persistent_evaluated_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_trials_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span><span class="p">)</span>
@@ -331,7 +386,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="k">return</span> <span class="n">ml_task</span><span class="p">,</span> <span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_test</span></div>
 
-<div class="viewcode-block" id="ResourceManager.load_best_estimator"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_best_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span></div>
+<div class="viewcode-block" id="ResourceManager.load_best_estimator"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_best_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
         <span class="c1"># todo: 最后调用分析程序？</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
         <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -343,7 +398,7 @@
             <span class="n">estimator</span> <span class="o">=</span> <span class="n">VoteClassifier</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">estimator</span> <span class="o">=</span> <span class="n">MeanRegressor</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">estimator</span>
+        <span class="k">return</span> <span class="n">estimator</span></div>
 
 <div class="viewcode-block" id="ResourceManager.load_best_dhp"><a class="viewcode-back" href="../../../_module/hyperflow.manager.html#hyperflow.manager.resource_manager.ResourceManager.load_best_dhp">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_dhp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">trial_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best_k_trials</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>

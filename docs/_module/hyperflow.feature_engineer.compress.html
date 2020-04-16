@@ -20,21 +20,11 @@
   <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: ''
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,7 +32,12 @@
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,7 +85,24 @@
               
             
             
-              <ul class="simple">
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Intruduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contribution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 </ul>
 
             
@@ -142,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/_module/hyperflow.feature_engineer.compress.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_module/hyperflow.feature_engineer.compress.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -162,47 +174,47 @@
 </div>
 <div class="section" id="module-hyperflow.feature_engineer.compress.f1_score">
 <span id="hyperflow-feature-engineer-compress-f1-score-module"></span><h2>hyperflow.feature_engineer.compress.f1_score module<a class="headerlink" href="#module-hyperflow.feature_engineer.compress.f1_score" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.feature_engineer.compress.f1_score.F1Score">
-<em class="property">class </em><code class="descclassname">hyperflow.feature_engineer.compress.f1_score.</code><code class="descname">F1Score</code><span class="sig-paren">(</span><em>threshold</em>, <em>n_jobs=1</em>, <em>max_delete=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#F1Score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.F1Score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.feature_engineer.compress.similarity_base.SimilarityBase</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.feature_engineer.compress.f1_score.</code><code class="sig-name descname">F1Score</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threshold</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">max_delete</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#F1Score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.F1Score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.feature_engineer.compress.similarity_base.SimilarityBase</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.feature_engineer.compress.f1_score.F1Score.core_func">
-<code class="descname">core_func</code><span class="sig-paren">(</span><em>s</em>, <em>e</em>, <em>L</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#F1Score.core_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.F1Score.core_func" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">core_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">L</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#F1Score.core_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.F1Score.core_func" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.feature_engineer.compress.f1_score.F1Score.name">
-<code class="descname">name</code><em class="property"> = 'f1_score'</em><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.F1Score.name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">name</code><em class="property"> = 'f1_score'</em><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.F1Score.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="hyperflow.feature_engineer.compress.f1_score.f1_score">
-<code class="descclassname">hyperflow.feature_engineer.compress.f1_score.</code><code class="descname">f1_score</code><span class="sig-paren">(</span><em>y_true</em>, <em>y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#f1_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.f1_score" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hyperflow.feature_engineer.compress.f1_score.</code><code class="sig-name descname">f1_score</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_true</span></em>, <em class="sig-param"><span class="n">y_pred</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#f1_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.f1_score" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="hyperflow.feature_engineer.compress.f1_score.valid">
-<code class="descclassname">hyperflow.feature_engineer.compress.f1_score.</code><code class="descname">valid</code><span class="sig-paren">(</span><em>arr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.valid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hyperflow.feature_engineer.compress.f1_score.</code><code class="sig-name descname">valid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/f1_score.html#valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.f1_score.valid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-hyperflow.feature_engineer.compress.pearson">
 <span id="hyperflow-feature-engineer-compress-pearson-module"></span><h2>hyperflow.feature_engineer.compress.pearson module<a class="headerlink" href="#module-hyperflow.feature_engineer.compress.pearson" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.feature_engineer.compress.pearson.Pearson">
-<em class="property">class </em><code class="descclassname">hyperflow.feature_engineer.compress.pearson.</code><code class="descname">Pearson</code><span class="sig-paren">(</span><em>threshold</em>, <em>n_jobs=1</em>, <em>max_delete=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/pearson.html#Pearson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.pearson.Pearson" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.feature_engineer.compress.similarity_base.SimilarityBase</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.feature_engineer.compress.pearson.</code><code class="sig-name descname">Pearson</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threshold</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">max_delete</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/pearson.html#Pearson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.pearson.Pearson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.feature_engineer.compress.similarity_base.SimilarityBase</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.feature_engineer.compress.pearson.Pearson.core_func">
-<code class="descname">core_func</code><span class="sig-paren">(</span><em>s</em>, <em>e</em>, <em>L</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/pearson.html#Pearson.core_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.pearson.Pearson.core_func" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">core_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">L</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/pearson.html#Pearson.core_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.pearson.Pearson.core_func" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.feature_engineer.compress.pearson.Pearson.name">
-<code class="descname">name</code><em class="property"> = 'pearson and f1_score'</em><a class="headerlink" href="#hyperflow.feature_engineer.compress.pearson.Pearson.name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">name</code><em class="property"> = 'pearson and f1_score'</em><a class="headerlink" href="#hyperflow.feature_engineer.compress.pearson.Pearson.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -210,47 +222,47 @@
 </div>
 <div class="section" id="module-hyperflow.feature_engineer.compress.similarity_base">
 <span id="hyperflow-feature-engineer-compress-similarity-base-module"></span><h2>hyperflow.feature_engineer.compress.similarity_base module<a class="headerlink" href="#module-hyperflow.feature_engineer.compress.similarity_base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase">
-<em class="property">class </em><code class="descclassname">hyperflow.feature_engineer.compress.similarity_base.</code><code class="descname">SimilarityBase</code><span class="sig-paren">(</span><em>threshold</em>, <em>n_jobs=1</em>, <em>max_delete=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.TransformerMixin</span></code>, <code class="xref py py-class docutils literal"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.feature_engineer.compress.similarity_base.</code><code class="sig-name descname">SimilarityBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threshold</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">max_delete</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
+<dl class="py method">
 <dt id="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.core_func">
-<code class="descname">core_func</code><span class="sig-paren">(</span><em>s</em>, <em>e</em>, <em>L</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase.core_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.core_func" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">core_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">L</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase.core_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.core_func" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X: Union[pandas.core.frame.DataFrame, numpy.ndarray], y=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">, </span>numpy.ndarray<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.name">
-<code class="descname">name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">name</code><em class="property"> = None</em><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#SimilarityBase.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase.transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="hyperflow.feature_engineer.compress.similarity_base.get_start_end_tuples">
-<code class="descclassname">hyperflow.feature_engineer.compress.similarity_base.</code><code class="descname">get_start_end_tuples</code><span class="sig-paren">(</span><em>threads</em>, <em>L</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#get_start_end_tuples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.get_start_end_tuples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hyperflow.feature_engineer.compress.similarity_base.</code><code class="sig-name descname">get_start_end_tuples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threads</span></em>, <em class="sig-param"><span class="n">L</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/similarity_base.html#get_start_end_tuples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.similarity_base.get_start_end_tuples" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-hyperflow.feature_engineer.compress.variance">
 <span id="hyperflow-feature-engineer-compress-variance-module"></span><h2>hyperflow.feature_engineer.compress.variance module<a class="headerlink" href="#module-hyperflow.feature_engineer.compress.variance" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="hyperflow.feature_engineer.compress.variance.Variance">
-<em class="property">class </em><code class="descclassname">hyperflow.feature_engineer.compress.variance.</code><code class="descname">Variance</code><span class="sig-paren">(</span><em>threshold</em>, <em>n_jobs=1</em>, <em>max_delete=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/variance.html#Variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.variance.Variance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase"><code class="xref py py-class docutils literal"><span class="pre">hyperflow.feature_engineer.compress.similarity_base.SimilarityBase</span></code></a></p>
-<dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">hyperflow.feature_engineer.compress.variance.</code><code class="sig-name descname">Variance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threshold</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">max_delete</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/variance.html#Variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.variance.Variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hyperflow.feature_engineer.compress.similarity_base.SimilarityBase" title="hyperflow.feature_engineer.compress.similarity_base.SimilarityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">hyperflow.feature_engineer.compress.similarity_base.SimilarityBase</span></code></a></p>
+<dl class="py method">
 <dt id="hyperflow.feature_engineer.compress.variance.Variance.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X: Union[pandas.core.frame.DataFrame, numpy.ndarray], y=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hyperflow.feature_engineer.compress.variance.Variance.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">, </span>numpy.ndarray<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hyperflow/feature_engineer/compress/variance.html#Variance.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hyperflow.feature_engineer.compress.variance.Variance.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

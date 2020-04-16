@@ -35,12 +35,12 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
-    'sphinx.ext.duration',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.githubpages',
+    # 'sphinx.ext.duration',
+    # 'sphinx.ext.extlinks',
+    # 'sphinx.ext.githubpages',
     'sphinx.ext.graphviz',
-    'sphinx.ext.linkcode',
-    'sphinx.ext.inheritance_diagram',
+    # 'sphinx.ext.linkcode',
+    # 'sphinx.ext.inheritance_diagram',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -49,6 +49,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_markdown_tables',
+    # 'numpydoc',
+    # 'sphinx_gallery.gen_gallery',
 ]
 
 autoclass_content = 'both'
@@ -58,8 +60,11 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_parsers = {
+    '.md': 'recommonmark.parser.CommonMarkParser',
+}
 
+source_suffix = ['.rst', '.md']
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
 

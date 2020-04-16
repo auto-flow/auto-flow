@@ -1,0 +1,77 @@
+Intruduction
+============
+
+
+
+Tabular Data-Processing Workflow
+----------------------------------
+
+`Titanic <https://www.kaggle.com/c/titanic>`_ is perhaps the most familiar machine learning task for data scientists.
+The sub table after sampling is shown below:
+
+.. csv-table:: Titanic Origin Data
+   :file: csv/origin.csv
+
+You must notice that such raw table cannot be used in data-mining or machine-learning.
+We should fill the missing value, encoding the category value, and so on.
+
+In order to introduce the practical problems this project wants to solve,
+I want to introduce a concept: ``feature group``.
+
+Feature Group
+~~~~~~~~~~~~~~~~~
+
+Except the columns that cannot provide entity specific properties, like ``id``,
+the remaining columns are called ``features``.
+
+.. note::
+    You can find ``column_descriptions``'s definition in :class:`hyperflow.manager.data_manager.DataManager`
+
+If some ``features`` have similar properties, they are containing in a same ``feature group``.
+
+.. note::
+    You can find some ``feature group``'s examples and practices in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+
+Their are some common ``feature group`` built-in the HyperFlow:
+    * ``nan``      - Not a Number, a column contain missing values.
+    * ``num``      - numerical features, such as [1, 2, 3].
+    * ``cat``      - categorical features, such as ["a", "b", "c"].
+    * ``num_nan``  - numerical features contains missing values. such as [1, 2, NaN].
+    * ``cat_nan``  - categorical features contains missing values. such as ["a", "b", NaN].
+    * ``highR_nan``  - highly ratio NaN. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+    * ``lowR_nan``   - lowly ratio NaN. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+    * ``highR_cat``  - highly cardinality ratio categorical. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+    * ``lowR_cat``  -  lowly cardinality ratio categorical. You can find explain in :class:`hyperflow.hdl.hdl_constructor.HDL_Constructor`
+
+Work Flow
+~~~~~~~~~~
+
+After defining a concept: ``feature group``, ``Workflow`` is the next important concept.
+
+You can consider the whole machine-learning training and testing procedure as a directed acyclic graph(DAG),
+except ETL or other data prepare and feature extract procedure.
+
+In this graph , you can consider nodes as ``feature group``,
+edges as `data-processing or estimating algorithms`.
+Each edges' tail node is a ``feature group`` **before processing**,
+each edges' head node is a other ``feature group`` **after processing**.
+
+You should keep in mind that, each edge represents **one** algorithm or **a list of**
+algorithms. For example, after a series of data-processing, single ``num`` (numerical)
+`feature group` is reserved, we should do estimating(`fit features to target column`):
+
+.. graphviz::
+
+   digraph estimating {
+      "num" -> "target" [ label="{lightgbm, random_forest}" ];
+   }
+
+In this figure we can see: ``lightgbm`` and ``random_forest`` are candidate algorithms.
+Some computer scientists said, ``AutoML`` is a ``CASH`` problem (Combined Algorithm Selection and Hyper-parameter optimization problem).
+
+In fact, the algorithm selection on the edge allows this ``workflow`` to be called a ``workflow space``.
+
+Hear is the ``workflow space`` for `Titanic <https://www.kaggle.com/c/titanic>`_  task.
+
+.. image:: images/workflow_space.png
+
