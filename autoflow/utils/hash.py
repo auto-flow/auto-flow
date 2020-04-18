@@ -39,9 +39,11 @@ def get_hash_of_dict(dict_, m=None):
     return m.hexdigest()
 
 
-def get_hash_decimal_of_str(x):
+def get_hash_decimal_of_str(x, m=None):
+    if m is None:
+        m = hashlib.md5()
     if isinstance(x, str):
-        hash_str = get_hash_of_str(x)
+        hash_str = get_hash_of_str(x, m)
         hash_int = int(hash_str[:5], 16)
         return hash_int
     elif isinstance(x, bool):
@@ -53,6 +55,8 @@ def get_hash_decimal_of_str(x):
 
 
 def get_hash_of_dataframe(df: pd.DataFrame, m=None):
+    if m is None:
+        m = hashlib.md5()
     df_ = deepcopy(df)
     object_columns = get_object_columns(df_)
     for objest_column in object_columns:
@@ -76,7 +80,7 @@ def get_hash_of_Xy(X: Union[pd.DataFrame, np.ndarray, None],
             y = y[:, None]
         y = pd.DataFrame(y, columns=["y"])
         if y.shape[1] != df.shape[1]:
-            return get_hash_of_dataframe(df)
+            return get_hash_of_dataframe(df, m)
         df = pd.concat([X, y], ignore_index=True)
     return get_hash_of_dataframe(df, m)
 
