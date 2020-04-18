@@ -7,7 +7,7 @@ import pandas as pd
 
 from autoflow.pipeline.components.utils import stack_Xs
 from autoflow.pipeline.dataframe import GenericDataFrame
-from autoflow.utils.data import is_nan, is_cat, is_highR_nan
+from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array
 from autoflow.utils.dataframe import pop_if_exists
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging import get_logger
@@ -18,6 +18,7 @@ class DataManager(StrSignatureMixin):
     '''
     DataManager is a Dataset manager to store the pattern of dataset.
     '''
+
     def __init__(
             self,
             X_train: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
@@ -25,7 +26,7 @@ class DataManager(StrSignatureMixin):
             X_test: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
             y_test: Union[pd.Series, np.ndarray, str, None] = None,
             dataset_metadata: Dict[str, Any] = frozenset(),
-            column_descriptions: Dict[str, Union[List[str],str]] = None,
+            column_descriptions: Dict[str, Union[List[str], str]] = None,
             highR_nan_threshold: float = 0.5,
     ):
         '''
@@ -185,6 +186,8 @@ class DataManager(StrSignatureMixin):
             L2 = X_test.shape[0]
             X_test.index = range(L1, L1 + L2)
         X_train.index = range(L1)
+        y_train = to_array(y_train)
+        y_test = to_array(y_test)
         return X_train, y_train, X_test, y_test, feature_groups, column2feature_groups
 
     def process_X(self, X):

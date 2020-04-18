@@ -30,5 +30,5 @@ scikit-optimize==0.7.4
 hyperopt==0.1.2
 hdfs==2.5.8
 redis
-
+imbalanced-learn
 

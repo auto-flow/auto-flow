@@ -87,6 +87,8 @@ def is_nan(s: pd.Series):
 
 
 def to_array(X):
+    if X is None:
+        return X
     if isinstance(X, (pd.DataFrame, pd.Series)):
         return X.values
     return X

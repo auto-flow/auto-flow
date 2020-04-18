@@ -119,7 +119,7 @@ class AutoFlowEstimator(BaseEstimator):
         hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
         # ---hdl_constructors-------------------------
         self.hdl_constructors = sequencing(hdl_constructor, HDL_Constructor)
-        self.hdl_constructor=self.hdl_constructors[0]
+        self.hdl_constructor = self.hdl_constructors[0]
         # ---resource_manager-----------------------------------
         self.resource_manager = instancing(resource_manager, ResourceManager, kwargs)
         # ---member_variable------------------------------------
@@ -252,6 +252,14 @@ class AutoFlowEstimator(BaseEstimator):
 
         return self
 
+    def get_sync_dict(self, n_jobs, tuner):
+        if n_jobs > 1 and tuner.search_method != "grid":
+            sync_dict = Manager().dict()
+            sync_dict["exit_processes"] = tuner.exit_processes
+        else:
+            sync_dict = None
+        return sync_dict
+
     def start_tuner(self, tuner: Tuner, hdl: dict):
         self.logger.debug(f"Start fine tune task, \nwhich HDL(Hyperparams Descriptions Language) is:\n{hdl}")
         self.logger.debug(f"which Tuner is:\n{tuner}")
@@ -271,11 +279,7 @@ class AutoFlowEstimator(BaseEstimator):
             tuner.design_initial_configs(n_jobs),
             n_jobs)
         random_states = np.arange(n_jobs) + self.random_state
-        if n_jobs > 1 and tuner.search_method != "grid":
-            sync_dict = Manager().dict()
-            sync_dict["exit_processes"] = tuner.exit_processes
-        else:
-            sync_dict = None
+        sync_dict = self.get_sync_dict(n_jobs, tuner)
         self.resource_manager.close_trials_table()
         self.resource_manager.clear_pid_list()
         self.resource_manager.close_redis()
