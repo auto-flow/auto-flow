@@ -219,7 +219,6 @@ class AutoFlowEstimator(BaseEstimator):
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
-                last_best_dhp = json.loads(last_best_dhp)
                 hdl = update_placeholder_from_other_dict(raw_hdl, last_best_dhp)
                 self.logger.debug(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
             else:
@@ -404,6 +403,7 @@ class AutoFlowEstimator(BaseEstimator):
             return self.ensemble_estimator
 
     def auto_fit_ensemble(self):
+        # todo: 调研stacking等ensemble方法的表现评估
         pass
 
     def _predict(
