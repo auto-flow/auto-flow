@@ -72,7 +72,7 @@ setup(
     version=version,
     author='qichun tang',
     author_email='tqichun@gmail.com',
-    description='AutoFlow: Automatic machine learning workflow modeling platform.',
+    description='AutoFlow: automatic machine learning workflow modeling platform.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     license='BSD',

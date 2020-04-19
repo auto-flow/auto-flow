@@ -2,7 +2,7 @@
 AutoFlow
 ==========
 
-``AutoFlow`` : **Automatic machine learning workflow modeling platform**
+``AutoFlow`` : **automatic machine learning workflow modeling platform**
 
 
 Introduction
