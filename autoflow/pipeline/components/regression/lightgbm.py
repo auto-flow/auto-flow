@@ -21,9 +21,13 @@ class LGBMRegressor(AutoFlowClassificationAlgorithm):
             eval_set = (X_valid, y_valid)
         else:
             eval_set = None
+        early_stopping_rounds=self.hyperparams.get("early_stopping_rounds")
+        if eval_set is None:
+            early_stopping_rounds=None
         return self.estimator.fit(
             X, y, categorical_feature=categorical_features_indices,
-            eval_set=eval_set, verbose=False
+            eval_set=eval_set, verbose=False,
+            early_stopping_rounds=early_stopping_rounds
         )
 
     def before_pred_X(self,X):

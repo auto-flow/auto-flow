@@ -31,6 +31,11 @@ loggers:
     handlers: [file_handler]
     propagate: false
 
+  hdfs.client:
+    level: INFO
+    handlers: [file_handler]
+    propagate: false
+
   dsmac.intensification.intensification.Intensifier:
     level: DEBUG
     handlers: [file_handler, console]

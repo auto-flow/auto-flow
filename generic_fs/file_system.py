@@ -2,6 +2,12 @@ import os
 import pandas as pd
 
 class FileSystem():
+    def connect_fs(self):
+        pass
+
+    def close_fs(self):
+        pass
+
     def listdir(self, parent, **kwargs):
         raise NotImplementedError
 

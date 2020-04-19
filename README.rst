@@ -21,7 +21,7 @@ in each edge algorithm selection and hyper-parameter optimization are doing.
 Unfortunately, if data scientists want to manually select algorithms and 
 hyper-parameters for such a workflow, 
 it will be a very tedious task. In order to solve this problem, 
-we developed the ``Hyperflow``, 
+we developed the ``AutoFlow``,
 which can automatically select algorithm and optimize the parameters of 
 machine learning workflow. 
 In other words, it can implement AutoML for tabular data.

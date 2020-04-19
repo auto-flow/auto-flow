@@ -15,7 +15,8 @@ examples_path = Path(autoflow.__file__).parent.parent / "examples"
 train_df = pd.read_csv(examples_path / "data/train_classification.csv")
 test_df = pd.read_csv(examples_path / "data/test_classification.csv")
 trained_pipeline = AutoFlowClassifier(
-    initial_runs=1, run_limit=1, n_jobs=1, included_classifiers=["lightgbm"],
+    initial_runs=5, run_limit=10, n_jobs=3,
+    included_classifiers=["lightgbm"],
     db_type="postgresql",
     db_params={
         "user": "tqc",
@@ -24,6 +25,7 @@ trained_pipeline = AutoFlowClassifier(
     },
     store_path="/autoflow",
     file_system="hdfs",
+    should_store_intermediate_result=True,
     file_system_params={
         "url": "http://0.0.0.0:50070"
     }
@@ -35,8 +37,9 @@ column_descriptions = {
 }
 # if not os.path.exists("autoflow_classification.bz2"):
 trained_pipeline.fit(
-    X_train=train_df, X_test=test_df, column_descriptions=column_descriptions, should_store_intermediate_result=True,
-    splitter=KFold(n_splits=3, shuffle=True, random_state=42), fit_ensemble_params=False
+    X_train=train_df, X_test=test_df, column_descriptions=column_descriptions,
+    splitter=KFold(n_splits=3, shuffle=True, random_state=42),
+    # fit_ensemble_params=False
 )
 joblib.dump(trained_pipeline, "autoflow_classification.bz2")
 predict_pipeline = joblib.load("autoflow_classification.bz2")
