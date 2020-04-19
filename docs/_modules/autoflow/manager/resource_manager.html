@@ -338,7 +338,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="k">return</span> <span class="n">db_params</span></div>
 
-<div class="viewcode-block" id="ResourceManager.estimate_new_id"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.estimate_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.estimate_new_id"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.estimate_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">forecast_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span>
         <span class="c1"># fixme : 用来预测下一个自增主键的ID，但是感觉有问题</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">records</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
@@ -577,7 +577,7 @@
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
         <span class="c1"># estimate new experiment_id</span>
-        <span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_new_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="p">,</span> <span class="s2">&quot;experiment_id&quot;</span><span class="p">)</span>
+        <span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forecast_new_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="p">,</span> <span class="s2">&quot;experiment_id&quot;</span><span class="p">)</span>
         <span class="c1"># todo: 是否需要删除data_manager的Xy</span>
         <span class="n">data_manager</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">data_manager</span><span class="p">)</span>
         <span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="kc">None</span>
