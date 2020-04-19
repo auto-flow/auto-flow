@@ -9,11 +9,9 @@ from typing import Dict, Tuple, List, Union, Any
 import peewee as pw
 from frozendict import frozendict
 from joblib import load
+from playhouse.fields import PickleField
 from redis import Redis
 
-import generic_fs
-from generic_fs import FileSystem
-from generic_fs.utils import get_db_class_by_db_type
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.manager.data_manager import DataManager
@@ -22,8 +20,9 @@ from autoflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dic
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging import get_logger
 from autoflow.utils.ml_task import MLTask
-from autoflow.utils.packages import find_components
-from autoflow.utils.peewee import PickleFiled
+from generic_fs import FileSystem
+from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, PickleField, create_database
+from generic_fs.utils.fs import get_file_system
 
 
 class ResourceManager(StrSignatureMixin):
@@ -96,12 +95,8 @@ class ResourceManager(StrSignatureMixin):
         db_params = dict(db_params)
         redis_params = dict(redis_params)
         # ---file_system------------
-        directory = os.path.split(generic_fs.__file__)[0]
-        file_system2cls = find_components(generic_fs.__package__, directory, FileSystem)
         self.file_system_type = file_system
-        if file_system not in file_system2cls:
-            raise Exception(f"Invalid file_system {file_system}")
-        self.file_system:FileSystem = file_system2cls[file_system](**file_system_params)
+        self.file_system: FileSystem = get_file_system(file_system)(**file_system_params)
         if self.file_system_type == "local":
             store_path = os.path.expandvars(os.path.expanduser(store_path))
         self.store_path = store_path
@@ -112,7 +107,7 @@ class ResourceManager(StrSignatureMixin):
         if db_type == "sqlite":
             assert self.file_system_type == "local"
         # ---redis----------------
-        self.redis_params = redis_params
+        self.redis_params = dict(redis_params)
         # ---max_persistent_model---
         self.max_persistent_estimators = max_persistent_estimators
         # ---persistent_mode-------
@@ -139,15 +134,11 @@ class ResourceManager(StrSignatureMixin):
         # --db-----------------------------------------
         self.Datebase = get_db_class_by_db_type(self.db_type)
         # --JSONField-----------------------------------------
-        if self.db_type == "sqlite":
-            from playhouse.sqlite_ext import JSONField
-            self.JSONField = JSONField
-        elif self.db_type == "postgresql":
-            from playhouse.postgres_ext import JSONField
-            self.JSONField = JSONField
-        elif self.db_type == "mysql":
-            from playhouse.mysql_ext import JSONField
-            self.JSONField = JSONField
+        self.JSONField = get_JSONField(self.db_type)
+        # --database_name---------------------------------
+        # None means didn't create database
+        self._meta_records_db_name = None  # meta records database
+        self._tasks_db_name = None
 
     def __reduce__(self):
         self.close_redis()
@@ -158,13 +149,13 @@ class ResourceManager(StrSignatureMixin):
         return super(ResourceManager, self).__reduce__()
 
     def update_db_params(self, database):
-        db_params = dict(self.db_params)
+        db_params = deepcopy(self.db_params)
         if self.db_type == "sqlite":
             db_params["database"] = self.file_system.join(self.databases_dir, f"{database}.db")
         elif self.db_type == "postgresql":
-            pass
+            db_params["database"] = database
         elif self.db_type == "mysql":
-            pass
+            db_params["database"] = database
         else:
             raise NotImplementedError
         return db_params
@@ -173,7 +164,6 @@ class ResourceManager(StrSignatureMixin):
         # fixme : 用来预测下一个自增主键的ID，但是感觉有问题
         try:
             records = Dataset.select(getattr(Dataset, id_field)). \
-                where(getattr(Dataset, id_field)). \
                 order_by(-getattr(Dataset, id_field)). \
                 limit(1)
             if len(records) == 0:
@@ -221,7 +211,8 @@ class ResourceManager(StrSignatureMixin):
     def load_best_estimator(self, ml_task: MLTask):
         # todo: 最后调用分析程序？
         self.init_trials_table()
-        record = self.TrialsModel.select().group_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
+        record = self.TrialsModel.select()\
+            .order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
         if self.persistent_mode == "fs":
             models = self.file_system.load_pickle(record.models_path)
         else:
@@ -271,7 +262,7 @@ class ResourceManager(StrSignatureMixin):
     # ----------runhistory------------------------------------------------------------------
     @property
     def runhistory_db_params(self):
-        return self.update_db_params(self.current_tasks_db_name)
+        return self.update_db_params(self.tasks_db_name)
 
     @property
     def runhistory_table_name(self):
@@ -281,12 +272,19 @@ class ResourceManager(StrSignatureMixin):
 
     @property
     def meta_records_db_name(self):
-        return "meta_records"
+        if self._meta_records_db_name is not None:
+            return self._meta_records_db_name
+        self._meta_records_db_name = "meta_records"
+        create_database(self._meta_records_db_name, self.db_type, self.db_params)
+        return self._meta_records_db_name
 
     @property
-    def current_tasks_db_name(self):
-        # return f"{self.task_id}-{self.hdl_id}"
-        return f"task_{self.task_id}"
+    def tasks_db_name(self):
+        if self._tasks_db_name is not None:
+            return self._tasks_db_name
+        self._tasks_db_name = f"task_{self.task_id}"
+        create_database(self._tasks_db_name, self.db_type, self.db_params)
+        return self._tasks_db_name
 
     # ----------redis------------------------------------------------------------------
 
@@ -336,7 +334,7 @@ class ResourceManager(StrSignatureMixin):
     # ----------experiments_model------------------------------------------------------------------
     def get_experiments_model(self) -> pw.Model:
         class Experiments(pw.Model):
-            experiment_id = pw.IntegerField(primary_key=True)
+            experiment_id = pw.AutoField(primary_key=True)
             general_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             current_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             hdl_id = pw.CharField(default="")
@@ -348,7 +346,7 @@ class ResourceManager(StrSignatureMixin):
             tuners = self.JSONField(default=[])
             tuner = pw.TextField(default="")
             should_calc_all_metric = pw.BooleanField(default=True)
-            data_manager_bin = PickleFiled(default=0)
+            data_manager_bin = PickleField(default=0)
             data_manager_path = pw.TextField(default="")
             column_descriptions = self.JSONField(default={})
             column2feature_groups = self.JSONField(default={})
@@ -448,7 +446,7 @@ class ResourceManager(StrSignatureMixin):
             fit_ensemble_params=str(fit_ensemble_params),
             additional_info=additional_info
         )
-        fetched_experiment_id = experiment_record.experiment_id
+        fetched_experiment_id =  experiment_record.experiment_id
         if fetched_experiment_id != experiment_id:
             self.logger.warning("fetched_experiment_id != experiment_id")
         self.experiment_id = experiment_id
@@ -592,7 +590,7 @@ class ResourceManager(StrSignatureMixin):
         if self.is_init_hdls_db:
             return
         self.is_init_hdls_db = True
-        self.hdls_db: pw.Database = self.Datebase(**self.update_db_params(self.current_tasks_db_name))
+        self.hdls_db: pw.Database = self.Datebase(**self.update_db_params(self.tasks_db_name))
         self.HDLsModel = self.get_hdls_model()
 
     def close_hdls_table(self):
@@ -604,7 +602,7 @@ class ResourceManager(StrSignatureMixin):
 
     def get_trials_model(self) -> pw.Model:
         class Trials(pw.Model):
-            trial_id = pw.IntegerField(primary_key=True)
+            trial_id = pw.AutoField(primary_key=True)
             config_id = pw.CharField(default="")
             task_id = pw.CharField(default="")
             hdl_id = pw.CharField(default="")
@@ -616,20 +614,20 @@ class ResourceManager(StrSignatureMixin):
             all_score = self.JSONField(default={})
             all_scores = self.JSONField(default=[])
             test_all_score = self.JSONField(default={})
-            models_bin = PickleFiled(default=0)
+            models_bin = PickleField(default=0)
             models_path = pw.TextField(default="")
-            y_true_indexes = PickleFiled(default=0)
-            y_preds = PickleFiled(default=0)
-            y_test_true = PickleFiled(default=0)
-            y_test_pred = PickleFiled(default=0)
-            smac_hyper_param = PickleFiled(default=0)
+            y_true_indexes = PickleField(default=0)
+            y_preds = PickleField(default=0)
+            y_test_true = PickleField(default=0)
+            y_test_pred = PickleField(default=0)
+            smac_hyper_param = PickleField(default=0)
             dict_hyper_param = self.JSONField(default={})  # todo: json field
             cost_time = pw.FloatField(default=65535)
             status = pw.CharField(default="SUCCESS")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
             intermediate_result_path = pw.TextField(default=""),
-            intermediate_result_bin = PickleFiled(default=b''),
+            intermediate_result_bin = PickleField(default=b''),
             timestamp = pw.DateTimeField(default=datetime.datetime.now)
             user = pw.CharField(default=getuser)
             pid = pw.IntegerField(default=os.getpid)
@@ -644,7 +642,7 @@ class ResourceManager(StrSignatureMixin):
         if self.is_init_trials_db:
             return
         self.is_init_trials_db = True
-        self.trials_db: pw.Database = self.Datebase(**self.update_db_params(self.current_tasks_db_name))
+        self.trials_db: pw.Database = self.Datebase(**self.update_db_params(self.tasks_db_name))
         self.TrialsModel = self.get_trials_model()
 
     def close_trials_table(self):
@@ -707,20 +705,22 @@ class ResourceManager(StrSignatureMixin):
         if not self.is_master:
             return True
         self.init_trials_table()
-        estimators = []
-        for record in self.TrialsModel.select().group_by(self.TrialsModel.estimator):
-            estimators.append(record.estimator)
-        for estimator in estimators:
-            should_delete = self.TrialsModel.select().where(self.TrialsModel.estimator == estimator).order_by(
-                self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
-            if len(should_delete):
-                if self.persistent_mode == "fs":
-                    for record in should_delete:
-                        models_path = record.models_path
-                        self.logger.info(f"Delete expire Model in path : {models_path}")
-                        self.file_system.delete(models_path)
-                self.TrialsModel.delete().where(
-                    self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()
+        # estimators = []
+        # for record in self.TrialsModel.select(self.TrialsModel.trial_id, self.TrialsModel.estimator).group_by(
+        #         self.TrialsModel.estimator):
+        #     estimators.append(record.estimator)
+        # for estimator in estimators:
+        # .where(self.TrialsModel.estimator == estimator)
+        should_delete = self.TrialsModel.select().order_by(
+            self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
+        if len(should_delete):
+            if self.persistent_mode == "fs":
+                for record in should_delete:
+                    models_path = record.models_path
+                    self.logger.info(f"Delete expire Model in path : {models_path}")
+                    self.file_system.delete(models_path)
+            self.TrialsModel.delete().where(
+                self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()
         return True
 
 

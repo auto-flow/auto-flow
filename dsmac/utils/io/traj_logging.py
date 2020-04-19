@@ -6,7 +6,7 @@ import typing
 from ConfigSpace.configuration_space import ConfigurationSpace, Configuration
 from ConfigSpace.hyperparameters import FloatHyperparameter, IntegerHyperparameter
 
-from generic_fs import LocalFS
+from generic_fs.local import LocalFS
 
 __author__ = "Marius Lindauer"
 __copyright__ = "Copyright 2016, ML4AAD"

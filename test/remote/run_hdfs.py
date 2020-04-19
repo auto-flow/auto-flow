@@ -15,7 +15,18 @@ examples_path = Path(autoflow.__file__).parent.parent / "examples"
 train_df = pd.read_csv(examples_path / "data/train_classification.csv")
 test_df = pd.read_csv(examples_path / "data/test_classification.csv")
 trained_pipeline = AutoFlowClassifier(
-    initial_runs=1, run_limit=1, n_jobs=1, included_classifiers=["lightgbm"],debug=True
+    initial_runs=1, run_limit=1, n_jobs=1, included_classifiers=["lightgbm"],
+    db_type="postgresql",
+    db_params={
+        "user": "tqc",
+        "host": "0.0.0.0",
+        "port": 5432
+    },
+    store_path="/autoflow",
+    file_system="hdfs",
+    file_system_params={
+        "url": "http://0.0.0.0:50070"
+    }
 )
 column_descriptions = {
     "id": "PassengerId",

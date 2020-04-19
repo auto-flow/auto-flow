@@ -7,7 +7,7 @@ import numpy as np
 from dsmac.utils.io.cmd_reader import CMDReader
 from dsmac.utils.io.input_reader import InputReader
 from dsmac.utils.io.output_writer import OutputWriter
-from generic_fs import HDFS, LocalFS
+from generic_fs.local import  LocalFS
 
 __author__ = "Marius Lindauer, Matthias Feurer, Aaron Kimmig"
 __copyright__ = "Copyright 2016, ML4AAD"

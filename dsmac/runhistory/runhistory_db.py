@@ -11,7 +11,7 @@ from dsmac.runhistory.structure import DataOrigin
 from dsmac.runhistory.utils import get_id_of_config
 from dsmac.tae.execute_ta_run import StatusType
 from dsmac.utils.logging import PickableLoggerAdapter
-from generic_fs.utils import get_db_class_by_db_type
+from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, PickleField
 
 
 class RunHistoryDB():
@@ -27,15 +27,7 @@ class RunHistoryDB():
         self.db: pw.Database = self.Datebase(**self.db_params)
         self.logger = PickableLoggerAdapter(__name__)
         # --JSONField-----------------------------------------
-        if self.db_type == "sqlite":
-            from playhouse.sqlite_ext import JSONField
-            self.JSONField = JSONField
-        elif self.db_type == "postgresql":
-            from playhouse.postgres_ext import JSONField
-            self.JSONField = JSONField
-        elif self.db_type == "mysql":
-            from playhouse.mysql_ext import JSONField
-            self.JSONField = JSONField
+        self.JSONField = get_JSONField(self.db_type)
         # -----------------------------------------------------
         self.Model: pw.Model = self.get_model()
         self.config_space: ConfigurationSpace = config_space
@@ -45,7 +37,7 @@ class RunHistoryDB():
             run_id = pw.CharField(primary_key=True)
             config_id = pw.CharField(default="")
             config = self.JSONField(default={})
-            config_bin = pw.BitField(default=0)
+            config_bin = PickleField(default=b"")
             config_origin = pw.TextField(default="")
             cost = pw.FloatField(default=65535)
             time = pw.FloatField(default=0.0)
@@ -93,21 +85,6 @@ class RunHistoryDB():
         if instance_id is None:
             instance_id = ""
         try:
-            self.Model.create(
-                run_id=run_id,
-                config_id=config_id,
-                config=config.get_dictionary(),
-                config_origin=config.origin,
-                config_bin=pickle.dumps(config),
-                cost=cost,
-                time=time,
-                instance_id=instance_id,
-                seed=seed,
-                status=status.value,
-                additional_info=dict(additional_info),
-                origin=origin.value,
-            )
-        except pw.IntegrityError:
             self.Model(
                 run_id=run_id,
                 config_id=config_id,
@@ -122,6 +99,8 @@ class RunHistoryDB():
                 additional_info=dict(additional_info),
                 origin=origin.value,
             ).save()
+        except Exception as e:
+            pass
         self.timestamp = datetime.datetime.now()
 
     def fetch_new_runhistory(self, is_init=False):

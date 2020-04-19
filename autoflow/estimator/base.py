@@ -78,7 +78,7 @@ class AutoFlowEstimator(BaseEstimator):
         highR_cat_threshold: float
             high ratio categorical feature's cardinality threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
 
-        kwargs: dict
+        kwargs
             if parameters like ``tuner`` or ``hdl_constructor`` and ``resource_manager`` are passing None,
 
             you can passing kwargs to make passed parameter work. See the following example.
