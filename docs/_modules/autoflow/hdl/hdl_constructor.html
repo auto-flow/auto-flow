@@ -25,6 +25,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -181,7 +182,7 @@
 <span class="kn">from</span> <span class="nn">autoflow.utils.math</span> <span class="kn">import</span> <span class="n">get_int_length</span>
 
 
-<div class="viewcode-block" id="HDL_Constructor"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor">[docs]</a><span class="k">class</span> <span class="nc">HDL_Constructor</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor">[docs]</a><span class="k">class</span> <span class="nc">HDL_Constructor</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    ``HDL`` is abbreviation of Hyper-parameter Descriptions Language.</span>
 <span class="sd">    It describes an abstract hyperparametric space that independent with concrete implementation.</span>
@@ -408,7 +409,7 @@
                 <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.generic_recommend"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">[docs]</a>    <span class="k">def</span> <span class="nf">generic_recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
+<div class="viewcode-block" id="HDL_Constructor.generic_recommend"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">[docs]</a>    <span class="k">def</span> <span class="nf">generic_recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Recommend a generic DAG workflow space back.</span>
 
@@ -448,7 +449,7 @@
         <span class="c1"># todo: 如果特征多，做特征选择或者降维。如果特征少，做增维</span>
         <span class="k">return</span> <span class="n">DAG_workflow</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.draw_workflow_space"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space">[docs]</a>    <span class="k">def</span> <span class="nf">draw_workflow_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor.draw_workflow_space"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space">[docs]</a>    <span class="k">def</span> <span class="nf">draw_workflow_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        Notes</span>
@@ -520,7 +521,7 @@
         <span class="n">graph</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;WorkFlow Space&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">graph</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.run"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">highR_cat_threshold</span><span class="p">):</span>
+<div class="viewcode-block" id="HDL_Constructor.run"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">,</span> <span class="n">random_state</span><span class="p">,</span> <span class="n">highR_cat_threshold</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        Parameters</span>
@@ -585,7 +586,7 @@
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span> <span class="o">=</span> <span class="n">final_dict</span></div>
 
-<div class="viewcode-block" id="HDL_Constructor.get_hdl"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.get_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="HDL_Constructor.get_hdl"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.get_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        Returns</span>

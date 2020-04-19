@@ -25,6 +25,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -94,6 +95,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#automatic-classification">Automatic Classification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automatic-regression">Automatic Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#phased-search">Phased Search</a></li>
 </ul>
 </li>
 </ul>
@@ -179,6 +181,7 @@
 <div class="section" id="automatic-classification">
 <h2>Automatic Classification<a class="headerlink" href="#automatic-classification" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">cd</span> examples/classification
+<span class="gp">$</span> python main.py
 </pre></div>
 </div>
 <p><strong>First step</strong>, import several needed packages.</p>
@@ -227,7 +230,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>Sixth step</strong>, auto do fitting. you can find full document in <a class="reference internal" href="_module/hyperflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit" title="autoflow.estimator.base.AutoFlowEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator.fit()</span></code></a> .</p>
+<p><strong>Sixth step</strong>, auto do fitting. you can find full document in <a class="reference internal" href="_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.fit" title="autoflow.estimator.base.AutoFlowEstimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator.fit()</span></code></a> .</p>
 <p>Passing data params <code class="docutils literal notranslate"><span class="pre">train_df</span></code>, <code class="docutils literal notranslate"><span class="pre">test_df</span></code> and <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code> to classifier.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">fit_ensemble_params</span></code> is “auto” or True, the top 10 models will be integrated by stacking ensemble.</p>
 <p><code class="docutils literal notranslate"><span class="pre">splitter</span></code> is train-valid-dataset splitter,now is set to <code class="docutils literal notranslate"><span class="pre">KFold(3,</span> <span class="pre">True,</span> <span class="pre">42)</span></code> to do 3-Fold Cross-Validation.</p>
@@ -260,6 +263,7 @@ you can use <code class="xref py py-meth docutils literal notranslate"><span cla
 <div class="section" id="automatic-regression">
 <h2>Automatic Regression<a class="headerlink" href="#automatic-regression" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">cd</span> examples/regression
+<span class="gp">$</span> python main.py
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -293,6 +297,120 @@ you can use <code class="xref py py-meth docutils literal notranslate"><span cla
 <span class="n">predict_pipeline</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;autoflow_regression.bz2&quot;</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">predict_pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_df</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="phased-search">
+<h2>Phased Search<a class="headerlink" href="#phased-search" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">phased</span> <span class="pre">search</span></code> allowed you to search the best pipeline(workflow) step by step.</p>
+<p>For example, if you want do <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span></code>, there are several variable you should take into consideration.
+If you search these hyper-parameters in one search task, the search-space can be very huge.</p>
+<p>Without loss of generality, we hypothesis the search-space contains two hyper-parameters :
+<span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> , if <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are both categorical-type hyper-param,
+<span class="math notranslate nohighlight">\(A\)</span> have <span class="math notranslate nohighlight">\(M\)</span> choices, <span class="math notranslate nohighlight">\(B\)</span> have <span class="math notranslate nohighlight">\(N\)</span> choices, the total hyper-parameters space have <span class="math notranslate nohighlight">\({N}\times{M}\)</span> choices,
+time complexity is <span class="math notranslate nohighlight">\({O}({A}\times{B})\)</span>.</p>
+<p>But if we greedily fine tune <span class="math notranslate nohighlight">\(A\)</span> in the first, and then fine tune <span class="math notranslate nohighlight">\(B\)</span> on the optimal <span class="math notranslate nohighlight">\(A\)</span>, we can
+we can reduce time complexity to <span class="math notranslate nohighlight">\(O({A} + {B})\)</span> .</p>
+<p>This is a very simple greedy thought, but it is very powerful and make sense if there is little correlation between each variable.</p>
+<p>In AutoFlow, we support such search method by <code class="docutils literal notranslate"><span class="pre">phased</span> <span class="pre">search</span></code>, you should define a list of <a class="reference internal" href="api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a> and a list of
+<a class="reference internal" href="api.html#autoflow.tuner.tuner.Tuner" title="autoflow.tuner.tuner.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.tuner.tuner.Tuner</span></code></a>, and AutoFlow will run each <code class="docutils literal notranslate"><span class="pre">hdl_constructor</span></code> and <code class="docutils literal notranslate"><span class="pre">tuner</span></code> .
+After finish one of phases, the best configuration will be extracted, and passing the intersted super parameter into the next <code class="docutils literal notranslate"><span class="pre">HDL</span></code> to cover <code class="docutils literal notranslate"><span class="pre">placeholder</span></code>.</p>
+<p>Back to <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span></code> example, there are almost two kinds of hyper-parameters: <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">algorithm</span></code> and
+<code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">ratio</span></code>.</p>
+<p>In the first step, we should keep <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">ratio</span></code> is same and change <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">algorithm</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DAG_workflow</span><span class="o">=</span><span class="p">{</span>  <span class="c1"># There are 4 algorithms to choice</span>
+    <span class="s2">&quot;num-&gt;selected&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;select.from_model_clf&quot;</span><span class="p">,</span> <span class="s2">&quot;_select_percent&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;select.rfe_clf&quot;</span><span class="p">,</span> <span class="s2">&quot;_select_percent&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;selected-&gt;target&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="s2">&quot;_vanilla&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="c1"># _vanilla means don&#39;t update hyper-params from hdl_bank to keep</span>
+    <span class="c1"># there are no hyper-params in classifier.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In second step, we should choose the best <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">algorithm</span></code> searched from first step and to find optimal
+<code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">ratio</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DAG_workflow</span><span class="o">=</span><span class="p">{</span>
+<span class="c1"># selector algorithm is set to &quot;&lt;placeholder&gt;&quot;,</span>
+<span class="c1"># means this variable will use the optimal value on the same position in the previous</span>
+<span class="c1"># search will be selected</span>
+    <span class="s2">&quot;num-&gt;selected&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;_select_percent&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_type&quot;</span><span class="p">:</span> <span class="s2">&quot;quniform&quot;</span><span class="p">,</span> <span class="s2">&quot;_value&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                                     <span class="s2">&quot;_default&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}},</span>
+    <span class="c1"># instead of fixed &quot;_select_percent&quot; hyper-param, in this phase it will be fine tuned.</span>
+    <span class="s2">&quot;selected-&gt;target&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="s2">&quot;_vanilla&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Hear is the complete code</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">cd</span> examples
+<span class="gp">$</span> python phased_search.py
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">autoflow.estimator.base</span> <span class="kn">import</span> <span class="n">AutoFlowEstimator</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl.hdl_constructor</span> <span class="kn">import</span> <span class="n">HDL_Constructor</span>
+<span class="kn">from</span> <span class="nn">autoflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+
+<span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/train_classification.csv&quot;</span><span class="p">)</span>
+
+<span class="n">hdl_constructors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">HDL_Constructor</span><span class="p">(</span>
+        <span class="n">DAG_workflow</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;nan-&gt;{highR=highR_nan,lowR=lowR_nan}&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.split.nan&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lowR_nan-&gt;nan&quot;</span><span class="p">:</span> <span class="s2">&quot;impute.fill_abnormal&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;highR_nan-&gt;nan&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.drop&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;all-&gt;{cat_name=cat,num_name=num}&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.split.cat_num&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cat-&gt;num&quot;</span><span class="p">:</span> <span class="s2">&quot;encode.label&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;num-&gt;selected&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;select.from_model_clf&quot;</span><span class="p">,</span> <span class="s2">&quot;_select_percent&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;select.rfe_clf&quot;</span><span class="p">,</span> <span class="s2">&quot;_select_percent&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;selected-&gt;target&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="s2">&quot;_vanilla&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">),</span>
+    <span class="n">HDL_Constructor</span><span class="p">(</span>
+        <span class="n">DAG_workflow</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;nan-&gt;{highR=highR_nan,lowR=lowR_nan}&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.split.nan&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lowR_nan-&gt;nan&quot;</span><span class="p">:</span> <span class="s2">&quot;impute.fill_abnormal&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;highR_nan-&gt;nan&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.drop&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;all-&gt;{cat_name=cat,num_name=num}&quot;</span><span class="p">:</span> <span class="s2">&quot;operate.split.cat_num&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cat-&gt;num&quot;</span><span class="p">:</span> <span class="s2">&quot;encode.label&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;num-&gt;selected&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;_select_percent&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_type&quot;</span><span class="p">:</span> <span class="s2">&quot;quniform&quot;</span><span class="p">,</span> <span class="s2">&quot;_value&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                                             <span class="s2">&quot;_default&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}},</span>
+            <span class="s2">&quot;selected-&gt;target&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_name&quot;</span><span class="p">:</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="s2">&quot;_vanilla&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">tuners</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Tuner</span><span class="p">(</span>
+        <span class="n">run_limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">search_method</span><span class="o">=</span><span class="s2">&quot;grid&quot;</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">),</span>
+    <span class="n">Tuner</span><span class="p">(</span>
+        <span class="n">run_limit</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">initial_runs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">search_method</span><span class="o">=</span><span class="s2">&quot;smac&quot;</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+<span class="n">autoflow_pipeline</span> <span class="o">=</span> <span class="n">AutoFlowEstimator</span><span class="p">(</span><span class="n">tuners</span><span class="p">,</span> <span class="n">hdl_constructors</span><span class="p">)</span>
+<span class="n">column_descriptions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;PassengerId&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;Survived&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ignore&quot;</span><span class="p">:</span> <span class="s2">&quot;Name&quot;</span>
+<span class="p">}</span>
+
+<span class="n">autoflow_pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">X_train</span><span class="o">=</span><span class="n">df_train</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="o">=</span><span class="n">column_descriptions</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>

@@ -25,6 +25,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -287,7 +288,7 @@
         <span class="n">hdl_constructor</span> <span class="o">=</span> <span class="n">instancing</span><span class="p">(</span><span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">HDL_Constructor</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># ---hdl_constructors-------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span> <span class="o">=</span> <span class="n">sequencing</span><span class="p">(</span><span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">HDL_Constructor</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># ---resource_manager-----------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">instancing</span><span class="p">(</span><span class="n">resource_manager</span><span class="p">,</span> <span class="n">ResourceManager</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># ---member_variable------------------------------------</span>
@@ -387,7 +388,6 @@
             <span class="n">raw_hdl</span> <span class="o">=</span> <span class="n">hdl_constructor</span><span class="o">.</span><span class="n">get_hdl</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">step</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_best_dhp</span><span class="p">()</span>
-                <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">last_best_dhp</span><span class="p">)</span>
                 <span class="n">hdl</span> <span class="o">=</span> <span class="n">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">raw_hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated HDL(Hyperparams Descriptions Language) in step </span><span class="si">{step}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{hdl}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -420,6 +420,14 @@
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
+<div class="viewcode-block" id="AutoFlowEstimator.get_sync_dict"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.get_sync_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_sync_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">tuner</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">tuner</span><span class="o">.</span><span class="n">search_method</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="n">sync_dict</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+            <span class="n">sync_dict</span><span class="p">[</span><span class="s2">&quot;exit_processes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">exit_processes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sync_dict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">sync_dict</span></div>
+
 <div class="viewcode-block" id="AutoFlowEstimator.start_tuner"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.start_tuner">[docs]</a>    <span class="k">def</span> <span class="nf">start_tuner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuner</span><span class="p">:</span> <span class="n">Tuner</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start fine tune task, </span><span class="se">\n</span><span class="s2">which HDL(Hyperparams Descriptions Language) is:</span><span class="se">\n</span><span class="si">{hdl}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;which Tuner is:</span><span class="se">\n</span><span class="si">{tuner}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -439,11 +447,7 @@
             <span class="n">tuner</span><span class="o">.</span><span class="n">design_initial_configs</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">),</span>
             <span class="n">n_jobs</span><span class="p">)</span>
         <span class="n">random_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
-        <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">tuner</span><span class="o">.</span><span class="n">search_method</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
-            <span class="n">sync_dict</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
-            <span class="n">sync_dict</span><span class="p">[</span><span class="s2">&quot;exit_processes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">exit_processes</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sync_dict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">sync_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sync_dict</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">tuner</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_trials_table</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">clear_pid_list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_redis</span><span class="p">()</span>
@@ -568,6 +572,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_estimator</span></div>
 
 <div class="viewcode-block" id="AutoFlowEstimator.auto_fit_ensemble"><a class="viewcode-back" href="../../../_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator.auto_fit_ensemble">[docs]</a>    <span class="k">def</span> <span class="nf">auto_fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># todo: 调研stacking等ensemble方法的表现评估</span>
         <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span>
