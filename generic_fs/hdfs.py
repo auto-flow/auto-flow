@@ -6,7 +6,7 @@ from generic_fs import FileSystem
 
 
 class HDFS(FileSystem):
-    def __init__(self, url='http://0.0.0.0:50070'):
+    def __init__(self, url='http://0.0.0.0:50070', proxy=None):
         self.client = hdfs.client.Client(url)  # , level=logging.WARN
 
     def listdir(self, parent, **kwargs):

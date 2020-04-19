@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>autoflow.hdl package &mdash; AutoFlow 0.1.0 documentation</title>
+  <title>autoflow.hdl package &mdash; AutoFlow 0.1.1 documentation</title>
   
 
   
@@ -25,6 +25,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -193,8 +194,8 @@
 It describes an abstract hyperparametric space that independent with concrete implementation.</p>
 <p><code class="docutils literal notranslate"><span class="pre">HDL_Constructor</span></code> is a class who is responsible for translating dict-type <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> into <code class="docutils literal notranslate"><span class="pre">H.D.L</span></code> .</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> didn’t be explicit assign (str “generic_recommend” is default ),
-a generic <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> will be recommend by analyzing input data in doing <a class="reference internal" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="autoflow.hdl.hdl_constructor.HDL_Constructor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
-<p>And then, by using function <a class="reference internal" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="autoflow.hdl.hdl_constructor.HDL_Constructor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> , <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> will be translated to <code class="docutils literal notranslate"><span class="pre">HDL</span></code>.</p>
+a generic <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> will be recommend by analyzing input data in doing <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="autoflow.hdl.hdl_constructor.HDL_Constructor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
+<p>And then, by using function <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="autoflow.hdl.hdl_constructor.HDL_Constructor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> , <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> will be translated to <code class="docutils literal notranslate"><span class="pre">HDL</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -284,7 +285,7 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <code class="sig-name descname">data_manager</code><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.data_manager" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="autoflow.manager.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -292,7 +293,7 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <dl class="py attribute">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.hdl">
 <code class="sig-name descname">hdl</code><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.hdl" title="Permalink to this definition">¶</a></dt>
-<dd><p>construct by <a class="reference internal" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="autoflow.hdl.hdl_constructor.HDL_Constructor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a></p>
+<dd><p>construct by <a class="reference internal" href="../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="autoflow.hdl.hdl_constructor.HDL_Constructor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
@@ -383,7 +384,7 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_manager</strong> (<a class="reference internal" href="autoflow.manager.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a>) – </p></li>
+<li><p><strong>data_manager</strong> (<a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a>) – </p></li>
 <li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>highR_cat_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
 </ul>

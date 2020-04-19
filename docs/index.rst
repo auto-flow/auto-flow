@@ -11,7 +11,6 @@ AutoFlow is a automatic machine learning workflow modeling platform.
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials
-   :hidden:
 
    introduction
    installation
@@ -20,14 +19,12 @@ AutoFlow is a automatic machine learning workflow modeling platform.
 .. toctree::
    :maxdepth: 3
    :caption: API
-   :hidden:
 
    api
 
 .. toctree::
    :maxdepth: 1
    :caption: Contribution
-   :hidden:
 
    contact
    license
