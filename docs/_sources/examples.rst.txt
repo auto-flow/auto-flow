@@ -271,3 +271,307 @@ In second step, we should choose the best ``feature selection algorithm`` search
     autoflow_pipeline.fit(
         X_train=df_train, column_descriptions=column_descriptions
     )
+
+Series connect two or more algorithms in single edge
+----------------------------------------------------------
+
+As you can see in :ref:`Work Flow`, edge represents `preprocessing` or `estimating` algorithms in AutoFlow framework.
+
+In the process of algorithm development,
+data scientists will series connect two or more algorithms to use according to their knowledge.
+
+For example, some algorithms need scaling ,some not.
+Data scientists have summed up a table based on their experience showed below:
+
++----------------------------------------------------------------------------------------------+---------------+
+| Algorithm Name                                                                               |  Need Scaling |
++==============================================================================================+===============+
+| SVM, KNN, PCA, K-Means, Linear Regression, Logistic Regression, Linear Discriminant Analysis | Y             |
++----------------------------------------------------------------------------------------------+---------------+
+| Naive Bayes, Tree-Based models                                                               | N             |
++----------------------------------------------------------------------------------------------+---------------+
+
+If we not only want to trial  algorithms that don't need scaling like ``Naive Bayes`` and ``Tree-Based models``,
+but also want trial scaling-needed algorithm like ``SVM``, ``KNN`` and ``LR``, How can we do ?
+
+The answer is very esay, what you should do is only connect two or more algorithms' name by a separator ``"|"``, like this:
+
+.. code-block:: python
+
+    trained_pipeline = AutoFlowClassifier(
+        initial_runs=12, run_limit=12, n_jobs=3,
+        included_classifiers=[
+            "scale.standardize|libsvm_svc", "scale.standardize|k_nearest_neighbors", "scale.standardize|logistic_regression",
+            "gaussian_nb", "extra_trees", "lightgbm"
+        ],
+    )
+
+``"scale.standardize|libsvm_svc"`` means do ``scale.standardize`` firstly, and do ``libsvm_svc`` as a classifier secondly.
+
+Store your data in remote
+-----------------------------
+
+If you're using machines that are distributed in different places, storage system will be a big problem.
+You must want to store your search records in single database, store your model persistent file in single
+file-system.
+
+Although the default option for AutoFlow is the local file system and local database (`sqlite <https://www.sqlite.org/index.html>`_),
+AutoFlow also support common relational-database like `PostgreSQL <https://www.postgresql.org/>`_ and `MySQL <https://www.mysql.com/>`_ .
+`Network File System <https://en.wikipedia.org/wiki/Network_File_System>`_ like `HDFS <https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html>`_
+is also supported  by AutoFlow.
+
+In this example, you will learn how to use ``PostgreSQL`` and ``HDFS`` to store your search records and model persistent file.
+
+Install PostgreSQL
+::::::::::::::::::::
+
+You can find many pages on Google that teach you how to install ``PostgreSQL``, but as a ML practitioner,
+install by docker or conda maybe a good and convenient choice.
+
+**Install by Docker**
+
+.. code-block:: console
+
+    $ docker pull postgres:9.6
+    $ docker volume create pgdata
+    $ docker run -it --rm -v pgdata:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=000  postgres:9.6
+    $ ls /var/lib/docker/volumes/pgdata
+      _data
+
+**Install by Conda**
+
+.. code-block:: console
+
+    $ conda create -n pg -y
+    $ conda activate pg
+    $ conda install -c conda-forge postgresql -y
+    $ pg_ctl -D /home/tqc/miniconda3/envs/pg/var/postgres initdb
+    $ pg_ctl -D /home/tqc/miniconda3/envs/pg/var/postgres -l logfile start
+    $ psql postgres
+
+Install HDFS
+::::::::::::::::::::
+
+After downloading ``hadoop`` from `official website <https://hadoop.apache.org/>`_ , move and uncompress the ``hadoop`` fold to
+``/usr/local/hadoop``.
+
+You should also install java if your computer haven't java environment.
+
+You should modify following file:
+
+**hadoop/etc/hadoop/hdfs-site.xml**
+
+
+.. code-block:: xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+        <property>
+            <name>dfs.replication</name>
+            <value>1</value>
+        </property>
+        <property>
+            <name>dfs.namenode.name.dir</name>
+            <value>file:/usr/local/hadoop/tmp/dfs/name</value>
+        </property>
+        <property>
+            <name>dfs.datanode.data.dir</name>
+            <value>file:/usr/local/hadoop/tmp/dfs/data</value>
+        </property>
+        <property>
+            <name>dfs.permissions</name>
+            <value>false</value>
+        </property>
+        <property>
+            <name>dfs.http.address</name>
+            <value>0.0.0.0:50070</value>
+        </property>
+    </configuration>
+
+**hadoop/etc/hadoop/hadoop-env.sh**
+
+.. code-block:: console
+
+    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+
+**hadoop/etc/hadoop/core-site.sh**
+
+.. code-block:: xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+      <property>
+        <name>hadoop.tmp.dir</name>
+        <value>file:/usr/local/hadoop/tmp</value>
+        <description>Abase for other temporary directories.</description>
+      </property>
+      <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://0.0.0.0:9000</value>
+      </property>
+    </configuration>
+
+**hadoop/etc/hadoop/yarn-site.sh**
+
+.. code-block:: xml
+
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+      <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>localhost</value>
+      </property>
+      <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+      </property>
+      <property>
+        <name>yarn.application.classpath</name>
+        <value>/usr/local/hadoop/etc/hadoop:/usr/local/hadoop/share/hadoop/common/lib/*:/usr/local/hadoop/share/hadoop/common/*:/usr/local/hadoop/share/hadoop/hdfs:/usr/local/hadoop/share/hadoop/hdfs/lib/*:/usr/local/hadoop/share/hadoop/hdfs/*:/usr/local/hadoop/share/hadoop/mapreduce/lib/*:/usr/local/hadoop/share/hadoop/mapreduce/*:/usr/local/hadoop/share/hadoop/yarn:/usr/local/hadoop/share/hadoop/yarn/lib/*:/usr/local/hadoop/share/hadoop/yarn/*</value>
+      </property>
+    </configuration>
+
+**hadoop/etc/hadoop/workers**
+
+(Pseudo distributed mode)
+
+.. code-block:: console
+
+    localhost
+
+**hadoop/etc/hadoop/mapred-site.xml**
+
+.. code-block:: xml
+
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+      <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+      </property>
+    </configuration>
+
+After all, you should start hdfs and yarn service.
+
+.. code-block:: xml
+
+    $ cd /usr/local/hadoop/sbin
+    $ ./start-all.sh
+
+Running AutoFlow job
+:::::::::::::::::::::::
+
+Different from the example above, in hear you should specify parameters like ``db_type``, ``db_params``, ``store_path``,
+``file_system``, ``file_system_params`` in :class:`autoflow.estimator.base.AutoFlowEstimator` .
+
+.. note::
+
+    Detailed explanation can be found in :class:`autoflow.estimator.base.AutoFlowEstimator`
+
+.. code-block:: python
+
+    trained_pipeline = AutoFlowClassifier(
+        initial_runs=5, run_limit=10, n_jobs=3,
+        included_classifiers=["lightgbm"],
+        should_store_intermediate_result=True,
+        db_type="postgresql",
+        db_params={
+            "user": "tqc",
+            "host": "0.0.0.0",
+            "port": 5432
+        },
+        store_path="/autoflow",
+        file_system="hdfs",
+        file_system_params={
+            "url": "http://0.0.0.0:50070",
+            "user": "tqc"
+        }
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

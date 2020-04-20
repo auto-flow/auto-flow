@@ -169,7 +169,7 @@
   <h1>Source code for autoflow.utils.dict</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Callable</span>
 
 <span class="kn">from</span> <span class="nn">autoflow.utils.list</span> <span class="kn">import</span> <span class="n">remove_suffix_in_list</span>
 
@@ -181,12 +181,12 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="group_dict_items_before_first_dot"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.group_dict_items_before_first_dot">[docs]</a><span class="k">def</span> <span class="nf">group_dict_items_before_first_dot</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="viewcode-block" id="group_dict_items_before_first_token"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.group_dict_items_before_first_token">[docs]</a><span class="k">def</span> <span class="nf">group_dict_items_before_first_token</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">packages</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">:</span>
-            <span class="n">split_list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-            <span class="n">key1</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">:</span>
+            <span class="n">split_list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">key1</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">key2</span> <span class="o">=</span> <span class="n">split_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">key1</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span>
@@ -214,6 +214,14 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="remove_None_value"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.remove_None_value">[docs]</a><span class="k">def</span> <span class="nf">remove_None_value</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 <div class="viewcode-block" id="GlobalList"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.GlobalList">[docs]</a><span class="k">class</span> <span class="nc">GlobalList</span><span class="p">:</span>
@@ -250,8 +258,8 @@
     <span class="n">dict_</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
-<div class="viewcode-block" id="update_placeholder_from_other_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.update_placeholder_from_other_dict">[docs]</a><span class="k">def</span> <span class="nf">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">ignored_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(choice)&quot;</span><span class="p">):</span>
-    <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span>
+<div class="viewcode-block" id="update_mask_from_other_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.update_mask_from_other_dict">[docs]</a><span class="k">def</span> <span class="nf">update_mask_from_other_dict</span><span class="p">(</span><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">ignored_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(choice)&quot;</span><span class="p">):</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s2">&quot;&lt;mask&gt;&quot;</span>
     <span class="n">updated</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">should_update</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">find_token_in_dict</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
         <span class="n">origin_path</span> <span class="o">=</span> <span class="n">path</span>
@@ -274,6 +282,12 @@
     <span class="k">return</span> <span class="n">updated</span></div>
 
 
+<div class="viewcode-block" id="filter_item_by_key_condition"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.filter_item_by_key_condition">[docs]</a><span class="k">def</span> <span class="nf">filter_item_by_key_condition</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">available_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_</span> <span class="k">if</span> <span class="n">func</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">dict_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
 
@@ -283,11 +297,11 @@
                           <span class="s1">&#39;2highR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
                           <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
                           <span class="s1">&#39;4cat-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                          <span class="s1">&#39;5num-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;&lt;placeholder&gt;&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_type&#39;</span><span class="p">:</span> <span class="s1">&#39;quniform&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;5num-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;&lt;mask&gt;&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_type&#39;</span><span class="p">:</span> <span class="s1">&#39;quniform&#39;</span><span class="p">,</span>
                                                                                       <span class="s1">&#39;_value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
                                                                                       <span class="s1">&#39;_default&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
                                                                   <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}}},</span>
-        <span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;placeholder&gt;&quot;</span><span class="p">}}}</span>
+        <span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;mask&gt;&quot;</span><span class="p">}}}</span>
     <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;gbdt&quot;</span><span class="p">}},</span>
                      <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span>
                          <span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
@@ -302,7 +316,7 @@
                                                                  <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                                                                  <span class="s1">&#39;multi_class&#39;</span><span class="p">:</span> <span class="s1">&#39;ovr&#39;</span><span class="p">,</span>
                                                                  <span class="s1">&#39;penalty&#39;</span><span class="p">:</span> <span class="s1">&#39;l1&#39;</span><span class="p">}}}}</span>
-    <span class="n">updated_hdl</span> <span class="o">=</span> <span class="n">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
+    <span class="n">updated_hdl</span> <span class="o">=</span> <span class="n">update_mask_from_other_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
     <span class="n">target</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;boosting_type&#39;</span><span class="p">:</span> <span class="s1">&#39;gbdt&#39;</span><span class="p">}},</span>
               <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span>
                   <span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>

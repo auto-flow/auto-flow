@@ -96,6 +96,13 @@
 <li class="toctree-l2"><a class="reference internal" href="#automatic-classification">Automatic Classification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automatic-regression">Automatic Regression</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#phased-search">Phased Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#series-connect-two-or-more-algorithms-in-single-edge">Series connect two or more algorithms in single edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#store-your-data-in-remote">Store your data in remote</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-postgresql">Install PostgreSQL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-hdfs">Install HDFS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-autoflow-job">Running AutoFlow job</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -412,6 +419,201 @@ After finish one of phases, the best configuration will be extracted, and passin
     <span class="n">X_train</span><span class="o">=</span><span class="n">df_train</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="o">=</span><span class="n">column_descriptions</span>
 <span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="series-connect-two-or-more-algorithms-in-single-edge">
+<h2>Series connect two or more algorithms in single edge<a class="headerlink" href="#series-connect-two-or-more-algorithms-in-single-edge" title="Permalink to this headline">¶</a></h2>
+<p>As you can see in <a class="reference internal" href="introduction.html#work-flow"><span class="std std-ref">Work Flow</span></a>, edge represents <cite>preprocessing</cite> or <cite>estimating</cite> algorithms in AutoFlow framework.</p>
+<p>In the process of algorithm development,
+data scientists will series connect two or more algorithms to use according to their knowledge.</p>
+<p>For example, some algorithms need scaling ,some not.
+Data scientists have summed up a table based on their experience showed below:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 86%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Algorithm Name</p></th>
+<th class="head"><p>Need Scaling</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SVM, KNN, PCA, K-Means, Linear Regression, Logistic Regression, Linear Discriminant Analysis</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>Naive Bayes, Tree-Based models</p></td>
+<td><p>N</p></td>
+</tr>
+</tbody>
+</table>
+<p>If we not only want to trial  algorithms that don’t need scaling like <code class="docutils literal notranslate"><span class="pre">Naive</span> <span class="pre">Bayes</span></code> and <code class="docutils literal notranslate"><span class="pre">Tree-Based</span> <span class="pre">models</span></code>,
+but also want trial scaling-needed algorithm like <code class="docutils literal notranslate"><span class="pre">SVM</span></code>, <code class="docutils literal notranslate"><span class="pre">KNN</span></code> and <code class="docutils literal notranslate"><span class="pre">LR</span></code>, How can we do ?</p>
+<p>The answer is very esay, what you should do is only connect two or more algorithms’ name by a separator <code class="docutils literal notranslate"><span class="pre">&quot;|&quot;</span></code>, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">AutoFlowClassifier</span><span class="p">(</span>
+    <span class="n">initial_runs</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">included_classifiers</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;scale.standardize|libsvm_svc&quot;</span><span class="p">,</span> <span class="s2">&quot;scale.standardize|k_nearest_neighbors&quot;</span><span class="p">,</span> <span class="s2">&quot;scale.standardize|logistic_regression&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_nb&quot;</span><span class="p">,</span> <span class="s2">&quot;extra_trees&quot;</span><span class="p">,</span> <span class="s2">&quot;lightgbm&quot;</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;scale.standardize|libsvm_svc&quot;</span></code> means do <code class="docutils literal notranslate"><span class="pre">scale.standardize</span></code> firstly, and do <code class="docutils literal notranslate"><span class="pre">libsvm_svc</span></code> as a classifier secondly.</p>
+</div>
+<div class="section" id="store-your-data-in-remote">
+<h2>Store your data in remote<a class="headerlink" href="#store-your-data-in-remote" title="Permalink to this headline">¶</a></h2>
+<p>If you’re using machines that are distributed in different places, storage system will be a big problem.
+You must want to store your search records in single database, store your model persistent file in single
+file-system.</p>
+<p>Although the default option for AutoFlow is the local file system and local database (<a class="reference external" href="https://www.sqlite.org/index.html">sqlite</a>),
+AutoFlow also support common relational-database like <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> and <a class="reference external" href="https://www.mysql.com/">MySQL</a> .
+<a class="reference external" href="https://en.wikipedia.org/wiki/Network_File_System">Network File System</a> like <a class="reference external" href="https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html">HDFS</a>
+is also supported  by AutoFlow.</p>
+<p>In this example, you will learn how to use <code class="docutils literal notranslate"><span class="pre">PostgreSQL</span></code> and <code class="docutils literal notranslate"><span class="pre">HDFS</span></code> to store your search records and model persistent file.</p>
+<div class="section" id="install-postgresql">
+<h3>Install PostgreSQL<a class="headerlink" href="#install-postgresql" title="Permalink to this headline">¶</a></h3>
+<p>You can find many pages on Google that teach you how to install <code class="docutils literal notranslate"><span class="pre">PostgreSQL</span></code>, but as a ML practitioner,
+install by docker or conda maybe a good and convenient choice.</p>
+<p><strong>Install by Docker</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> docker pull postgres:9.6
+<span class="gp">$</span> docker volume create pgdata
+<span class="gp">$</span> docker run -it --rm -v pgdata:/var/lib/postgresql/data -p <span class="m">5432</span>:5432 -e <span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span><span class="m">000</span>  postgres:9.6
+<span class="gp">$</span> ls /var/lib/docker/volumes/pgdata
+<span class="go">  _data</span>
+</pre></div>
+</div>
+<p><strong>Install by Conda</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> conda create -n pg -y
+<span class="gp">$</span> conda activate pg
+<span class="gp">$</span> conda install -c conda-forge postgresql -y
+<span class="gp">$</span> pg_ctl -D /home/tqc/miniconda3/envs/pg/var/postgres initdb
+<span class="gp">$</span> pg_ctl -D /home/tqc/miniconda3/envs/pg/var/postgres -l logfile start
+<span class="gp">$</span> psql postgres
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-hdfs">
+<h3>Install HDFS<a class="headerlink" href="#install-hdfs" title="Permalink to this headline">¶</a></h3>
+<p>After downloading <code class="docutils literal notranslate"><span class="pre">hadoop</span></code> from <a class="reference external" href="https://hadoop.apache.org/">official website</a> , move and uncompress the <code class="docutils literal notranslate"><span class="pre">hadoop</span></code> fold to
+<code class="docutils literal notranslate"><span class="pre">/usr/local/hadoop</span></code>.</p>
+<p>You should also install java if your computer haven’t java environment.</p>
+<p>You should modify following file:</p>
+<p><strong>hadoop/etc/hadoop/hdfs-site.xml</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>dfs.replication<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>1<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>dfs.namenode.name.dir<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>file:/usr/local/hadoop/tmp/dfs/name<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>dfs.datanode.data.dir<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>file:/usr/local/hadoop/tmp/dfs/data<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>dfs.permissions<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>false<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>dfs.http.address<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>0.0.0.0:50070<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+<p><strong>hadoop/etc/hadoop/hadoop-env.sh</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export JAVA_HOME=&quot;/usr/lib/jvm/java-8-openjdk-amd64&quot;</span>
+</pre></div>
+</div>
+<p><strong>hadoop/etc/hadoop/core-site.sh</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>hadoop.tmp.dir<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>file:/usr/local/hadoop/tmp<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;description&gt;</span>Abase for other temporary directories.<span class="nt">&lt;/description&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>fs.defaultFS<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>hdfs://0.0.0.0:9000<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+<p><strong>hadoop/etc/hadoop/yarn-site.sh</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>yarn.resourcemanager.hostname<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>localhost<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>yarn.nodemanager.aux-services<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>mapreduce_shuffle<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>yarn.application.classpath<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>/usr/local/hadoop/etc/hadoop:/usr/local/hadoop/share/hadoop/common/lib/*:/usr/local/hadoop/share/hadoop/common/*:/usr/local/hadoop/share/hadoop/hdfs:/usr/local/hadoop/share/hadoop/hdfs/lib/*:/usr/local/hadoop/share/hadoop/hdfs/*:/usr/local/hadoop/share/hadoop/mapreduce/lib/*:/usr/local/hadoop/share/hadoop/mapreduce/*:/usr/local/hadoop/share/hadoop/yarn:/usr/local/hadoop/share/hadoop/yarn/lib/*:/usr/local/hadoop/share/hadoop/yarn/*<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+<p><strong>hadoop/etc/hadoop/workers</strong></p>
+<p>(Pseudo distributed mode)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">localhost</span>
+</pre></div>
+</div>
+<p><strong>hadoop/etc/hadoop/mapred-site.xml</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>mapreduce.framework.name<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>yarn<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+<p>After all, you should start hdfs and yarn service.</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>$ cd /usr/local/hadoop/sbin
+$ ./start-all.sh
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-autoflow-job">
+<h3>Running AutoFlow job<a class="headerlink" href="#running-autoflow-job" title="Permalink to this headline">¶</a></h3>
+<p>Different from the example above, in hear you should specify parameters like <code class="docutils literal notranslate"><span class="pre">db_type</span></code>, <code class="docutils literal notranslate"><span class="pre">db_params</span></code>, <code class="docutils literal notranslate"><span class="pre">store_path</span></code>,
+<code class="docutils literal notranslate"><span class="pre">file_system</span></code>, <code class="docutils literal notranslate"><span class="pre">file_system_params</span></code> in <a class="reference internal" href="_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator" title="autoflow.estimator.base.AutoFlowEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator</span></code></a> .</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Detailed explanation can be found in <a class="reference internal" href="_module/autoflow.estimator.html#autoflow.estimator.base.AutoFlowEstimator" title="autoflow.estimator.base.AutoFlowEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.estimator.base.AutoFlowEstimator</span></code></a></p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">AutoFlowClassifier</span><span class="p">(</span>
+    <span class="n">initial_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">included_classifiers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lightgbm&quot;</span><span class="p">],</span>
+    <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">db_type</span><span class="o">=</span><span class="s2">&quot;postgresql&quot;</span><span class="p">,</span>
+    <span class="n">db_params</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;tqc&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">5432</span>
+    <span class="p">},</span>
+    <span class="n">store_path</span><span class="o">=</span><span class="s2">&quot;/autoflow&quot;</span><span class="p">,</span>
+    <span class="n">file_system</span><span class="o">=</span><span class="s2">&quot;hdfs&quot;</span><span class="p">,</span>
+    <span class="n">file_system_params</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://0.0.0.0:50070&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;tqc&quot;</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

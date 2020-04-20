@@ -177,12 +177,9 @@
 <span class="c1"># import json5 as json</span>
 <span class="kn">import</span> <span class="nn">peewee</span> <span class="k">as</span> <span class="nn">pw</span>
 <span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
-<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">load</span>
+<span class="kn">from</span> <span class="nn">playhouse.fields</span> <span class="kn">import</span> <span class="n">PickleField</span>
 <span class="kn">from</span> <span class="nn">redis</span> <span class="kn">import</span> <span class="n">Redis</span>
 
-<span class="kn">import</span> <span class="nn">generic_fs</span>
-<span class="kn">from</span> <span class="nn">generic_fs</span> <span class="kn">import</span> <span class="n">FileSystem</span>
-<span class="kn">from</span> <span class="nn">generic_fs.utils</span> <span class="kn">import</span> <span class="n">get_db_class_by_db_type</span>
 <span class="kn">from</span> <span class="nn">autoflow.ensemble.mean.regressor</span> <span class="kn">import</span> <span class="n">MeanRegressor</span>
 <span class="kn">from</span> <span class="nn">autoflow.ensemble.vote.classifier</span> <span class="kn">import</span> <span class="n">VoteClassifier</span>
 <span class="kn">from</span> <span class="nn">autoflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
@@ -191,8 +188,9 @@
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.packages</span> <span class="kn">import</span> <span class="n">find_components</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.peewee</span> <span class="kn">import</span> <span class="n">PickleFiled</span>
+<span class="kn">from</span> <span class="nn">generic_fs</span> <span class="kn">import</span> <span class="n">FileSystem</span>
+<span class="kn">from</span> <span class="nn">generic_fs.utils.db</span> <span class="kn">import</span> <span class="n">get_db_class_by_db_type</span><span class="p">,</span> <span class="n">get_JSONField</span><span class="p">,</span> <span class="n">PickleField</span><span class="p">,</span> <span class="n">create_database</span>
+<span class="kn">from</span> <span class="nn">generic_fs.utils.fs</span> <span class="kn">import</span> <span class="n">get_file_system</span>
 
 
 <div class="viewcode-block" id="ResourceManager"><a class="viewcode-back" href="../../../api.html#autoflow.manager.resource_manager.ResourceManager">[docs]</a><span class="k">class</span> <span class="nc">ResourceManager</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
@@ -209,7 +207,6 @@
             <span class="n">db_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
             <span class="n">redis_params</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
             <span class="n">max_persistent_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-            <span class="n">persistent_mode</span><span class="o">=</span><span class="s2">&quot;fs&quot;</span><span class="p">,</span>
             <span class="n">compress_suffix</span><span class="o">=</span><span class="s2">&quot;bz2&quot;</span>
 
     <span class="p">):</span>
@@ -249,12 +246,6 @@
 <span class="sd">            If more than this number, the The worst performing model file will be delete,</span>
 
 <span class="sd">            the corresponding database record will also be deleted.</span>
-<span class="sd">        persistent_mode: str</span>
-<span class="sd">            Indicator-string about which persistent mode will be used.</span>
-
-<span class="sd">            Available options list below:</span>
-<span class="sd">                * ``db`` - serialize entity to bytes and store in database directly.</span>
-<span class="sd">                * ``fs`` - serialize entity to bytes and form a pickle file upload to storage system or save in local.</span>
 <span class="sd">        compress_suffix: str</span>
 <span class="sd">            compress file&#39;s suffix, default is bz2</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -265,12 +256,8 @@
         <span class="n">db_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">db_params</span><span class="p">)</span>
         <span class="n">redis_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">redis_params</span><span class="p">)</span>
         <span class="c1"># ---file_system------------</span>
-        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">generic_fs</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">file_system2cls</span> <span class="o">=</span> <span class="n">find_components</span><span class="p">(</span><span class="n">generic_fs</span><span class="o">.</span><span class="n">__package__</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">FileSystem</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_system_type</span> <span class="o">=</span> <span class="n">file_system</span>
-        <span class="k">if</span> <span class="n">file_system</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_system2cls</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid file_system </span><span class="si">{file_system}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="p">:</span><span class="n">FileSystem</span> <span class="o">=</span> <span class="n">file_system2cls</span><span class="p">[</span><span class="n">file_system</span><span class="p">](</span><span class="o">**</span><span class="n">file_system_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="p">:</span> <span class="n">FileSystem</span> <span class="o">=</span> <span class="n">get_file_system</span><span class="p">(</span><span class="n">file_system</span><span class="p">)(</span><span class="o">**</span><span class="n">file_system_params</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system_type</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
             <span class="n">store_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">store_path</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_path</span> <span class="o">=</span> <span class="n">store_path</span>
@@ -281,12 +268,9 @@
         <span class="k">if</span> <span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system_type</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span>
         <span class="c1"># ---redis----------------</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">redis_params</span> <span class="o">=</span> <span class="n">redis_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">redis_params</span><span class="p">)</span>
         <span class="c1"># ---max_persistent_model---</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_persistent_estimators</span> <span class="o">=</span> <span class="n">max_persistent_estimators</span>
-        <span class="c1"># ---persistent_mode-------</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">=</span> <span class="n">persistent_mode</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;fs&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">)</span>
         <span class="c1"># ---compress_suffix------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress_suffix</span> <span class="o">=</span> <span class="n">compress_suffix</span>
         <span class="c1"># ---post_process------------</span>
@@ -308,41 +292,40 @@
         <span class="c1"># --db-----------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span> <span class="o">=</span> <span class="n">get_db_class_by_db_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_type</span><span class="p">)</span>
         <span class="c1"># --JSONField-----------------------------------------</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">playhouse.sqlite_ext</span> <span class="kn">import</span> <span class="n">JSONField</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">JSONField</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;postgresql&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">playhouse.postgres_ext</span> <span class="kn">import</span> <span class="n">JSONField</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">JSONField</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;mysql&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">playhouse.mysql_ext</span> <span class="kn">import</span> <span class="n">JSONField</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">JSONField</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span> <span class="o">=</span> <span class="n">get_JSONField</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_type</span><span class="p">)</span>
+        <span class="c1"># --database_name---------------------------------</span>
+        <span class="c1"># None means didn&#39;t create database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># meta records database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.close_all"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_all">[docs]</a>    <span class="k">def</span> <span class="nf">close_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_redis</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_experiments_table</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_tasks_table</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_hdls_table</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">close_fs</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_all</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ResourceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ResourceManager.update_db_params"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.update_db_params">[docs]</a>    <span class="k">def</span> <span class="nf">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">):</span>
-        <span class="n">db_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_params</span><span class="p">)</span>
+        <span class="n">db_params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_params</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
             <span class="n">db_params</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">databases_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{database}</span><span class="s2">.db&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;postgresql&quot;</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="n">db_params</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">database</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span> <span class="o">==</span> <span class="s2">&quot;mysql&quot;</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="n">db_params</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">database</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="k">return</span> <span class="n">db_params</span></div>
 
-<div class="viewcode-block" id="ResourceManager.estimate_new_id"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.estimate_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">forecast_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.forecast_new_id"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.forecast_new_id">[docs]</a>    <span class="k">def</span> <span class="nf">forecast_new_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">):</span>
         <span class="c1"># fixme : 用来预测下一个自增主键的ID，但是感觉有问题</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">records</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
-                <span class="n">where</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
                 <span class="n">order_by</span><span class="p">(</span><span class="o">-</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">id_field</span><span class="p">))</span><span class="o">.</span> \
                 <span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -354,19 +337,29 @@
             <span class="n">estimated_id</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">estimated_id</span></div>
 
-<div class="viewcode-block" id="ResourceManager.persistent_evaluated_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">[docs]</a>    <span class="k">def</span> <span class="nf">persistent_evaluated_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="ResourceManager.persistent_evaluated_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">[docs]</a>    <span class="k">def</span> <span class="nf">persistent_evaluated_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">model_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_trials_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">)</span>
-        <span class="n">model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{trial_id}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># ----get specific URL---------</span>
+        <span class="n">model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{model_id}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;intermediate_result&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">,</span>
-                                                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{trial_id}</span><span class="s2">_inter-res.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{model_id}</span><span class="s2">_inter-res.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;finally_fit_model&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">finally_fit_model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_dir</span><span class="p">,</span>
+                                                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{model_id}</span><span class="s2">_final.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">finally_fit_model_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># ----do dump---------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">],</span> <span class="n">model_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">intermediate_result_path</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;intermediate_result&quot;</span><span class="p">],</span> <span class="n">intermediate_result_path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span></div>
+        <span class="k">if</span> <span class="n">finally_fit_model_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;finally_fit_model&quot;</span><span class="p">],</span> <span class="n">finally_fit_model_path</span><span class="p">)</span>
+        <span class="c1"># ----return----------------</span>
+        <span class="k">return</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span><span class="p">,</span> <span class="n">finally_fit_model_path</span></div>
 
 <div class="viewcode-block" id="ResourceManager.get_ensemble_needed_info"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_ensemble_needed_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">MLTask</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span>
@@ -375,26 +368,19 @@
         <span class="n">task_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">ml_task_str</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">ml_task</span>
         <span class="n">ml_task</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">ml_task_str</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-            <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">Xy_train_path</span>
-            <span class="n">Xy_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">Xy_train_path</span><span class="p">)</span>
-            <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">Xy_test_path</span>
-            <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">Xy_test_path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span>
-            <span class="n">Xy_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">Xy_train</span>
-            <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">Xy_test</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">Xy_train_path</span>
+        <span class="n">Xy_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">Xy_train_path</span><span class="p">)</span>
+        <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">Xy_test_path</span>
+        <span class="n">Xy_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">Xy_test_path</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">ml_task</span><span class="p">,</span> <span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_test</span></div>
 
 <div class="viewcode-block" id="ResourceManager.load_best_estimator"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.load_best_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
         <span class="c1"># todo: 最后调用分析程序？</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
-        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-            <span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">models</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">models_bin</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span> \
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
             <span class="n">estimator</span> <span class="o">=</span> <span class="n">VoteClassifier</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -422,13 +408,10 @@
         <span class="n">y_preds_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
             <span class="n">exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">):</span>
-                    <span class="n">exists</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">estimator_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">):</span>
+                <span class="n">exists</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">estimator_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_bin</span><span class="p">)</span>
+                <span class="n">estimator_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">exists</span><span class="p">:</span>
                 <span class="n">y_true_indexes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">y_true_indexes</span><span class="p">)</span>
                 <span class="n">y_preds_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">y_preds</span><span class="p">)</span>
@@ -440,7 +423,7 @@
     <span class="c1"># ----------runhistory------------------------------------------------------------------</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">runhistory_db_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_tasks_db_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_db_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">runhistory_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -450,12 +433,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">meta_records_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;meta_records&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span> <span class="o">=</span> <span class="s2">&quot;meta_records&quot;</span>
+        <span class="n">create_database</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">current_tasks_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># return f&quot;{self.task_id}-{self.hdl_id}&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;task_</span><span class="si">{self.task_id}</span><span class="s2">&quot;</span>
+    <span class="k">def</span> <span class="nf">tasks_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;task_</span><span class="si">{self.task_id}</span><span class="s2">&quot;</span>
+        <span class="n">create_database</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span>
 
     <span class="c1"># ----------redis------------------------------------------------------------------</span>
 
@@ -475,15 +465,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_redis</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="ResourceManager.clear_pid_list"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.clear_pid_list">[docs]</a>    <span class="k">def</span> <span class="nf">clear_pid_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">redis_delete</span><span class="p">(</span><span class="s2">&quot;autoflow_pid_list&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_delete</span><span class="p">(</span><span class="s2">&quot;pid_list&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ResourceManager.push_pid_list"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.push_pid_list">[docs]</a>    <span class="k">def</span> <span class="nf">push_pid_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="s2">&quot;autoflow_pid_list&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="s2">&quot;pid_list&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="ResourceManager.get_pid_list"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_pid_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_pid_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_redis</span><span class="p">():</span>
-            <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">lrange</span><span class="p">(</span><span class="s2">&quot;autoflow_pid_list&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">lrange</span><span class="p">(</span><span class="s2">&quot;pid_list&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">decode</span><span class="p">()),</span> <span class="n">l</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span></div>
@@ -505,7 +495,7 @@
     <span class="c1"># ----------experiments_model------------------------------------------------------------------</span>
 <div class="viewcode-block" id="ResourceManager.get_experiments_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_experiments_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiments_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">Experiments</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-            <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">general_experiment_timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
             <span class="n">current_experiment_timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
             <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -517,8 +507,8 @@
             <span class="n">tuners</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
             <span class="n">tuner</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">should_calc_all_metric</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">data_manager_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">resource_manager_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">column_descriptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
             <span class="n">column2feature_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
             <span class="n">dataset_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
@@ -526,7 +516,8 @@
             <span class="n">splitter</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">ml_task</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">fit_ensemble_params</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+            <span class="n">fit_ensemble_params</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">),</span>
+            <span class="n">should_finally_fit</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">additional_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
             <span class="n">user</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">getuser</span><span class="p">)</span>
 
@@ -545,14 +536,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
         <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">==</span> <span class="n">experiment_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">data_manager_bin</span>
         <span class="n">data_manager_path</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">data_manager_path</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-            <span class="n">data_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">data_manager_path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span>
-            <span class="n">data_manager</span> <span class="o">=</span> <span class="n">data_manager_bin</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="n">data_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">data_manager_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data_manager</span></div>
 
 <div class="viewcode-block" id="ResourceManager.insert_to_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_experiments_table</span><span class="p">(</span>
@@ -573,8 +558,11 @@
             <span class="n">splitter</span><span class="p">,</span>
             <span class="n">should_store_intermediate_result</span><span class="p">,</span>
             <span class="n">fit_ensemble_params</span><span class="p">,</span>
-            <span class="n">additional_info</span>
+            <span class="n">additional_info</span><span class="p">,</span>
+            <span class="n">should_finally_fit</span>
     <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_all</span><span class="p">()</span>
+        <span class="n">copied_resource_manager</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
         <span class="c1"># estimate new experiment_id</span>
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forecast_new_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="p">,</span> <span class="s2">&quot;experiment_id&quot;</span><span class="p">)</span>
@@ -584,15 +572,12 @@
         <span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_experiments_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">)</span>
-            <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">data_manager_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;data_manager.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">data_manager_path</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">data_manager_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">data_manager_bin</span> <span class="o">=</span> <span class="n">data_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_experiments_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">)</span>
+        <span class="n">data_manager_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;data_manager.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">resource_manager_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;resource_manager.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">data_manager_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">copied_resource_manager</span><span class="p">,</span> <span class="n">resource_manager_path</span><span class="p">)</span>
         <span class="n">experiment_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">general_experiment_timestamp</span><span class="o">=</span><span class="n">general_experiment_timestamp</span><span class="p">,</span>
             <span class="n">current_experiment_timestamp</span><span class="o">=</span><span class="n">current_experiment_timestamp</span><span class="p">,</span>
@@ -605,8 +590,8 @@
             <span class="n">tuners</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tuners</span><span class="p">],</span>
             <span class="n">tuner</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tuner</span><span class="p">),</span>
             <span class="n">should_calc_all_metric</span><span class="o">=</span><span class="n">should_calc_all_metric</span><span class="p">,</span>
-            <span class="n">data_manager_bin</span><span class="o">=</span><span class="n">data_manager_bin</span><span class="p">,</span>
             <span class="n">data_manager_path</span><span class="o">=</span><span class="n">data_manager_path</span><span class="p">,</span>
+            <span class="n">resource_manager_path</span><span class="o">=</span><span class="n">resource_manager_path</span><span class="p">,</span>
             <span class="n">column_descriptions</span><span class="o">=</span><span class="n">column_descriptions</span><span class="p">,</span>
             <span class="n">column2feature_groups</span><span class="o">=</span><span class="n">data_manager</span><span class="o">.</span><span class="n">column2feature_groups</span><span class="p">,</span>  <span class="c1"># todo</span>
             <span class="n">dataset_metadata</span><span class="o">=</span><span class="n">dataset_metadata</span><span class="p">,</span>
@@ -615,7 +600,8 @@
             <span class="n">ml_task</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">ml_task</span><span class="p">),</span>
             <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="n">should_store_intermediate_result</span><span class="p">,</span>
             <span class="n">fit_ensemble_params</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fit_ensemble_params</span><span class="p">),</span>
-            <span class="n">additional_info</span><span class="o">=</span><span class="n">additional_info</span>
+            <span class="n">additional_info</span><span class="o">=</span><span class="n">additional_info</span><span class="p">,</span>
+            <span class="n">should_finally_fit</span><span class="o">=</span><span class="n">should_finally_fit</span>
         <span class="p">)</span>
         <span class="n">fetched_experiment_id</span> <span class="o">=</span> <span class="n">experiment_record</span><span class="o">.</span><span class="n">experiment_id</span>
         <span class="k">if</span> <span class="n">fetched_experiment_id</span> <span class="o">!=</span> <span class="n">experiment_id</span><span class="p">:</span>
@@ -646,11 +632,9 @@
             <span class="c1"># Xy_train</span>
             <span class="n">Xy_train_hash</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">Xy_train_bin</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BitField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="c1"># Xy_test</span>
             <span class="n">Xy_test_hash</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BitField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
             <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
                 <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span>
@@ -681,27 +665,16 @@
             <span class="c1"># ---store_datasets----------------------------------------------------</span>
             <span class="n">Xy_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">]</span>
             <span class="n">Xy_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span><span class="p">]</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-                <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span>
-                                                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{Xy_train_hash}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_train_path</span><span class="p">)</span>
-                <span class="n">Xy_train_bin</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-                <span class="n">Xy_train_bin</span> <span class="o">=</span> <span class="n">Xy_train</span>
+            <span class="n">Xy_train_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span>
+                                                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{Xy_train_hash}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">Xy_train</span><span class="p">,</span> <span class="n">Xy_train_path</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">Xy_test_hash</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-                    <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span>
-                                                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{Xy_test_hash}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">Xy_test</span><span class="p">,</span> <span class="n">Xy_test_path</span><span class="p">)</span>
-                    <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-                    <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="n">Xy_test</span>
+                <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dir</span><span class="p">,</span>
+                                                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{Xy_test_hash}</span><span class="s2">.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">Xy_test</span><span class="p">,</span> <span class="n">Xy_test_path</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-                <span class="n">Xy_test_bin</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="c1"># if len(records) == 0:</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
                 <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
@@ -712,11 +685,9 @@
                 <span class="c1"># Xy_train</span>
                 <span class="n">Xy_train_hash</span><span class="o">=</span><span class="n">Xy_train_hash</span><span class="p">,</span>
                 <span class="n">Xy_train_path</span><span class="o">=</span><span class="n">Xy_train_path</span><span class="p">,</span>
-                <span class="n">Xy_train_bin</span><span class="o">=</span><span class="n">Xy_train_bin</span><span class="p">,</span>
                 <span class="c1"># Xy_test</span>
                 <span class="n">Xy_test_hash</span><span class="o">=</span><span class="n">Xy_test_hash</span><span class="p">,</span>
                 <span class="n">Xy_test_path</span><span class="o">=</span><span class="n">Xy_test_path</span><span class="p">,</span>
-                <span class="n">Xy_test_bin</span><span class="o">=</span><span class="n">Xy_test_bin</span><span class="p">,</span>
 
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span></div>
@@ -761,7 +732,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_tasks_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_db_name</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hdls_model</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ResourceManager.close_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -773,7 +744,7 @@
 
 <div class="viewcode-block" id="ResourceManager.get_trials_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_trials_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_trials_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">Trials</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-            <span class="n">trial_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">trial_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">config_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">task_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -785,20 +756,24 @@
             <span class="n">all_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
             <span class="n">all_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
             <span class="n">test_all_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
-            <span class="n">models_bin</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">models_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">y_true_indexes</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">y_preds</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">y_test_true</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">smac_hyper_param</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">final_model_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="c1"># 都是将python对象进行序列化存储，是否合适？</span>
+            <span class="n">y_true_indexes</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_preds</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_test_true</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># -------------------------------------</span>
+            <span class="n">y_test_score</span><span class="o">=</span><span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_test_scores</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="c1"># -------------------------------------</span>
+            <span class="n">smac_hyper_param</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">dict_hyper_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>  <span class="c1"># todo: json field</span>
             <span class="n">cost_time</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">65535</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">)</span>
             <span class="n">failed_info</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">warning_info</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
-            <span class="n">intermediate_result_bin</span> <span class="o">=</span> <span class="n">PickleFiled</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
             <span class="n">timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
             <span class="n">user</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">getuser</span><span class="p">)</span>
             <span class="n">pid</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">)</span>
@@ -813,7 +788,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_tasks_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_db_name</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trials_model</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ResourceManager.close_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -824,17 +799,10 @@
 <div class="viewcode-block" id="ResourceManager.insert_to_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
         <span class="n">config_id</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config_id&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-            <span class="c1"># todo: 考虑更特殊的情况，不同的任务下，相同的配置</span>
-            <span class="n">models_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">persistent_evaluated_model</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">config_id</span><span class="p">)</span>
-            <span class="n">models_bin</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">intermediate_result_bin</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">models_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">intermediate_result_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">models_bin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">]</span>
-            <span class="n">intermediate_result_bin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;intermediate_result&quot;</span><span class="p">]</span>
+        <span class="c1"># todo: 考虑更特殊的情况，不同的任务下，相同的配置</span>
+        <span class="n">models_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span><span class="p">,</span> <span class="n">finally_fit_model_path</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">persistent_evaluated_model</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">config_id</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">config_id</span><span class="o">=</span><span class="n">config_id</span><span class="p">,</span>
             <span class="n">task_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span>
@@ -847,8 +815,8 @@
             <span class="n">all_score</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_score&quot;</span><span class="p">,</span> <span class="p">{}),</span>
             <span class="n">all_scores</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all_scores&quot;</span><span class="p">,</span> <span class="p">[]),</span>
             <span class="n">test_all_score</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_all_score&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-            <span class="n">models_bin</span><span class="o">=</span><span class="n">models_bin</span><span class="p">,</span>
             <span class="n">models_path</span><span class="o">=</span><span class="n">models_path</span><span class="p">,</span>
+            <span class="n">final_model_path</span><span class="o">=</span><span class="n">finally_fit_model_path</span><span class="p">,</span>
             <span class="n">y_true_indexes</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_true_indexes&quot;</span><span class="p">),</span>
             <span class="n">y_preds</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_preds&quot;</span><span class="p">),</span>
             <span class="n">y_test_true</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y_test_true&quot;</span><span class="p">),</span>
@@ -860,7 +828,6 @@
             <span class="n">failed_info</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;failed_info&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
             <span class="n">warning_info</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;warning_info&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
             <span class="n">intermediate_result_path</span><span class="o">=</span><span class="n">intermediate_result_path</span><span class="p">,</span>
-            <span class="n">intermediate_result_bin</span><span class="o">=</span><span class="n">intermediate_result_bin</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ResourceManager.delete_models"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.delete_models">[docs]</a>    <span class="k">def</span> <span class="nf">delete_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -876,20 +843,21 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_master</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
-        <span class="n">estimators</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span><span class="p">):</span>
-            <span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">estimators</span><span class="p">:</span>
-            <span class="n">should_delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span> <span class="o">==</span> <span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_persistent_estimators</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">should_delete</span><span class="p">):</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_mode</span> <span class="o">==</span> <span class="s2">&quot;fs&quot;</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">should_delete</span><span class="p">:</span>
-                        <span class="n">models_path</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">models_path</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Delete expire Model in path : </span><span class="si">{models_path}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">models_path</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">should_delete</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="p">)))</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="c1"># estimators = []</span>
+        <span class="c1"># for record in self.TrialsModel.select(self.TrialsModel.trial_id, self.TrialsModel.estimator).group_by(</span>
+        <span class="c1">#         self.TrialsModel.estimator):</span>
+        <span class="c1">#     estimators.append(record.estimator)</span>
+        <span class="c1"># for estimator in estimators:</span>
+        <span class="c1"># .where(self.TrialsModel.estimator == estimator)</span>
+        <span class="n">should_delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_persistent_estimators</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">should_delete</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">should_delete</span><span class="p">:</span>
+                <span class="n">models_path</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">models_path</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Delete expire Model in path : </span><span class="si">{models_path}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">models_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">should_delete</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span><span class="p">)))</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 

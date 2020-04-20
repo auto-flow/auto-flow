@@ -168,15 +168,16 @@
             
   <h1>Source code for autoflow.hdl.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterator</span>
 
 <span class="kn">import</span> <span class="nn">json5</span> <span class="k">as</span> <span class="nn">json</span>
 
 <span class="kn">from</span> <span class="nn">autoflow</span> <span class="kn">import</span> <span class="n">hdl</span>
+<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">,</span> <span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span>
 
 
 <div class="viewcode-block" id="is_hdl_bottom"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.is_hdl_bottom">[docs]</a><span class="k">def</span> <span class="nf">is_hdl_bottom</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">purify_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;_type&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -185,7 +186,7 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="get_hdl_bank"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_hdl_bank">[docs]</a><span class="k">def</span> <span class="nf">get_hdl_bank</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<div class="viewcode-block" id="get_hdl_bank"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_hdl_bank">[docs]</a><span class="k">def</span> <span class="nf">get_hdl_bank</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
@@ -197,6 +198,36 @@
 
 <div class="viewcode-block" id="get_default_hdl_bank"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_default_hdl_bank">[docs]</a><span class="k">def</span> <span class="nf">get_default_hdl_bank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">Path</span><span class="p">(</span><span class="n">hdl</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;hdl_bank.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="get_origin_models"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_origin_models">[docs]</a><span class="k">def</span> <span class="nf">get_origin_models</span><span class="p">(</span><span class="n">raw_models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">raw_model</span> <span class="ow">in</span> <span class="n">raw_models</span><span class="p">:</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">raw_model</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">last</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="purify_key"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.purify_key">[docs]</a><span class="k">def</span> <span class="nf">purify_key</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">key</span>
+    <span class="k">if</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">key</span><span class="p">[</span><span class="n">ix</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+<div class="viewcode-block" id="add_leader_model"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.add_leader_model">[docs]</a><span class="k">def</span> <span class="nf">add_leader_model</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">leader_model</span><span class="p">,</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">leader_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">key</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">leader_model</span> <span class="o">+</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span> <span class="o">+</span> <span class="n">key</span></div>
+
+
+<div class="viewcode-block" id="purify_keys"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.purify_keys">[docs]</a><span class="k">def</span> <span class="nf">purify_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">yield</span> <span class="n">purify_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

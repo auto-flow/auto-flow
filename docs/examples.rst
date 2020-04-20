@@ -294,8 +294,19 @@ Data scientists have summed up a table based on their experience showed below:
 If we not only want to trial  algorithms that don't need scaling like ``Naive Bayes`` and ``Tree-Based models``,
 but also want trial scaling-needed algorithm like ``SVM``, ``KNN`` and ``LR``, How can we do ?
 
+The answer is very esay, what you should do is only connect two or more algorithms' name by a separator ``"|"``, like this:
 
+.. code-block:: python
 
+    trained_pipeline = AutoFlowClassifier(
+        initial_runs=12, run_limit=12, n_jobs=3,
+        included_classifiers=[
+            "scale.standardize|libsvm_svc", "scale.standardize|k_nearest_neighbors", "scale.standardize|logistic_regression",
+            "gaussian_nb", "extra_trees", "lightgbm"
+        ],
+    )
+
+``"scale.standardize|libsvm_svc"`` means do ``scale.standardize`` firstly, and do ``libsvm_svc`` as a classifier secondly.
 
 Store your data in remote
 -----------------------------

@@ -244,7 +244,7 @@
 <span id="autoflow-manager-resource-manager-module"></span><h2>autoflow.manager.resource_manager module<a class="headerlink" href="#module-autoflow.manager.resource_manager" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="autoflow.manager.resource_manager.ResourceManager">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.manager.resource_manager.</code><code class="sig-name descname">ResourceManager</code><span class="sig-paren">(</span><em class="sig-param">store_path='~/autoflow'</em>, <em class="sig-param">file_system='local'</em>, <em class="sig-param">file_system_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">db_type='sqlite'</em>, <em class="sig-param">db_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">redis_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">max_persistent_estimators=50</em>, <em class="sig-param">persistent_mode='fs'</em>, <em class="sig-param">compress_suffix='bz2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.manager.resource_manager.</code><code class="sig-name descname">ResourceManager</code><span class="sig-paren">(</span><em class="sig-param">store_path='~/autoflow'</em>, <em class="sig-param">file_system='local'</em>, <em class="sig-param">file_system_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">db_type='sqlite'</em>, <em class="sig-param">db_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">redis_params=&lt;frozendict {}&gt;</em>, <em class="sig-param">max_persistent_estimators=50</em>, <em class="sig-param">compress_suffix='bz2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="autoflow.utils.html#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 <p><code class="docutils literal notranslate"><span class="pre">ResourceManager</span></code> is a class manager computer resources such like <code class="docutils literal notranslate"><span class="pre">file_system</span></code> and <code class="docutils literal notranslate"><span class="pre">data_base</span></code>.</p>
 <dl class="field-list simple">
@@ -280,15 +280,6 @@
 <p>If more than this number, the The worst performing model file will be delete,</p>
 <p>the corresponding database record will also be deleted.</p>
 </p></li>
-<li><p><strong>persistent_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <p>Indicator-string about which persistent mode will be used.</p>
-<dl class="simple">
-<dt>Available options list below:</dt><dd><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">db</span></code> - serialize entity to bytes and store in database directly.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">fs</span></code> - serialize entity to bytes and form a pickle file upload to storage system or save in local.</p></li>
-</ul>
-</dd>
-</dl>
-</p></li>
 <li><p><strong>compress_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – compress file’s suffix, default is bz2</p></li>
 </ul>
 </dd>
@@ -296,6 +287,11 @@
 <dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.clear_pid_list">
 <code class="sig-name descname">clear_pid_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.clear_pid_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.clear_pid_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.manager.resource_manager.ResourceManager.close_all">
+<code class="sig-name descname">close_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.close_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.close_all" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -329,18 +325,13 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="autoflow.manager.resource_manager.ResourceManager.current_tasks_db_name">
-<em class="property">property </em><code class="sig-name descname">current_tasks_db_name</code><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.current_tasks_db_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.delete_models">
 <code class="sig-name descname">delete_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.delete_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.delete_models" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="autoflow.manager.resource_manager.ResourceManager.estimate_new_id">
-<code class="sig-name descname">forecast_new_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">id_field</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.estimate_new_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.estimate_new_id" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.manager.resource_manager.ResourceManager.forecast_new_id">
+<code class="sig-name descname">forecast_new_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">id_field</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.forecast_new_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.forecast_new_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -405,7 +396,7 @@
 
 <dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">
-<code class="sig-name descname">insert_to_experiments_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">general_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">current_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">hdl_constructors</span></em>, <em class="sig-param"><span class="n">hdl_constructor</span></em>, <em class="sig-param"><span class="n">raw_hdl</span></em>, <em class="sig-param"><span class="n">hdl</span></em>, <em class="sig-param"><span class="n">tuners</span></em>, <em class="sig-param"><span class="n">tuner</span></em>, <em class="sig-param"><span class="n">should_calc_all_metric</span></em>, <em class="sig-param"><span class="n">data_manager</span></em>, <em class="sig-param"><span class="n">column_descriptions</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">should_store_intermediate_result</span></em>, <em class="sig-param"><span class="n">fit_ensemble_params</span></em>, <em class="sig-param"><span class="n">additional_info</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_to_experiments_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">general_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">current_experiment_timestamp</span></em>, <em class="sig-param"><span class="n">hdl_constructors</span></em>, <em class="sig-param"><span class="n">hdl_constructor</span></em>, <em class="sig-param"><span class="n">raw_hdl</span></em>, <em class="sig-param"><span class="n">hdl</span></em>, <em class="sig-param"><span class="n">tuners</span></em>, <em class="sig-param"><span class="n">tuner</span></em>, <em class="sig-param"><span class="n">should_calc_all_metric</span></em>, <em class="sig-param"><span class="n">data_manager</span></em>, <em class="sig-param"><span class="n">column_descriptions</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">should_store_intermediate_result</span></em>, <em class="sig-param"><span class="n">fit_ensemble_params</span></em>, <em class="sig-param"><span class="n">additional_info</span></em>, <em class="sig-param"><span class="n">should_finally_fit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_experiments_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -450,7 +441,7 @@
 
 <dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model">
-<code class="sig-name descname">persistent_evaluated_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">trial_id</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.persistent_evaluated_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">persistent_evaluated_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">info</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">model_id</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.persistent_evaluated_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.persistent_evaluated_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -486,6 +477,11 @@
 <dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.set_is_master">
 <code class="sig-name descname">set_is_master</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">is_master</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.set_is_master"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.set_is_master" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.manager.resource_manager.ResourceManager.tasks_db_name">
+<em class="property">property </em><code class="sig-name descname">tasks_db_name</code><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.tasks_db_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

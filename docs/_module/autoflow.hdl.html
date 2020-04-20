@@ -339,7 +339,7 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <dl class="py method">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">
 <code class="sig-name descname">generic_recommend</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>List<span class="p">[</span>Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.generic_recommend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recommend a generic DAG workflow space back.</p>
+<dd><p>Recommend a generic DAG workflow-space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>DAG_workflow</strong></p>
@@ -398,6 +398,11 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <div class="section" id="module-autoflow.hdl.utils">
 <span id="autoflow-hdl-utils-module"></span><h2>autoflow.hdl.utils module<a class="headerlink" href="#module-autoflow.hdl.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
+<dt id="autoflow.hdl.utils.add_leader_model">
+<code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">add_leader_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">leader_model</span></em>, <em class="sig-param"><span class="n">SERIES_CONNECT_LEADER_TOKEN</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/utils.html#add_leader_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.add_leader_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.hdl.utils.get_default_hdl_bank">
 <code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">get_default_hdl_bank</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/autoflow/hdl/utils.html#get_default_hdl_bank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.get_default_hdl_bank" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -408,8 +413,23 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="autoflow.hdl.utils.get_origin_models">
+<code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">get_origin_models</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_models</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/utils.html#get_origin_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.get_origin_models" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.hdl.utils.is_hdl_bottom">
 <code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">is_hdl_bottom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/utils.html#is_hdl_bottom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.is_hdl_bottom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.hdl.utils.purify_key">
+<code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">purify_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/utils.html#purify_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.purify_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.hdl.utils.purify_keys">
+<code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">purify_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span> &#x2192; Iterator<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/hdl/utils.html#purify_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.purify_keys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

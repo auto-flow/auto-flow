@@ -176,7 +176,6 @@
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Manager</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
 
-<span class="kn">import</span> <span class="nn">json5</span> <span class="k">as</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
@@ -195,7 +194,7 @@
 <span class="kn">from</span> <span class="nn">autoflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">get_chunks</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.config_space</span> <span class="kn">import</span> <span class="n">replace_phps</span><span class="p">,</span> <span class="n">estimate_config_space_numbers</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_placeholder_from_other_dict</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_mask_from_other_dict</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">instancing</span><span class="p">,</span> <span class="n">sequencing</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">setup_logger</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_name_of_module</span>
@@ -214,6 +213,9 @@
             <span class="n">log_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">highR_nan_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
             <span class="n">highR_cat_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">should_finally_fit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">should_calc_all_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -247,7 +249,7 @@
 <span class="sd">        highR_cat_threshold: float</span>
 <span class="sd">            high ratio categorical feature&#39;s cardinality threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`</span>
 
-<span class="sd">        kwargs: dict</span>
+<span class="sd">        kwargs</span>
 <span class="sd">            if parameters like ``tuner`` or ``hdl_constructor`` and ``resource_manager`` are passing None,</span>
 
 <span class="sd">            you can passing kwargs to make passed parameter work. See the following example.</span>
@@ -269,6 +271,9 @@
 <span class="sd">            hdl_bank={&#39;classification&#39;: {&#39;lightgbm&#39;: {&#39;boosting_type&#39;: {&#39;_type&#39;: &#39;choice&#39;, &#39;_value&#39;: [&#39;gbdt&#39;, &#39;dart&#39;, &#39;goss&#39;]}}}}</span>
 <span class="sd">            included_classifiers=(&#39;adaboost&#39;, &#39;catboost&#39;, &#39;decision_tree&#39;, &#39;extra_trees&#39;, &#39;gaussian_nb&#39;, &#39;k_nearest_neighbors&#39;, &#39;liblinear_svc&#39;, &#39;lib...</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_finally_fit</span> <span class="o">=</span> <span class="n">should_finally_fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">should_store_intermediate_result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metrics</span> <span class="o">=</span> <span class="n">should_calc_all_metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_config</span> <span class="o">=</span> <span class="n">log_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">highR_nan_threshold</span> <span class="o">=</span> <span class="n">highR_nan_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">highR_cat_threshold</span> <span class="o">=</span> <span class="n">highR_cat_threshold</span>
@@ -304,10 +309,8 @@
             <span class="n">column_descriptions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">dataset_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
             <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">should_calc_all_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">splitter</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span>
             <span class="n">specific_task_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">additional_info</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(),</span>
             <span class="n">fit_ensemble_params</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
 
@@ -346,8 +349,6 @@
 <span class="sd">        -------</span>
 <span class="sd">        self</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">should_store_intermediate_result</span>
         <span class="n">dataset_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_metadata</span><span class="p">)</span>
         <span class="n">additional_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">additional_info</span><span class="p">)</span>
         <span class="c1"># build data_manager</span>
@@ -377,7 +378,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">specific_task_token</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_tasks_table</span><span class="p">()</span>
         <span class="c1"># store other params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metrics</span> <span class="o">=</span> <span class="n">should_calc_all_metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">splitter</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tuners</span><span class="p">)</span>
         <span class="n">n_step</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">)</span>
@@ -388,7 +388,7 @@
             <span class="n">raw_hdl</span> <span class="o">=</span> <span class="n">hdl_constructor</span><span class="o">.</span><span class="n">get_hdl</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">step</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_best_dhp</span><span class="p">()</span>
-                <span class="n">hdl</span> <span class="o">=</span> <span class="n">update_placeholder_from_other_dict</span><span class="p">(</span><span class="n">raw_hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
+                <span class="n">hdl</span> <span class="o">=</span> <span class="n">update_mask_from_other_dict</span><span class="p">(</span><span class="n">raw_hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated HDL(Hyperparams Descriptions Language) in step </span><span class="si">{step}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{hdl}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">hdl</span> <span class="o">=</span> <span class="n">raw_hdl</span>
@@ -399,12 +399,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_experiments_table</span><span class="p">(</span><span class="n">general_experiment_timestamp</span><span class="p">,</span>
                                                               <span class="n">current_experiment_timestamp</span><span class="p">,</span>
                                                               <span class="bp">self</span><span class="o">.</span><span class="n">hdl_constructors</span><span class="p">,</span> <span class="n">hdl_constructor</span><span class="p">,</span> <span class="n">raw_hdl</span><span class="p">,</span> <span class="n">hdl</span><span class="p">,</span>
-                                                              <span class="bp">self</span><span class="o">.</span><span class="n">tuners</span><span class="p">,</span> <span class="n">tuner</span><span class="p">,</span> <span class="n">should_calc_all_metrics</span><span class="p">,</span>
+                                                              <span class="bp">self</span><span class="o">.</span><span class="n">tuners</span><span class="p">,</span> <span class="n">tuner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metrics</span><span class="p">,</span>
                                                               <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span>
                                                               <span class="n">column_descriptions</span><span class="p">,</span>
                                                               <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
-                                                              <span class="n">should_store_intermediate_result</span><span class="p">,</span> <span class="n">fit_ensemble_params</span><span class="p">,</span>
-                                                              <span class="n">additional_info</span><span class="p">)</span>
+                                                              <span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span><span class="p">,</span>
+                                                              <span class="n">fit_ensemble_params</span><span class="p">,</span>
+                                                              <span class="n">additional_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_finally_fit</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_experiments_table</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">hdl_id</span>
@@ -448,9 +449,8 @@
             <span class="n">n_jobs</span><span class="p">)</span>
         <span class="n">random_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
         <span class="n">sync_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sync_dict</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">tuner</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_trials_table</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">clear_pid_list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_redis</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_all</span><span class="p">()</span>
         <span class="n">resource_managers</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)]</span>
         <span class="n">tuners</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">tuner</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)]</span>
         <span class="n">processes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -521,7 +521,8 @@
                 <span class="n">should_calc_all_metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">should_calc_all_metrics</span><span class="p">,</span>
                 <span class="n">splitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
                 <span class="n">should_store_intermediate_result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">should_store_intermediate_result</span><span class="p">,</span>
-                <span class="n">resource_manager</span><span class="o">=</span><span class="n">resource_manager</span>
+                <span class="n">resource_manager</span><span class="o">=</span><span class="n">resource_manager</span><span class="p">,</span>
+                <span class="n">should_finally_fit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">should_finally_fit</span>
             <span class="p">),</span>
             <span class="n">instance_id</span><span class="o">=</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span>
             <span class="n">rh_db_type</span><span class="o">=</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">db_type</span><span class="p">,</span>

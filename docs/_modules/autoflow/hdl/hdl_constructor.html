@@ -173,7 +173,7 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span>
+<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">,</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">,</span> <span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span>
 <span class="kn">from</span> <span class="nn">autoflow.hdl.utils</span> <span class="kn">import</span> <span class="n">get_hdl_bank</span><span class="p">,</span> <span class="n">get_default_hdl_bank</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">add_prefix_in_dict_keys</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.graphviz</span> <span class="kn">import</span> <span class="n">ColorSelector</span>
@@ -394,7 +394,7 @@
 
 <div class="viewcode-block" id="HDL_Constructor.get_params_in_dict"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.hdl_constructor.HDL_Constructor.get_params_in_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_params_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl_bank</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">packages</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mainTask</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">(</span><span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">)</span>
-        <span class="n">packages</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="n">packages</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">packages</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span><span class="p">)</span>
         <span class="n">params_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_params_in_dict</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">[</span><span class="n">PHASE1</span><span class="p">],</span> <span class="n">package</span><span class="p">)</span> <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span>
                                    <span class="n">packages</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
         <span class="n">last_phase_key</span> <span class="o">=</span> <span class="n">PHASE1</span> <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="n">PHASE1</span> <span class="k">else</span> <span class="n">mainTask</span>
@@ -406,12 +406,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">params_list</span><span class="p">,</span> <span class="n">packages</span><span class="p">):</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">))</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">package</span> <span class="o">+</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="HDL_Constructor.generic_recommend"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor.generic_recommend">[docs]</a>    <span class="k">def</span> <span class="nf">generic_recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Recommend a generic DAG workflow space back.</span>
+<span class="sd">        Recommend a generic DAG workflow-space.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
