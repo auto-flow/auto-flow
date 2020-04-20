@@ -28,7 +28,7 @@ hdl_constructors = [
             "highR_nan->nan": "operate.drop",
             "all->{cat_name=cat,num_name=num}": "operate.split.cat_num",
             "cat->num": "encode.label",
-            "num->selected": {"_name": "<placeholder>",
+            "num->selected": {"_name": "<mask>",
                          "_select_percent": {"_type": "quniform", "_value": [1, 100, 0.5],
                                              "_default": 80}},
             "selected->target": {"_name": "logistic_regression", "_vanilla": True}
