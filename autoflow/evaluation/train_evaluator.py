@@ -10,7 +10,7 @@ from typing import Dict, Optional
 import numpy as np
 from ConfigSpace import Configuration
 
-from autoflow.constants import PHASE2, PHASE1
+from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
 from autoflow.manager.data_manager import DataManager
@@ -19,7 +19,7 @@ from autoflow.metrics import Scorer, calculate_score
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
 from autoflow.shp2dhp.shp2dhp import SHP2DHP
-from autoflow.utils.dict import group_dict_items_before_first_dot
+from autoflow.utils.dict import group_dict_items_before_first_token
 from autoflow.utils.logging import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
@@ -309,8 +309,8 @@ class TrainEvaluator(BaseEvaluator):
         assert phase in (PHASE1, PHASE2)
         packages = list(sub_dhp.keys())[0]
         params = sub_dhp[packages]
-        packages = packages.split("|")
-        grouped_params = group_dict_items_before_first_dot(params)
+        packages = packages.split(SERIES_CONNECT_SEPARATOR_TOKEN)
+        grouped_params = group_dict_items_before_first_token(params, SERIES_CONNECT_LEADER_TOKEN)
         if len(packages) == 1:
             if bool(grouped_params):
                 grouped_params[packages[0]] = grouped_params.pop("single")

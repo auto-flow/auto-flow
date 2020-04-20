@@ -6,3 +6,5 @@ multilabel_classification_task = MLTask("classification", "multilabel", "classif
 regression_task = MLTask("regression", "regression", "regressor")
 PHASE1 = "preprocessing"
 PHASE2 = "estimating"
+SERIES_CONNECT_LEADER_TOKEN = "#"
+SERIES_CONNECT_SEPARATOR_TOKEN = "|"

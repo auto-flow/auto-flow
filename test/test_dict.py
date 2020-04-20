@@ -1,6 +1,6 @@
 import unittest
 
-from autoflow.utils.dict import update_placeholder_from_other_dict
+from autoflow.utils.dict import update_mask_from_other_dict
 from autoflow.utils.hash import get_hash_of_dict
 
 
@@ -45,11 +45,11 @@ class TestDict(unittest.TestCase):
                 '2highR_nan->nan(choice)': {'operate.drop': {'random_state': 42}},
                 '3all->{cat_name=cat,num_name=num}(choice)': {'operate.split.cat_num': {'random_state': 42}},
                 '4cat->num(choice)': {'encode.label': {'random_state': 42}},
-                '5num->num(choice)': {'<placeholder>': {'_select_percent': {'_type': 'quniform',
+                '5num->num(choice)': {'<mask>': {'_select_percent': {'_type': 'quniform',
                                                                             '_value': [1, 100, 0.5],
                                                                             '_default': 80},
                                                         'random_state': 42}}},
-            'estimator(choice)': {'lightgbm': {"boosting_type": "<placeholder>"}}}
+            'estimator(choice)': {'lightgbm': {"boosting_type": "<mask>"}}}
         last_best_dhp = {'estimator': {'lightgbm': {"boosting_type": "gbdt"}},
                          'preprocessing': {
                              '0nan->{highR=highR_nan,lowR=lowR_nan}': {'operate.split.nan': {'random_state': 42}},
@@ -64,7 +64,7 @@ class TestDict(unittest.TestCase):
                                                                      'dual': False,
                                                                      'multi_class': 'ovr',
                                                                      'penalty': 'l1'}}}}
-        updated_hdl = update_placeholder_from_other_dict(hdl, last_best_dhp)
+        updated_hdl = update_mask_from_other_dict(hdl, last_best_dhp)
         target = {'estimator(choice)': {'lightgbm': {'boosting_type': 'gbdt'}},
                   'preprocessing': {
                       '0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {'random_state': 42}},

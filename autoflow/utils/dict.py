@@ -1,6 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Callable
 
 from autoflow.utils.list import remove_suffix_in_list
 
@@ -12,12 +12,12 @@ def add_prefix_in_dict_keys(dict_: Dict[str, Any], prefix: str) -> Dict[str, Any
     return result
 
 
-def group_dict_items_before_first_dot(dict_: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+def group_dict_items_before_first_token(dict_: Dict[str, Any], token: str) -> Dict[str, Dict[str, Any]]:
     result = defaultdict(dict)
     for packages, value in dict_.items():
-        if "." in packages:
-            split_list = packages.split(".")
-            key1 = ".".join(split_list[:-1])
+        if token in packages:
+            split_list = packages.split(token)
+            key1 = token.join(split_list[:-1])
             key2 = split_list[-1]
         else:
             key1 = "single"
@@ -47,13 +47,12 @@ def sort_dict(obj):
         return obj
 
 
-def remove_None_value(dict_: dict)->dict:
-    result={}
-    for k,v in dict_.items():
+def remove_None_value(dict_: dict) -> dict:
+    result = {}
+    for k, v in dict_.items():
         if v is not None:
-            result[k]=v
+            result[k] = v
     return result
-
 
 
 class GlobalList:
@@ -90,8 +89,8 @@ def write_dict_in_path_mode(dict_: dict, path: List[str], value):
     dict_[path[-1]] = value
 
 
-def update_placeholder_from_other_dict(should_update: Dict, template: Dict, ignored_suffix: str = "(choice)"):
-    token = "<placeholder>"
+def update_mask_from_other_dict(should_update: Dict, template: Dict, ignored_suffix: str = "(choice)"):
+    token = "<mask>"
     updated = deepcopy(should_update)
     for path, type_ in find_token_in_dict(updated, token):
         origin_path = path
@@ -114,6 +113,12 @@ def update_placeholder_from_other_dict(should_update: Dict, template: Dict, igno
     return updated
 
 
+def filter_item_by_key_condition(dict_: dict, func: Callable) -> dict:
+    available_keys = [key for key in dict_ if func(key)]
+    result = {key: dict_[key] for key in available_keys}
+    return result
+
+
 if __name__ == '__main__':
     from pprint import pprint
 
@@ -123,11 +128,11 @@ if __name__ == '__main__':
                           '2highR_nan->nan(choice)': {'operate.drop': {'random_state': 42}},
                           '3all->{cat_name=cat,num_name=num}(choice)': {'operate.split.cat_num': {'random_state': 42}},
                           '4cat->num(choice)': {'encode.label': {'random_state': 42}},
-                          '5num->num(choice)': {'<placeholder>': {'_select_percent': {'_type': 'quniform',
+                          '5num->num(choice)': {'<mask>': {'_select_percent': {'_type': 'quniform',
                                                                                       '_value': [1, 100, 0.5],
                                                                                       '_default': 80},
                                                                   'random_state': 42}}},
-        'estimator(choice)': {'lightgbm': {"boosting_type": "<placeholder>"}}}
+        'estimator(choice)': {'lightgbm': {"boosting_type": "<mask>"}}}
     last_best_dhp = {'estimator': {'lightgbm': {"boosting_type": "gbdt"}},
                      'preprocessing': {
                          '0nan->{highR=highR_nan,lowR=lowR_nan}': {'operate.split.nan': {'random_state': 42}},
@@ -142,7 +147,7 @@ if __name__ == '__main__':
                                                                  'dual': False,
                                                                  'multi_class': 'ovr',
                                                                  'penalty': 'l1'}}}}
-    updated_hdl = update_placeholder_from_other_dict(hdl, last_best_dhp)
+    updated_hdl = update_mask_from_other_dict(hdl, last_best_dhp)
     target = {'estimator(choice)': {'lightgbm': {'boosting_type': 'gbdt'}},
               'preprocessing': {
                   '0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {'random_state': 42}},

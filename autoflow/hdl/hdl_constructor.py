@@ -4,7 +4,7 @@ from typing import Union, Tuple, List, Any, Dict
 
 import pandas as pd
 
-from autoflow.constants import PHASE1, PHASE2
+from autoflow.constants import PHASE1, PHASE2, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from autoflow.utils.dict import add_prefix_in_dict_keys
 from autoflow.utils.graphviz import ColorSelector
@@ -225,7 +225,7 @@ class HDL_Constructor(StrSignatureMixin):
 
     def get_params_in_dict(self, hdl_bank: dict, packages: str, phase: str, mainTask):
         assert phase in (PHASE1, PHASE2)
-        packages: list = packages.split("|")
+        packages: list = packages.split(SERIES_CONNECT_SEPARATOR_TOKEN)
         params_list: List[dict] = [self._get_params_in_dict(hdl_bank[PHASE1], package) for package in
                                    packages[:-1]]
         last_phase_key = PHASE1 if phase == PHASE1 else mainTask
@@ -237,12 +237,12 @@ class HDL_Constructor(StrSignatureMixin):
         else:
             result = {}
             for params, package in zip(params_list, packages):
-                result.update(add_prefix_in_dict_keys(params, package + "."))
+                result.update(add_prefix_in_dict_keys(params, package + SERIES_CONNECT_LEADER_TOKEN))
             return result
 
     def generic_recommend(self) -> Dict[str, List[Union[str, Dict[str, Any]]]]:
         '''
-        Recommend a generic DAG workflow space back.
+        Recommend a generic DAG workflow-space.
 
         Returns
         -------

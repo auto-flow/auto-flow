@@ -25,7 +25,7 @@ from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.tuner.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import replace_phps, estimate_config_space_numbers
-from autoflow.utils.dict import update_placeholder_from_other_dict
+from autoflow.utils.dict import update_mask_from_other_dict
 from autoflow.utils.klass import instancing, sequencing
 from autoflow.utils.logging import get_logger, setup_logger
 from autoflow.utils.packages import get_class_name_of_module
@@ -219,7 +219,7 @@ class AutoFlowEstimator(BaseEstimator):
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
-                hdl = update_placeholder_from_other_dict(raw_hdl, last_best_dhp)
+                hdl = update_mask_from_other_dict(raw_hdl, last_best_dhp)
                 self.logger.debug(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
             else:
                 hdl = raw_hdl

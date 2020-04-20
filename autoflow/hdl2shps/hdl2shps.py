@@ -12,11 +12,12 @@ from ConfigSpace import InCondition, EqualsCondition
 from hyperopt import fmin, tpe, hp
 
 import autoflow.hdl.smac as smac_hdl
+from autoflow.constants import PHASE2, SERIES_CONNECT_LEADER_TOKEN
+from autoflow.hdl.utils import is_hdl_bottom, get_origin_models, purify_keys, purify_key, add_leader_model
+from autoflow.utils.dict import filter_item_by_key_condition
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.ml_task import MLTask
-from autoflow.constants import PHASE2
-from autoflow.hdl.utils import is_hdl_bottom, get_origin_models
 from autoflow.utils.logging import get_logger
+from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_name_of_module
 
 
@@ -35,7 +36,7 @@ class HDL2SHPS(StrSignatureMixin):
     def get_forbid_hit_in_models_by_rely(self, models, rely_model="boost_model"):
         forbid_in_value = []
         hit = []
-        models=get_origin_models(models)
+        models = get_origin_models(models)
         for model in models:
             module_path = f"autoflow.pipeline.components.{self.ml_task.mainTask}.{model}"
             _class = get_class_name_of_module(module_path)
@@ -188,13 +189,18 @@ class HDL2SHPS(StrSignatureMixin):
         for key, value in hdl.items():
             if isinstance(value, dict):
                 ok = False
-                for k, v in value.items():
-                    if isinstance(v, dict) and "__rely_model" in v:
+                for name, sub_dict in value.items():
+                    if isinstance(sub_dict, dict) and "__rely_model" in purify_keys(sub_dict):
                         ok = True
-                        rely_model = v["__rely_model"]
+                        endswith_rely_model_dicts = filter_item_by_key_condition(
+                            sub_dict,
+                            lambda x: x.endswith("__rely_model"))
+                        rely_models = list(endswith_rely_model_dicts.values())
+                        rely_model = rely_models[0]
                         _, hit = self.get_forbid_hit_in_models_by_rely(models, rely_model)
                         if set(hit) == set(models):
-                            v.pop("__rely_model")
+                            for key in endswith_rely_model_dicts:
+                                sub_dict.pop(key)
                 if not ok:
                     self.purify_isolate_rely_in_hdl(value, models)
 
@@ -205,13 +211,17 @@ class HDL2SHPS(StrSignatureMixin):
             if isinstance(value, dict):
                 ok = False
                 deleted_keys = []
-                for k, v in value.items():
-                    if isinstance(v, dict) and "__rely_model" in v:
+                for name, sub_dict in value.items():
+                    if isinstance(sub_dict, dict) and "__rely_model" in purify_keys(sub_dict):
                         ok = True
-                        rely_model = v["__rely_model"]
+                        rely_models = filter_item_by_key_condition(
+                            sub_dict,
+                            lambda x: x.endswith("__rely_model")).values()
+                        rely_models = list(rely_models)
+                        rely_model = rely_models[0]
                         _, hit = self.get_forbid_hit_in_models_by_rely(models, rely_model)
                         if not hit:
-                            deleted_keys.append(k)
+                            deleted_keys.append(name)
                 for deleted_key in deleted_keys:
                     value.pop(deleted_key)
                 if not ok:
@@ -231,10 +241,10 @@ class HDL2SHPS(StrSignatureMixin):
         #     "p":p
         # }
 
-    def __condition(self, item: Dict, store: Dict):
-        child = item["_child"]
+    def __condition(self, item: Dict, store: Dict, leader_model):
+        child = add_leader_model(item["_child"], leader_model, SERIES_CONNECT_LEADER_TOKEN)
         child = store[child]
-        parent = item["_parent"]
+        parent = add_leader_model(item["_parent"], leader_model, SERIES_CONNECT_LEADER_TOKEN)
         parent = store[parent]
         value = (item["_values"])
         if (isinstance(value, list) and len(value) == 1):
@@ -245,18 +255,19 @@ class HDL2SHPS(StrSignatureMixin):
             cond = EqualsCondition(child, parent, smac_hdl._encode(value))
         return cond
 
-    def __forbidden(self, value: List, store: Dict, cs: ConfigurationSpace):
+    def __forbidden(self, value: List, store: Dict, cs: ConfigurationSpace, leader_model):
         assert isinstance(value, list)
         for item in value:
             assert isinstance(item, dict)
             clauses = []
-            for k, v in item.items():
-                if isinstance(v, list) and len(v) == 1:
-                    v = v[0]
-                if isinstance(v, list):
-                    clauses.append(ForbiddenInClause(store[k], list(map(smac_hdl._encode, v))))
+            for name, forbidden_values in item.items():
+                true_name = add_leader_model(name, leader_model, SERIES_CONNECT_LEADER_TOKEN)
+                if isinstance(forbidden_values, list) and len(forbidden_values) == 1:
+                    forbidden_values = forbidden_values[0]
+                if isinstance(forbidden_values, list):
+                    clauses.append(ForbiddenInClause(store[true_name], list(map(smac_hdl._encode, forbidden_values))))
                 else:
-                    clauses.append(ForbiddenEqualsClause(store[k], smac_hdl._encode(v)))
+                    clauses.append(ForbiddenEqualsClause(store[true_name], smac_hdl._encode(forbidden_values)))
             cs.add_forbidden_clause(ForbiddenAndConjunction(*clauses))
 
     # def activate_helper(self,value):
@@ -287,18 +298,22 @@ class HDL2SHPS(StrSignatureMixin):
             dict_.pop(key)
         return dict_
 
-    def __activate(self, value: Dict, store: Dict, cs: ConfigurationSpace):
+    def __activate(self, value: Dict, store: Dict, cs: ConfigurationSpace, leader_model):
         assert isinstance(value, dict)
         for k, v in value.items():
             assert isinstance(v, dict)
             reversed_dict = self.reverse_dict(v)
             reversed_dict = self.pop_covered_item(reversed_dict, len(v))
             for sk, sv in reversed_dict.items():
-                cond = self.__condition({
-                    "_child": sk,
-                    "_values": sv,
-                    "_parent": k
-                }, store)
+                cond = self.__condition(
+                    {
+                        "_child": sk,
+                        "_values": sv,
+                        "_parent": k
+                    },
+                    store,
+                    leader_model
+                )
                 cs.add_condition(cond)
 
     def recursion(self, hdl: Dict, path=()) -> ConfigurationSpace:
@@ -315,23 +330,28 @@ class HDL2SHPS(StrSignatureMixin):
                 store = {}
                 conditions_dict = {}
                 for key, value in hdl.items():
-                    if key.startswith("__"):
+                    if purify_key(key).startswith("__"):
                         conditions_dict[key] = value
                     else:
                         hp = self.__parse_dict_to_config(key, value)
                         cs.add_hyperparameter(hp)
                         store[key] = hp
                 for key, value in conditions_dict.items():
-                    if key == "__condition":
+                    if SERIES_CONNECT_LEADER_TOKEN in key:
+                        leader_model, condition_indicator = key.split(SERIES_CONNECT_LEADER_TOKEN)
+                    else:
+                        leader_model, condition_indicator = None, key
+
+                    if condition_indicator == "__condition":
                         assert isinstance(value, list)
                         for item in value:
-                            cond = self.__condition(item, store)
+                            cond = self.__condition(item, store, leader_model)
                             cs.add_condition(cond)
-                    elif key == "__activate":
-                        self.__activate(value, store, cs)
-                    elif key == "__forbidden":
-                        self.__forbidden(value, store, cs)
-                    elif key == "__rely_model":
+                    elif condition_indicator == "__activate":
+                        self.__activate(value, store, cs, leader_model)
+                    elif condition_indicator == "__forbidden":
+                        self.__forbidden(value, store, cs, leader_model)
+                    elif condition_indicator == "__rely_model":
                         RelyModels.info.append([
                             value,
                             deepcopy(path)
