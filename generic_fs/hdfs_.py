@@ -1,8 +1,10 @@
+import logging
 import os
 from fnmatch import fnmatchcase
-import logging
 
-logger=logging.getLogger(__name__)
+from autoflow.utils.dict import remove_None_value
+
+logger = logging.getLogger(__name__)
 
 import hdfs
 from joblib import dump, load
@@ -11,7 +13,8 @@ from generic_fs import FileSystem
 
 
 class HDFS(FileSystem):
-    def __init__(self, url='http://0.0.0.0:50070', root=None, proxy=None, timeout=None, session=None):
+    def __init__(self, url='http://0.0.0.0:50070', user="dr.who", root=None, proxy=None, timeout=None, session=None):
+        self.user = user
         self.session = session
         self.timeout = timeout
         self.proxy = proxy
@@ -23,7 +26,18 @@ class HDFS(FileSystem):
         if self.is_init:
             return
         self.is_init = True
-        self.client = hdfs.client.Client(self.url, self.root, self.proxy, self.timeout, self.session)
+        kwargs = {
+            "root": self.root,
+            "proxy": self.proxy,
+            "timeout": self.timeout,
+            "session": self.session
+        }
+        kwargs = remove_None_value(kwargs)
+        # todo 调研参数
+        self.client = hdfs.client.InsecureClient(
+            self.url, self.user,
+            **kwargs
+        )
 
     def close_fs(self):
         self.is_init = False

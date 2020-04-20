@@ -35,7 +35,10 @@ def get_hash_of_array(X, m=None):
 def get_hash_of_dict(dict_, m=None):
     if m is None:
         m = hashlib.md5()
-    m.update(str(sort_dict(deepcopy(dict_))).encode("utf-8"))
+
+    # sorted_dict = sort_dict(deepcopy(dict_))
+    sorted_dict = deepcopy(dict_)
+    m.update(str(sorted_dict).encode("utf-8"))
     return m.hexdigest()
 
 
@@ -87,6 +90,6 @@ def get_hash_of_Xy(X: Union[pd.DataFrame, np.ndarray, None],
 
 def get_hash_of_str(s: str, m=None):
     if m is None:
-        m=hashlib.md5()
+        m = hashlib.md5()
     m.update(s.encode("utf-8"))
     return m.hexdigest()

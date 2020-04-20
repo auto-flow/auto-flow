@@ -27,7 +27,8 @@ trained_pipeline = AutoFlowClassifier(
     file_system="hdfs",
     should_store_intermediate_result=True,
     file_system_params={
-        "url": "http://0.0.0.0:50070"
+        "url": "http://0.0.0.0:50070",
+        "user": "tqc"
     }
 )
 column_descriptions = {
