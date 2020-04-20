@@ -15,7 +15,7 @@ import autoflow.hdl.smac as smac_hdl
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.ml_task import MLTask
 from autoflow.constants import PHASE2
-from autoflow.hdl.utils import is_hdl_bottom
+from autoflow.hdl.utils import is_hdl_bottom, get_origin_models
 from autoflow.utils.logging import get_logger
 from autoflow.utils.packages import get_class_name_of_module
 
@@ -35,6 +35,7 @@ class HDL2SHPS(StrSignatureMixin):
     def get_forbid_hit_in_models_by_rely(self, models, rely_model="boost_model"):
         forbid_in_value = []
         hit = []
+        models=get_origin_models(models)
         for model in models:
             module_path = f"autoflow.pipeline.components.{self.ml_task.mainTask}.{model}"
             _class = get_class_name_of_module(module_path)

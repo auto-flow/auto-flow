@@ -5,7 +5,7 @@
 
 import joblib
 import pandas as pd
-from sklearn.model_selection import KFold
+from sklearn.model_selection import ShuffleSplit
 
 from autoflow import AutoFlowClassifier
 
@@ -13,20 +13,10 @@ train_df = pd.read_csv("./data/train_classification.csv")
 test_df = pd.read_csv("./data/test_classification.csv")
 trained_pipeline = AutoFlowClassifier(
     initial_runs=5, run_limit=10, n_jobs=3,
-    included_classifiers=["lightgbm"],
-    db_type="postgresql",
-    db_params={
-        "user": "tqc",
-        "host": "0.0.0.0",
-        "port": 5432
-    },
-    store_path="/autoflow",
-    file_system="hdfs",
-    should_store_intermediate_result=True,
-    file_system_params={
-        "url": "http://0.0.0.0:50070",
-        "user": "tqc"
-    }
+    included_classifiers=[
+        "scale.standardize|libsvm_svc", "scale.standardize|k_nearest_neighbors", "scale.standardize|logistic_regression",
+        "gaussian_nb", "extra_trees", "lightgbm"
+    ],
 )
 column_descriptions = {
     "id": "PassengerId",
@@ -35,7 +25,7 @@ column_descriptions = {
 }
 trained_pipeline.fit(
     X_train=train_df, X_test=test_df, column_descriptions=column_descriptions,
-    splitter=KFold(n_splits=3, shuffle=True, random_state=42),
+    splitter=ShuffleSplit(n_splits=1, test_size=0.25, random_state=42),
 )
 joblib.dump(trained_pipeline, "autoflow_classification.bz2")
 predict_pipeline = joblib.load("autoflow_classification.bz2")

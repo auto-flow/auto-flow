@@ -272,6 +272,30 @@ In second step, we should choose the best ``feature selection algorithm`` search
         X_train=df_train, column_descriptions=column_descriptions
     )
 
+Series connect two or more algorithms in single edge
+----------------------------------------------------------
+
+As you can see in :ref:`Work Flow`, edge represents `preprocessing` or `estimating` algorithms in AutoFlow framework.
+
+In the process of algorithm development,
+data scientists will series connect two or more algorithms to use according to their knowledge.
+
+For example, some algorithms need scaling ,some not.
+Data scientists have summed up a table based on their experience showed below:
+
++----------------------------------------------------------------------------------------------+---------------+
+| Algorithm Name                                                                               |  Need Scaling |
++==============================================================================================+===============+
+| SVM, KNN, PCA, K-Means, Linear Regression, Logistic Regression, Linear Discriminant Analysis | Y             |
++----------------------------------------------------------------------------------------------+---------------+
+| Naive Bayes, Tree-Based models                                                               | N             |
++----------------------------------------------------------------------------------------------+---------------+
+
+If we not only want to trial  algorithms that don't need scaling like ``Naive Bayes`` and ``Tree-Based models``,
+but also want trial scaling-needed algorithm like ``SVM``, ``KNN`` and ``LR``, How can we do ?
+
+
+
 
 Store your data in remote
 -----------------------------

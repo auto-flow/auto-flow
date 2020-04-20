@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import json5 as json
 
@@ -28,3 +28,12 @@ def get_hdl_bank(path: str,logger=None) -> Dict:
 
 def get_default_hdl_bank() -> Dict:
     return json.loads((Path(hdl.__file__).parent / f"hdl_bank.json").read_text())
+
+def get_origin_models(raw_models:List[str]):
+    result=[]
+    for raw_model in raw_models:
+        last=raw_model.split("|")[-1]
+        if last not in result:
+            result.append(last)
+    return result
+
