@@ -84,18 +84,18 @@ autoflow.utils.list module
    :undoc-members:
    :show-inheritance:
 
-autoflow.utils.logging module
------------------------------
+autoflow.utils.logging\_ module
+-------------------------------
 
-.. automodule:: autoflow.utils.logging
+.. automodule:: autoflow.utils.logging_
    :members:
    :undoc-members:
    :show-inheritance:
 
-autoflow.utils.math module
---------------------------
+autoflow.utils.math\_ module
+----------------------------
 
-.. automodule:: autoflow.utils.math
+.. automodule:: autoflow.utils.math_
    :members:
    :undoc-members:
    :show-inheritance:
@@ -116,14 +116,6 @@ autoflow.utils.packages module
    :undoc-members:
    :show-inheritance:
 
-autoflow.utils.peewee module
-----------------------------
-
-.. automodule:: autoflow.utils.peewee
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 autoflow.utils.pipeline module
 ------------------------------
 
@@ -140,10 +132,10 @@ autoflow.utils.sys module
    :undoc-members:
    :show-inheritance:
 
-autoflow.utils.typing module
-----------------------------
+autoflow.utils.typing\_ module
+------------------------------
 
-.. automodule:: autoflow.utils.typing
+.. automodule:: autoflow.utils.typing_
    :members:
    :undoc-members:
    :show-inheritance:

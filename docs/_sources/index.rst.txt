@@ -18,7 +18,7 @@ AutoFlow : automatic machine learning workflow modeling platform.
 
 .. toctree::
    :maxdepth: 3
-   :caption: API
+   :caption: API Document
 
    api
 

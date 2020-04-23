@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -401,12 +402,12 @@
 
 <dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">
-<code class="sig-name descname">insert_to_hdls_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_to_hdls_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl</span></em>, <em class="sig-param"><span class="n">hdl_metadata</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_hdls_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">
-<code class="sig-name descname">insert_to_tasks_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager">autoflow.manager.data_manager.DataManager</a></span></em>, <em class="sig-param"><span class="n">metric</span><span class="p">:</span> <span class="n"><a class="reference internal" href="autoflow.metrics.html#autoflow.metrics.Scorer" title="autoflow.metrics.Scorer">autoflow.metrics.Scorer</a></span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">specific_task_token</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert_to_tasks_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span><span class="p">:</span> <span class="n"><a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager">autoflow.manager.data_manager.DataManager</a></span></em>, <em class="sig-param"><span class="n">metric</span><span class="p">:</span> <span class="n"><a class="reference internal" href="autoflow.metrics.html#autoflow.metrics.Scorer" title="autoflow.metrics.Scorer">autoflow.metrics.Scorer</a></span></em>, <em class="sig-param"><span class="n">splitter</span></em>, <em class="sig-param"><span class="n">specific_task_token</span></em>, <em class="sig-param"><span class="n">dataset_metadata</span></em>, <em class="sig-param"><span class="n">task_metadata</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/manager/resource_manager.html#ResourceManager.insert_to_tasks_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

@@ -38,5 +38,25 @@ Tuner
 .. autoclass:: autoflow.tuner.tuner.Tuner
     :members:
 
+Algorithm Components
+=====================
+
+Classification
+---------------
+
+:ref:`autoflow.pipeline.components.classification package`
+
+Regression
+-----------
+
+:ref:`autoflow.pipeline.components.regression package`
+
+
+Preprocessing
+---------------
+
+:ref:`autoflow.pipeline.components.preprocessing package`
+
+
 
 

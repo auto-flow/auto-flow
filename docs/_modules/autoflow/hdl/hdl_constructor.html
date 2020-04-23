@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -172,14 +173,15 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">frozendict</span> <span class="kn">import</span> <span class="n">frozendict</span>
 
 <span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">PHASE1</span><span class="p">,</span> <span class="n">PHASE2</span><span class="p">,</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">,</span> <span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span>
 <span class="kn">from</span> <span class="nn">autoflow.hdl.utils</span> <span class="kn">import</span> <span class="n">get_hdl_bank</span><span class="p">,</span> <span class="n">get_default_hdl_bank</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">add_prefix_in_dict_keys</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.graphviz</span> <span class="kn">import</span> <span class="n">ColorSelector</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.math</span> <span class="kn">import</span> <span class="n">get_int_length</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging_</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.math_</span> <span class="kn">import</span> <span class="n">get_int_length</span>
 
 
 <div class="viewcode-block" id="HDL_Constructor"><a class="viewcode-back" href="../../../api.html#autoflow.hdl.hdl_constructor.HDL_Constructor">[docs]</a><span class="k">class</span> <span class="nc">HDL_Constructor</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
@@ -201,6 +203,7 @@
             <span class="n">DAG_workflow</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;generic_recommend&quot;</span><span class="p">,</span>
             <span class="n">hdl_bank_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">hdl_bank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">hdl_metadata</span><span class="o">=</span><span class="n">frozendict</span><span class="p">(),</span>
             <span class="n">included_classifiers</span><span class="o">=</span><span class="p">(</span>
                     <span class="s2">&quot;adaboost&quot;</span><span class="p">,</span> <span class="s2">&quot;catboost&quot;</span><span class="p">,</span> <span class="s2">&quot;decision_tree&quot;</span><span class="p">,</span> <span class="s2">&quot;extra_trees&quot;</span><span class="p">,</span> <span class="s2">&quot;gaussian_nb&quot;</span><span class="p">,</span> <span class="s2">&quot;k_nearest_neighbors&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;liblinear_svc&quot;</span><span class="p">,</span> <span class="s2">&quot;libsvm_svc&quot;</span><span class="p">,</span> <span class="s2">&quot;lightgbm&quot;</span><span class="p">,</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span> <span class="s2">&quot;sgd&quot;</span><span class="p">),</span>
@@ -334,7 +337,7 @@
 <span class="sd">        {&#39;preprocessing&#39;: {}, &#39;estimating(choice)&#39;: {&#39;lightgbm&#39;: {&#39;boosting_type&#39;: {&#39;_type&#39;: &#39;choice&#39;, &#39;_value&#39;: [&#39;gbdt&#39;, &#39;dart&#39;, &#39;goss&#39;]}}}}</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdl_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hdl_metadata</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">included_lowR_cat_encoders</span> <span class="o">=</span> <span class="n">included_lowR_cat_encoders</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">included_highR_cat_encoders</span> <span class="o">=</span> <span class="n">included_highR_cat_encoders</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">included_num_nan_imputers</span> <span class="o">=</span> <span class="n">included_num_nan_imputers</span>
@@ -537,12 +540,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span> <span class="o">==</span> <span class="s2">&quot;generic_recommend&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdl_metadata</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;generic_recommend&quot;</span><span class="p">})</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using &#39;generic_recommend&#39; method to initialize a generic DAG_workflow, </span><span class="se">\n</span><span class="s2">&quot;</span>
                                  <span class="s2">&quot;to Adapt to various data such like NaN and categorical features.&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_recommend</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DAG_workflow</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdl_metadata</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;user_defined&quot;</span><span class="p">})</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;DAG_workflow is specifically set by user.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>

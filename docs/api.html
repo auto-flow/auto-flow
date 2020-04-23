@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Estimators</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#classifier">Classifier</a></li>
@@ -105,6 +105,12 @@
 <li class="toctree-l1"><a class="reference internal" href="#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#algorithm-components">Algorithm Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classification">Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#regression">Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preprocessing">Preprocessing</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -267,7 +273,7 @@ And we can see  hdl_constructor is instanced by kwargs implicitly.</p>
 <h1>HDL(Hyper-param Description Language)<a class="headerlink" href="#hdl-hyper-param-description-language" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.hdl.hdl_constructor.</code><code class="sig-name descname">HDL_Constructor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">DAG_workflow</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'generic_recommend'</span></em>, <em class="sig-param"><span class="n">hdl_bank_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hdl_bank</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">included_classifiers</span><span class="o">=</span><span class="default_value">'adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'libsvm_svc', 'lightgbm', 'logistic_regression', 'random_forest', 'sgd'</span></em>, <em class="sig-param"><span class="n">included_regressors</span><span class="o">=</span><span class="default_value">'adaboost', 'bayesian_ridge', 'catboost', 'decision_tree', 'elasticnet', 'extra_trees', 'gaussian_process', 'k_nearest_neighbors', 'kernel_ridge', 'liblinear_svr', 'lightgbm', 'random_forest', 'sgd'</span></em>, <em class="sig-param"><span class="n">included_highR_nan_imputers</span><span class="o">=</span><span class="default_value">'operate.drop', {'_name': 'operate.merge', '__rely_model': 'boost_model'}</span></em>, <em class="sig-param"><span class="n">included_cat_nan_imputers</span><span class="o">=</span><span class="default_value">'impute.fill_cat', {'_name': 'impute.fill_abnormal', '__rely_model': 'boost_model'}</span></em>, <em class="sig-param"><span class="n">included_num_nan_imputers</span><span class="o">=</span><span class="default_value">'impute.fill_num', {'_name': 'impute.fill_abnormal', '__rely_model': 'boost_model'}</span></em>, <em class="sig-param"><span class="n">included_highR_cat_encoders</span><span class="o">=</span><span class="default_value">'operate.drop', 'encode.label', 'encode.cat_boost'</span></em>, <em class="sig-param"><span class="n">included_lowR_cat_encoders</span><span class="o">=</span><span class="default_value">'encode.one_hot', 'encode.label', 'encode.cat_boost'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.hdl.hdl_constructor.</code><code class="sig-name descname">HDL_Constructor</code><span class="sig-paren">(</span><em class="sig-param">DAG_workflow: Union[str</em>, <em class="sig-param">Dict[str</em>, <em class="sig-param">Any]] = 'generic_recommend'</em>, <em class="sig-param">hdl_bank_path=None</em>, <em class="sig-param">hdl_bank=None</em>, <em class="sig-param">hdl_metadata=&lt;frozendict {}&gt;</em>, <em class="sig-param">included_classifiers=('adaboost'</em>, <em class="sig-param">'catboost'</em>, <em class="sig-param">'decision_tree'</em>, <em class="sig-param">'extra_trees'</em>, <em class="sig-param">'gaussian_nb'</em>, <em class="sig-param">'k_nearest_neighbors'</em>, <em class="sig-param">'liblinear_svc'</em>, <em class="sig-param">'libsvm_svc'</em>, <em class="sig-param">'lightgbm'</em>, <em class="sig-param">'logistic_regression'</em>, <em class="sig-param">'random_forest'</em>, <em class="sig-param">'sgd')</em>, <em class="sig-param">included_regressors=('adaboost'</em>, <em class="sig-param">'bayesian_ridge'</em>, <em class="sig-param">'catboost'</em>, <em class="sig-param">'decision_tree'</em>, <em class="sig-param">'elasticnet'</em>, <em class="sig-param">'extra_trees'</em>, <em class="sig-param">'gaussian_process'</em>, <em class="sig-param">'k_nearest_neighbors'</em>, <em class="sig-param">'kernel_ridge'</em>, <em class="sig-param">'liblinear_svr'</em>, <em class="sig-param">'lightgbm'</em>, <em class="sig-param">'random_forest'</em>, <em class="sig-param">'sgd')</em>, <em class="sig-param">included_highR_nan_imputers=('operate.drop'</em>, <em class="sig-param">{'_name': 'operate.merge'</em>, <em class="sig-param">'__rely_model': 'boost_model'})</em>, <em class="sig-param">included_cat_nan_imputers=('impute.fill_cat'</em>, <em class="sig-param">{'_name': 'impute.fill_abnormal'</em>, <em class="sig-param">'__rely_model': 'boost_model'})</em>, <em class="sig-param">included_num_nan_imputers=('impute.fill_num'</em>, <em class="sig-param">{'_name': 'impute.fill_abnormal'</em>, <em class="sig-param">'__rely_model': 'boost_model'})</em>, <em class="sig-param">included_highR_cat_encoders=('operate.drop'</em>, <em class="sig-param">'encode.label'</em>, <em class="sig-param">'encode.cat_boost')</em>, <em class="sig-param">included_lowR_cat_encoders=('encode.one_hot'</em>, <em class="sig-param">'encode.label'</em>, <em class="sig-param">'encode.cat_boost')</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">HDL</span></code> is abbreviation of Hyper-parameter Descriptions Language.
 It describes an abstract hyperparametric space that independent with concrete implementation.</p>
 <p><code class="docutils literal notranslate"><span class="pre">HDL_Constructor</span></code> is a class who is responsible for translating dict-type <code class="docutils literal notranslate"><span class="pre">DAG-workflow</span></code> into <code class="docutils literal notranslate"><span class="pre">H.D.L</span></code> .</p>
@@ -601,6 +607,21 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="algorithm-components">
+<h1>Algorithm Components<a class="headerlink" href="#algorithm-components" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classification">
+<h2>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="_module/autoflow.pipeline.components.classification.html#autoflow-pipeline-components-classification-package"><span class="std std-ref">autoflow.pipeline.components.classification package</span></a></p>
+</div>
+<div class="section" id="regression">
+<h2>Regression<a class="headerlink" href="#regression" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="_module/autoflow.pipeline.components.regression.html#autoflow-pipeline-components-regression-package"><span class="std std-ref">autoflow.pipeline.components.regression package</span></a></p>
+</div>
+<div class="section" id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="_module/autoflow.pipeline.components.preprocessing.html#autoflow-pipeline-components-preprocessing-package"><span class="std std-ref">autoflow.pipeline.components.preprocessing package</span></a></p>
+</div>
 </div>
 
 

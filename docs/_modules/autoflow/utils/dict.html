@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -172,6 +173,9 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Callable</span>
 
 <span class="kn">from</span> <span class="nn">autoflow.utils.list</span> <span class="kn">import</span> <span class="n">remove_suffix_in_list</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging_</span> <span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="add_prefix_in_dict_keys"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.add_prefix_in_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">add_prefix_in_dict_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -288,54 +292,51 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<div class="viewcode-block" id="update_data_structure"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dict.update_data_structure">[docs]</a><span class="k">def</span> <span class="nf">update_data_structure</span><span class="p">(</span><span class="n">old_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">additional_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; update_data_structure(</span>
+<span class="sd">    ...     {&quot;key1&quot;: &quot;a&quot;, &quot;key2&quot;: [1, True, {&quot;a&quot;, (2, )}], &quot;key3&quot;: {&quot;a&quot;:1, &quot;b&quot;:2}},</span>
+<span class="sd">    ...     {&quot;key1&quot;: &quot;b&quot;, &quot;key2&quot;: [1, False], &quot;key3&quot;: {&quot;a&quot;:{&quot;b&quot;:2}}, &quot;key4&quot;: &quot;new_value&quot;}</span>
+<span class="sd">    ... )</span>
+<span class="sd">    {&quot;key1&quot;: &quot;b&quot;, &quot;key2&quot;: [1, True, {&quot;a&quot;, (2, )}, 1, False], &quot;key3&quot;: {&quot;a&quot;:{&quot;b&quot;:2, &quot;b&quot;:2}}, &quot;key4&quot;: &quot;new_value&quot;}</span>
 
-    <span class="n">hdl</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                          <span class="s1">&#39;1lowR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;impute.fill_abnormal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                          <span class="s1">&#39;2highR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                          <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                          <span class="s1">&#39;4cat-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                          <span class="s1">&#39;5num-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;&lt;mask&gt;&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_type&#39;</span><span class="p">:</span> <span class="s1">&#39;quniform&#39;</span><span class="p">,</span>
-                                                                                      <span class="s1">&#39;_value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
-                                                                                      <span class="s1">&#39;_default&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
-                                                                  <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}}},</span>
-        <span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;mask&gt;&quot;</span><span class="p">}}}</span>
-    <span class="n">last_best_dhp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;boosting_type&quot;</span><span class="p">:</span> <span class="s2">&quot;gbdt&quot;</span><span class="p">}},</span>
-                     <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span>
-                         <span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                         <span class="s1">&#39;1lowR_nan-&gt;nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;impute.fill_abnormal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                         <span class="s1">&#39;2highR_nan-&gt;nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                         <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                         <span class="s1">&#39;4cat-&gt;num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                         <span class="s1">&#39;5num-&gt;num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;select.from_model_clf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
-                                                                 <span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="s1">&#39;sklearn.svm.LinearSVC&#39;</span><span class="p">,</span>
-                                                                 <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
-                                                                 <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                                                                 <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                                                                 <span class="s1">&#39;multi_class&#39;</span><span class="p">:</span> <span class="s1">&#39;ovr&#39;</span><span class="p">,</span>
-                                                                 <span class="s1">&#39;penalty&#39;</span><span class="p">:</span> <span class="s1">&#39;l1&#39;</span><span class="p">}}}}</span>
-    <span class="n">updated_hdl</span> <span class="o">=</span> <span class="n">update_mask_from_other_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">last_best_dhp</span><span class="p">)</span>
-    <span class="n">target</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;estimator(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;lightgbm&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;boosting_type&#39;</span><span class="p">:</span> <span class="s1">&#39;gbdt&#39;</span><span class="p">}},</span>
-              <span class="s1">&#39;preprocessing&#39;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s1">&#39;0nan-&gt;{highR=highR_nan,lowR=lowR_nan}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.nan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                  <span class="s1">&#39;1lowR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;impute.fill_abnormal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                  <span class="s1">&#39;2highR_nan-&gt;nan(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.drop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                  <span class="s1">&#39;3all-&gt;{cat_name=cat,num_name=num}(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;operate.split.cat_num&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                  <span class="s1">&#39;4cat-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;encode.label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}},</span>
-                  <span class="s1">&#39;5num-&gt;num(choice)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;select.from_model_clf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                                                                  <span class="s1">&#39;_select_percent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_default&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
-                                                                                      <span class="s1">&#39;_type&#39;</span><span class="p">:</span> <span class="s1">&#39;quniform&#39;</span><span class="p">,</span>
-                                                                                      <span class="s1">&#39;_value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span>
-                                                                                                 <span class="mi">100</span><span class="p">,</span>
-                                                                                                 <span class="mf">0.5</span><span class="p">]},</span>
-                                                                  <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                                                                  <span class="s1">&#39;estimator&#39;</span><span class="p">:</span> <span class="s1">&#39;sklearn.svm.LinearSVC&#39;</span><span class="p">,</span>
-                                                                  <span class="s1">&#39;multi_class&#39;</span><span class="p">:</span> <span class="s1">&#39;ovr&#39;</span><span class="p">,</span>
-                                                                  <span class="s1">&#39;penalty&#39;</span><span class="p">:</span> <span class="s1">&#39;l1&#39;</span><span class="p">,</span>
-                                                                  <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}}}}</span>
-    <span class="n">pprint</span><span class="p">(</span><span class="n">updated_hdl</span><span class="p">)</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    updated_dict: dict</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">updated_dict</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">old_dict</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">new_v</span> <span class="ow">in</span> <span class="n">additional_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">updated_dict</span><span class="p">:</span>
+            <span class="n">old_v</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">new_v</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">new_v</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">old_v</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In &#39;update_data_structure&#39;, old_v = </span><span class="si">{old_v}</span><span class="s2">, but new_v = &quot;</span>
+                                   <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{new_v}</span><span class="s2"> is not dict, cannot update.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">new_v</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_v</span><span class="p">]</span>
+                <span class="n">old_v</span> <span class="o">+=</span> <span class="n">new_v</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">old_v</span> <span class="o">=</span> <span class="n">new_v</span>
+            <span class="n">updated_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">updated_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">additional_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">updated_dict</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">updated_dict</span> <span class="o">=</span> <span class="n">update_data_structure</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)}],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}},</span>
+        <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}},</span> <span class="s2">&quot;key4&quot;</span><span class="p">:</span> <span class="s2">&quot;new_value&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">wanted</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)},</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+              <span class="s2">&quot;key4&quot;</span><span class="p">:</span> <span class="s2">&quot;new_value&quot;</span><span class="p">}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">wanted</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">updated_dict</span> <span class="o">==</span> <span class="n">wanted</span><span class="p">)</span>
 </pre></div>
 
            </div>

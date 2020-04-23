@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -401,6 +402,26 @@ typically classification target values
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="autoflow.utils.dict.update_data_structure">
+<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">update_data_structure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_dict</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">additional_dict</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a><a class="reference internal" href="../_modules/autoflow/utils/dict.html#update_data_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.update_data_structure" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update_data_structure</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">)}],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">}},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">}},</span> <span class="s2">&quot;key4&quot;</span><span class="p">:</span> <span class="s2">&quot;new_value&quot;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">{&quot;key1&quot;: &quot;b&quot;, &quot;key2&quot;: [1, True, {&quot;a&quot;, (2, )}, 1, False], &quot;key3&quot;: {&quot;a&quot;:{&quot;b&quot;:2, &quot;b&quot;:2}}, &quot;key4&quot;: &quot;new_value&quot;}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>updated_dict</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.utils.dict.update_mask_from_other_dict">
 <code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">update_mask_from_other_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">template</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">ignored_suffix</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span> <span class="o">=</span> <span class="default_value">'(choice)'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#update_mask_from_other_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.update_mask_from_other_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -485,77 +506,11 @@ typically classification target values
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-autoflow.utils.logging">
-<span id="autoflow-utils-logging-module"></span><h2>autoflow.utils.logging module<a class="headerlink" href="#module-autoflow.utils.logging" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.logging.</code><code class="sig-name descname">PickableLoggerAdapter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.critical">
-<code class="sig-name descname">critical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.critical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.critical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.debug">
-<code class="sig-name descname">debug</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.debug" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.error">
-<code class="sig-name descname">error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.error" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.exception">
-<code class="sig-name descname">exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.exception" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.info">
-<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.isEnabledFor">
-<code class="sig-name descname">isEnabledFor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.isEnabledFor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.isEnabledFor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.log">
-<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.logging.PickableLoggerAdapter.warning">
-<code class="sig-name descname">warning</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#PickableLoggerAdapter.warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.PickableLoggerAdapter.warning" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.logging.get_logger">
-<code class="sig-prename descclassname">autoflow.utils.logging.</code><code class="sig-name descname">get_logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#get_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.get_logger" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.logging.setup_logger">
-<code class="sig-prename descclassname">autoflow.utils.logging.</code><code class="sig-name descname">setup_logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">logging_config</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/logging.html#setup_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.logging.setup_logger" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="autoflow-utils-logging-module">
+<h2>autoflow.utils.logging module<a class="headerlink" href="#autoflow-utils-logging-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.utils.math">
-<span id="autoflow-utils-math-module"></span><h2>autoflow.utils.math module<a class="headerlink" href="#module-autoflow.utils.math" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="autoflow.utils.math.float_gcd">
-<code class="sig-prename descclassname">autoflow.utils.math.</code><code class="sig-name descname">float_gcd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/math.html#float_gcd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.math.float_gcd" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.math.get_int_length">
-<code class="sig-prename descclassname">autoflow.utils.math.</code><code class="sig-name descname">get_int_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/math.html#get_int_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.math.get_int_length" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="autoflow-utils-math-module">
+<h2>autoflow.utils.math module<a class="headerlink" href="#autoflow-utils-math-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-autoflow.utils.ml_task">
 <span id="autoflow-utils-ml-task-module"></span><h2>autoflow.utils.ml_task module<a class="headerlink" href="#module-autoflow.utils.ml_task" title="Permalink to this headline">¶</a></h2>
@@ -658,29 +613,8 @@ typically classification target values
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-autoflow.utils.typing">
-<span id="autoflow-utils-typing-module"></span><h2>autoflow.utils.typing module<a class="headerlink" href="#module-autoflow.utils.typing" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.utils.typing.GenericEstimator">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.typing.</code><code class="sig-name descname">GenericEstimator</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/typing.html#GenericEstimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.typing.GenericEstimator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">typing_extensions.Protocol</span></code></p>
-<dl class="py method">
-<dt id="autoflow.utils.typing.GenericEstimator.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/typing.html#GenericEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.typing.GenericEstimator.fit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.typing.GenericEstimator.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/typing.html#GenericEstimator.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.typing.GenericEstimator.predict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.utils.typing.GenericEstimator.predict_proba">
-<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/typing.html#GenericEstimator.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.typing.GenericEstimator.predict_proba" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-utils-typing-module">
+<h2>autoflow.utils.typing module<a class="headerlink" href="#autoflow-utils-typing-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-autoflow.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow.utils" title="Permalink to this headline">¶</a></h2>

@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -184,9 +185,10 @@
 <span class="kn">from</span> <span class="nn">autoflow.ensemble.vote.classifier</span> <span class="kn">import</span> <span class="n">VoteClassifier</span>
 <span class="kn">from</span> <span class="nn">autoflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
 <span class="kn">from</span> <span class="nn">autoflow.metrics</span> <span class="kn">import</span> <span class="n">Scorer</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_data_structure</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.hash</span> <span class="kn">import</span> <span class="n">get_hash_of_Xy</span><span class="p">,</span> <span class="n">get_hash_of_str</span><span class="p">,</span> <span class="n">get_hash_of_dict</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging_</span> <span class="kn">import</span> <span class="n">get_logger</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
 <span class="kn">from</span> <span class="nn">generic_fs</span> <span class="kn">import</span> <span class="n">FileSystem</span>
 <span class="kn">from</span> <span class="nn">generic_fs.utils.db</span> <span class="kn">import</span> <span class="n">get_db_class_by_db_type</span><span class="p">,</span> <span class="n">get_JSONField</span><span class="p">,</span> <span class="n">PickleField</span><span class="p">,</span> <span class="n">create_database</span>
@@ -518,7 +520,7 @@
             <span class="n">should_store_intermediate_result</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">fit_ensemble_params</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">),</span>
             <span class="n">should_finally_fit</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">additional_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">additional_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>  <span class="c1"># additional_info 应该存储在trials中</span>
             <span class="n">user</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">getuser</span><span class="p">)</span>
 
             <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
@@ -578,6 +580,7 @@
         <span class="n">resource_manager_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;resource_manager.</span><span class="si">{self.compress_suffix}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">data_manager_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">dump_pickle</span><span class="p">(</span><span class="n">copied_resource_manager</span><span class="p">,</span> <span class="n">resource_manager_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">additional_info</span> <span class="o">=</span> <span class="n">additional_info</span>
         <span class="n">experiment_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">general_experiment_timestamp</span><span class="o">=</span><span class="n">general_experiment_timestamp</span><span class="p">,</span>
             <span class="n">current_experiment_timestamp</span><span class="o">=</span><span class="n">current_experiment_timestamp</span><span class="p">,</span>
@@ -635,6 +638,8 @@
             <span class="c1"># Xy_test</span>
             <span class="n">Xy_test_hash</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">Xy_test_path</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="c1"># meta info</span>
+            <span class="n">meta_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
 
             <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
                 <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span>
@@ -642,7 +647,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">Tasks</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">Tasks</span></div>
 
-<div class="viewcode-block" id="ResourceManager.insert_to_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Scorer</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">specific_task_token</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.insert_to_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">,</span>
+                              <span class="n">metric</span><span class="p">:</span> <span class="n">Scorer</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
+                              <span class="n">specific_task_token</span><span class="p">,</span> <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
         <span class="n">Xy_train_hash</span> <span class="o">=</span> <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
         <span class="n">Xy_test_hash</span> <span class="o">=</span> <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span><span class="p">)</span>
@@ -660,6 +667,9 @@
         <span class="n">task_hash</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
         <span class="n">task_id</span> <span class="o">=</span> <span class="n">task_hash</span>
         <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)</span>
+        <span class="n">meta_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">dataset_metadata</span><span class="o">=</span><span class="n">dataset_metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">task_metadata</span>
+        <span class="p">)</span>
         <span class="c1"># ---store_task_record----------------------------------------------------</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># ---store_datasets----------------------------------------------------</span>
@@ -688,8 +698,15 @@
                 <span class="c1"># Xy_test</span>
                 <span class="n">Xy_test_hash</span><span class="o">=</span><span class="n">Xy_test_hash</span><span class="p">,</span>
                 <span class="n">Xy_test_path</span><span class="o">=</span><span class="n">Xy_test_path</span><span class="p">,</span>
-
+                <span class="n">meta_data</span><span class="o">=</span><span class="n">meta_data</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">old_meta_data</span> <span class="o">=</span> <span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">meta_data</span>
+            <span class="n">new_meta_data</span> <span class="o">=</span> <span class="n">update_data_structure</span><span class="p">(</span><span class="n">old_meta_data</span><span class="p">,</span> <span class="n">meta_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="p">(</span>
+                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+                <span class="n">meta_data</span><span class="o">=</span><span class="n">new_meta_data</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span></div>
 
 <div class="viewcode-block" id="ResourceManager.init_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -709,6 +726,7 @@
         <span class="k">class</span> <span class="nc">HDLs</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
             <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">hdl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="n">meta_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
 
             <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
                 <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span>
@@ -716,7 +734,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">HDLs</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">HDLs</span></div>
 
-<div class="viewcode-block" id="ResourceManager.insert_to_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.insert_to_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">,</span> <span class="n">hdl_metadata</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_hdls_table</span><span class="p">()</span>
         <span class="n">hdl_hash</span> <span class="o">=</span> <span class="n">get_hash_of_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
         <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_hash</span>
@@ -724,8 +742,17 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
                 <span class="n">hdl_id</span><span class="o">=</span><span class="n">hdl_id</span><span class="p">,</span>
-                <span class="n">hdl</span><span class="o">=</span><span class="n">hdl</span>
+                <span class="n">hdl</span><span class="o">=</span><span class="n">hdl</span><span class="p">,</span>
+                <span class="n">meta_data</span><span class="o">=</span><span class="n">hdl_metadata</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">old_meta_data</span> <span class="o">=</span> <span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">meta_data</span>
+            <span class="n">meta_data</span> <span class="o">=</span> <span class="n">update_data_structure</span><span class="p">(</span><span class="n">old_meta_data</span><span class="p">,</span> <span class="n">hdl_metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="p">(</span>
+                <span class="n">hdl_id</span><span class="o">=</span><span class="n">hdl_id</span><span class="p">,</span>
+                <span class="n">hdl</span><span class="o">=</span><span class="n">hdl</span><span class="p">,</span>
+                <span class="n">meta_data</span><span class="o">=</span><span class="n">meta_data</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_id</span></div>
 
 <div class="viewcode-block" id="ResourceManager.init_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -763,12 +790,14 @@
             <span class="n">y_preds</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">y_test_true</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="c1"># -------------------------------------</span>
-            <span class="n">y_test_score</span><span class="o">=</span><span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">y_test_scores</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="c1"># --理论上测试集的结果是不可知的，这两个field由用户手动填写-----</span>
+            <span class="n">y_test_score</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">y_test_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="c1"># ------------被附加的额外信息---------------</span>
+            <span class="n">additional_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
             <span class="c1"># -------------------------------------</span>
             <span class="n">smac_hyper_param</span> <span class="o">=</span> <span class="n">PickleField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">dict_hyper_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>  <span class="c1"># todo: json field</span>
+            <span class="n">dict_hyper_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
             <span class="n">cost_time</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">65535</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">)</span>
             <span class="n">failed_info</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>

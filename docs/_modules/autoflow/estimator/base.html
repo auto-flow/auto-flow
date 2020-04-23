@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -196,7 +197,7 @@
 <span class="kn">from</span> <span class="nn">autoflow.utils.config_space</span> <span class="kn">import</span> <span class="n">replace_phps</span><span class="p">,</span> <span class="n">estimate_config_space_numbers</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_mask_from_other_dict</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">instancing</span><span class="p">,</span> <span class="n">sequencing</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.logging</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">setup_logger</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.logging_</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">setup_logger</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.packages</span> <span class="kn">import</span> <span class="n">get_class_name_of_module</span>
 
 
@@ -307,11 +308,12 @@
             <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_descriptions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">dataset_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
             <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">splitter</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span>
             <span class="n">specific_task_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">additional_info</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(),</span>
+            <span class="n">dataset_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
+            <span class="n">task_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">frozendict</span><span class="p">(),</span>
             <span class="n">fit_ensemble_params</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
 
     <span class="p">):</span>
@@ -351,6 +353,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">dataset_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_metadata</span><span class="p">)</span>
         <span class="n">additional_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">additional_info</span><span class="p">)</span>
+        <span class="n">task_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
         <span class="c1"># build data_manager</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span> <span class="o">=</span> <span class="n">DataManager</span><span class="p">(</span>
             <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">column_descriptions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">highR_nan_threshold</span>
@@ -375,7 +378,8 @@
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
         <span class="c1"># get task_id, and insert record into &quot;tasks.tasks&quot; database</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">specific_task_token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
+                                                    <span class="n">specific_task_token</span><span class="p">,</span> <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_tasks_table</span><span class="p">()</span>
         <span class="c1"># store other params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">splitter</span>
@@ -393,7 +397,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">hdl</span> <span class="o">=</span> <span class="n">raw_hdl</span>
             <span class="c1"># get hdl_id, and insert record into &quot;{task_id}.hdls&quot; database</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_hdls_table</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_hdls_table</span><span class="p">(</span><span class="n">hdl</span><span class="p">,</span> <span class="n">hdl_constructor</span><span class="o">.</span><span class="n">hdl_metadata</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_hdls_table</span><span class="p">()</span>
             <span class="c1"># now we get task_id and hdl_id, we can insert current runtime information into &quot;experiments.experiments&quot; database</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_experiments_table</span><span class="p">(</span><span class="n">general_experiment_timestamp</span><span class="p">,</span>

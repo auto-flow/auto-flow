@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption"><span class="caption-text">API Document</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Estimators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#hdl-hyper-param-description-language">HDL(Hyper-param Description Language)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#data-manager">Data Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#resource-manager">Resource Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#tuner">Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#algorithm-components">Algorithm Components</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contribution</span></p>
 <ul>
@@ -226,7 +227,7 @@ And we can see  hdl_constructor is instanced by kwargs implicitly.</p>
 
 <dl class="py method">
 <dt id="autoflow.estimator.base.AutoFlowEstimator.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X_train: Union[numpy.ndarray, pandas.core.frame.DataFrame], y_train=None, X_test=None, y_test=None, column_descriptions: Optional[Dict] = None, dataset_metadata: dict = frozenset({}), metric=None, splitter=KFold(n_splits=5, random_state=42, shuffle=True), specific_task_token='', additional_info: dict = &lt;frozendict {}&gt;, fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = 'auto'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/estimator/base.html#AutoFlowEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.estimator.base.AutoFlowEstimator.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X_train: Union[numpy.ndarray, pandas.core.frame.DataFrame], y_train=None, X_test=None, y_test=None, column_descriptions: Optional[Dict] = None, metric=None, splitter=KFold(n_splits=5, random_state=42, shuffle=True), specific_task_token='', additional_info: dict = &lt;frozendict {}&gt;, dataset_metadata: dict = frozenset({}), task_metadata: dict = &lt;frozendict {}&gt;, fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = 'auto'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/estimator/base.html#AutoFlowEstimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.estimator.base.AutoFlowEstimator.fit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
