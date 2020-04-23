@@ -2,7 +2,7 @@ from typing import List, Tuple
 from numpy import ndarray
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.typing import GenericEstimator
+from autoflow.utils.typing_ import GenericEstimator
 
 
 class TrainedDataFetcher(StrSignatureMixin):

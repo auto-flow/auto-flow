@@ -15,9 +15,10 @@ from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.manager.data_manager import DataManager
 from autoflow.metrics import Scorer
+from autoflow.utils.dict import update_data_structure
 from autoflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from generic_fs import FileSystem
 from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, PickleField, create_database
@@ -349,7 +350,7 @@ class ResourceManager(StrSignatureMixin):
             should_store_intermediate_result = pw.BooleanField(default=False)
             fit_ensemble_params = pw.TextField(default="auto"),
             should_finally_fit = pw.BooleanField(default=False)
-            additional_info = self.JSONField(default={})
+            additional_info = self.JSONField(default={})  # additional_info 应该存储在trials中
             user = pw.CharField(default=getuser)
 
             class Meta:
@@ -409,6 +410,7 @@ class ResourceManager(StrSignatureMixin):
         resource_manager_path = self.file_system.join(self.experiment_dir, f"resource_manager.{self.compress_suffix}")
         self.file_system.dump_pickle(data_manager, data_manager_path)
         self.file_system.dump_pickle(copied_resource_manager, resource_manager_path)
+        self.additional_info = additional_info
         experiment_record = self.ExperimentsModel.create(
             general_experiment_timestamp=general_experiment_timestamp,
             current_experiment_timestamp=current_experiment_timestamp,
@@ -466,6 +468,8 @@ class ResourceManager(StrSignatureMixin):
             # Xy_test
             Xy_test_hash = pw.CharField(default="")
             Xy_test_path = pw.TextField(default="")
+            # meta info
+            meta_data = self.JSONField(default={})
 
             class Meta:
                 database = self.tasks_db
@@ -473,7 +477,9 @@ class ResourceManager(StrSignatureMixin):
         self.tasks_db.create_tables([Tasks])
         return Tasks
 
-    def insert_to_tasks_table(self, data_manager: DataManager, metric: Scorer, splitter, specific_task_token):
+    def insert_to_tasks_table(self, data_manager: DataManager,
+                              metric: Scorer, splitter,
+                              specific_task_token, dataset_metadata, task_metadata):
         self.init_tasks_table()
         Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
         Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
@@ -491,6 +497,9 @@ class ResourceManager(StrSignatureMixin):
         task_hash = m.hexdigest()
         task_id = task_hash
         records = self.TasksModel.select().where(self.TasksModel.task_id == task_id)
+        meta_data = dict(
+            dataset_metadata=dataset_metadata, **task_metadata
+        )
         # ---store_task_record----------------------------------------------------
         if len(records) == 0:
             # ---store_datasets----------------------------------------------------
@@ -519,8 +528,15 @@ class ResourceManager(StrSignatureMixin):
                 # Xy_test
                 Xy_test_hash=Xy_test_hash,
                 Xy_test_path=Xy_test_path,
-
+                meta_data=meta_data
             )
+        else:
+            old_meta_data = records[0].meta_data
+            new_meta_data = update_data_structure(old_meta_data, meta_data)
+            self.TasksModel(
+                task_id=task_id,
+                meta_data=new_meta_data
+            ).save()
         self.task_id = task_id
 
     def init_tasks_table(self):
@@ -540,6 +556,7 @@ class ResourceManager(StrSignatureMixin):
         class HDLs(pw.Model):
             hdl_id = pw.CharField(primary_key=True)
             hdl = self.JSONField(default={})
+            meta_data = self.JSONField(default={})
 
             class Meta:
                 database = self.hdls_db
@@ -547,7 +564,7 @@ class ResourceManager(StrSignatureMixin):
         self.hdls_db.create_tables([HDLs])
         return HDLs
 
-    def insert_to_hdls_table(self, hdl):
+    def insert_to_hdls_table(self, hdl, hdl_metadata):
         self.init_hdls_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
@@ -555,8 +572,17 @@ class ResourceManager(StrSignatureMixin):
         if len(records) == 0:
             self.HDLsModel.create(
                 hdl_id=hdl_id,
-                hdl=hdl
+                hdl=hdl,
+                meta_data=hdl_metadata
             )
+        else:
+            old_meta_data = records[0].meta_data
+            meta_data = update_data_structure(old_meta_data, hdl_metadata)
+            self.HDLsModel(
+                hdl_id=hdl_id,
+                hdl=hdl,
+                meta_data=meta_data
+            ).save()
         self.hdl_id = hdl_id
 
     def init_hdls_table(self):
@@ -594,12 +620,14 @@ class ResourceManager(StrSignatureMixin):
             y_preds = PickleField(default=0)
             y_test_true = PickleField(default=0)
             y_test_pred = PickleField(default=0)
-            # -------------------------------------
-            y_test_score=pw.FloatField(default=0)
-            y_test_scores=self.JSONField(default={})
+            # --理论上测试集的结果是不可知的，这两个field由用户手动填写-----
+            y_test_score = pw.FloatField(default=0)
+            y_test_scores = self.JSONField(default={})
+            # ------------被附加的额外信息---------------
+            additional_info = self.JSONField(default={})
             # -------------------------------------
             smac_hyper_param = PickleField(default=0)
-            dict_hyper_param = self.JSONField(default={})  # todo: json field
+            dict_hyper_param = self.JSONField(default={})
             cost_time = pw.FloatField(default=65535)
             status = pw.CharField(default="SUCCESS")
             failed_info = pw.TextField(default="")

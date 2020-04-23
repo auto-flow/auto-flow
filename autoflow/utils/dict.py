@@ -3,6 +3,9 @@ from copy import deepcopy
 from typing import Dict, Any, List, Callable
 
 from autoflow.utils.list import remove_suffix_in_list
+from autoflow.utils.logging_ import get_logger
+
+logger = get_logger(__name__)
 
 
 def add_prefix_in_dict_keys(dict_: Dict[str, Any], prefix: str) -> Dict[str, Any]:
@@ -119,51 +122,48 @@ def filter_item_by_key_condition(dict_: dict, func: Callable) -> dict:
     return result
 
 
-if __name__ == '__main__':
-    from pprint import pprint
+def update_data_structure(old_dict: dict, additional_dict: dict) -> dict:
+    '''
+    >>> update_data_structure(
+    ...     {"key1": "a", "key2": [1, True, {"a", (2, )}], "key3": {"a":1, "b":2}},
+    ...     {"key1": "b", "key2": [1, False], "key3": {"a":{"b":2}}, "key4": "new_value"}
+    ... )
+    {"key1": "b", "key2": [1, True, {"a", (2, )}, 1, False], "key3": {"a":{"b":2, "b":2}}, "key4": "new_value"}
 
-    hdl = {
-        'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {'random_state': 42}},
-                          '1lowR_nan->nan(choice)': {'impute.fill_abnormal': {'random_state': 42}},
-                          '2highR_nan->nan(choice)': {'operate.drop': {'random_state': 42}},
-                          '3all->{cat_name=cat,num_name=num}(choice)': {'operate.split.cat_num': {'random_state': 42}},
-                          '4cat->num(choice)': {'encode.label': {'random_state': 42}},
-                          '5num->num(choice)': {'<mask>': {'_select_percent': {'_type': 'quniform',
-                                                                                      '_value': [1, 100, 0.5],
-                                                                                      '_default': 80},
-                                                                  'random_state': 42}}},
-        'estimator(choice)': {'lightgbm': {"boosting_type": "<mask>"}}}
-    last_best_dhp = {'estimator': {'lightgbm': {"boosting_type": "gbdt"}},
-                     'preprocessing': {
-                         '0nan->{highR=highR_nan,lowR=lowR_nan}': {'operate.split.nan': {'random_state': 42}},
-                         '1lowR_nan->nan': {'impute.fill_abnormal': {'random_state': 42}},
-                         '2highR_nan->nan': {'operate.drop': {'random_state': 42}},
-                         '3all->{cat_name=cat,num_name=num}': {'operate.split.cat_num': {'random_state': 42}},
-                         '4cat->num': {'encode.label': {'random_state': 42}},
-                         '5num->num': {'select.from_model_clf': {'_select_percent': 80,
-                                                                 'estimator': 'sklearn.svm.LinearSVC',
-                                                                 'random_state': 42,
-                                                                 'C': 1,
-                                                                 'dual': False,
-                                                                 'multi_class': 'ovr',
-                                                                 'penalty': 'l1'}}}}
-    updated_hdl = update_mask_from_other_dict(hdl, last_best_dhp)
-    target = {'estimator(choice)': {'lightgbm': {'boosting_type': 'gbdt'}},
-              'preprocessing': {
-                  '0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {'random_state': 42}},
-                  '1lowR_nan->nan(choice)': {'impute.fill_abnormal': {'random_state': 42}},
-                  '2highR_nan->nan(choice)': {'operate.drop': {'random_state': 42}},
-                  '3all->{cat_name=cat,num_name=num}(choice)': {'operate.split.cat_num': {'random_state': 42}},
-                  '4cat->num(choice)': {'encode.label': {'random_state': 42}},
-                  '5num->num(choice)': {'select.from_model_clf': {'C': 1,
-                                                                  '_select_percent': {'_default': 80,
-                                                                                      '_type': 'quniform',
-                                                                                      '_value': [1,
-                                                                                                 100,
-                                                                                                 0.5]},
-                                                                  'dual': False,
-                                                                  'estimator': 'sklearn.svm.LinearSVC',
-                                                                  'multi_class': 'ovr',
-                                                                  'penalty': 'l1',
-                                                                  'random_state': 42}}}}
-    pprint(updated_hdl)
+    Returns
+    -------
+    updated_dict: dict
+    '''
+    updated_dict = deepcopy(old_dict)
+    for k, new_v in additional_dict.items():
+        if k in updated_dict:
+            old_v = deepcopy(updated_dict[k])
+            new_v = deepcopy(new_v)
+            if isinstance(old_v, dict):
+                if isinstance(new_v, dict):
+                    old_v.update(new_v)
+                else:
+                    logger.warning(f"In 'update_data_structure', old_v = {old_v}, but new_v = "
+                                   f"{new_v} is not dict, cannot update.")
+            elif isinstance(old_v, list):
+                if not isinstance(new_v, list):
+                    new_v = [new_v]
+                old_v += new_v
+            else:
+                old_v = new_v
+            updated_dict[k] = old_v
+        else:
+            updated_dict[k] = additional_dict[k]
+    return updated_dict
+
+
+if __name__ == '__main__':
+    updated_dict = update_data_structure(
+        {"key1": "a", "key2": [1, True, {"a", (2,)}], "key3": {"a": 1, "b": 2}},
+        {"key1": "b", "key2": [1, False], "key3": {"a": {"b": 2}}, "key4": "new_value"}
+    )
+    wanted = {"key1": "b", "key2": [1, True, {"a", (2,)}, 1, False], "key3": {"a": {"b": 2}, "b": 2},
+              "key4": "new_value"}
+    print(updated_dict)
+    print(wanted)
+    print(updated_dict == wanted)

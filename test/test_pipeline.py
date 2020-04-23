@@ -11,7 +11,7 @@ from autoflow.pipeline.components.preprocessing.impute.fill_cat import FillCat
 from autoflow.pipeline.components.preprocessing.impute.fill_num import FillNum
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 
 
 class TestPipeline(unittest.TestCase):

@@ -16,7 +16,7 @@ from autoflow.constants import PHASE2, SERIES_CONNECT_LEADER_TOKEN
 from autoflow.hdl.utils import is_hdl_bottom, get_origin_models, purify_keys, purify_key, add_leader_model
 from autoflow.utils.dict import filter_item_by_key_condition
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_name_of_module
 

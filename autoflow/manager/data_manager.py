@@ -10,7 +10,7 @@ from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array
 from autoflow.utils.dataframe import pop_if_exists
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask, get_ml_task_from_y
 
 

@@ -5,7 +5,7 @@ import sys
 import traceback
 from pathlib import Path
 
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 
 logger = get_logger(__name__)
 

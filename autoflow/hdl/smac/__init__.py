@@ -4,7 +4,7 @@ from typing import Any, List
 from ConfigSpace import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter, Constant
 
-from autoflow.utils.math import float_gcd
+from autoflow.utils.math_ import float_gcd
 
 
 def _encode(value: Any) -> str:

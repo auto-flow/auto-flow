@@ -16,7 +16,7 @@ from autoflow.manager.resource_manager import ResourceManager
 from autoflow.utils.concurrence import parse_n_jobs
 from autoflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 
 class Tuner(StrSignatureMixin):

@@ -3,14 +3,15 @@ from copy import deepcopy
 from typing import Union, Tuple, List, Any, Dict
 
 import pandas as pd
+from frozendict import frozendict
 
 from autoflow.constants import PHASE1, PHASE2, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from autoflow.utils.dict import add_prefix_in_dict_keys
 from autoflow.utils.graphviz import ColorSelector
 from autoflow.utils.klass import StrSignatureMixin
-from autoflow.utils.logging import get_logger
-from autoflow.utils.math import get_int_length
+from autoflow.utils.logging_ import get_logger
+from autoflow.utils.math_ import get_int_length
 
 
 class HDL_Constructor(StrSignatureMixin):
@@ -32,6 +33,7 @@ class HDL_Constructor(StrSignatureMixin):
             DAG_workflow: Union[str, Dict[str, Any]] = "generic_recommend",
             hdl_bank_path=None,
             hdl_bank=None,
+            hdl_metadata=frozendict(),
             included_classifiers=(
                     "adaboost", "catboost", "decision_tree", "extra_trees", "gaussian_nb", "k_nearest_neighbors",
                     "liblinear_svc", "libsvm_svc", "lightgbm", "logistic_regression", "random_forest", "sgd"),
@@ -165,7 +167,7 @@ class HDL_Constructor(StrSignatureMixin):
         {'preprocessing': {}, 'estimating(choice)': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
 
         '''
-
+        self.hdl_metadata = dict(hdl_metadata)
         self.included_lowR_cat_encoders = included_lowR_cat_encoders
         self.included_highR_cat_encoders = included_highR_cat_encoders
         self.included_num_nan_imputers = included_num_nan_imputers
@@ -368,12 +370,14 @@ class HDL_Constructor(StrSignatureMixin):
         self.random_state = random_state
         if isinstance(self.DAG_workflow, str):
             if self.DAG_workflow == "generic_recommend":
+                self.hdl_metadata.update({"source": "generic_recommend"})
                 self.logger.info("Using 'generic_recommend' method to initialize a generic DAG_workflow, \n"
                                  "to Adapt to various data such like NaN and categorical features.")
                 self.DAG_workflow = self.generic_recommend()
             else:
                 raise NotImplementedError
         elif isinstance(self.DAG_workflow, dict):
+            self.hdl_metadata.update({"source": "user_defined"})
             self.logger.info("DAG_workflow is specifically set by user.")
         else:
             raise NotImplementedError

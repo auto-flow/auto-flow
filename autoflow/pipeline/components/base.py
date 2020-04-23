@@ -13,7 +13,7 @@ from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.utils.data import densify
 from autoflow.utils.dataframe import rectify_dtypes
 from autoflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 
 
 class AutoFlowComponent(BaseEstimator):

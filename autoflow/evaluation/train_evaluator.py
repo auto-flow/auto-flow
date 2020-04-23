@@ -20,7 +20,7 @@ from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
 from autoflow.shp2dhp.shp2dhp import SHP2DHP
 from autoflow.utils.dict import group_dict_items_before_first_token
-from autoflow.utils.logging import get_logger
+from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline

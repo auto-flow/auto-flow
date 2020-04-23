@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression, ElasticNet
 
 from autoflow.ensemble.base import EnsembleEstimator
-from autoflow.utils import typing
+from autoflow.utils import typing_
 
 
 class StackEstimator(EnsembleEstimator):
@@ -33,7 +33,7 @@ class StackEstimator(EnsembleEstimator):
 
     def fit_trained_data(
             self,
-            estimators_list: List[List[typing.GenericEstimator]],  # fixme : typing是否存在局限性？
+            estimators_list: List[List[typing_.GenericEstimator]],  # fixme : typing是否存在局限性？
             y_preds_list: List[List[np.ndarray]],
             y_true_indexes_list: List[List[np.ndarray]],
             y_true: np.ndarray

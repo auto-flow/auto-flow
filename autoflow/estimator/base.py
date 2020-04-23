@@ -27,7 +27,7 @@ from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from autoflow.utils.dict import update_mask_from_other_dict
 from autoflow.utils.klass import instancing, sequencing
-from autoflow.utils.logging import get_logger, setup_logger
+from autoflow.utils.logging_ import get_logger, setup_logger
 from autoflow.utils.packages import get_class_name_of_module
 
 
@@ -138,11 +138,12 @@ class AutoFlowEstimator(BaseEstimator):
             X_test=None,
             y_test=None,
             column_descriptions: Optional[Dict] = None,
-            dataset_metadata: dict = frozenset(),
             metric=None,
             splitter=KFold(5, True, 42),
             specific_task_token="",
             additional_info: dict = frozendict(),
+            dataset_metadata: dict = frozenset(),
+            task_metadata: dict = frozendict(),
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
 
     ):
@@ -182,6 +183,7 @@ class AutoFlowEstimator(BaseEstimator):
         '''
         dataset_metadata = dict(dataset_metadata)
         additional_info = dict(additional_info)
+        task_metadata = dict(task_metadata)
         # build data_manager
         self.data_manager = DataManager(
             X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold
@@ -206,7 +208,8 @@ class AutoFlowEstimator(BaseEstimator):
                 raise NotImplementedError()
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter, specific_task_token)
+        self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter,
+                                                    specific_task_token, dataset_metadata, task_metadata)
         self.resource_manager.close_tasks_table()
         # store other params
         self.splitter = splitter
@@ -224,7 +227,7 @@ class AutoFlowEstimator(BaseEstimator):
             else:
                 hdl = raw_hdl
             # get hdl_id, and insert record into "{task_id}.hdls" database
-            self.resource_manager.insert_to_hdls_table(hdl)
+            self.resource_manager.insert_to_hdls_table(hdl, hdl_constructor.hdl_metadata)
             self.resource_manager.close_hdls_table()
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
             self.resource_manager.insert_to_experiments_table(general_experiment_timestamp,

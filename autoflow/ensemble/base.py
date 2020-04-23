@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autoflow.utils import typing
+from autoflow.utils import typing_
 
 
 class EnsembleEstimator(BaseEstimator):
@@ -21,7 +21,7 @@ class EnsembleEstimator(BaseEstimator):
 
     def fit_trained_data(
             self,
-            estimators_list: List[List[typing.GenericEstimator]],
+            estimators_list: List[List[typing_.GenericEstimator]],
             y_true_indexes_list: List[List[np.ndarray]],
             y_preds_list: List[List[np.ndarray]],
             y_true: np.ndarray
