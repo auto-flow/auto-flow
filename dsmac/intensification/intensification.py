@@ -10,6 +10,8 @@ from dsmac.configspace import Configuration
 from dsmac.optimizer.ei_optimization import ChallengerList
 from dsmac.optimizer.objective import sum_cost
 from dsmac.runhistory.runhistory import RunHistory
+from dsmac.runhistory.structure import RunKey
+from dsmac.runhistory.utils import get_id_of_config
 from dsmac.stats.stats import Stats
 from dsmac.tae.execute_ta_run import BudgetExhaustedException, CappedRunException, ExecuteTARun
 from dsmac.utils.constants import MAXINT, MAX_CUTOFF
@@ -185,7 +187,11 @@ class Intensifier(object):
             if challenger == incumbent:
                 self.logger.debug("Challenger was the same as the current incumbent; Skipping challenger")
                 continue
-
+            # fixme: 对challenger是否存在runhistory做一个判断
+            run_key = RunKey(get_id_of_config(challenger), self.instance, 0)
+            if run_key in run_history.data:
+                self.logger.debug(f"run_key = {run_key} is already existing in run_history, pass.")
+                continue
             self.logger.debug("Intensify on %s", challenger)
             if hasattr(challenger, 'origin'):
                 self.logger.debug(
@@ -201,15 +207,6 @@ class Intensifier(object):
                                                   run_history=run_history,
                                                   aggregate_func=aggregate_func,
                                                   log_traj=log_traj)
-                if self.always_race_against and \
-                        challenger == incumbent and \
-                        self.always_race_against != challenger:
-                    self.logger.debug("Race against constant configuration after incumbent change.")
-                    incumbent = self._race_challenger(challenger=self.always_race_against,
-                                                      incumbent=incumbent,
-                                                      run_history=run_history,
-                                                      aggregate_func=aggregate_func,
-                                                      log_traj=log_traj)
 
             except BudgetExhaustedException:
                 # We return incumbent, SMBO stops due to its own budget checks
@@ -223,6 +220,8 @@ class Intensifier(object):
                     self.logger.debug(
                         "Maximum #runs for intensification reached")
                     break
+                # 一般来说在这里退出。(tm - self.start_time) 表示程序运行时间, 如果大于 time_bound(1e5)说明程序进行了
+                # 运算，那么就退出。
                 if not self.use_ta_time_bound and tm - self.start_time - time_bound >= 0:
                     self.logger.debug("Wallclock time limit for intensification reached ("
                                       "used: %f sec, available: %f sec)" %
@@ -349,62 +348,42 @@ class Intensifier(object):
         inc_inst_seeds = set(run_history.get_runs_for_config(incumbent))
         # Line 9
         while True:
-            chall_inst_seeds = set(run_history.get_runs_for_config(challenger))
-
-            # Line 10
-            missing_runs = list(inc_inst_seeds - chall_inst_seeds)
-
-            # Line 11
-            self.rs.shuffle(missing_runs)
-            to_run = missing_runs[:min(N, len(missing_runs))]
-            # Line 13 (Line 12 comes below...)
-            missing_runs = missing_runs[min(N, len(missing_runs)):]
-
-            # for adaptive capping
-            # because of efficieny computed here
-            inst_seed_pairs = list(inc_inst_seeds - set(missing_runs))
             # cost used by incumbent for going over all runs in inst_seed_pairs
             inc_sum_cost = sum_cost(config=incumbent,
-                                    instance_seed_pairs=inst_seed_pairs,
+                                    instance_seed_pairs=None,
                                     run_history=run_history)
 
-            if len(to_run) == 0:
-                self.logger.debug("No further runs for challenger available")
+            cutoff = self._adapt_cutoff(challenger=challenger,
+                                        incumbent=incumbent,
+                                        run_history=run_history,
+                                        inc_sum_cost=inc_sum_cost)
+            if cutoff is not None and cutoff <= 0:
+                # no time to validate challenger
+                self.logger.debug("Stop challenger itensification due "
+                                  "to adaptive capping.")
+                # challenger performance is worse than incumbent
+                return incumbent
 
-            # Line 12
-            # Run challenger on all <config,seed> to run
-            for instance, seed in to_run:
+            if not first_run:
+                first_run = True
+                self._chall_indx += 1
 
-                cutoff = self._adapt_cutoff(challenger=challenger,
-                                            incumbent=incumbent,
-                                            run_history=run_history,
-                                            inc_sum_cost=inc_sum_cost)
-                if cutoff is not None and cutoff <= 0:
-                    # no time to validate challenger
-                    self.logger.debug("Stop challenger itensification due "
-                                      "to adaptive capping.")
-                    # challenger performance is worse than incumbent
-                    return incumbent
-
-                if not first_run:
-                    first_run = True
-                    self._chall_indx += 1
-
-                self.logger.debug("Add run of challenger")
-                try:
-                    status, cost, dur, result = self.tae_runner.start(
-                        config=challenger,
-                        instance=instance,
-                        seed=seed,
-                        cutoff=cutoff,
-                        instance_specific=self.instance_specifics.get(
-                            instance, "0"),
-                        capped=(self.cutoff is not None) and
-                               (cutoff < self.cutoff))
-                    self._num_run += 1
-                    self._ta_time += dur
-                except CappedRunException:
-                    return incumbent
+            self.logger.debug("Add run of challenger")
+            # fixme: 我删除了这里一个意义不明的for循环，并且修改了instance等传入参数
+            try:
+                status, cost, dur, result = self.tae_runner.start(
+                    config=challenger,
+                    instance=self.instance,
+                    seed=0,
+                    cutoff=cutoff,
+                    instance_specific=self.instance_specifics.get(
+                        self.instance, "0"),
+                    capped=(self.cutoff is not None) and
+                           (cutoff < self.cutoff))
+                self._num_run += 1
+                self._ta_time += dur
+            except CappedRunException:
+                return incumbent
 
             new_incumbent = self._compare_configs(
                 incumbent=incumbent, challenger=challenger,

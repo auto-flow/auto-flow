@@ -131,6 +131,16 @@ class AutoFlowEstimator(BaseEstimator):
         self.estimator = None
         self.ensemble_estimator = None
 
+    def smbo_transfer_learn(self, transfer_tasks, transfer_hdls):
+        # 调用这个函数的时候，task_id 和 hdl_id 都建立了
+        new_task_id = self.resource_manager.task_id
+        if transfer_tasks is not None:
+            for old_task_id in transfer_tasks:
+                # hdl_id使用当前的hdl_id
+                hdl_id = self.resource_manager.hdl_id
+                # 根据old_task_id + hdl_id就能定位到runhistory数据表，把数据取出来存到当前的runhistory数据表
+                self.resource_manager.migrate_runhistory(old_task_id, hdl_id, new_task_id, hdl_id)
+
     def fit(
             self,
             X_train: Union[np.ndarray, pd.DataFrame, GenericDataFrame],
@@ -141,6 +151,8 @@ class AutoFlowEstimator(BaseEstimator):
             metric=None,
             splitter=KFold(5, True, 42),
             specific_task_token="",
+            transfer_tasks: Union[List[str], str, None] = None,
+            transfer_hdls: Union[List[str], str, None] = None,
             additional_info: dict = frozendict(),
             dataset_metadata: dict = frozenset(),
             task_metadata: dict = frozendict(),
@@ -153,7 +165,7 @@ class AutoFlowEstimator(BaseEstimator):
         ----------
         X_train: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
         y_train: :class:`numpy.ndarray` or str
-        X_test: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
+        X_test: :class:`numpy.ndarray` or :class:`pandas.DataFrame` or None
         y_test: :class:`numpy.ndarray` or str or None
         column_descriptions: dict
             Description about each columns' feature_group, you can find full definition in :class:`autoflow.manager.data_manager.DataManager` .
@@ -184,6 +196,10 @@ class AutoFlowEstimator(BaseEstimator):
         dataset_metadata = dict(dataset_metadata)
         additional_info = dict(additional_info)
         task_metadata = dict(task_metadata)
+        if isinstance(transfer_tasks, str):
+            transfer_tasks = [transfer_tasks]
+        if isinstance(transfer_hdls, str):
+            transfer_hdls = [transfer_hdls]
         # build data_manager
         self.data_manager = DataManager(
             X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold
@@ -229,6 +245,8 @@ class AutoFlowEstimator(BaseEstimator):
             # get hdl_id, and insert record into "{task_id}.hdls" database
             self.resource_manager.insert_to_hdls_table(hdl, hdl_constructor.hdl_metadata)
             self.resource_manager.close_hdls_table()
+            # prepare for transfer learn. load runhistory record from old task database to new database
+            self.smbo_transfer_learn(transfer_tasks, transfer_hdls)
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
             self.resource_manager.insert_to_experiments_table(general_experiment_timestamp,
                                                               current_experiment_timestamp,

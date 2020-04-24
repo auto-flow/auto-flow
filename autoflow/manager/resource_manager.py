@@ -253,13 +253,59 @@ class ResourceManager(StrSignatureMixin):
         self.is_master = is_master
 
     # ----------runhistory------------------------------------------------------------------
+    def get_runhistory_db_params(self, task_id):
+
+        return self.update_db_params(self.get_tasks_db_name(task_id))
+
     @property
     def runhistory_db_params(self):
-        return self.update_db_params(self.tasks_db_name)
+        return self.get_runhistory_db_params(self.task_id)
+
+    def get_runhistory_table_name(self, hdl_id):
+        return f"runhistory_{hdl_id}"
 
     @property
     def runhistory_table_name(self):
-        return f"runhistory_{self.hdl_id}"
+        return self.get_runhistory_table_name(self.hdl_id)
+
+    def migrate_runhistory(self, old_task_id, old_hdl_id, new_task_id, new_hdl_id):
+        from dsmac.runhistory.runhistory_db import RunHistoryDB
+        # 1. 把 f"task_{old_task_id}".f"runhistory_{old_hdl_id}" 的所有数据records抽出来
+        old_runhistory_db = RunHistoryDB(
+            config_space=None,
+            runhistory=None,
+            db_type=self.db_type,
+            db_params=self.get_runhistory_db_params(old_task_id),
+            db_table_name=self.get_runhistory_table_name(old_hdl_id)
+        ).get_model()
+        new_runhistory_db = RunHistoryDB(
+            config_space=None,
+            runhistory=None,
+            db_type=self.db_type,
+            db_params=self.get_runhistory_db_params(new_task_id),
+            db_table_name=self.get_runhistory_table_name(new_hdl_id)
+        ).get_model()
+        old_runhistory_records = old_runhistory_db.select().dicts()
+        if len(old_runhistory_records) == 0:
+            self.logger.warning(f"SMBO Transfer learning warning: old_runhistory_db have no records!")
+        else:
+            self.logger.info(f"SMBO Transfer learning will migrate {len(old_runhistory_records)} "
+                             f"records from old_runhistory_records.")
+            transfer_cnt = 0
+            for record in old_runhistory_records:
+                fetched = new_runhistory_db.select().where(new_runhistory_db.run_id == record["run_id"])
+                if len(fetched) == 0:
+                    transfer_cnt += 1
+                    new_runhistory_db.create(**record)
+                else:
+                    self.logger.warning(f'''run_id '{record["run_id"]}' in new_runhistory_db is already exist.''')
+            if transfer_cnt:
+                self.logger.info(
+                    f"SMBO Transfer learning successfully migrate {transfer_cnt} records to new_runhistory_db.")
+            else:
+                self.logger.warning(
+                    f"Unfortunately, all the migrates failed, "
+                    f"please check if you have done SMBO transfer learning in previous tasks.")
 
     # ----------database name------------------------------------------------------------------
 
@@ -271,16 +317,20 @@ class ResourceManager(StrSignatureMixin):
         create_database(self._meta_records_db_name, self.db_type, self.db_params)
         return self._meta_records_db_name
 
+    def get_tasks_db_name(self, task_id):
+        return f"task_{task_id}"
+
     @property
     def tasks_db_name(self):
         if self._tasks_db_name is not None:
             return self._tasks_db_name
-        self._tasks_db_name = f"task_{self.task_id}"
+        self._tasks_db_name = self.get_tasks_db_name(self.task_id)
         create_database(self._tasks_db_name, self.db_type, self.db_params)
         return self._tasks_db_name
 
     # ----------redis------------------------------------------------------------------
 
+    # todo: 重构redis并增加测试与样例
     def connect_redis(self):
         if self.is_init_redis:
             return True
@@ -391,7 +441,8 @@ class ResourceManager(StrSignatureMixin):
             should_store_intermediate_result,
             fit_ensemble_params,
             additional_info,
-            should_finally_fit
+            should_finally_fit,
+            set_id=True
     ):
         self.close_all()
         copied_resource_manager = deepcopy(self)
@@ -439,7 +490,8 @@ class ResourceManager(StrSignatureMixin):
         fetched_experiment_id = experiment_record.experiment_id
         if fetched_experiment_id != experiment_id:
             self.logger.warning("fetched_experiment_id != experiment_id")
-        self.experiment_id = experiment_id
+        if set_id:
+            self.experiment_id = experiment_id
 
     def init_experiments_table(self):
         if self.is_init_experiments_db:
@@ -479,7 +531,8 @@ class ResourceManager(StrSignatureMixin):
 
     def insert_to_tasks_table(self, data_manager: DataManager,
                               metric: Scorer, splitter,
-                              specific_task_token, dataset_metadata, task_metadata):
+                              specific_task_token, dataset_metadata,
+                              task_metadata, set_id=True):
         self.init_tasks_table()
         Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
         Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
@@ -537,7 +590,8 @@ class ResourceManager(StrSignatureMixin):
                 task_id=task_id,
                 meta_data=new_meta_data
             ).save()
-        self.task_id = task_id
+        if set_id:
+            self.task_id = task_id
 
     def init_tasks_table(self):
         if self.is_init_tasks_db:
@@ -564,7 +618,7 @@ class ResourceManager(StrSignatureMixin):
         self.hdls_db.create_tables([HDLs])
         return HDLs
 
-    def insert_to_hdls_table(self, hdl, hdl_metadata):
+    def insert_to_hdls_table(self, hdl, hdl_metadata, set_id=True):
         self.init_hdls_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
@@ -583,7 +637,8 @@ class ResourceManager(StrSignatureMixin):
                 hdl=hdl,
                 meta_data=meta_data
             ).save()
-        self.hdl_id = hdl_id
+        if set_id:
+            self.hdl_id = hdl_id
 
     def init_hdls_table(self):
         if self.is_init_hdls_db:

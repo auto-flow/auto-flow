@@ -162,16 +162,17 @@ class SMBO(object):
             self.incumbent = self.scenario.cs.get_default_configuration()
 
     def start_(self):
+        self.instance_id=self.intensifier.instance
         self.runhistory.db.fetch_new_runhistory(True)
-        all_configs = self.runhistory.get_all_configs()
-        self.incumbent = self.runhistory.get_incumbent()
+        self.incumbent = self.runhistory.get_incumbent(self.instance_id)
         self.start(self.incumbent)
 
     def run_(self):
+        self.instance_id = self.intensifier.instance
         start_time = time.time()
         self.runhistory.db.fetch_new_runhistory(False)
-        # todo: 做一个信息提示？
-        self.incumbent = self.runhistory.get_incumbent()
+        # todo: 做一个信息提示？如果从其他进程的搜索数据中找到了更好的结果
+        self.incumbent = self.runhistory.get_incumbent(self.instance_id)
         X, Y = self.rh2EPM.transform(self.runhistory)
 
         self.logger.debug("Search for next configuration")
@@ -210,7 +211,8 @@ class SMBO(object):
             The best found configuration
         """
         self.runhistory.db.fetch_new_runhistory(True)
-        self.incumbent = self.runhistory.get_incumbent()
+        self.instance_id=self.intensifier.instance
+        self.incumbent = self.runhistory.get_incumbent(self.instance_id)
         self.start(self.incumbent)
 
         # Main BO loop
@@ -305,14 +307,17 @@ class SMBO(object):
                 raise ValueError("Runhistory is empty and the cost value of "
                                  "the incumbent is unknown.")
             incumbent_value = self._get_incumbent_value()
-
-        self.acquisition_func.update(model=self.model, eta=incumbent_value, num_data=len(self.runhistory.data))
-
+        # dsmac.optimizer.acquisition.LogEI
+        self.acquisition_func.update(model=self.model,
+                                     eta=incumbent_value, num_data=len(self.runhistory.data))
+        # dsmac.optimizer.ei_optimization.InterleavedLocalAndRandomSearch
         challengers = self.acq_optimizer.maximize(
             runhistory=self.runhistory,
             stats=self.stats,
-            num_points=self.scenario.acq_opt_challengers,
-            random_configuration_chooser=self.random_configuration_chooser
+            num_points=self.scenario.acq_opt_challengers, # 10000
+            random_configuration_chooser=self.random_configuration_chooser,
+            instance_id=self.instance_id
+            # dsmac.optimizer.random_configuration_chooser.ChooserProb
         )
         return challengers
 
