@@ -169,11 +169,18 @@ class ResourceManager(StrSignatureMixin):
             estimated_id = 1
         return estimated_id
 
-    def persistent_evaluated_model(self, info: Dict, model_id) -> Tuple[str, str, str]:
+    def persistent_evaluated_model(self, info: Dict, model_id) -> Tuple[str, str, str, str]:
+        y_info = {
+            "y_true_indexes": info.get("y_true_indexes"),
+            "y_preds": info.get("y_preds"),
+            "y_test_pred": info.get("y_test_pred")
+        }
+        # ----dir---------------------
         self.trial_dir = self.file_system.join(self.parent_trials_dir, self.task_id, self.hdl_id)
         self.file_system.mkdir(self.trial_dir)
         # ----get specific URL---------
-        model_path = self.file_system.join(self.trial_dir, f"{model_id}.{self.compress_suffix}")
+        models_path = self.file_system.join(self.trial_dir, f"{model_id}_models.{self.compress_suffix}")
+        y_info_path = self.file_system.join(self.trial_dir, f"{model_id}_y-info.{self.compress_suffix}")
         if info["intermediate_result"] is not None:
             intermediate_result_path = self.file_system.join(self.trial_dir,
                                                              f"{model_id}_inter-res.{self.compress_suffix}")
@@ -185,17 +192,17 @@ class ResourceManager(StrSignatureMixin):
         else:
             finally_fit_model_path = ""
         # ----do dump---------------
-        self.file_system.dump_pickle(info["models"], model_path)
+        self.file_system.dump_pickle(info["models"], models_path)
+        self.file_system.dump_pickle(y_info, y_info_path)
         if intermediate_result_path:
             self.file_system.dump_pickle(info["intermediate_result"], intermediate_result_path)
         if finally_fit_model_path:
             self.file_system.dump_pickle(info["finally_fit_model"], finally_fit_model_path)
         # ----return----------------
-        return model_path, intermediate_result_path, finally_fit_model_path
+        return models_path, intermediate_result_path, finally_fit_model_path, y_info_path
 
-    def get_ensemble_needed_info(self, task_id, hdl_id) -> Tuple[MLTask, Any, Any]:
+    def get_ensemble_needed_info(self, task_id) -> Tuple[MLTask, Any, Any]:
         self.task_id = task_id
-        self.hdl_id = hdl_id
         self.init_tasks_table()
         task_record = self.TasksModel.select().where(self.TasksModel.task_id == task_id)[0]
         ml_task_str = task_record.ml_task
@@ -245,8 +252,9 @@ class ResourceManager(StrSignatureMixin):
             else:
                 estimator_list.append(self.file_system.load_pickle(record.models_path))
             if exists:
-                y_true_indexes_list.append(record.y_true_indexes)
-                y_preds_list.append(record.y_preds)
+                y_info = self.file_system.load_pickle(record.y_info_path)
+                y_true_indexes_list.append(y_info["y_true_indexes"])
+                y_preds_list.append(y_info["y_preds"])
         return estimator_list, y_true_indexes_list, y_preds_list
 
     def set_is_master(self, is_master):
@@ -400,7 +408,7 @@ class ResourceManager(StrSignatureMixin):
             should_store_intermediate_result = pw.BooleanField(default=False)
             fit_ensemble_params = pw.TextField(default="auto"),
             should_finally_fit = pw.BooleanField(default=False)
-            additional_info = self.JSONField(default={})  # additional_info 应该存储在trials中
+            additional_info = self.JSONField(default={})  # trials与experiments同时存储
             user = pw.CharField(default=getuser)
 
             class Meta:
@@ -664,20 +672,14 @@ class ResourceManager(StrSignatureMixin):
             estimator = pw.CharField(default="")
             loss = pw.FloatField(default=65535)
             losses = self.JSONField(default=[])
-            test_loss = self.JSONField(default=[])
+            test_loss = self.JSONField(default=[])  # 测试集
             all_score = self.JSONField(default={})
             all_scores = self.JSONField(default=[])
-            test_all_score = self.JSONField(default={})
+            test_all_score = self.JSONField(default={})  # 测试集
             models_path = pw.TextField(default="")
             final_model_path = pw.TextField(default="")
             # 都是将python对象进行序列化存储，是否合适？
-            y_true_indexes = PickleField(default=0)
-            y_preds = PickleField(default=0)
-            y_test_true = PickleField(default=0)
-            y_test_pred = PickleField(default=0)
-            # --理论上测试集的结果是不可知的，这两个field由用户手动填写-----
-            y_test_score = pw.FloatField(default=0)
-            y_test_scores = self.JSONField(default={})
+            y_info_path = pw.TextField(default="")
             # ------------被附加的额外信息---------------
             additional_info = self.JSONField(default={})
             # -------------------------------------
@@ -713,8 +715,9 @@ class ResourceManager(StrSignatureMixin):
     def insert_to_trials_table(self, info: Dict):
         self.init_trials_table()
         config_id = info.get("config_id")
-        # todo: 考虑更特殊的情况，不同的任务下，相同的配置
-        models_path, intermediate_result_path, finally_fit_model_path = \
+        # 这个变量还是很有必要的，因为可能用户指定的切分器每次切的数据不一样
+
+        models_path, intermediate_result_path, finally_fit_model_path, y_info_path = \
             self.persistent_evaluated_model(info, config_id)
 
         self.TrialsModel.create(
@@ -731,10 +734,8 @@ class ResourceManager(StrSignatureMixin):
             test_all_score=info.get("test_all_score", {}),
             models_path=models_path,
             final_model_path=finally_fit_model_path,
-            y_true_indexes=info.get("y_true_indexes"),
-            y_preds=info.get("y_preds"),
-            y_test_true=info.get("y_test_true"),
-            y_test_pred=info.get("y_test_pred"),
+            y_info_path=y_info_path,
+            additional_info=self.additional_info,
             smac_hyper_param=info.get("program_hyper_param"),
             dict_hyper_param=info.get("dict_hyper_param", {}),
             cost_time=info.get("cost_time", 65535),

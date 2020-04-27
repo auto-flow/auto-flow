@@ -27,12 +27,13 @@ class AutoFlowComponent(BaseEstimator):
     suspend_other_processes = False
     is_fit = False
 
-    def __init__(self):
+    def __init__(self,**kwargs):
         self.resource_manager = None
         self.estimator = None
         self.in_feature_groups = None
         self.out_feature_groups = None
-        self.hyperparams = {}
+        self.hyperparams = kwargs
+        self.set_addition_info(kwargs)
         self.logger = get_logger(self)
 
     def _get_param_names(cls):
@@ -209,10 +210,7 @@ class AutoFlowComponent(BaseEstimator):
         for key, value in dict_.items():
             setattr(self, key, value)
 
-    def update_hyperparams(self, hp: dict):
-        '''set default hyperparameters in init'''
-        self.hyperparams.update(hp)
-        self.set_addition_info(hp)
+
 
     def get_estimator(self):
         return self.estimator

@@ -10,7 +10,7 @@ from dsmac.facade.smac_hpo_facade import SMAC4HPO
 from dsmac.scenario.scenario import Scenario
 from autoflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from autoflow.evaluation.train_evaluator import TrainEvaluator
-from autoflow.hdl2shps.hdl2shps import HDL2SHPS
+from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.utils.concurrence import parse_n_jobs

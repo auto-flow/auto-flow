@@ -410,13 +410,15 @@ class AutoFlowEstimator(BaseEstimator):
         trial_ids = trials_fetcher.fetch()
         estimator_list, y_true_indexes_list, y_preds_list = TrainedDataFetcher(
             task_id, hdl_id, trial_ids, self.resource_manager).fetch()
-        ml_task, Xy_train, Xy_test = self.resource_manager.get_ensemble_needed_info(task_id, hdl_id)
+        # todo: 在这里，只取了验证集的数据，没有取测试集的数据。待拓展
+        ml_task, Xy_train, Xy_test = self.resource_manager.get_ensemble_needed_info(task_id)
         y_true = Xy_train[1]
         ensemble_estimator_package_name = f"autoflow.ensemble.{ensemble_type}.{ml_task.role}"
         ensemble_estimator_package = import_module(ensemble_estimator_package_name)
         ensemble_estimator_class_name = get_class_name_of_module(ensemble_estimator_package_name)
         ensemble_estimator_class = getattr(ensemble_estimator_package, ensemble_estimator_class_name)
         ensemble_estimator: EnsembleEstimator = ensemble_estimator_class(**ensemble_params)
+        # todo: 集成学习部分，存在无法处理K折验证以外问题的情况（不完整的y_pred）
         ensemble_estimator.fit_trained_data(estimator_list, y_true_indexes_list, y_preds_list, y_true)
         self.ensemble_estimator = ensemble_estimator
         if return_Xy_test:

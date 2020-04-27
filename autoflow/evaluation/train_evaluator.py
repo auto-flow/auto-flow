@@ -18,7 +18,7 @@ from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
-from autoflow.shp2dhp.shp2dhp import SHP2DHP
+from autoflow.hdl.shp2dhp import SHP2DHP
 from autoflow.utils.dict import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
@@ -203,7 +203,7 @@ class TrainEvaluator(BaseEvaluator):
                 info.update({
                     "test_loss": test_loss,
                     "test_all_score": test_all_score,
-                    "y_test_true": y_test,
+                    # "y_test_true": y_test,
                     "y_test_pred": y_test_pred
                 })
         info["warning_info"] = warning_info.getvalue()
@@ -235,6 +235,7 @@ class TrainEvaluator(BaseEvaluator):
     def shp2model(self, shp):
         shp2dhp = SHP2DHP()
         dhp = shp2dhp(shp)
+        # todo : 引入一个参数，描述运行模式。一共有3种模式：普通，深度学习，大数据。对以下三个翻译的步骤进行重构
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
@@ -298,9 +299,8 @@ class TrainEvaluator(BaseEvaluator):
 
     def _create_component(self, key1, key2, params):
         cls = get_class_object_in_pipeline_components(key1, key2)
-        component = cls()
+        component = cls(**params)
         # component.set_addition_info(self.addition_info)
-        component.update_hyperparams(params)
         return component
 
     def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feature_groups="all", out_feature_groups="all",
@@ -325,11 +325,13 @@ class TrainEvaluator(BaseEvaluator):
                 preprocessor
             ])
         key1 = PHASE1 if phase == PHASE1 else self.ml_task.mainTask
-        component = self._create_component(key1, packages[-1], grouped_params[packages[-1]])
+        hyperparams = grouped_params[packages[-1]]
+        if outsideEdge_info:
+            hyperparams.update(outsideEdge_info)
+        component = self._create_component(key1, packages[-1], hyperparams)
         component.in_feature_groups = in_feature_groups
         component.out_feature_groups = out_feature_groups
-        if outsideEdge_info:
-            component.update_hyperparams(outsideEdge_info)
+
         pipeline_list.append([
             step_name,
             component

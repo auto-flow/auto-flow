@@ -27,7 +27,7 @@ column_descriptions = {
 # if not os.path.exists("autoflow_classification.bz2"):
 trained_pipeline.fit(
     X_train=train_df, X_test=test_df, column_descriptions=column_descriptions,
-    splitter=KFold(n_splits=3, shuffle=True, random_state=42), fit_ensemble_params=False
+    splitter=KFold(n_splits=3, shuffle=True, random_state=42)
 )
 joblib.dump(trained_pipeline, "autoflow_classification.bz2")
 predict_pipeline = joblib.load("autoflow_classification.bz2")
