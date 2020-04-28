@@ -1,7 +1,8 @@
 from autoflow.pipeline.components.base import AutoFlowComponent
+from sklearn.base import RegressorMixin
 
 
-class AutoFlowRegressionAlgorithm(AutoFlowComponent):
+class AutoFlowRegressionAlgorithm(AutoFlowComponent, RegressorMixin):
     """Provide an abstract interface for regression algorithms in
     auto-sklearn.
 

@@ -13,12 +13,12 @@ from ConfigSpace import Configuration
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
+from autoflow.hdl.shp2dhp import SHP2DHP
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
-from autoflow.hdl.shp2dhp import SHP2DHP
 from autoflow.utils.dict import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
@@ -42,8 +42,10 @@ class TrainEvaluator(BaseEvaluator):
             splitter,
             should_store_intermediate_result: bool,
             resource_manager: ResourceManager,
-            should_finally_fit: bool
+            should_finally_fit: bool,
+            model_registry: dict
     ):
+        self.model_registry = model_registry
         self.random_state = random_state
         if hasattr(splitter, "random_state"):
             setattr(splitter, "random_state", self.random_state)
@@ -226,10 +228,13 @@ class TrainEvaluator(BaseEvaluator):
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["estimator"] = estimator
         info["cost_time"] = cost_time
+        info["additional_info"] = {
+            "config_origin": getattr(shp, "origin", "unk")
+        }
         self.resource_manager.insert_to_trials_table(info)
         return {
             "loss": info["loss"],
-            "status": info["status"]
+            "status": info["status"],
         }
 
     def shp2model(self, shp):
@@ -298,7 +303,10 @@ class TrainEvaluator(BaseEvaluator):
         return GenericPipeline(self.create_component(dhp[PHASE2], PHASE2, self.ml_task.role))
 
     def _create_component(self, key1, key2, params):
-        cls = get_class_object_in_pipeline_components(key1, key2)
+        if key2 in self.model_registry:
+            cls = self.model_registry[key2]
+        else:
+            cls = get_class_object_in_pipeline_components(key1, key2)
         component = cls(**params)
         # component.set_addition_info(self.addition_info)
         return component

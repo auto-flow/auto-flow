@@ -40,9 +40,12 @@ class HDL2SHPS(StrSignatureMixin):
         for model in models:
             module_path = f"autoflow.pipeline.components.{self.ml_task.mainTask}.{model}"
             _class = get_class_name_of_module(module_path)
-            M = import_module(module_path)
-            cls = getattr(M, _class)
-            is_hit = getattr(cls, rely_model, False)
+            if _class is not None:
+                M = import_module(module_path)
+                cls = getattr(M, _class)
+                is_hit = getattr(cls, rely_model, False)
+            else:
+                is_hit = False
             if not is_hit:
                 forbid_in_value.append(model)
             else:

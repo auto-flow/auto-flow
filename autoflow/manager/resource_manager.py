@@ -215,7 +215,6 @@ class ResourceManager(StrSignatureMixin):
         return ml_task, Xy_train, Xy_test
 
     def load_best_estimator(self, ml_task: MLTask):
-        # todo: 最后调用分析程序？
         self.init_trials_table()
         record = self.TrialsModel.select() \
             .order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
@@ -592,12 +591,11 @@ class ResourceManager(StrSignatureMixin):
                 meta_data=meta_data
             )
         else:
-            old_meta_data = records[0].meta_data
+            record = records[0]
+            old_meta_data = record.meta_data
             new_meta_data = update_data_structure(old_meta_data, meta_data)
-            self.TasksModel(
-                task_id=task_id,
-                meta_data=new_meta_data
-            ).save()
+            record.meta_data = new_meta_data
+            record.save()
         if set_id:
             self.task_id = task_id
 
@@ -638,13 +636,11 @@ class ResourceManager(StrSignatureMixin):
                 meta_data=hdl_metadata
             )
         else:
-            old_meta_data = records[0].meta_data
-            meta_data = update_data_structure(old_meta_data, hdl_metadata)
-            self.HDLsModel(
-                hdl_id=hdl_id,
-                hdl=hdl,
-                meta_data=meta_data
-            ).save()
+            record = records[0]
+            old_meta_data = record.meta_data
+            new_meta_data = update_data_structure(old_meta_data, hdl_metadata)
+            record.meta_data = new_meta_data
+            record.save()
         if set_id:
             self.hdl_id = hdl_id
 
@@ -719,7 +715,8 @@ class ResourceManager(StrSignatureMixin):
 
         models_path, intermediate_result_path, finally_fit_model_path, y_info_path = \
             self.persistent_evaluated_model(info, config_id)
-
+        additional_info = deepcopy(self.additional_info)
+        additional_info.update(info["additional_info"])
         self.TrialsModel.create(
             config_id=config_id,
             task_id=self.task_id,
@@ -735,7 +732,7 @@ class ResourceManager(StrSignatureMixin):
             models_path=models_path,
             final_model_path=finally_fit_model_path,
             y_info_path=y_info_path,
-            additional_info=self.additional_info,
+            additional_info=additional_info,
             smac_hyper_param=info.get("program_hyper_param"),
             dict_hyper_param=info.get("dict_hyper_param", {}),
             cost_time=info.get("cost_time", 65535),

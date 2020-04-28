@@ -1,4 +1,5 @@
 import datetime
+import inspect
 import math
 import multiprocessing
 import os
@@ -39,6 +40,7 @@ class AutoFlowEstimator(BaseEstimator):
             tuner: Union[Tuner, List[Tuner], None, dict] = None,
             hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
+            model_registry=None,
             random_state=42,
             log_file: str = None,
             log_config: Optional[dict] = None,
@@ -102,13 +104,18 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        if model_registry is None:
+            model_registry = {}
+        assert isinstance(model_registry, dict)
+        for key, value in model_registry.items():
+            assert inspect.isclass(value)
+        self.model_registry = model_registry
         self.should_finally_fit = should_finally_fit
         self.should_store_intermediate_result = should_store_intermediate_result
         self.should_calc_all_metrics = should_calc_all_metrics
         self.log_config = log_config
         self.highR_nan_threshold = highR_nan_threshold
         self.highR_cat_threshold = highR_cat_threshold
-
         # ---logger------------------------------------
         self.log_file = log_file
         setup_logger(self.log_file, self.log_config)
@@ -374,7 +381,8 @@ class AutoFlowEstimator(BaseEstimator):
                 splitter=self.splitter,
                 should_store_intermediate_result=self.should_store_intermediate_result,
                 resource_manager=resource_manager,
-                should_finally_fit=self.should_finally_fit
+                should_finally_fit=self.should_finally_fit,
+                model_registry=self.model_registry
             ),
             instance_id=resource_manager.task_id,
             rh_db_type=resource_manager.db_type,

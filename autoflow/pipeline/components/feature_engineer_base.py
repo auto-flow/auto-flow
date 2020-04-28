@@ -4,9 +4,10 @@ from autoflow.pipeline.components.base import AutoFlowComponent
 from autoflow.pipeline.components.utils import stack_Xs
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.utils.data import densify
+from sklearn.base import TransformerMixin
 
 
-class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent):
+class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
     need_y = False
 
     def fit_transform(self, X_train=None, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None,

@@ -1,11 +1,12 @@
+from sklearn.base import ClassifierMixin
 from sklearn.multiclass import OneVsRestClassifier
 
 from autoflow.pipeline.components.base import AutoFlowComponent
-from autoflow.utils.data import softmax, densify
+from autoflow.utils.data import softmax
 from autoflow.utils.ml_task import get_ml_task_from_y
 
 
-class AutoFlowClassificationAlgorithm(AutoFlowComponent):
+class AutoFlowClassificationAlgorithm(AutoFlowComponent, ClassifierMixin):
     """Provide an abstract interface for classification algorithms in
     auto-sklearn.
 
@@ -42,7 +43,3 @@ class AutoFlowClassificationAlgorithm(AutoFlowComponent):
             else:
                 raise NotImplementedError()
         return self.estimator.predict_proba(self.before_pred_X(X))
-
-    def score(self, X, y):
-        X = densify(X)
-        return self.estimator.score(X, y)

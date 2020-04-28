@@ -8,7 +8,10 @@ from importlib import import_module
 
 def get_class_name_of_module(input_module):
     if isinstance(input_module,str):
-        _module=import_module(input_module)
+        try:
+            _module=import_module(input_module)
+        except:
+            return None
     else:
         _module=input_module
     if hasattr(_module,"__all__"):
