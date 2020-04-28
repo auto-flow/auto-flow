@@ -32,3 +32,4 @@ hdfs==2.5.8
 redis
 imbalanced-learn
 psycopg2
+skimpute
