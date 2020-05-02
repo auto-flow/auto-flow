@@ -5,7 +5,7 @@ from sklearn.model_selection import ShuffleSplit
 
 from autoflow.estimator.base import AutoFlowEstimator
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.tuner.tuner import Tuner
+from autoflow.tuner import Tuner
 
 digits = load_digits()
 data = digits.data

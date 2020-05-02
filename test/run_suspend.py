@@ -2,7 +2,7 @@ import pandas as pd
 
 from autoflow.estimator.base import AutoFlowEstimator
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.tuner.tuner import Tuner
+from autoflow.tuner import Tuner
 
 df = pd.read_csv("../data/QSAR.csv")
 

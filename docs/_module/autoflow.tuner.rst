@@ -4,10 +4,10 @@ autoflow.tuner package
 Submodules
 ----------
 
-autoflow.tuner.tuner module
+autoflow.tuner module
 ---------------------------
 
-.. automodule:: autoflow.tuner.tuner
+.. automodule:: autoflow.tuner
    :members:
    :undoc-members:
    :show-inheritance:

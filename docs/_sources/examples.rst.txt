@@ -161,7 +161,7 @@ we can reduce time complexity to :math:`O({A} + {B})` .
 This is a very simple greedy thought, but it is very powerful and make sense if there is little correlation between each variable.
 
 In AutoFlow, we support such search method by ``phased search``, you should define a list of :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` and a list of
-:class:`autoflow.tuner.tuner.Tuner`, and AutoFlow will run each ``hdl_constructor`` and ``tuner`` .
+:class:`autoflow.tuner.Tuner`, and AutoFlow will run each ``hdl_constructor`` and ``tuner`` .
 After finish one of phases, the best configuration will be extracted, and passing the intersted super parameter into the next ``HDL`` to cover ``placeholder``.
 
 Back to ``feature selection`` example, there are almost two kinds of hyper-parameters: ``feature selection algorithm`` and
@@ -212,7 +212,7 @@ In second step, we should choose the best ``feature selection algorithm`` search
 
     from autoflow.estimator.base import AutoFlowEstimator
     from autoflow.hdl.hdl_constructor import HDL_Constructor
-    from autoflow.tuner.tuner import Tuner
+    from autoflow.tuner import Tuner
 
     df_train = pd.read_csv("./data/train_classification.csv")
 

@@ -35,7 +35,7 @@ Resource Manager
 Tuner
 =================
 
-.. autoclass:: autoflow.tuner.tuner.Tuner
+.. autoclass:: autoflow.tuner.Tuner
     :members:
 
 

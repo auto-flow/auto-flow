@@ -321,7 +321,7 @@ time complexity is <span class="math notranslate nohighlight">\({O}({A}\times{B}
 we can reduce time complexity to <span class="math notranslate nohighlight">\(O({A} + {B})\)</span> .</p>
 <p>This is a very simple greedy thought, but it is very powerful and make sense if there is little correlation between each variable.</p>
 <p>In AutoFlow, we support such search method by <code class="docutils literal notranslate"><span class="pre">phased</span> <span class="pre">search</span></code>, you should define a list of <a class="reference internal" href="api.html#autoflow.hdl.hdl_constructor.HDL_Constructor" title="autoflow.hdl.hdl_constructor.HDL_Constructor"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.hdl.hdl_constructor.HDL_Constructor</span></code></a> and a list of
-<a class="reference internal" href="api.html#autoflow.tuner.tuner.Tuner" title="autoflow.tuner.tuner.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.tuner.tuner.Tuner</span></code></a>, and AutoFlow will run each <code class="docutils literal notranslate"><span class="pre">hdl_constructor</span></code> and <code class="docutils literal notranslate"><span class="pre">tuner</span></code> .
+<a class="reference internal" href="api.html#autoflow.tuner.Tuner" title="autoflow.tuner.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.tuner.Tuner</span></code></a>, and AutoFlow will run each <code class="docutils literal notranslate"><span class="pre">hdl_constructor</span></code> and <code class="docutils literal notranslate"><span class="pre">tuner</span></code> .
 After finish one of phases, the best configuration will be extracted, and passing the intersted super parameter into the next <code class="docutils literal notranslate"><span class="pre">HDL</span></code> to cover <code class="docutils literal notranslate"><span class="pre">placeholder</span></code>.</p>
 <p>Back to <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span></code> example, there are almost two kinds of hyper-parameters: <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">algorithm</span></code> and
 <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">selection</span> <span class="pre">ratio</span></code>.</p>
@@ -360,7 +360,7 @@ After finish one of phases, the best configuration will be extracted, and passin
 
 <span class="kn">from</span> <span class="nn">autoflow.estimator.base</span> <span class="kn">import</span> <span class="n">AutoFlowEstimator</span>
 <span class="kn">from</span> <span class="nn">autoflow.hdl.hdl_constructor</span> <span class="kn">import</span> <span class="n">HDL_Constructor</span>
-<span class="kn">from</span> <span class="nn">autoflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span> <span class="nn">autoflow.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
 
 <span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/train_classification.csv&quot;</span><span class="p">)</span>
 

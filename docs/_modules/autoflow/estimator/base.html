@@ -192,7 +192,7 @@
 <span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
 <span class="kn">from</span> <span class="nn">autoflow.metrics</span> <span class="kn">import</span> <span class="n">r2</span><span class="p">,</span> <span class="n">accuracy</span>
 <span class="kn">from</span> <span class="nn">autoflow.pipeline.dataframe</span> <span class="kn">import</span> <span class="n">GenericDataFrame</span>
-<span class="kn">from</span> <span class="nn">autoflow.tuner.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span> <span class="nn">autoflow.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">get_chunks</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.config_space</span> <span class="kn">import</span> <span class="n">replace_phps</span><span class="p">,</span> <span class="n">estimate_config_space_numbers</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.dict</span> <span class="kn">import</span> <span class="n">update_mask_from_other_dict</span>
@@ -222,7 +222,7 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        tuner: :class:`autoflow.tuner.tuner.Tuner` or None</span>
+<span class="sd">        tuner: :class:`autoflow.tuner.Tuner` or None</span>
 <span class="sd">            ``Tuner`` if class who agent an abstract search process.</span>
 
 <span class="sd">        hdl_constructor: :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or None</span>

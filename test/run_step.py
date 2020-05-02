@@ -6,7 +6,7 @@ from sklearn.model_selection import ShuffleSplit
 import autoflow
 from autoflow.estimator.base import AutoFlowEstimator
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.tuner.tuner import Tuner
+from autoflow.tuner import Tuner
 
 
 examples_path = Path(autoflow.__file__).parent.parent / "examples"

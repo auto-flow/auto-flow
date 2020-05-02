@@ -23,7 +23,7 @@ from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import r2, accuracy
 from autoflow.pipeline.dataframe import GenericDataFrame
-from autoflow.tuner.tuner import Tuner
+from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import replace_phps, estimate_config_space_numbers
 from autoflow.utils.dict import update_mask_from_other_dict
@@ -55,7 +55,7 @@ class AutoFlowEstimator(BaseEstimator):
         '''
         Parameters
         ----------
-        tuner: :class:`autoflow.tuner.tuner.Tuner` or None
+        tuner: :class:`autoflow.tuner.Tuner` or None
             ``Tuner`` if class who agent an abstract search process.
 
         hdl_constructor: :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or None

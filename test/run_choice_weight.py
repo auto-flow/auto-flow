@@ -3,7 +3,7 @@ from sklearn.model_selection import ShuffleSplit
 
 from autoflow.estimator.base import AutoFlowEstimator
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.tuner.tuner import Tuner
+from autoflow.tuner import Tuner
 
 df = pd.read_csv("../examples/classification/train_classification.csv")
 ss = ShuffleSplit(n_splits=1, random_state=0, test_size=0.25)
