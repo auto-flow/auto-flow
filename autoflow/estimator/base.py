@@ -46,6 +46,7 @@ class AutoFlowEstimator(BaseEstimator):
             log_config: Optional[dict] = None,
             highR_nan_threshold=0.5,
             highR_cat_threshold=0.5,
+            consider_ordinal_as_cat=False,
             should_store_intermediate_result=False,
             should_finally_fit=False,
             should_calc_all_metrics=True,
@@ -104,6 +105,7 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        self.consider_ordinal_as_cat = consider_ordinal_as_cat
         if model_registry is None:
             model_registry = {}
         assert isinstance(model_registry, dict)
@@ -209,7 +211,8 @@ class AutoFlowEstimator(BaseEstimator):
             transfer_hdls = [transfer_hdls]
         # build data_manager
         self.data_manager = DataManager(
-            X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold
+            X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
+            self.highR_cat_threshold, self.consider_ordinal_as_cat
         )
         self.ml_task = self.data_manager.ml_task
         if self.checked_mainTask is not None:
@@ -241,7 +244,7 @@ class AutoFlowEstimator(BaseEstimator):
         general_experiment_timestamp = datetime.datetime.now()
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
             current_experiment_timestamp = datetime.datetime.now()
-            hdl_constructor.run(self.data_manager, self.random_state, self.highR_cat_threshold)
+            hdl_constructor.run(self.data_manager, self.random_state)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
@@ -328,7 +331,6 @@ class AutoFlowEstimator(BaseEstimator):
                 p.start()
         for p in processes:
             p.join()
-
         return {"is_manual": False}
 
     def start_final_step(self, fit_ensemble_params):

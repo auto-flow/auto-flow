@@ -22,7 +22,7 @@ trained_pipeline = AutoFlowClassifier(
 column_descriptions = {
     "id": "PassengerId",
     "target": "Survived",
-    "ignore": "Name"
+    "text": "Name"
 }
 # if not os.path.exists("autoflow_classification.bz2"):
 trained_pipeline.fit(

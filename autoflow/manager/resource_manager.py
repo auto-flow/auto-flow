@@ -171,6 +171,7 @@ class ResourceManager(StrSignatureMixin):
 
     def persistent_evaluated_model(self, info: Dict, model_id) -> Tuple[str, str, str, str]:
         y_info = {
+            # 这个变量还是很有必要的，因为可能用户指定的切分器每次切的数据不一样
             "y_true_indexes": info.get("y_true_indexes"),
             "y_preds": info.get("y_preds"),
             "y_test_pred": info.get("y_test_pred")
@@ -660,13 +661,20 @@ class ResourceManager(StrSignatureMixin):
 
     def get_trials_model(self) -> pw.Model:
         class Trials(pw.Model):
-            trial_id = pw.AutoField(primary_key=True)
-            config_id = pw.CharField(default="")
-            task_id = pw.CharField(default="")
-            hdl_id = pw.CharField(default="")
-            experiment_id = pw.IntegerField(default=0)
-            estimator = pw.CharField(default="")
-            loss = pw.FloatField(default=65535)
+            trial_id = pw.AutoField(primary_key=True,
+                                    help_text="Trial ID. One experiment consists of many experiments.")
+            config_id = pw.CharField(default="",
+                                     help_text="Configuration ID. Calculated by hash value of Configuration array.")
+            task_id = pw.CharField(default="",
+                                   help_text="Task ID. Task ID is calculated by hash(TrainSet, TestSet, metric, splitter, ml_task, specific_task_token)")
+            hdl_id = pw.CharField(default="",
+                                  help_text="Hyper-param Descriptions Language ID, calculated by hash(hdl)")
+            experiment_id = pw.IntegerField(default=0,
+                                            help_text="Experiment ID. The operation of a program is called an experiment.")
+            estimator = pw.CharField(default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
+            loss = pw.FloatField(default=65535,
+                                 help_text="Loss value, is calculated by metric's current-value and 'optimal-value' and 'greater-is-better'. \n"
+                                           "For instance, r2 is 'greater-is-better' and 'optimal-value'=1, now the r2=0.55, so loss=0.45 . ")
             losses = self.JSONField(default=[])
             test_loss = self.JSONField(default=[])  # 测试集
             all_score = self.JSONField(default={})
@@ -711,8 +719,6 @@ class ResourceManager(StrSignatureMixin):
     def insert_to_trials_table(self, info: Dict):
         self.init_trials_table()
         config_id = info.get("config_id")
-        # 这个变量还是很有必要的，因为可能用户指定的切分器每次切的数据不一样
-
         models_path, intermediate_result_path, finally_fit_model_path, y_info_path = \
             self.persistent_evaluated_model(info, config_id)
         additional_info = deepcopy(self.additional_info)

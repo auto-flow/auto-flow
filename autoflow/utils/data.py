@@ -1,8 +1,11 @@
 # -*- encoding: utf-8 -*-
+from typing import Union
 
 import numpy as np
 import pandas as pd
+from datefinder import find_dates
 from scipy.sparse import issparse
+from sklearn.utils.multiclass import type_of_target
 
 
 def convert_to_num(Ybin):
@@ -69,17 +72,44 @@ def densify(X):
         return X
 
 
-def is_cat(s: pd.Series):
-    for elem in s:
-        if isinstance(elem, (float, int)):
-            continue
-        else:
-            return True
+def is_cat(s: Union[pd.Series, np.ndarray], consider_ordinal_as_cat):
+    if not isinstance(s, pd.Series):
+        s = pd.Series(s)
+    if s.dtype == object:
+        for elem in s:
+            if isinstance(elem, (float, int)):
+                continue
+            else:
+                return True
+        s = s.astype('float32')
+        if consider_ordinal_as_cat:
+            s = s.dropna()
+            tp = type_of_target(s)
+            if tp in ("multiclass",):
+                return True
     return False
+
+
+def finite_array(array):
+    """
+    Replace NaN and Inf (there should not be any!)
+    :param array:
+    :return:
+    """
+    a = np.ravel(array)
+    maxi = np.nanmax(a[np.isfinite(a)])
+    mini = np.nanmin(a[np.isfinite(a)])
+    array[array == float('inf')] = maxi
+    array[array == float('-inf')] = mini
+    return array
 
 
 def is_highR_nan(s: pd.Series, threshold):
     return (np.count_nonzero(pd.isna(s)) / s.size) > threshold
+
+
+def is_highR_cat(s: pd.Series, threshold):
+    return (np.unique(s.astype("str")).size / s.size) > threshold
 
 
 def is_nan(s: pd.Series):
@@ -92,3 +122,63 @@ def to_array(X):
     if isinstance(X, (pd.DataFrame, pd.Series)):
         return X.values
     return X
+
+
+def is_text(s, cat_been_checked=False):
+    if not isinstance(s, pd.Series):
+        s = pd.Series(s)
+    if not cat_been_checked:
+        if not is_cat(s, consider_ordinal_as_cat=False):
+            return False
+    s = s.dropna()
+    s = s.astype(str)
+    if is_highR_cat(s, 0.8):
+        s = s.str.split(" ")
+        s = s.apply(len)
+        return np.all(s >= 2)
+    return False
+
+
+def is_date(s, cat_been_checked=False):
+    if not isinstance(s, pd.Series):
+        s = pd.Series(s)
+    if not cat_been_checked:
+        if not is_cat(s, consider_ordinal_as_cat=False):
+            return False
+    s = s.dropna()
+    s = s.astype(str)
+    return all(bool(list(find_dates(elem,strict=True))) for elem in s)
+
+
+if __name__ == '__main__':
+    print(is_text([
+        "hello world",
+        "good morning"
+        "it is a good day"
+    ]))
+    print(is_text([
+        "hello world",
+        "good morning",
+        0
+    ]))
+    print(is_text([
+        "hello world",
+        "good morning",
+        "omg"
+    ]))
+    print(is_text([
+        "hello world",
+        "hello world",
+        "hello world",
+    ]))
+    print(is_date([
+        '2018',
+        '2016',
+        '658.2.3'
+    ]))
+    print(is_date([
+        '456',
+        '456',
+        '256'
+    ]))
+

@@ -2,6 +2,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Union, Tuple, List, Any, Dict
 
+import numpy as np
 import pandas as pd
 from frozendict import frozendict
 
@@ -41,13 +42,18 @@ class HDL_Constructor(StrSignatureMixin):
                     "adaboost", "bayesian_ridge", "catboost", "decision_tree", "elasticnet", "extra_trees",
                     "gaussian_process", "k_nearest_neighbors", "kernel_ridge",
                     "liblinear_svr", "lightgbm", "random_forest", "sgd"),
-            included_highR_nan_imputers=("operate.drop", {"_name": "operate.merge", "__rely_model": "boost_model"}),
-            included_cat_nan_imputers=(
-                    "impute.fill_cat", {"_name": "impute.fill_abnormal", "__rely_model": "boost_model"}),
-            included_num_nan_imputers=(
-                    "impute.fill_num", {"_name": "impute.fill_abnormal", "__rely_model": "boost_model"}),
+            included_highR_nan_imputers=("operate.drop", "operate.merge"),
+            included_nan_imputers=(
+                    "impute.adaptive_fill",),
             included_highR_cat_encoders=("operate.drop", "encode.label", "encode.cat_boost"),
             included_lowR_cat_encoders=("encode.one_hot", "encode.label", "encode.cat_boost"),
+            num2purified_workflow=frozendict({
+                "num->scaled": ["scale.standardize", "operate.merge"],
+                "scaled->purified": ["operate.merge", "transform.power"]
+            }),
+            purified2final_workflow=frozendict({
+                "purified->final": ["operate.merge"]
+            })
 
     ):
         '''
@@ -167,11 +173,12 @@ class HDL_Constructor(StrSignatureMixin):
         {'preprocessing': {}, 'estimating(choice)': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
 
         '''
+        self.purified2final_workflow = purified2final_workflow
+        self.num2purified_workflow = num2purified_workflow
         self.hdl_metadata = dict(hdl_metadata)
         self.included_lowR_cat_encoders = included_lowR_cat_encoders
         self.included_highR_cat_encoders = included_highR_cat_encoders
-        self.included_num_nan_imputers = included_num_nan_imputers
-        self.included_cat_nan_imputers = included_cat_nan_imputers
+        self.included_nan_imputers = included_nan_imputers
         self.included_highR_nan_imputers = included_highR_nan_imputers
         self.included_regressors = included_regressors
         self.included_classifiers = included_classifiers
@@ -253,30 +260,54 @@ class HDL_Constructor(StrSignatureMixin):
         '''
         DAG_workflow = OrderedDict()
         contain_highR_nan = False
-        contain_nan = False
+        essential_feature_groups = self.data_manager.essential_feature_groups
+        fg_set = set(essential_feature_groups)
+        if "highR_cat" in fg_set or "lowR_cat" in fg_set:
+            fg_set.add("cat")
+        # fixme: 两个新的fg：nlp ， date
+        assert "num" in fg_set or "cat" in fg_set
         # todo: 对于num特征进行scale transform
         # --------Start imputing missing(nan) value--------------------
         if "highR_nan" in self.data_manager.feature_groups:
             DAG_workflow["highR_nan->nan"] = self.included_highR_nan_imputers
             contain_highR_nan = True
         if contain_highR_nan or "nan" in self.data_manager.feature_groups:
-            # split nan to cat_nan and num_nan
-            DAG_workflow["nan->{cat_name=cat_nan,num_name=num_nan}"] = "operate.split.cat_num"
-            DAG_workflow["num_nan->num"] = self.included_num_nan_imputers
-            DAG_workflow["cat_nan->cat"] = self.included_cat_nan_imputers
-            contain_nan = True
+            # todo: 更多的特征组
+            DAG_workflow["nan->imputed"] = self.included_nan_imputers
+            if ("cat" in fg_set) and ("num" in fg_set):
+                DAG_workflow["imputed->{cat_name=cat,num_name=num}"] = {"_name": "operate.split.cat_num",
+                                                                        "consider_ordinal_as_cat": self.consider_ordinal_as_cat}
+            elif ("cat" in fg_set) and ("num" not in fg_set):
+                DAG_workflow["imputed->cat"] = "operate.merge"
+            elif ("cat" not in fg_set) and ("num" in fg_set):
+                DAG_workflow["imputed->num"] = "operate.merge"
+            else:
+                raise NotImplementedError
         # --------Start encoding categorical(cat) value --------------------
-        if contain_nan or "cat" in self.data_manager.feature_groups:
-            DAG_workflow["cat->{highR=highR_cat,lowR=lowR_cat}"] = {"_name": "operate.split.cat",
-                                                                    "threshold": self.highR_cat_threshold}
-            DAG_workflow["highR_cat->num"] = self.included_highR_cat_encoders
-            DAG_workflow["lowR_cat->num"] = self.included_lowR_cat_encoders
+        if "cat" in fg_set:
+            if ("highR_cat" in fg_set) and ("lowR_cat" in fg_set):
+                DAG_workflow["cat->{highR=highR_cat,lowR=lowR_cat}"] = {"_name": "operate.split.cat",
+                                                                        "threshold": self.highR_cat_threshold}
+                DAG_workflow["highR_cat->purified"] = self.included_highR_cat_encoders
+                DAG_workflow["lowR_cat->purified"] = self.included_lowR_cat_encoders
+            elif ("highR_cat" in fg_set) and ("lowR_cat" not in fg_set):
+                DAG_workflow["cat->purified"] = self.included_highR_cat_encoders
+            elif ("highR_cat" not in fg_set) and ("lowR_cat" in fg_set):
+                DAG_workflow["cat->purified"] = self.included_lowR_cat_encoders
+            else:
+                raise NotImplementedError
+        # --------processing numerical features--------------------
+        for k, v in self.num2purified_workflow.items():
+            DAG_workflow[k] = v
+        # --------finally processing--------------------
+        for k, v in self.purified2final_workflow.items():
+            DAG_workflow[k] = v
         # --------Start estimating--------------------
         mainTask = self.ml_task.mainTask
         if mainTask == "classification":
-            DAG_workflow["num->target"] = self.included_classifiers
+            DAG_workflow["final->target"] = self.included_classifiers
         elif mainTask == "regression":
-            DAG_workflow["num->target"] = self.included_regressors
+            DAG_workflow["final->target"] = self.included_regressors
         else:
             raise NotImplementedError
         # todo: 如果特征多，做特征选择或者降维。如果特征少，做增维
@@ -354,7 +385,7 @@ class HDL_Constructor(StrSignatureMixin):
         graph.attr(label=r'WorkFlow Space')
         return graph
 
-    def run(self, data_manager, random_state, highR_cat_threshold):
+    def run(self, data_manager, random_state):
         '''
 
         Parameters
@@ -364,9 +395,11 @@ class HDL_Constructor(StrSignatureMixin):
         highR_cat_threshold: float
 
         '''
-        self.highR_cat_threshold = highR_cat_threshold
         self.data_manager = data_manager
         self.ml_task = data_manager.ml_task
+        self.highR_cat_threshold = data_manager.highR_cat_threshold
+        self.highR_nan_threshold = data_manager.highR_nan_threshold
+        self.consider_ordinal_as_cat = data_manager.consider_ordinal_as_cat
         self.random_state = random_state
         if isinstance(self.DAG_workflow, str):
             if self.DAG_workflow == "generic_recommend":

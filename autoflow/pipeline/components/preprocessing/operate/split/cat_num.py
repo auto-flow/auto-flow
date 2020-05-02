@@ -8,8 +8,6 @@ __all__ = ["SplitCatNum"]
 
 
 class SplitCatNum(BaseSplit):
-    def calc_R(self, col, rows):
-        return np.unique(col).size / rows
 
     key1_hp_name = "cat_name"
     key2_hp_name = "num_name"
@@ -19,7 +17,8 @@ class SplitCatNum(BaseSplit):
     key2 = "num"
 
     def judge_keyname(self, col: pd.Series, rows):
-        if is_cat(col):
+        consider_ordinal_as_cat = self.hyperparams.get("consider_ordinal_as_cat", False)
+        if is_cat(col, consider_ordinal_as_cat):
             keyname = self.key1
         else:
             keyname = self.key2
