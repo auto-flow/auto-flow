@@ -1,8 +1,8 @@
 from autoflow.pipeline.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
-__all__ = ["KNNImputer"]
+__all__ = ["MissForest"]
 
 
-class KNNImputer(AutoFlowFeatureEngineerAlgorithm):
-    class__ = "KNNImputer"
+class MissForest(AutoFlowFeatureEngineerAlgorithm):
+    class__ = "MissForest"
     module__ = "skimpute"
