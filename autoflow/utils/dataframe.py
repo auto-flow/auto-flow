@@ -1,7 +1,21 @@
+from copy import deepcopy
 from typing import Optional, List, Union
 
 import numpy as np
 import pandas as pd
+
+
+def process_dataframe(X: Union[pd.DataFrame, np.ndarray], copy=True) -> pd.DataFrame:
+    if isinstance(X, pd.DataFrame):
+        if copy:
+            X_ = deepcopy(X)
+        else:
+            X_ = X
+    elif isinstance(X, np.ndarray):
+        X_ = pd.DataFrame(X, columns=range(X.shape[1]))
+    else:
+        raise NotImplementedError
+    return X_
 
 
 def pop_if_exists(df: pd.DataFrame, col: str) -> Optional[pd.DataFrame]:
@@ -41,5 +55,3 @@ class DataFrameValuesWrapper():
 
     def wrap_to_dataframe(self, array):
         return pd.DataFrame(array, columns=self.dataframe.columns, index=self.dataframe.index)
-
-

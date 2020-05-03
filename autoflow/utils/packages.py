@@ -1,23 +1,23 @@
 import importlib
 import inspect
 import pkgutil
-import sys
 from collections import OrderedDict
 from importlib import import_module
 
 
 def get_class_name_of_module(input_module):
-    if isinstance(input_module,str):
+    if isinstance(input_module, str):
         try:
-            _module=import_module(input_module)
+            _module = import_module(input_module)
         except:
             return None
     else:
-        _module=input_module
-    if hasattr(_module,"__all__"):
+        _module = input_module
+    if hasattr(_module, "__all__"):
         return _module.__all__[0]
     else:
-        return inspect.getmembers(_module,inspect.isclass)[-1][0]
+        return inspect.getmembers(_module, inspect.isclass)[-1][0]
+
 
 def get_class_object_in_pipeline_components(key1, key2):
     module_path = f"autoflow.pipeline.components.{key1}.{key2}"
@@ -37,7 +37,7 @@ def find_components(package, directory, base_class):
         full_module_name = "%s.%s" % (package, module_name)
         # if full_module_name not in sys.modules and not ispkg:
         module = importlib.import_module(full_module_name)
-        if hasattr(module,"excludeToken"):
+        if hasattr(module, "excludeToken"):
             continue
         for member_name, obj in inspect.getmembers(module):
             if inspect.isclass(obj) and issubclass(obj, base_class) and \
@@ -50,4 +50,9 @@ def find_components(package, directory, base_class):
 
     return components
 
-
+def import_by_package_url(package_url:str):
+    assert "." in package_url
+    ix=package_url.rfind(".")
+    module=package_url[:ix]
+    class_name=package_url[ix+1:]
+    return getattr(import_module(module),class_name)

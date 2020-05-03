@@ -24,7 +24,7 @@ from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline
-from autoflow.utils.sys import get_trance_back_msg
+from autoflow.utils.sys_ import get_trance_back_msg
 from dsmac.runhistory.utils import get_id_of_config
 
 
