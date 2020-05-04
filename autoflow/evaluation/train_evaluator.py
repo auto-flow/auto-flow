@@ -1,4 +1,3 @@
-import re
 import sys
 from collections import defaultdict
 from contextlib import redirect_stderr
@@ -258,40 +257,41 @@ class TrainEvaluator(BaseEvaluator):
                 break
         cnt = int(cnt)
         key = key[ix:]
-        pattern = re.compile(r"(\{.*\})")
-        match = pattern.search(key)
-        additional_info = {}
-        if match:
-            braces_content = match.group(1)
-            _to = braces_content[1:-1]
-            param_kvs = _to.split(",")
-            for param_kv in param_kvs:
-                k, v = param_kv.split("=")
-                additional_info[k] = v
-            key = pattern.sub("", key)
+        # pattern = re.compile(r"(\{.*\})")
+        # match = pattern.search(key)
+        # additional_info = {}
+        # if match:
+        #     braces_content = match.group(1)
+        #     _to = braces_content[1:-1]
+        #     param_kvs = _to.split(",")
+        #     for param_kv in param_kvs:
+        #         k, v = param_kv.split("=")
+        #         additional_info[k] = v
+        #     key = pattern.sub("", key)
+        # todo: 支持多结点的输入输出，与dataframe.py耦合
         if "->" in key:
             _from, _to = key.split("->")
-            in_feature_groups = _from
-            out_feature_groups = _to
+            in_feature_groups = _from.split(",")[0]
+            out_feature_groups = _to.split(",")[0]
         else:
             in_feature_groups, out_feature_groups = None, None
         if not in_feature_groups:
             in_feature_groups = None
         if not out_feature_groups:
             out_feature_groups = None
-        return in_feature_groups, out_feature_groups, additional_info
+        return in_feature_groups, out_feature_groups
 
     def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
         preprocessing_dict: dict = dhp[PHASE1]
         pipeline_list = []
         for key, value in preprocessing_dict.items():
             name = key  # like: "cat->num"
-            in_feature_groups, out_feature_groups, outsideEdge_info = self.parse_key(key)
+            in_feature_groups, out_feature_groups = self.parse_key(key)
             sub_dict = preprocessing_dict[name]
             if sub_dict is None:
                 continue
             preprocessor = self.create_component(sub_dict, PHASE1, name, in_feature_groups, out_feature_groups,
-                                                 outsideEdge_info)
+                                                 )
             pipeline_list.extend(preprocessor)
         if pipeline_list:
             return GenericPipeline(pipeline_list)

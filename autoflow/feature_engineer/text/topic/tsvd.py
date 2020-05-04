@@ -5,7 +5,7 @@
 from autoflow.feature_engineer.text.topic.base import BaseSklearnTextTransformer
 
 
-class TsvdTranformer(BaseSklearnTextTransformer):
+class TsvdTransformer(BaseSklearnTextTransformer):
     def __init__(self, num_topics=2, algorithm="randomized", n_iter=5,
                  random_state=42, tol=0.):
         self.tol = tol

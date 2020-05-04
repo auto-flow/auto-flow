@@ -14,7 +14,7 @@ from autoflow.feature_engineer.text.topic import LdaTransformer
 from autoflow.feature_engineer.text.topic import LsiTransformer
 from autoflow.feature_engineer.text.topic import RpTransformer
 from autoflow.feature_engineer.text.topic import NmfTransformer
-from autoflow.feature_engineer.text.topic import TsvdTranformer
+from autoflow.feature_engineer.text.topic import TsvdTransformer
 
 examples_path = Path(autoflow.__file__).parent.parent / "examples"
 train_df = pd.read_csv(examples_path / "data/train_classification.csv")
@@ -47,7 +47,7 @@ score = cross_val_score(rf, vectorized, y)
 print(score.mean())
 
 
-vectorized = TsvdTranformer(num_topics=4).fit_transform(tokenized)
+vectorized = TsvdTransformer(num_topics=4).fit_transform(tokenized)
 print("--------TSVD--------")
 score = cross_val_score(rf, vectorized, y)
 print(score.mean())

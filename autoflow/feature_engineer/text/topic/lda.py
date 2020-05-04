@@ -9,7 +9,7 @@ import numpy as np
 class LdaTransformer(BaseGensim):
     def __init__(self, num_topics=100,  chunksize=2000, passes=1, update_every=1, alpha='symmetric',
                  eta=None, decay=0.5, offset=1.0, eval_every=10, iterations=50, gamma_threshold=0.001,
-                 minimum_probability=0.01, random_state=None, scorer='perplexity', dtype=np.float32):
+                 minimum_probability=0.01, random_state=42, scorer='perplexity', dtype=np.float32):
         self.dtype = dtype
         self.scorer = scorer
         self.random_state = random_state

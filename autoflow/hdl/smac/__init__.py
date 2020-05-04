@@ -22,7 +22,10 @@ def _decode(str_value: str) -> Any:
     else:
         value_ = str_value[:ix]
         type_ = str_value[ix + 1:]
-        return eval(value_)
+        try:
+            return eval(value_)
+        except Exception:
+            return str_value
 
 
 def choice(label: str, options: List, default=None):

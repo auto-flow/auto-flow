@@ -7,6 +7,7 @@ import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import PHASE1, PHASE2, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
+from autoflow.hdl.smac import _encode
 from autoflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
 from autoflow.utils.dict import add_prefix_in_dict_keys
 from autoflow.utils.graphviz import ColorSelector
@@ -46,10 +47,20 @@ class HDL_Constructor(StrSignatureMixin):
             included_nan_imputers=(
                     "impute.adaptive_fill",),
             included_highR_cat_encoders=("operate.drop", "encode.label", "encode.cat_boost"),
-            included_lowR_cat_encoders=("encode.one_hot", "encode.label", "encode.cat_boost"),
+            included_cat_encoders=("encode.one_hot", "encode.label", "encode.cat_boost"),
             num2purified_workflow=frozendict({
                 "num->scaled": ["scale.standardize", "operate.merge"],
                 "scaled->purified": ["operate.merge", "transform.power"]
+            }),
+            text2purified_workflow=frozendict({
+                "text->tokenized": "text.tokenize.simple",
+                "tokenized->purified": [
+                    "text.topic.tsvd",
+                    "text.topic.lsi",
+                    "text.topic.nmf",
+                ]
+            }),
+            date2purified_workflow=frozendict({
             }),
             purified2final_workflow=frozendict({
                 "purified->final": ["operate.merge"]
@@ -173,10 +184,12 @@ class HDL_Constructor(StrSignatureMixin):
         {'preprocessing': {}, 'estimating(choice)': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
 
         '''
+        self.date2purified_workflow = date2purified_workflow
+        self.text2purified_workflow = text2purified_workflow
         self.purified2final_workflow = purified2final_workflow
         self.num2purified_workflow = num2purified_workflow
         self.hdl_metadata = dict(hdl_metadata)
-        self.included_lowR_cat_encoders = included_lowR_cat_encoders
+        self.included_cat_encoders = included_cat_encoders
         self.included_highR_cat_encoders = included_highR_cat_encoders
         self.included_nan_imputers = included_nan_imputers
         self.included_highR_nan_imputers = included_highR_nan_imputers
@@ -261,44 +274,36 @@ class HDL_Constructor(StrSignatureMixin):
         DAG_workflow = OrderedDict()
         contain_highR_nan = False
         essential_feature_groups = self.data_manager.essential_feature_groups
+        nan_column2essential_fg = self.data_manager.nan_column2essential_fg
         fg_set = set(essential_feature_groups)
-        if "highR_cat" in fg_set or "lowR_cat" in fg_set:
-            fg_set.add("cat")
-        # fixme: 两个新的fg：nlp ， date
-        assert "num" in fg_set or "cat" in fg_set
-        # todo: 对于num特征进行scale transform
+        nan_fg_set = set(nan_column2essential_fg.values())
         # --------Start imputing missing(nan) value--------------------
         if "highR_nan" in self.data_manager.feature_groups:
             DAG_workflow["highR_nan->nan"] = self.included_highR_nan_imputers
             contain_highR_nan = True
         if contain_highR_nan or "nan" in self.data_manager.feature_groups:
-            # todo: 更多的特征组
             DAG_workflow["nan->imputed"] = self.included_nan_imputers
-            if ("cat" in fg_set) and ("num" in fg_set):
-                DAG_workflow["imputed->{cat_name=cat,num_name=num}"] = {"_name": "operate.split.cat_num",
-                                                                        "consider_ordinal_as_cat": self.consider_ordinal_as_cat}
-            elif ("cat" in fg_set) and ("num" not in fg_set):
-                DAG_workflow["imputed->cat"] = "operate.merge"
-            elif ("cat" not in fg_set) and ("num" in fg_set):
-                DAG_workflow["imputed->num"] = "operate.merge"
+            if len(nan_fg_set) > 1:
+                DAG_workflow[f"imputed->{','.join(nan_fg_set)}"] = {"_name": "operate.split",
+                                                                    "column2fg": _encode(nan_column2essential_fg)}
+            elif len(nan_fg_set) == 1:
+                elem = list(nan_fg_set)[0]
+                DAG_workflow[f"imputed->{elem}"] = "operate.merge"
             else:
                 raise NotImplementedError
         # --------Start encoding categorical(cat) value --------------------
         if "cat" in fg_set:
-            if ("highR_cat" in fg_set) and ("lowR_cat" in fg_set):
-                DAG_workflow["cat->{highR=highR_cat,lowR=lowR_cat}"] = {"_name": "operate.split.cat",
-                                                                        "threshold": self.highR_cat_threshold}
-                DAG_workflow["highR_cat->purified"] = self.included_highR_cat_encoders
-                DAG_workflow["lowR_cat->purified"] = self.included_lowR_cat_encoders
-            elif ("highR_cat" in fg_set) and ("lowR_cat" not in fg_set):
-                DAG_workflow["cat->purified"] = self.included_highR_cat_encoders
-            elif ("highR_cat" not in fg_set) and ("lowR_cat" in fg_set):
-                DAG_workflow["cat->purified"] = self.included_lowR_cat_encoders
-            else:
-                raise NotImplementedError
+            DAG_workflow["cat->purified"] = self.included_cat_encoders
+        if "highR_cat" in fg_set:
+            DAG_workflow["highR_cat->purified"] = self.included_highR_cat_encoders
+        # --------processing text features--------------------
+        if "text" in fg_set:
+            for k, v in self.text2purified_workflow.items():
+                DAG_workflow[k] = v
         # --------processing numerical features--------------------
-        for k, v in self.num2purified_workflow.items():
-            DAG_workflow[k] = v
+        if "num" in fg_set:
+            for k, v in self.num2purified_workflow.items():
+                DAG_workflow[k] = v
         # --------finally processing--------------------
         for k, v in self.purified2final_workflow.items():
             DAG_workflow[k] = v
@@ -311,6 +316,7 @@ class HDL_Constructor(StrSignatureMixin):
         else:
             raise NotImplementedError
         # todo: 如果特征多，做特征选择或者降维。如果特征少，做增维
+        # todo: 处理样本不平衡
         return DAG_workflow
 
     def draw_workflow_space(self):
@@ -460,8 +466,6 @@ class HDL_Constructor(StrSignatureMixin):
         Returns
         -------
         hdl: dict
-
-
         '''
         # 获取hdl
         return self.hdl

@@ -423,13 +423,10 @@
       }
     },
     "impute": {
-      "fill_abnormal": {},
-      "fill_cat": {
-        "strategy": {"_type": "choice","_value": ["<NULL>","most_frequent"],"_default": "<NULL>"},
+      "adaptive_fill": {
+        "num_strategy": {"_type": "choice","_value": ["median","mean"],"_default": "median"},
+        "cat_strategy": "most_frequent"
       },
-      "fill_num": {
-        "strategy": {"_type": "choice","_value": ["median","mean"],"_default": "mean"},
-      }
     },
     "reduce": {
       "fast_ica": {
@@ -489,12 +486,12 @@
       "normalize": {
         "copy": false,
       },
-      "quantile_transformer": {
+      "quantile": {
         "n_quantiles": {"_type": "int_uniform", "_value": [10,2000],"_default": 1000},
         "output_distribution":  {"_type": "choice", "_value": ["uniform", "normal"],"_default": "normal"},
         "copy": false
       },
-      "robust_scaler": {
+      "robust": {
         "q_min": {"_type":  "quniform", "_value": [0.001, 0.3],"_default": 0.25},
         "q_max":  {"_type": "quniform", "_value": [0.7, 0.999],"_default": 0.75}
       },
@@ -585,5 +582,35 @@
         "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       }
     },
+    "text": {
+      "tokenize": {
+        "simple": {}
+      },
+      "topic": {
+        "hdp": {"random_state": 42},
+        "lda": {
+          "random_state": 42,
+          "num_topics": {"_type": "int_quniform", "_value": [5, 200, 5],"_default": 10},
+          "iterations": 50
+        },
+        "lsi": {
+          "num_topics": {"_type": "int_quniform", "_value": [10, 400, 10],"_default": 20}
+        },
+        "nmf": {
+          "random_state": 42,
+          "num_topics": {"_type": "int_quniform", "_value": [10, 400, 10],"_default": 20}
+        },
+        "rp": {
+          "num_topics": {"_type": "int_quniform", "_value": [10, 300, 10],"_default": 20}
+        },
+        "tsvd": {
+          "random_state": 42,
+          "num_topics": {"_type": "int_quniform", "_value": [5, 200, 5],"_default": 10}
+        }
+      }
+    },
+    "transform": {
+
+    }
   }
 }

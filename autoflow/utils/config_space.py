@@ -1,3 +1,4 @@
+import logging
 import random
 from copy import deepcopy
 from typing import List, Union, Dict
@@ -9,7 +10,7 @@ from ConfigSpace import ConfigurationSpace, Configuration, CategoricalHyperparam
 from autoflow.constants import PHASE1,PHASE2
 from autoflow.hdl.smac import _encode
 
-
+logger=logging.getLogger(__name__)
 def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state=42) -> List[Configuration]:
     None_name = "None:NoneType"
     shps = deepcopy(shps)
@@ -45,6 +46,7 @@ def get_grid_initial_configs(shps: ConfigurationSpace, n_configs=-1, random_stat
     if n_configs > 0:
         random.seed(random_state)
         grid_configs = random.sample(grid_configs, n_configs)
+    logger.info(f"Length of grid_initial_configs = {len(grid_configs)}.")
     return grid_configs
 
 

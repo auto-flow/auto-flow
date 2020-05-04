@@ -8,7 +8,7 @@ from autoflow.feature_engineer.text.topic.base import BaseSklearnTextTransformer
 class NmfTransformer(BaseSklearnTextTransformer):
     def __init__(self, num_topics=None, init=None, solver='cd',
                  beta_loss='frobenius', tol=1e-4, max_iter=200,
-                 random_state=None, alpha=0., l1_ratio=0., verbose=0,
+                 random_state=42, alpha=0., l1_ratio=0., verbose=0,
                  shuffle=False):
         self.shuffle = shuffle
         self.verbose = verbose

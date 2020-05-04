@@ -114,7 +114,7 @@ class AutoFlowComponent(BaseEstimator):
                 df = X.filter_feature_groups(self.in_feature_groups)
             else:
                 df = X
-            rectify_dtypes(df)
+            # rectify_dtypes(df)
             if extract_info:
                 return df, df.feature_groups, df.columns_metadata
             else:

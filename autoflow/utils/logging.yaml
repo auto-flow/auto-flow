@@ -55,3 +55,28 @@ loggers:
     level: INFO
     handlers: [file_handler]
     propagate: false
+
+  gensim.models.hdpmodel:
+    level: WARNING
+    handlers: [file_handler]
+    propagate: false
+
+  gensim.models.ldamodel:
+    level: WARNING
+    handlers: [file_handler]
+    propagate: false
+
+  gensim.models.lsimodel:
+    level: WARNING
+    handlers: [file_handler]
+    propagate: false
+
+  gensim.models.rpmodel:
+    level: WARNING
+    handlers: [file_handler]
+    propagate: false
+
+  gensim.corpora.dictionary:
+    level: WARNING
+    handlers: [file_handler]
+    propagate: false

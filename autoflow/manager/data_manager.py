@@ -72,71 +72,41 @@ class DataManager(StrSignatureMixin):
         y_train = deepcopy(y_train)
         X_test = deepcopy(X_test)
         y_test = deepcopy(y_test)
-        X_train, y_train, X_test, y_test, feature_groups, column2feature_groups, essential_feature_groups = \
-            self.parse_column_descriptions(
-                column_descriptions, X_train, y_train, X_test, y_test
-            )
-        self.essential_feature_groups = essential_feature_groups
-        self.feature_groups = feature_groups
-        self.column2feature_groups = column2feature_groups
-        self.ml_task: MLTask = get_ml_task_from_y(y_train)
-        self.X_train = GenericDataFrame(X_train, feature_groups=feature_groups)
-        self.y_train = y_train
-        self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None
-        self.y_test = y_test if y_test is not None else None
-
+        self.parse_column_descriptions(
+            column_descriptions, X_train, y_train, X_test, y_test
+        )
         # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定
         # fixme: 不支持multilabel
-        if len(y_train.shape) > 2:
+        if len(self.y_train.shape) > 2:
             raise ValueError('y must not have more than two dimensions, '
                              'but has %d.' % len(y_train.shape))
 
-        if X_train.shape[0] != y_train.shape[0]:
+        if self.X_train.shape[0] != self.y_train.shape[0]:
             raise ValueError('X and y must have the same number of '
                              'datapoints, but have %d and %d.' % (X_train.shape[0],
                                                                   y_train.shape[0]))
 
-    def parse_feature_group(self, series: pd.Series) -> str:
+    def parse_feature_group(self, series: pd.Series, consider_nan=True) -> str:
         # --- start parsing feature-group -----
-        if is_nan(series):
+        if consider_nan and is_nan(series):
             if is_highR_nan(series, self.highR_nan_threshold):
                 feature_group = "highR_nan"
             else:
                 feature_group = "nan"
         elif is_cat(series, self.consider_ordinal_as_cat):
-            feature_group = "cat"
             if is_date(series, True):
                 feature_group = "date"
             elif is_text(series, True):
                 feature_group = "text"
+            else:
+                if is_highR_cat(series, self.highR_cat_threshold):
+                    feature_group = "highR_cat"
+                else:
+                    feature_group = "cat"
         else:
             feature_group = "num"
 
         return feature_group
-
-    def parse_essential_feature_group(self, series, feature_group):
-        # --- start parsing essential-feature-group -----
-        if feature_group not in ("highR_nan", "nan", "cat", "num", "date", "text"):
-            self.logger.info(f"'{feature_group}' is a user-defined feature_group.")
-            feature_group = self.parse_feature_group(series)
-        if feature_group in ("nan", "highR_nan"):
-            if is_cat(series, self.consider_ordinal_as_cat):
-                essential_feature_group = "cat"
-            else:
-                essential_feature_group = "num"
-        else:
-            essential_feature_group = feature_group
-        if essential_feature_group == "cat":
-            if is_text(series, True):
-                essential_feature_group = "text"
-            elif is_date(series, True):
-                essential_feature_group = "date"
-            else:
-                if is_highR_cat(series, self.highR_cat_threshold):
-                    essential_feature_group = "highR_cat"
-                else:
-                    essential_feature_group = "lowR_cat"
-        return essential_feature_group
 
     def type_check(self, X):
         if isinstance(X, GenericDataFrame):
@@ -186,7 +156,7 @@ class DataManager(StrSignatureMixin):
             y_test = pop_if_exists(X_test, target_col)
         # --确定id--
         if "id" in column_descriptions:
-            id_col = column_descriptions["id"]
+            id_col = column_descriptions["id"]  # id 应该只有一列
             self.id_seq = pop_if_exists(X_train, id_col)
             self.test_id_seq = pop_if_exists(X_test, id_col)
         # --确定ignore--
@@ -201,7 +171,8 @@ class DataManager(StrSignatureMixin):
         if both_set:
             assert X_train.shape[1] == X_test.shape[1]
             assert np.all(X_train.columns == X_test.columns)
-        # --确定其他列--
+        # --用户自定义列--
+        userDefined_column2feature_groups = {}
         column2feature_groups = {}
         for key, values in column_descriptions.items():
             if key in ("id", "target", "ignore"):
@@ -209,22 +180,31 @@ class DataManager(StrSignatureMixin):
             if isinstance(values, str):
                 values = [values]
             for value in values:
-                column2feature_groups[value] = key
+                userDefined_column2feature_groups[value] = key
+        column2feature_groups.update(deepcopy(userDefined_column2feature_groups))
+        column2essential_feature_groups = deepcopy(column2feature_groups)
         # ----尝试将X_train与X_test拼在一起，然后做解析---------
         X = stack_Xs(X_train, None, X_test)
-        # ----对于没有标注的列，打上nan, highR_nan, cat, num三种标记
-        essential_feature_groups = []
-        # fixme ： essential_feature_groups 存疑
+        # --识别用户自定义列中的nan--
+        for column, feature_group in list(column2feature_groups.items()):
+            nan_col = self.detect_nan_feature_group(X[column])
+            if nan_col is not None:
+                column2feature_groups[column] = nan_col
+                # 只会涉及 feature_groups, 不会涉及essential_feature_groups
+        # ----对于没有标注的列，打上nan, highR_nan, cat, highR_cat num三种标记---
         for column in X.columns:
             if column not in column2feature_groups:
-                feature_group = self.parse_feature_group(X[column])
+                feature_group = self.parse_feature_group(X[column], consider_nan=True)
                 column2feature_groups[column] = feature_group
-        for column in X.columns:
-            series = X[column]
-            essential_feature_group = self.parse_essential_feature_group(series, column2feature_groups[column])
-            essential_feature_groups.append(essential_feature_group)
+                if column not in column2essential_feature_groups:
+                    if feature_group in ("nan", "highR_nan"):
+                        essential_feature_group = self.parse_feature_group(X[column], consider_nan=False)
+                    else:
+                        essential_feature_group = feature_group
+                    column2essential_feature_groups[column] = essential_feature_group
 
         feature_groups = [column2feature_groups[column] for column in X.columns]
+        essential_feature_groups = [column2essential_feature_groups[column] for column in X.columns]
         L1 = X_train.shape[0] if X_train is not None else 0
         if X_test is not None:
             L2 = X_test.shape[0]
@@ -232,7 +212,33 @@ class DataManager(StrSignatureMixin):
         X_train.index = range(L1)
         y_train = to_array(y_train)
         y_test = to_array(y_test)
-        return X_train, y_train, X_test, y_test, feature_groups, column2feature_groups, essential_feature_groups
+        self.ml_task: MLTask = get_ml_task_from_y(y_train)
+        self.X_train = GenericDataFrame(X_train, feature_groups=feature_groups)
+        self.y_train = y_train
+        self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None
+        self.y_test = y_test if y_test is not None else None
+        self.feature_groups = feature_groups
+        self.column2feature_groups = column2feature_groups
+        self.userDefined_column2feature_groups = userDefined_column2feature_groups
+        self.essential_feature_groups = essential_feature_groups
+        self.column2essential_feature_groups = column2essential_feature_groups
+        self.nan_column2essential_fg = self.get_nan_column2essential_fg()
+        # todo: 对用户自定义特征组的验证
+
+    def get_nan_column2essential_fg(self):
+        result = {}
+        for column, feature_group in self.column2feature_groups.items():
+            if feature_group in ("nan", "highR_nan"):
+                result[column] = self.column2essential_feature_groups[column]
+        return result
+
+    def detect_nan_feature_group(self, series):
+        if is_nan(series):
+            if is_highR_nan(series, self.highR_nan_threshold):
+                return "highR_nan"
+            else:
+                return "nan"
+        return None
 
     def process_X(self, X):
         if X is None:
