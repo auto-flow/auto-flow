@@ -33,3 +33,4 @@ redis
 imbalanced-learn
 psycopg2
 skimpute
+gensim
