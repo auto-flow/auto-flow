@@ -5,7 +5,7 @@
 
 from pprint import pprint
 
-from autoflow.utils.dict import update_mask_from_other_dict
+from autoflow.utils.dict_ import update_mask_from_other_dict
 
 hdl = {
     'preprocessing': {'0nan->{highR=highR_nan,lowR=lowR_nan}(choice)': {'operate.split.nan': {'random_state': 42}},

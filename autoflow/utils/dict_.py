@@ -2,7 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, Any, List, Callable
 
-from autoflow.utils.list import remove_suffix_in_list
+from autoflow.utils.list_ import remove_suffix_in_list
 from autoflow.utils.logging_ import get_logger
 
 logger = get_logger(__name__)
@@ -13,6 +13,12 @@ def add_prefix_in_dict_keys(dict_: Dict[str, Any], prefix: str) -> Dict[str, Any
     for key, value in dict_.items():
         result[f"{prefix}{key}"] = value
     return result
+
+def pop_dict_key(dict_:dict,key_name):
+    dict_=deepcopy(dict_)
+    if key_name in dict_:
+        dict_.pop(key_name)
+    return dict_
 
 
 def group_dict_items_before_first_token(dict_: Dict[str, Any], token: str) -> Dict[str, Dict[str, Any]]:

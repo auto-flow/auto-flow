@@ -18,7 +18,7 @@ from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
-from autoflow.utils.dict import group_dict_items_before_first_token
+from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
@@ -230,7 +230,7 @@ class TrainEvaluator(BaseEvaluator):
         info["additional_info"] = {
             "config_origin": getattr(shp, "origin", "unk")
         }
-        self.resource_manager.insert_to_trials_table(info)
+        self.resource_manager.insert_to_trial_table(info)
         return {
             "loss": info["loss"],
             "status": info["status"],

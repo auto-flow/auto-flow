@@ -1,6 +1,6 @@
 import unittest
 
-from autoflow.utils.dict import update_mask_from_other_dict
+from autoflow.utils.dict_ import update_mask_from_other_dict
 from autoflow.utils.hash import get_hash_of_dict
 
 

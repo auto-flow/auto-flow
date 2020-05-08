@@ -2,7 +2,7 @@ import logging
 import os
 from fnmatch import fnmatchcase
 
-from autoflow.utils.dict import remove_None_value
+from autoflow.utils.dict_ import remove_None_value
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ class HDFS(FileSystem):
         self.connect_fs()
         tmp_path = self.join("/tmp", self.basename(path))
         dump(data, tmp_path)
-        self.client.upload(path, tmp_path)
+        self.client.upload_remote(path, tmp_path)
         os.remove(tmp_path)
 
     def load_pickle(self, path):

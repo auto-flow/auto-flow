@@ -9,7 +9,7 @@ from frozendict import frozendict
 from autoflow.constants import PHASE1, PHASE2, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.hdl.smac import _encode
 from autoflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
-from autoflow.utils.dict import add_prefix_in_dict_keys
+from autoflow.utils.dict_ import add_prefix_in_dict_keys
 from autoflow.utils.graphviz import ColorSelector
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger

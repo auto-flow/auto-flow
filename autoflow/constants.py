@@ -1,3 +1,5 @@
+import re
+
 from autoflow.utils.ml_task import MLTask
 
 binary_classification_task = MLTask("classification", "binary", "classifier")
@@ -8,4 +10,5 @@ PHASE1 = "preprocessing"
 PHASE2 = "estimating"
 SERIES_CONNECT_LEADER_TOKEN = "#"
 SERIES_CONNECT_SEPARATOR_TOKEN = "|"
-NATIVE_FEATURE_GROUPS=("text","date","cat","highR_cat","num")
+NATIVE_FEATURE_GROUPS = ("text", "date", "cat", "highR_cat", "num")
+VARIABLE_PATTERN = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")

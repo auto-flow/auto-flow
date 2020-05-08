@@ -302,10 +302,10 @@
 
 <div class="viewcode-block" id="ResourceManager.close_all"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_all">[docs]</a>    <span class="k">def</span> <span class="nf">close_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_redis</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_experiments_table</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_tasks_table</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_hdls_table</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_experiment_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_task_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_hdl_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_trial_table</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">close_fs</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -366,7 +366,7 @@
 <div class="viewcode-block" id="ResourceManager.get_ensemble_needed_info"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_ensemble_needed_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_ensemble_needed_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">MLTask</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_task_table</span><span class="p">()</span>
         <span class="n">task_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">ml_task_str</span> <span class="o">=</span> <span class="n">task_record</span><span class="o">.</span><span class="n">ml_task</span>
         <span class="n">ml_task</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">ml_task_str</span><span class="p">)</span>
@@ -379,7 +379,7 @@
 
 <div class="viewcode-block" id="ResourceManager.load_best_estimator"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.load_best_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">load_best_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ml_task</span><span class="p">:</span> <span class="n">MLTask</span><span class="p">):</span>
         <span class="c1"># todo: 最后调用分析程序？</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
         <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span> \
             <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">models_path</span><span class="p">)</span>
@@ -395,7 +395,7 @@
         <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">dict_hyper_param</span></div>
 
 <div class="viewcode-block" id="ResourceManager.get_best_k_trials"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_best_k_trials">[docs]</a>    <span class="k">def</span> <span class="nf">get_best_k_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
         <span class="n">trial_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">cost_time</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
@@ -403,7 +403,7 @@
         <span class="k">return</span> <span class="n">trial_ids</span></div>
 
 <div class="viewcode-block" id="ResourceManager.load_estimators_in_trials"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.load_estimators_in_trials">[docs]</a>    <span class="k">def</span> <span class="nf">load_estimators_in_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
         <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">trial_id</span> <span class="o">&lt;&lt;</span> <span class="n">trials</span><span class="p">)</span>
         <span class="n">estimator_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">y_true_indexes_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -425,7 +425,7 @@
     <span class="c1"># ----------runhistory------------------------------------------------------------------</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">runhistory_db_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_db_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_db_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">runhistory_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -434,7 +434,7 @@
     <span class="c1"># ----------database name------------------------------------------------------------------</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">meta_records_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">meta_record_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span> <span class="o">=</span> <span class="s2">&quot;meta_records&quot;</span>
@@ -442,7 +442,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_records_db_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">tasks_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">task_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tasks_db_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;task_</span><span class="si">{self.task_id}</span><span class="s2">&quot;</span>
@@ -495,7 +495,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
     <span class="c1"># ----------experiments_model------------------------------------------------------------------</span>
-<div class="viewcode-block" id="ResourceManager.get_experiments_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_experiments_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiments_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+<div class="viewcode-block" id="ResourceManager.get_experiments_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_experiments_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">Experiments</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
             <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">general_experiment_timestamp</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
@@ -530,19 +530,19 @@
         <span class="k">return</span> <span class="n">Experiments</span></div>
 
 <div class="viewcode-block" id="ResourceManager.get_experiment_id_by_task_id"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_experiment_id_by_task_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_id_by_task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_task_table</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">)[</span>
             <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">experiment_id</span></div>
 
 <div class="viewcode-block" id="ResourceManager.load_data_manager_by_experiment_id"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.load_data_manager_by_experiment_id">[docs]</a>    <span class="k">def</span> <span class="nf">load_data_manager_by_experiment_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_experiment_table</span><span class="p">()</span>
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
         <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">==</span> <span class="n">experiment_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">data_manager_path</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">data_manager_path</span>
         <span class="n">data_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_system</span><span class="o">.</span><span class="n">load_pickle</span><span class="p">(</span><span class="n">data_manager_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data_manager</span></div>
 
-<div class="viewcode-block" id="ResourceManager.insert_to_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_experiments_table</span><span class="p">(</span>
+<div class="viewcode-block" id="ResourceManager.insert_to_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_experiment_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">general_experiment_timestamp</span><span class="p">,</span>
             <span class="n">current_experiment_timestamp</span><span class="p">,</span>
@@ -565,7 +565,7 @@
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_all</span><span class="p">()</span>
         <span class="n">copied_resource_manager</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_experiments_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_experiment_table</span><span class="p">()</span>
         <span class="c1"># estimate new experiment_id</span>
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forecast_new_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span><span class="p">,</span> <span class="s2">&quot;experiment_id&quot;</span><span class="p">)</span>
         <span class="c1"># todo: 是否需要删除data_manager的Xy</span>
@@ -611,20 +611,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;fetched_experiment_id != experiment_id&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">=</span> <span class="n">experiment_id</span></div>
 
-<div class="viewcode-block" id="ResourceManager.init_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_experiments_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.init_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_experiment_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_records_db_name</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiments_model</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_record_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiment_model</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ResourceManager.close_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_experiments_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.close_experiments_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_experiments_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_experiment_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_experiments_db</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiments_db</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ExperimentsModel</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="c1"># ----------tasks_model------------------------------------------------------------------</span>
-<div class="viewcode-block" id="ResourceManager.get_tasks_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_tasks_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_tasks_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+<div class="viewcode-block" id="ResourceManager.get_tasks_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_tasks_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">Tasks</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
             <span class="c1"># task_id = md5(X_train, y_train, X_test, y_test, splitter, metric)</span>
             <span class="n">task_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -650,7 +650,7 @@
 <div class="viewcode-block" id="ResourceManager.insert_to_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_manager</span><span class="p">:</span> <span class="n">DataManager</span><span class="p">,</span>
                               <span class="n">metric</span><span class="p">:</span> <span class="n">Scorer</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
                               <span class="n">specific_task_token</span><span class="p">,</span> <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_tasks_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_task_table</span><span class="p">()</span>
         <span class="n">Xy_train_hash</span> <span class="o">=</span> <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
         <span class="n">Xy_test_hash</span> <span class="o">=</span> <span class="n">get_hash_of_Xy</span><span class="p">(</span><span class="n">data_manager</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="n">data_manager</span><span class="o">.</span><span class="n">y_test</span><span class="p">)</span>
         <span class="n">metric_str</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">name</span>
@@ -709,20 +709,20 @@
             <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span></div>
 
-<div class="viewcode-block" id="ResourceManager.init_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.init_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_task_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_records_db_name</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tasks_model</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_record_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_task_model</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ResourceManager.close_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.close_tasks_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_tasks_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_task_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_tasks_db</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tasks_db</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">TasksModel</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="c1"># ----------hdls_model------------------------------------------------------------------</span>
-<div class="viewcode-block" id="ResourceManager.get_hdls_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_hdls_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdls_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+<div class="viewcode-block" id="ResourceManager.get_hdls_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_hdls_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_hdl_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">HDLs</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
             <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">hdl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{})</span>
@@ -734,8 +734,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">HDLs</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">HDLs</span></div>
 
-<div class="viewcode-block" id="ResourceManager.insert_to_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">,</span> <span class="n">hdl_metadata</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_hdls_table</span><span class="p">()</span>
+<div class="viewcode-block" id="ResourceManager.insert_to_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_hdl_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">,</span> <span class="n">hdl_metadata</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_hdl_table</span><span class="p">()</span>
         <span class="n">hdl_hash</span> <span class="o">=</span> <span class="n">get_hash_of_dict</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
         <span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_hash</span>
         <span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">==</span> <span class="n">hdl_id</span><span class="p">)</span>
@@ -755,21 +755,21 @@
             <span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="n">hdl_id</span></div>
 
-<div class="viewcode-block" id="ResourceManager.init_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.init_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_hdl_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_db_name</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hdls_model</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hdl_model</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ResourceManager.close_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_hdls_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.close_hdls_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_hdls_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_hdl_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_hdls_db</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdls_db</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">HDLsModel</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="c1"># ----------trials_model------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ResourceManager.get_trials_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_trials_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_trials_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+<div class="viewcode-block" id="ResourceManager.get_trials_model"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.get_trials_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_trial_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">Trials</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
             <span class="n">trial_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">config_id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -813,20 +813,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">Trials</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">Trials</span></div>
 
-<div class="viewcode-block" id="ResourceManager.init_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.init_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.init_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_trial_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_db_name</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trials_model</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span><span class="p">:</span> <span class="n">pw</span><span class="o">.</span><span class="n">Database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Datebase</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">update_db_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_db_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trial_model</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ResourceManager.close_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResourceManager.close_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.close_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">close_trial_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_init_trials_db</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trials_db</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">TrialsModel</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ResourceManager.insert_to_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_trials_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+<div class="viewcode-block" id="ResourceManager.insert_to_trials_table"><a class="viewcode-back" href="../../../_module/autoflow.manager.html#autoflow.manager.resource_manager.ResourceManager.insert_to_trials_table">[docs]</a>    <span class="k">def</span> <span class="nf">insert_to_trial_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
         <span class="n">config_id</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config_id&quot;</span><span class="p">)</span>
         <span class="c1"># todo: 考虑更特殊的情况，不同的任务下，相同的配置</span>
         <span class="n">models_path</span><span class="p">,</span> <span class="n">intermediate_result_path</span><span class="p">,</span> <span class="n">finally_fit_model_path</span> <span class="o">=</span> \
@@ -871,7 +871,7 @@
         <span class="c1"># master segment</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_master</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
         <span class="c1"># estimators = []</span>
         <span class="c1"># for record in self.TrialsModel.select(self.TrialsModel.trial_id, self.TrialsModel.estimator).group_by(</span>
         <span class="c1">#         self.TrialsModel.estimator):</span>
@@ -893,7 +893,7 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">rm</span> <span class="o">=</span> <span class="n">ResourceManager</span><span class="p">(</span><span class="s2">&quot;/home/tqc/PycharmProjects/autoflow/test/test_db&quot;</span><span class="p">)</span>
     <span class="n">rm</span><span class="o">.</span><span class="n">init_dataset_path</span><span class="p">(</span><span class="s2">&quot;default_dataset_name&quot;</span><span class="p">)</span>
-    <span class="n">rm</span><span class="o">.</span><span class="n">init_trials_table</span><span class="p">()</span>
+    <span class="n">rm</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
     <span class="n">estimators</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">TrialsModel</span><span class="o">.</span><span class="n">estimator</span><span class="p">):</span>
         <span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span>

@@ -19,14 +19,14 @@ from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
 from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.manager.data_container.dataframe import DataframeDataContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import r2, accuracy
-from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import replace_phps, estimate_config_space_numbers
-from autoflow.utils.dict import update_mask_from_other_dict
+from autoflow.utils.dict_ import update_mask_from_other_dict
 from autoflow.utils.klass import instancing, sequencing
 from autoflow.utils.logging_ import get_logger, setup_logger
 from autoflow.utils.packages import get_class_name_of_module
@@ -152,11 +152,11 @@ class AutoFlowEstimator(BaseEstimator):
 
     def fit(
             self,
-            X_train: Union[np.ndarray, pd.DataFrame, GenericDataFrame],
+            X_train: Union[np.ndarray, pd.DataFrame, DataframeDataContainer, str],
             y_train=None,
-            X_test=None,
+            X_test: Union[np.ndarray, pd.DataFrame, DataframeDataContainer, str] = None,
             y_test=None,
-            column_descriptions: Optional[Dict] = None,
+            column_descriptions: Optional[Dict] = frozendict(),
             metric=None,
             splitter=KFold(5, True, 42),
             specific_task_token="",
@@ -205,12 +205,14 @@ class AutoFlowEstimator(BaseEstimator):
         dataset_metadata = dict(dataset_metadata)
         additional_info = dict(additional_info)
         task_metadata = dict(task_metadata)
+        column_descriptions = dict(column_descriptions)
         if isinstance(transfer_tasks, str):
             transfer_tasks = [transfer_tasks]
         if isinstance(transfer_hdls, str):
             transfer_hdls = [transfer_hdls]
         # build data_manager
         self.data_manager = DataManager(
+            self.resource_manager,
             X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
             self.highR_cat_threshold, self.consider_ordinal_as_cat
         )
@@ -236,7 +238,7 @@ class AutoFlowEstimator(BaseEstimator):
         # get task_id, and insert record into "tasks.tasks" database
         self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter,
                                                     specific_task_token, dataset_metadata, task_metadata)
-        self.resource_manager.close_tasks_table()
+        self.resource_manager.close_task_table()
         # store other params
         self.splitter = splitter
         assert len(self.hdl_constructors) == len(self.tuners)
@@ -253,22 +255,22 @@ class AutoFlowEstimator(BaseEstimator):
             else:
                 hdl = raw_hdl
             # get hdl_id, and insert record into "{task_id}.hdls" database
-            self.resource_manager.insert_to_hdls_table(hdl, hdl_constructor.hdl_metadata)
-            self.resource_manager.close_hdls_table()
+            self.resource_manager.insert_to_hdl_table(hdl, hdl_constructor.hdl_metadata)
+            self.resource_manager.close_hdl_table()
             # prepare for transfer learn. load runhistory record from old task database to new database
             self.smbo_transfer_learn(transfer_tasks, transfer_hdls)
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
-            self.resource_manager.insert_to_experiments_table(general_experiment_timestamp,
-                                                              current_experiment_timestamp,
-                                                              self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
-                                                              self.tuners, tuner, self.should_calc_all_metrics,
-                                                              self.data_manager,
-                                                              column_descriptions,
-                                                              dataset_metadata, metric, splitter,
-                                                              self.should_store_intermediate_result,
-                                                              fit_ensemble_params,
-                                                              additional_info, self.should_finally_fit)
-            self.resource_manager.close_experiments_table()
+            self.resource_manager.insert_to_experiment_table(general_experiment_timestamp,
+                                                             current_experiment_timestamp,
+                                                             self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
+                                                             self.tuners, tuner, self.should_calc_all_metrics,
+                                                             self.data_manager,
+                                                             column_descriptions,
+                                                             dataset_metadata, metric, splitter,
+                                                             self.should_store_intermediate_result,
+                                                             fit_ensemble_params,
+                                                             additional_info, self.should_finally_fit)
+            self.resource_manager.close_experiment_table()
             self.task_id = self.resource_manager.task_id
             self.hdl_id = self.resource_manager.hdl_id
             self.experiment_id = self.resource_manager.experiment_id
@@ -465,8 +467,9 @@ class AutoFlowEstimator(BaseEstimator):
             if _experiment_id is None:
                 self.logger.info(
                     "'_experiment_id' is not exist, initializing data_manager by user given parameters.")
-                self.data_manager = DataManager(X_test, column_descriptions=column_descriptions,
-                                                highR_nan_threshold=highR_nan_threshold)
+                self.data_manager: DataManager = DataManager(self.resource_manager, X_test,
+                                                             column_descriptions=column_descriptions,
+                                                             highR_nan_threshold=highR_nan_threshold)
                 is_set_X_test = True
             else:
                 self.logger.info(

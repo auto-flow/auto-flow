@@ -1,14 +1,19 @@
 # -*- encoding: utf-8 -*-
+import os
+from collections import defaultdict
 from copy import deepcopy
-from typing import Union, Any, Dict, Sequence, List
+from typing import Union, Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from frozendict import frozendict
 
+from autoflow.manager.data_container.dataframe import DataframeDataContainer
 from autoflow.pipeline.components.utils import stack_Xs
 from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
-from autoflow.utils.dataframe import pop_if_exists
+from autoflow.utils.dataframe import pop_if_exists, get_unique_col_name
+from autoflow.utils.dict_ import pop_dict_key
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask, get_ml_task_from_y
@@ -21,12 +26,13 @@ class DataManager(StrSignatureMixin):
 
     def __init__(
             self,
-            X_train: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
-            y_train: Union[pd.Series, np.ndarray, str, None] = None,
-            X_test: Union[pd.DataFrame, GenericDataFrame, np.ndarray, None] = None,
-            y_test: Union[pd.Series, np.ndarray, str, None] = None,
-            dataset_metadata: Dict[str, Any] = frozenset(),
-            column_descriptions: Dict[str, Union[List[str], str]] = None,
+            resource_manager=None,
+            X_train: Union[pd.DataFrame, DataframeDataContainer, np.ndarray, None, str] = None,
+            y_train: Union[pd.Series, np.ndarray, None] = None,
+            X_test: Union[pd.DataFrame, DataframeDataContainer, np.ndarray, None, str] = None,
+            y_test: Union[pd.Series, np.ndarray, None] = None,
+            dataset_metadata: Dict[str, Any] = frozendict(),
+            column_descriptions: Dict[str, Union[List[str], str]] = frozendict(),
             highR_nan_threshold: float = 0.5,
             highR_cat_threshold: float = 0.5,
             consider_ordinal_as_cat=False,
@@ -62,29 +68,135 @@ class DataManager(StrSignatureMixin):
         highR_nan_threshold: float
             high ratio NaN threshold, you can find examples and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
         '''
+        from autoflow.manager.resource_manager import ResourceManager
+        self.logger = get_logger(self)
+        if resource_manager is None:
+            self.logger.warning(
+                "In DataManager __init__, resource_manager is None, create a default local resource_manager.")
+            resource_manager = ResourceManager()
+        self.resource_manager: ResourceManager = resource_manager
+        self.resource_manager = resource_manager
         self.highR_cat_threshold = highR_cat_threshold
         self.consider_ordinal_as_cat = consider_ordinal_as_cat
-        self.logger = get_logger(self)
         dataset_metadata = dict(dataset_metadata)
         self.highR_nan_threshold = highR_nan_threshold
         self.dataset_metadata = dataset_metadata
-        X_train = deepcopy(X_train)
-        y_train = deepcopy(y_train)
-        X_test = deepcopy(X_test)
-        y_test = deepcopy(y_test)
-        self.parse_column_descriptions(
-            column_descriptions, X_train, y_train, X_test, y_test
-        )
+        self.column_descriptions = dict(column_descriptions)
+        # --load data to container---------------------------------
+        self.X_test, self.input_test_hash = self.parse_data_container(X_test, y_test)
+        # train set 靠后，以train set 的column_descriptions为准
+        self.X_train, self.input_train_hash = self.parse_data_container(X_train, y_train)
+        # --migrate column descriptions------------------------------
+        if self.final_column_descriptions is not None:
+            self.column_descriptions = deepcopy(self.final_column_descriptions)
+        # --column descriptions------------------------------
+        self.parse_column_descriptions()
+        # ---check target-----------------------------------------------------
+        assert "target" in self.column_descriptions
+        target_col_name = self.column_descriptions["target"]
+        self.target_col_name = target_col_name
+        # todo: 测试集预测的情况
+        # --final column descriptions------------------------------
+        if self.final_column_descriptions is None:
+            final_column_descriptions = defaultdict(list)
+            final_column_descriptions.update(self.column_descriptions)
+            for feat_grp, cols in final_column_descriptions.items():
+                if feat_grp not in ("id", "target"):
+                    if isinstance(cols, str):
+                        final_column_descriptions[feat_grp] = [cols]
+            for column, essential_feature_group in zip(self.columns, self.essential_feature_groups):
+                if column not in final_column_descriptions[essential_feature_group]:
+                    final_column_descriptions[essential_feature_group].append(column)
+            self.final_column_descriptions = final_column_descriptions
+        self.final_column_descriptions = dict(self.final_column_descriptions)
+        # ---upload to dataset-----------------------------------------------------
+        if self.X_train is not None:
+            self.X_train.column_descriptions = deepcopy(self.final_column_descriptions)
+            self.X_train.upload()
+            self.logger.info(f"TrainSet's DataSet ID = {self.X_train.dataset_hash}")
+        if self.X_test is not None:
+            if self.target_col_name in self.X_test.columns:
+                column_descriptions = pop_dict_key(self.final_column_descriptions, "target")
+            else:
+                column_descriptions = deepcopy(self.final_column_descriptions)
+            self.X_test.column_descriptions = column_descriptions
+            self.X_test.upload()
+            self.logger.info(f"TestSet's DataSet ID = {self.X_test.dataset_hash}")
+        # ---origin hash-----------------------------------------------------
+        self.train_set_hash = self.X_train.get_hash() if self.X_train is not None else ""
+        self.test_set_hash = self.X_test.get_hash() if self.X_test is not None else ""
+        if self.input_train_hash:
+            assert self.input_train_hash == self.train_set_hash
+        if self.input_test_hash:
+            assert self.input_test_hash == self.test_set_hash
+        # ---pop useless columns-----------------------------------------------------
+        y_train = pop_if_exists(self.X_train.data, target_col_name)
+        y_test = pop_if_exists(self.X_test.data, target_col_name)
+        # --确定id--
+        if "id" in self.column_descriptions:
+            id_col = self.column_descriptions["id"]  # id 应该只有一列
+            self.id_seq = pop_if_exists(self.X_train.data, id_col)
+            self.test_id_seq = pop_if_exists(self.X_test.data, id_col)
+        # --确定ignore--
+        if "ignore" in self.column_descriptions:
+            ignore_cols = self.column_descriptions["ignore"]
+            if not isinstance(ignore_cols, (list, tuple)):
+                ignore_cols = [ignore_cols]
+            for ignore_col in ignore_cols:
+                pop_if_exists(self.X_train.data, ignore_col)
+                pop_if_exists(self.X_test.data, ignore_col)
+        # --验证X与X_test的列应该相同
+        if self.X_test is not None and self.X_train is not None:
+            assert self.X_train.shape[1] == self.X_test.shape[1]
+            assert np.all(self.X_train.columns == self.X_test.columns)
+        # --设置参数--
+        y_train = to_array(y_train)
+        y_test = to_array(y_test)
+        self.ml_task: MLTask = get_ml_task_from_y(y_train)
+        self.y_train = y_train
+        self.y_test = y_test if y_test is not None else None
+
         # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定
         # fixme: 不支持multilabel
-        if len(self.y_train.shape) > 2:
-            raise ValueError('y must not have more than two dimensions, '
-                             'but has %d.' % len(y_train.shape))
 
-        if self.X_train.shape[0] != self.y_train.shape[0]:
-            raise ValueError('X and y must have the same number of '
-                             'datapoints, but have %d and %d.' % (X_train.shape[0],
-                                                                  y_train.shape[0]))
+    def concat_y(self, X, y):
+        if isinstance(y, (np.ndarray, pd.Series)):
+            # 添加y为target列并与X合并，更新column_descriptions
+            y = pd.Series(y)
+            target_col_name = get_unique_col_name(X.columns, "target")
+            y = pd.DataFrame(y, columns=[target_col_name])
+            self.column_descriptions.update({"target": target_col_name})
+            y.index = X.index
+            assert y.shape[0] == X.shape[0]
+            X = pd.merge([X, y], axis=1)
+        return X
+
+    def parse_data_container(self, X, y) -> Tuple[Optional[DataframeDataContainer], str]:
+        if X is None:
+            return X, ""
+        input_dataset_hash = ""
+        self.final_column_descriptions = None
+        if isinstance(X, str):
+            if os.path.exists(X):
+                self.logger.info(f"'{X}' will be treated as a file path.")
+                X = DataframeDataContainer(dataset_path=X, resource_manager=self.resource_manager,
+                                           dataset_metadata=self.dataset_metadata)
+            else:
+                self.logger.info(f"'{X}' will be treated as dataset ID, and download from database.")
+                input_dataset_hash = X
+                X = DataframeDataContainer(dataset_id=X, resource_manager=self.resource_manager,
+                                           dataset_metadata=self.dataset_metadata)
+                self.final_column_descriptions = deepcopy(X.column_descriptions)
+        elif isinstance(X, DataframeDataContainer):
+            pass
+        else:
+            if isinstance(X, np.ndarray):
+                X = pd.DataFrame(X,
+                                 columns=[f"column_{i}" for i in range(len(X.shape[1]))])
+            X = self.concat_y(X, y)
+            X = DataframeDataContainer(dataset_instance=X, resource_manager=self.resource_manager,
+                                       dataset_metadata=self.dataset_metadata)
+        return X, input_dataset_hash
 
     def parse_feature_group(self, series: pd.Series, consider_nan=True) -> str:
         # --- start parsing feature-group -----
@@ -121,60 +233,16 @@ class DataManager(StrSignatureMixin):
             raise TypeError
         return X
 
-    def parse_column_descriptions(self, column_descriptions, X_train, y_train, X_test, y_test):
-        # todo: 校验X是否存在重名列
-        X_train = self.type_check(X_train)
-        X_test = self.type_check(X_test)
-        both_set = False
-        if X_train is not None and X_test is None:
-            X = X_train
-            y = y_train
-        elif X_train is None and X_test is not None:
-            X = X_test
-            y = y_test
-        elif X_train is not None and X_test is not None:
-            both_set = True
-            X = X_train
-            y = y_train
-            self.logger.info("X_train and X_test are both set.")
-        else:
+    def parse_column_descriptions(self):
+        if self.X_train is None and self.X_test is None:
             self.logger.error("X_train and X_test are both None, it is invalide.")
             raise ValueError
-        if column_descriptions is None:
-            column_descriptions = {}
-            # fixme : DataManager存在只托管X的情况
-            # assert y is not None
-        # --确定target--
-        if isinstance(y, str) or "target" in column_descriptions:
-            if isinstance(y, str):
-                target_col = y
-            elif "target" in column_descriptions:
-                target_col = column_descriptions["target"]
-            else:
-                raise NotImplementedError
-            y_train = pop_if_exists(X_train, target_col)
-            y_test = pop_if_exists(X_test, target_col)
-        # --确定id--
-        if "id" in column_descriptions:
-            id_col = column_descriptions["id"]  # id 应该只有一列
-            self.id_seq = pop_if_exists(X_train, id_col)
-            self.test_id_seq = pop_if_exists(X_test, id_col)
-        # --确定ignore--
-        if "ignore" in column_descriptions:
-            ignore_cols = column_descriptions["ignore"]
-            if not isinstance(ignore_cols, Sequence):
-                ignore_cols = [ignore_cols]
-            for ignore_col in ignore_cols:
-                pop_if_exists(X_train, ignore_col)
-                pop_if_exists(X_test, ignore_col)
-        # --验证X与X_test的列应该相同
-        if both_set:
-            assert X_train.shape[1] == X_test.shape[1]
-            assert np.all(X_train.columns == X_test.columns)
+        if self.column_descriptions is None:
+            self.column_descriptions = {}
         # --用户自定义列--
         userDefined_column2feature_groups = {}
         column2feature_groups = {}
-        for key, values in column_descriptions.items():
+        for key, values in self.column_descriptions.items():
             if key in ("id", "target", "ignore"):
                 continue
             if isinstance(values, str):
@@ -184,7 +252,7 @@ class DataManager(StrSignatureMixin):
         column2feature_groups.update(deepcopy(userDefined_column2feature_groups))
         column2essential_feature_groups = deepcopy(column2feature_groups)
         # ----尝试将X_train与X_test拼在一起，然后做解析---------
-        X = stack_Xs(X_train, None, X_test)
+        X = stack_Xs(self.X_train.data, None, self.X_test.data)
         # --识别用户自定义列中的nan--
         for column, feature_group in list(column2feature_groups.items()):
             nan_col = self.detect_nan_feature_group(X[column])
@@ -205,25 +273,20 @@ class DataManager(StrSignatureMixin):
 
         feature_groups = [column2feature_groups[column] for column in X.columns]
         essential_feature_groups = [column2essential_feature_groups[column] for column in X.columns]
-        L1 = X_train.shape[0] if X_train is not None else 0
-        if X_test is not None:
-            L2 = X_test.shape[0]
-            X_test.index = range(L1, L1 + L2)
-        X_train.index = range(L1)
-        y_train = to_array(y_train)
-        y_test = to_array(y_test)
-        self.ml_task: MLTask = get_ml_task_from_y(y_train)
-        self.X_train = GenericDataFrame(X_train, feature_groups=feature_groups)
-        self.y_train = y_train
-        self.X_test = GenericDataFrame(X_test, feature_groups=feature_groups) if X_test is not None else None
-        self.y_test = y_test if y_test is not None else None
+        L1 = self.X_train.shape[0] if self.X_train is not None else 0
+        if self.X_test is not None:
+            L2 = self.X_test.shape[0]
+            self.X_test.index = range(L1, L1 + L2)
+        self.X_train.index = range(L1)
+        # todo y_train 为None的情况
+        self.columns = X.columns
         self.feature_groups = feature_groups
         self.column2feature_groups = column2feature_groups
         self.userDefined_column2feature_groups = userDefined_column2feature_groups
         self.essential_feature_groups = essential_feature_groups
         self.column2essential_feature_groups = column2essential_feature_groups
         self.nan_column2essential_fg = self.get_nan_column2essential_fg()
-        # todo: 对用户自定义特征组的验证
+        # todo: 对用户自定义特征组的验证（HDL_Constructor?）
 
     def get_nan_column2essential_fg(self):
         result = {}

@@ -4,8 +4,8 @@
 # @Contact    : tqichun@gmail.com
 import unittest
 
-from autoflow.utils.dict import update_data_structure
-from autoflow.utils.dict import update_mask_from_other_dict
+from autoflow.utils.dict_ import update_data_structure
+from autoflow.utils.dict_ import update_mask_from_other_dict
 
 
 class TestDict(unittest.TestCase):

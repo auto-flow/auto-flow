@@ -18,6 +18,14 @@ def process_dataframe(X: Union[pd.DataFrame, np.ndarray], copy=True) -> pd.DataF
     return X_
 
 
+def replace_nan_to_None(df: pd.DataFrame) -> pd.DataFrame:
+    df = deepcopy(df)
+    for column, dtype in zip(df.columns, df.dtypes):
+        if dtype == object:
+            df[column] = df[column].apply(lambda x: None if pd.isna(x) else x)
+    return df
+
+
 def pop_if_exists(df: pd.DataFrame, col: str) -> Optional[pd.DataFrame]:
     if df is None:
         return None
@@ -25,6 +33,28 @@ def pop_if_exists(df: pd.DataFrame, col: str) -> Optional[pd.DataFrame]:
         return df.pop(col)
     else:
         return None
+
+
+def replace_dict(dict_: dict, from_, to_):
+    for k, v in dict_.items():
+        if v == from_:
+            dict_[k] = to_
+
+
+def replace_dicts(dicts, from_, to_):
+    for dict_ in dicts:
+        replace_dict(dict_, from_, to_)
+
+
+def get_unique_col_name(columns: List[str], wanted: str):
+    while wanted in columns:
+        wanted = wanted + "_"
+    return wanted
+
+
+def inverse_dict(dict_: dict):
+    dict_ = deepcopy(dict_)
+    return {v: k for k, v in dict_.items()}
 
 
 def rectify_dtypes(df: pd.DataFrame):
