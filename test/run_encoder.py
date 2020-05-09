@@ -23,7 +23,7 @@ hdl_constructor=HDL_Constructor(
                     "encode.binary",
                     "encode.cat_boost",
                     "encode.hash",
-                    "encode.label",
+                    "encode.ordinal",
                     "encode.leave_one_out",
                     "encode.one_hot",
                     "encode.target",

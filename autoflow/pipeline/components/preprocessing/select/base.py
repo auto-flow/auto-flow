@@ -101,19 +101,19 @@ class SelectPercentileBase(SklearnSelectMixin, AutoFlowFeatureEngineerAlgorithm)
         return hyperparams
 
     def before_fit_X(self, X):
-        wrapper = DataFrameValuesWrapper(X)
-        X = wrapper.array
+        wrapper = DataFrameValuesWrapper(X.data)
+        X_ = wrapper.array
         if X is None:
             return None
-        X = deepcopy(X)
+        X_ = deepcopy(X_)
         if self.score_func == sklearn.feature_selection.chi2:
-            X[X < 0] = 0.0
-        return wrapper.wrap_to_dataframe(X)
+            X_[X_ < 0] = 0.0
+        X.data = wrapper.wrap_to_dataframe(X_)
 
     def before_trans_X(self, X):
-        wrapper = DataFrameValuesWrapper(X)
-        X = wrapper.array
-        X = deepcopy(X)
+        wrapper = DataFrameValuesWrapper(X.data)
+        X_ = wrapper.array
+        X_ = deepcopy(X_)
         if self.score_func == sklearn.feature_selection.chi2:
-            X[X < 0] = 0.0
-        return wrapper.wrap_to_dataframe(X)
+            X_[X_ < 0] = 0.0
+        X.data = wrapper.wrap_to_dataframe(X_)

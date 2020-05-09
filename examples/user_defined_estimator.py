@@ -22,10 +22,10 @@ class MLPClassifier(AutoFlowClassificationAlgorithm):
         return self
 
     def predict(self, X):
-        return self.estimator.predict(X)
+        return self.estimator.predict(X.data)
 
     def predict_proba(self, X):
-        return self.estimator.predict_proba(X)
+        return self.estimator.predict_proba(X.data)
 
 
 hdl_bank = get_default_hdl_bank()

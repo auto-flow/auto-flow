@@ -20,7 +20,7 @@ hdl_constructor = HDL_Constructor(
         "scaled->transformed": ["scale.normalize", "transform.power", None],
         "transformed->selected": ["select.ref_clf", "select.from_model_clf", None],
         "selected->final": ["reduce.pca", None],
-        "cat->final": ["encode.label", "encode.target"],
+        "cat->final": ["encode.ordinal", "encode.target"],
         "final->target": ["lightgbm", "libsvm_svc", "random_forest"]
     }
 )

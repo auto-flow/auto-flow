@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+from copy import deepcopy
+from pickle import dumps
+
 import numpy as np
 from frozendict import frozendict
 
@@ -59,3 +62,23 @@ class DataContainer():
     @property
     def size(self):
         return self.data.size
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: \n" + str(self.data)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}: \n" + repr(self.data)
+
+    def copy(self):
+        tmp_data = self.data
+        self.data = None
+        res = deepcopy(self)
+        self.data = tmp_data
+        return res
+
+    def pickle(self):
+        tmp_data = self.data
+        self.data = None
+        res = dumps(self)
+        self.data = tmp_data
+        return res

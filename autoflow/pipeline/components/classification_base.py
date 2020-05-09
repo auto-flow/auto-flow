@@ -1,6 +1,7 @@
 from sklearn.base import ClassifierMixin
 from sklearn.multiclass import OneVsRestClassifier
 
+from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.pipeline.components.base import AutoFlowComponent
 from autoflow.utils.data import softmax
 from autoflow.utils.ml_task import get_ml_task_from_y
@@ -19,21 +20,15 @@ class AutoFlowClassificationAlgorithm(AutoFlowComponent, ClassifierMixin):
 
     def after_process_estimator(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
                                 y_test=None):
-        # def after_process_estimator(self, estimator, X, y):
         if self.isOVR() and get_ml_task_from_y(y_train).subTask != "binary":
             estimator = OneVsRestClassifier(estimator, n_jobs=1)
         return estimator
 
-    # def _pred_or_trans(self, X_train, X_valid=None, X_test=None):
-    def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
-                       y_train=None):
-        return self.estimator.predict(self.before_pred_X(X_train_))
-
     def predict(self, X):
-        return self.pred_or_trans(X)
+        return self.estimator.predict(self.before_pred_X(X))
 
-    def predict_proba(self, X):
-        X = self.preprocess_data(X)
+    def predict_proba(self, X: DataFrameContainer):
+        X = self.filter_feature_groups(X)
         if not self.estimator:
             raise NotImplementedError()
         if not hasattr(self, "predict_proba"):

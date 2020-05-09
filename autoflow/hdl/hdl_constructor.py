@@ -46,8 +46,8 @@ class HDL_Constructor(StrSignatureMixin):
             included_highR_nan_imputers=("operate.drop", "operate.merge"),
             included_nan_imputers=(
                     "impute.adaptive_fill",),
-            included_highR_cat_encoders=("operate.drop", "encode.label", "encode.cat_boost"),
-            included_cat_encoders=("encode.one_hot", "encode.label", "encode.cat_boost"),
+            included_highR_cat_encoders=("operate.drop", "encode.ordinal", "encode.cat_boost"),
+            included_cat_encoders=("encode.one_hot", "encode.ordinal", "encode.cat_boost"),
             num2purified_workflow=frozendict({
                 "num->scaled": ["scale.standardize", "operate.merge"],
                 "scaled->purified": ["operate.merge", "transform.power"]

@@ -617,7 +617,7 @@ class ResourceManager(StrSignatureMixin):
     ):
         self.close_all()
         copied_resource_manager = deepcopy(self)
-        data_manager = deepcopy(data_manager)
+        data_manager = data_manager.copy()
         self.init_experiment_table()
         # estimate new experiment_id
         experiment_id = self.forecast_new_id(self.ExperimentModel, "experiment_id")
@@ -706,6 +706,8 @@ class ResourceManager(StrSignatureMixin):
         ml_task_str = str(data_manager.ml_task)
         if sub_sample_indexes is None:
             sub_sample_indexes = []
+        if sub_feature_indexes is None:
+            sub_feature_indexes = []
         if not isinstance(sub_sample_indexes, list):
             sub_sample_indexes = list(sub_sample_indexes)
         subsample_indexes_str = str(sub_sample_indexes)
@@ -829,7 +831,6 @@ class ResourceManager(StrSignatureMixin):
             test_all_score = self.JSONField(default={})  # 测试集
             models_path = pw.TextField(default="")
             final_model_path = pw.TextField(default="")
-            # 都是将python对象进行序列化存储，是否合适？
             y_info_path = pw.TextField(default="")
             # ------------被附加的额外信息---------------
             additional_info = self.JSONField(default={})

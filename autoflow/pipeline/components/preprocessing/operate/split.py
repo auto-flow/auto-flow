@@ -3,21 +3,21 @@ from typing import Optional
 
 import pandas as pd
 
+from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.pipeline.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
-from autoflow.pipeline.dataframe import GenericDataFrame
 
 __all__ = ["Split"]
 
 
 class Split(AutoFlowFeatureEngineerAlgorithm):
 
-    def fit(self, X_train: GenericDataFrame, y_train=None,
+    def fit(self, X_train: DataFrameContainer, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
         self.column2fg = self.hyperparams["column2fg"]
         return self
 
-    def process(self, X_origin: Optional[GenericDataFrame]) -> Optional[GenericDataFrame]:
+    def process(self, X_origin: Optional[DataFrameContainer]) -> Optional[DataFrameContainer]:
         X = deepcopy(X_origin)
         if X is None:
             return None

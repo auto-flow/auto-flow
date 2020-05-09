@@ -13,7 +13,7 @@ class StrSignatureMixin():
         result = f"{self.__class__.__name__}("
         valid_params = []
         for key in inspect.signature(self.__init__).parameters.keys():
-            value = getattr(self, key, )
+            value = getattr(self, key, NONE_TOKEN)
             if isinstance(value, str) and value == NONE_TOKEN:
                 pass
             else:

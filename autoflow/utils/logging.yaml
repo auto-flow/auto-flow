@@ -56,6 +56,11 @@ loggers:
     handlers: [file_handler]
     propagate: false
 
+  numexpr.utils:
+    level: INFO
+    handlers: [file_handler]
+    propagate: false
+
   gensim.models.hdpmodel:
     level: WARNING
     handlers: [file_handler]

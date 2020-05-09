@@ -1,8 +1,9 @@
 from copy import deepcopy
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple, Dict
 
 import numpy as np
 import pandas as pd
+
 
 
 def process_dataframe(X: Union[pd.DataFrame, np.ndarray], copy=True) -> pd.DataFrame:
@@ -26,13 +27,7 @@ def replace_nan_to_None(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def pop_if_exists(df: pd.DataFrame, col: str) -> Optional[pd.DataFrame]:
-    if df is None:
-        return None
-    if col in df.columns:
-        return df.pop(col)
-    else:
-        return None
+
 
 
 def replace_dict(dict_: dict, from_, to_):
@@ -46,10 +41,30 @@ def replace_dicts(dicts, from_, to_):
         replace_dict(dict_, from_, to_)
 
 
-def get_unique_col_name(columns: List[str], wanted: str):
-    while wanted in columns:
+def get_unique_col_name(columns: pd.Index, wanted: str):
+    while np.sum(columns == wanted) > 1:
         wanted = wanted + "_"
     return wanted
+
+
+def process_duplicated_columns(columns: pd.Index) -> Tuple[pd.Index, Dict[str, str]]:
+    # 查看是否有重复列，并去重
+    if isinstance(columns, pd.Index):
+        columns = pd.Series(columns)
+    else:
+        columns = deepcopy(columns)
+    unq, cnt = np.unique(columns, return_counts=True)
+    if len(unq) == len(columns):
+        return columns, {}
+    duplicated_columns = unq[cnt > 1]
+    index2newName = {}
+    for duplicated_column in duplicated_columns:
+        for ix in reversed(np.where(columns == duplicated_column)[0]):
+            new_name = get_unique_col_name(columns, columns[ix])
+            columns[ix] = new_name
+            index2newName[ix] = new_name
+    assert len(np.unique(columns)) == len(columns)
+    return columns, index2newName
 
 
 def inverse_dict(dict_: dict):
@@ -85,3 +100,9 @@ class DataFrameValuesWrapper():
 
     def wrap_to_dataframe(self, array):
         return pd.DataFrame(array, columns=self.dataframe.columns, index=self.dataframe.index)
+
+# if __name__ == '__main__':
+#     columns = pd.Index([str(x) for x in [1, 2, 3, 2, 3, 4, 5]])
+#     columns, index2newName = process_duplicated_columns(columns)
+#     print(columns)
+#     print(index2newName)

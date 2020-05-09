@@ -13,10 +13,8 @@ class LGBMClassifier(AutoFlowClassificationAlgorithm):
     tree_model = True
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feature_groups=None, columns_metadata=None):
-        categorical_features_indices = get_categorical_features_indices(X, columns_metadata)
-        X = to_array(X)
-        X_valid = to_array(X_valid)
+                 y_test=None, feature_groups=None):
+        categorical_features_indices = get_categorical_features_indices(X)
         if (X_valid is not None) and (y_valid is not None):
             eval_set = (X_valid, y_valid)
         else:
@@ -30,5 +28,4 @@ class LGBMClassifier(AutoFlowClassificationAlgorithm):
             early_stopping_rounds=early_stopping_rounds
         )
 
-    def before_pred_X(self, X):
-        return to_array(X)
+

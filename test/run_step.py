@@ -23,7 +23,7 @@ hdl_constructors = [
             "lowR_nan->nan": "impute.fill_abnormal",
             "highR_nan->nan": "operate.drop",
             "all->{cat_name=cat,num_name=num}": "operate.split.cat_num",
-            "cat->num": "encode.label",
+            "cat->num": "encode.ordinal",
             "num->num": [
                 {"_name": "select.from_model_clf", "_select_percent": 80},
                 {"_name": "select.rfe_clf", "_select_percent": 80},
@@ -37,7 +37,7 @@ hdl_constructors = [
             "lowR_nan->nan": "impute.fill_abnormal",
             "highR_nan->nan": "operate.drop",
             "all->{cat_name=cat,num_name=num}": "operate.split.cat_num",
-            "cat->num": "encode.label",
+            "cat->num": "encode.ordinal",
             "num->num": {"_name": "<mask>",
                          "_select_percent": {"_type": "quniform", "_value": [1, 100, 0.5],
                                                        "_default": 80}},

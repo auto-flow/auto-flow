@@ -36,7 +36,7 @@ def check_and_adjust_Xs_index(Xs: List[pd.DataFrame]):
     return True
 
 
-def get_categorical_features_indices(X, columns_metadata):
+def get_categorical_features_indices(X):
     if isinstance(X, pd.DataFrame):
         X = X.values
     categorical_features_indices = []

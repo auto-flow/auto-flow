@@ -1,7 +1,8 @@
 import pandas as pd
 
+from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.manager.data_container.utils import copy_data_container_structure
 from autoflow.pipeline.components.base import AutoFlowComponent
-from autoflow.pipeline.dataframe import GenericDataFrame
 
 
 class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
@@ -16,7 +17,7 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
     def fit_transform(self, X_train=None, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
         return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
 
-    def transform(self, X_train: GenericDataFrame = None, X_valid=None, X_test=None, y_train=None):
+    def transform(self, X_train: DataFrameContainer = None, X_valid=None, X_test=None, y_train=None):
         sample_X_test = self.hyperparams.get("sample_X_test", False)
         if y_train is not None:
             X_train, y_train = self._transform(X_train, y_train)
@@ -30,12 +31,11 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
             "y_train": y_train
         }
 
-    def _transform(self, X: GenericDataFrame, y):
-        columns = X.columns
-        feature_groups = X.feature_groups
-        columns_metadata = X.columns_metadata
-        X_, y_ = self._transform_proc(X, y)
-        X = GenericDataFrame(pd.DataFrame(X_, columns=columns), feature_groups=feature_groups, columns_metadata=columns_metadata)
+    def _transform(self, X: DataFrameContainer, y):
+        X_data, y_ = self._transform_proc(X.data, y)
+        X = copy_data_container_structure(X)
+        X_data = pd.DataFrame(X_data, columns=X.columns, index=X.index)
+        X.data = X_data
         return X, y_
 
     def _transform_proc(self, X_train, y_train):

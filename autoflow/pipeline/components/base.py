@@ -5,13 +5,10 @@ from copy import deepcopy
 from importlib import import_module
 from typing import Dict, Optional
 
-import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 
-from autoflow.pipeline.dataframe import GenericDataFrame
-from autoflow.utils.data import densify
-from autoflow.utils.dataframe import rectify_dtypes
+from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
 from autoflow.utils.logging_ import get_logger
 
@@ -27,7 +24,7 @@ class AutoFlowComponent(BaseEstimator):
     suspend_other_processes = False
     is_fit = False
 
-    def __init__(self,**kwargs):
+    def __init__(self, **kwargs):
         self.resource_manager = None
         self.estimator = None
         self.in_feature_groups = None
@@ -76,23 +73,24 @@ class AutoFlowComponent(BaseEstimator):
                                 y_test=None):
         return estimator
 
-    def before_fit_X(self, X):
+    def before_fit_X(self, X: DataFrameContainer):
         return X
 
     def before_fit_y(self, y):
         return y
 
-    def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
-                       y_train=None):
-        raise NotImplementedError
+    # def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
+    #                    y_train=None):
+    # def _pred_or_trans(self, X_train=None, X_valid=None, X_test=None, y_train=None):
+    #     raise NotImplementedError
 
-    def pred_or_trans(self, X_train, X_valid=None, X_test=None, y_train=None):
-        X_train_ = self.preprocess_data(X_train)
-        X_valid_ = self.preprocess_data(X_valid)
-        X_test_ = self.preprocess_data(X_test)
-        if not self.estimator:
-            raise NotImplementedError()
-        return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, y_train)
+    # def pred_or_trans(self, X_train, X_valid=None, X_test=None, y_train=None):
+    #     X_train_ = self.filter_feature_groups(X_train)
+    #     X_valid_ = self.filter_feature_groups(X_valid)
+    #     X_test_ = self.filter_feature_groups(X_test)
+    #     if not self.estimator:
+    #         raise NotImplementedError()
+    #     return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, y_train)
 
     def filter_invalid(self, cls, hyperparams: Dict) -> Dict:
         hyperparams = deepcopy(hyperparams)
@@ -104,27 +102,17 @@ class AutoFlowComponent(BaseEstimator):
                 pass
         return validated
 
-    def preprocess_data(self, X: Optional[GenericDataFrame], extract_info=False):
-        # todo 考虑在这                                                                                                                                                                                    里多densify
+    def filter_feature_groups(self, X: Optional[DataFrameContainer]):
         if X is None:
             return None
-        elif isinstance(X, GenericDataFrame):
-            from autoflow.pipeline.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
-            if issubclass(self.__class__, AutoFlowFeatureEngineerAlgorithm):
-                df = X.filter_feature_groups(self.in_feature_groups)
-            else:
-                df = X
-            # rectify_dtypes(df)
-            if extract_info:
-                return df, df.feature_groups, df.columns_metadata
-            else:
-                return df
-        elif isinstance(X, pd.DataFrame):
-            return X
-        elif isinstance(X, np.ndarray):
-            return X
+        assert isinstance(X, DataFrameContainer)
+        from autoflow.pipeline.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
+        if issubclass(self.__class__, AutoFlowFeatureEngineerAlgorithm):
+            df = X.filter_feature_groups(self.in_feature_groups)
         else:
-            raise NotImplementedError
+            df = X
+        # rectify_dtypes(df)
+        return df
 
     def build_proxy_estimator(self):
         # 默认采用代理模式（但可以颠覆这种模式，完全重写这个类）
@@ -140,51 +128,49 @@ class AutoFlowComponent(BaseEstimator):
     def fit(self, X_train, y_train=None,
             X_valid=None, y_valid=None,
             X_test=None, y_test=None):
-        # todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？
         # 只选择当前需要的feature_groups
-        assert isinstance(X_train, GenericDataFrame)
-        X_train_, feature_groups, columns_metadata = self.preprocess_data(X_train, True)
-        X_valid_ = self.preprocess_data(X_valid)
-        X_test_ = self.preprocess_data(X_test)
-        # 通过以上步骤，保证所有的X都是np.ndarray 形式
-        self.shape = X_train_.shape
+        assert isinstance(X_train, DataFrameContainer)
+        X_train = self.filter_feature_groups(X_train)
+        X_valid = self.filter_feature_groups(X_valid)
+        X_test = self.filter_feature_groups(X_test)
+        self.shape = X_train.shape
         self.build_proxy_estimator()
         # 对数据进行预处理（比如有的preprocessor只能处理X>0的数据）
-        X_train_ = self.before_fit_X(X_train_)
+        X_train = self.before_fit_X(X_train)
         y_train = self.before_fit_y(y_train)
-        X_test_ = self.before_fit_X(X_test_)
+        X_test = self.before_fit_X(X_test)
         y_test = self.before_fit_y(y_test)
-        X_valid_ = self.before_fit_X(X_valid_)
+        X_valid = self.before_fit_X(X_valid)
         y_valid = self.before_fit_y(y_valid)
         # 对代理的estimator进行预处理
-        self.estimator = self.after_process_estimator(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
+        self.estimator = self.after_process_estimator(self.estimator, X_train, y_train, X_valid, y_valid, X_test,
                                                       y_test)
-        # todo:  根据原信息判断是否要densify
-        X_train_ = densify(X_train_)
-        X_valid_ = densify(X_valid_)
-        X_test_ = densify(X_test_)
         # todo: 测试特征全部删除的情况
-        if len(X_train_.shape) > 1 and X_train_.shape[1] > 0:
-            self.estimator = self._fit(self.estimator, X_train_, y_train, X_valid_, y_valid, X_test_,
-                                       y_test, feature_groups, columns_metadata)
+        if len(X_train.shape) > 1 and X_train.shape[1] > 0:
+            self.estimator = self._fit(self.estimator, X_train, y_train, X_valid, y_valid, X_test,
+                                       y_test)
             self.is_fit = True
         else:
             self.logger.warning(
-                f"Component: {self.__class__.__name__} is fitting a empty data.\nShape of X_train_ = {X_train_.shape}.")
+                f"Component: {self.__class__.__name__} is fitting a empty data.\nShape of X_train_ = {X_train.shape}.")
         return self
 
-    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
-        return X_train
+    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None) -> pd.DataFrame:
+        return X_train.data
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
-             y_test=None, feature_groups=None, columns_metadata=None):
+             y_test=None):
         # 保留其他数据集的参数，方便模型拓展
         X = self.prepare_X_to_fit(X_train, X_valid, X_test)
+        X_valid = X_valid.data if X_valid is not None else None
+        X_test = X_test.data if X_valid is not None else None
+        feature_groups = X_train.feature_groups
         if self.store_intermediate:
+            # fixme: 考虑将这个部分移植到Workflow的实现中
             if self.resource_manager is None:
-                print("warn: no resource_manager when store_intermediate is True")
+                self.logger.warning("no resource_manager when store_intermediate is True")
                 fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test,
-                                                 feature_groups, columns_metadata)
+                                                 feature_groups)
             else:
                 # get hash value from X, y, hyperparameters
                 Xy_hash = get_hash_of_Xy(X, y_train)
@@ -197,20 +183,17 @@ class AutoFlowComponent(BaseEstimator):
                 else:
                     fitted_estimator = pickle.loads(result)
         else:
-            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, feature_groups,
-                                             columns_metadata)
+            fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, feature_groups)
         self.resource_manager = None  # avoid can not pickle error
         return fitted_estimator
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feature_groups=None, columns_metadata=None):
+                 y_test=None, feature_groups=None):
         return estimator.fit(X, y)
 
     def set_addition_info(self, dict_: dict):
         for key, value in dict_.items():
             setattr(self, key, value)
-
-
 
     def get_estimator(self):
         return self.estimator
@@ -271,7 +254,5 @@ class AutoFlowComponent(BaseEstimator):
         else:
             raise NotImplementedError()
 
-    def before_pred_X(self, X):
-        if isinstance(X, pd.DataFrame):
-            return X
-        return X
+    def before_pred_X(self, X: DataFrameContainer):
+        return X.data

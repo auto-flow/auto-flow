@@ -17,7 +17,7 @@ hdl_constructor = HDL_Constructor(
         "lowR_nan->nan": "impute.fill_abnormal",
         "highR_nan->nan": "operate.drop",
         "all->{cat_name=cat,num_name=num}": "operate.split.cat_num",
-        "cat->num": ["encode.cat_boost", "encode.target", "encode.label"],
+        "cat->num": ["encode.cat_boost", "encode.target", "encode.ordinal"],
         "num->target": {"_name": "lightgbm", "_vanilla": True}
     }
 )

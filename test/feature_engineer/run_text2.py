@@ -19,8 +19,8 @@ trained_pipeline = AutoFlowClassifier(
     initial_runs=1, run_limit=-1, n_jobs=1,
     included_classifiers={"_name": "lightgbm", "_vanilla": True},
     included_highR_nan_imputers="operate.drop",
-    included_cat_encoders="encode.label",
-    included_highR_cat_encoders="encode.label",
+    included_cat_encoders="encode.ordinal",
+    included_highR_cat_encoders="encode.ordinal",
     included_nan_imputers={"_name": "impute.adaptive_fill", "num_strategy": "mean"},
     num2purified_workflow={
         "num->scaled": "scale.standardize",

@@ -4,5 +4,5 @@ __all__ = ["LabelEncoder"]
 
 
 class LabelEncoder(BaseEncoder):
-    class__ = "LabelEncoder"
-    module__ = "autoflow.feature_engineer.encode.label_encode"
+    class__ = "OrdinalEncoder"
+    module__ = "category_encoders"

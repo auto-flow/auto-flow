@@ -13,10 +13,10 @@ from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERI
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
 from autoflow.hdl.shp2dhp import SHP2DHP
+from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
-from autoflow.pipeline.dataframe import GenericDataFrame
 from autoflow.pipeline.pipeline import GenericPipeline
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
@@ -99,8 +99,11 @@ class TrainEvaluator(BaseEvaluator):
         return y_pred
 
     def get_Xy(self):
-        # fixme: 会出现结果被改变的情况！  目前这个bug在autoflow.pipeline.components.preprocessing.operate.merge.Merge 出现过
-        return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
+        # fixme: 会出现结果被改变的情况！
+        #  目前这个bug在autoflow.pipeline.components.preprocessing.operate.merge.Merge 出现过
+        # fixme: autoflow.manager.data_container.dataframe.DataFrameContainer#sub_sample 函数采用deepcopy，
+        #  应该能从源头上解决X_train数据集的问题，但是要注意X_test
+        return (self.X_train), (self.y_train), deepcopy(self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
     def evaluate(self, model: GenericPipeline, X, y, X_test, y_test):
@@ -116,10 +119,11 @@ class TrainEvaluator(BaseEvaluator):
             all_scores = []
             status = "SUCCESS"
             failed_info = ""
-            for train_index, valid_index in self.splitter.split(X, y):
+            for train_index, valid_index in self.splitter.split(X.data, y):
                 cloned_model = deepcopy(model)
-                X: GenericDataFrame
-                X_train, X_valid = X.split([train_index, valid_index])
+                X: DataFrameContainer
+                X_train = X.sub_sample(train_index)
+                X_valid = X.sub_sample(valid_index)
                 y_train, y_valid = y[train_index], y[valid_index]
                 if self.should_store_intermediate_result:
                     intermediate_result = []

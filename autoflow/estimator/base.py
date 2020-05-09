@@ -459,7 +459,7 @@ class AutoFlowEstimator(BaseEstimator):
 
     def _predict(
             self,
-            X_test,
+            X_test:Union[DataFrameContainer, pd.DataFrame, np.ndarray],
             task_id=None,
             trial_id=None,
             experiment_id=None,
@@ -498,3 +498,18 @@ class AutoFlowEstimator(BaseEstimator):
                 f"'{self.__class__.__name__}' 's estimator is None, maybe you didn't use fit method to train the data.\n"
                 f"We try to query trials database if you seed trial_id specifically.")
             raise NotImplementedError
+
+    def copy(self):
+        tmp_dm = self.data_manager
+        self.data_manager = self.data_manager.copy()
+        res = deepcopy(self)
+        self.data_manager = tmp_dm
+        return res
+
+    def pickle(self):
+        from pickle import dumps
+        tmp_dm = self.data_manager
+        self.data_manager = self.data_manager.copy()
+        res = dumps(self)
+        self.data_manager = tmp_dm
+        return res

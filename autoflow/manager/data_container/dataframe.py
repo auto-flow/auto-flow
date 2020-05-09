@@ -13,8 +13,11 @@ from frozendict import frozendict
 
 from autoflow.constants import VARIABLE_PATTERN
 from autoflow.manager.data_container.base import DataContainer
-from autoflow.utils.dataframe import inverse_dict
+from autoflow.manager.data_container.utils import copy_data_container_structure
+from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns
 from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict
+
+
 
 
 class DataFrameContainer(DataContainer):
@@ -23,14 +26,15 @@ class DataFrameContainer(DataContainer):
     def __init__(self, dataset_type, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
                  dataset_metadata=frozendict()):
         self.column_descriptions = None
-        self.feature_groups = None
+        self.feature_groups = pd.Series([])
+        self.columns_mapper = {}
         super(DataFrameContainer, self).__init__(dataset_type, dataset_path, dataset_instance, dataset_id,
                                                  resource_manager, dataset_metadata)
 
     def process_dataset_instance(self, dataset_instance):
         if isinstance(dataset_instance, np.ndarray):
             dataset_instance = pd.DataFrame(dataset_instance,
-                                            columns=[f"column_{i}" for i in range(len(dataset_instance.shape[1]))])
+                                            columns=[f"column_{i}" for i in range(dataset_instance.shape[1])])
         elif isinstance(dataset_instance, pd.DataFrame):
             origin_columns = dataset_instance.columns
             columns = deepcopy(origin_columns)
@@ -84,7 +88,7 @@ class DataFrameContainer(DataContainer):
     def set_feature_groups(self, feature_groups):
         if not isinstance(feature_groups, pd.Series):
             feature_groups = pd.Series(feature_groups)
-        assert len(feature_groups)==self.shape[1], "feature_groups' length should equal to features' length."
+        assert len(feature_groups) == self.shape[1], "feature_groups' length should equal to features' length."
         self.feature_groups = feature_groups
 
     def set_column_descriptions(self, column_descriptions):
@@ -108,85 +112,86 @@ class DataFrameContainer(DataContainer):
             if isinstance(value, list) and len(value) == 0:
                 should_pop.append(key)
         for key in should_pop:
-            self.logger.info(f"After processing, feature_gourp '{key}' is empty, should discard in {self.dataset_type}.")
+            self.logger.info(
+                f"After processing, feature_gourp '{key}' is empty, should discard in {self.dataset_type}.")
             column_descriptions.pop(key)
         self.column_descriptions = column_descriptions
 
-    # def filter_feature_groups(self, feature_group: Union[List, str], copy=True, isin=True):  # , inplace=False
-    #     if feature_group == "all":  # todo 用正则表达式判断
-    #         feature_group = np.unique(self.feature_groups).tolist()
-    #     # 用于过滤feature_groups
-    #     if isinstance(feature_group, str):
-    #         feature_group = [feature_group]
-    #     if copy:
-    #         result = deepcopy(self)
-    #         result = GenericDataFrame(result, feature_groups=self.feature_groups,
-    #                                   columns_metadata=self.columns_metadata)
-    #     else:
-    #         result = self
-    #     loc = result.feature_groups.isin(feature_group)
-    #     if not isin:
-    #         loc = (~loc)
-    #     result.set_feature_groups(result.feature_groups[loc])
-    #     result.set_columns_metadata(result.columns_metadata[loc])
-    #     loc_df = result.loc[:, result.columns[loc]]
-    #     return GenericDataFrame(loc_df, feature_groups=result.feature_groups, columns_metadata=result.columns_metadata)
-    #
-    # def concat_two(self, df1, df2):
-    #     assert isinstance(df1, GenericDataFrame)
-    #     assert isinstance(df2, GenericDataFrame)
-    #
-    #     new_df = pd.concat([df1, df2], axis=1)
-    #     # todo: 杜绝重复列
-    #     new_feature_groups = pd.concat([df1.feature_groups, df2.feature_groups], ignore_index=True)
-    #     new_columns_metadata = pd.concat([df1.columns_metadata, df2.columns_metadata], ignore_index=True)
-    #     return GenericDataFrame(new_df, feature_groups=new_feature_groups, columns_metadata=new_columns_metadata)
-    #
-    # def replace_feature_groups(self, old_feature_group: Union[List[str], str],
-    #                            values: Union[np.ndarray, pd.DataFrame],
-    #                            new_feature_group: Union[str, List[str], pd.Series],
-    #                            new_columns_metadata: Union[str, List[dict], None, pd.Series] = None):
-    #     if old_feature_group == "all":
-    #         old_feature_group = np.unique(self.feature_groups).tolist()
-    #     if isinstance(old_feature_group, str):
-    #         old_feature_group = [old_feature_group]
-    #
-    #     if new_columns_metadata is None:
-    #         new_columns_metadata = [{}] * values.shape[1]
-    #     assert len(new_columns_metadata) == values.shape[1]
-    #     new_columns_metadata = pd.Series(new_columns_metadata)
-    #
-    #     # 将 new_feature_groups 从str表达为list
-    #     if isinstance(new_feature_group, str):
-    #         new_feature_group = [new_feature_group] * values.shape[1]
-    #     assert len(new_feature_group) == values.shape[1]
-    #     new_feature_group = pd.Series(new_feature_group)
-    #
-    #     # new_df 的 columns
-    #     replaced_columns = self.columns[self.feature_groups.isin(old_feature_group)]
-    #     if len(replaced_columns) == values.shape[1]:
-    #         columns = replaced_columns
-    #     else:
-    #         columns = [f"{x}_{i}" for i, x in enumerate(new_feature_group)]
-    #
-    #     # 开始构造df
-    #     if isinstance(values, np.ndarray):
-    #         values = pd.DataFrame(values, columns=columns)
-    #     deleted_df = self.filter_feature_groups(old_feature_group, True, False)
-    #     new_df = GenericDataFrame(values, feature_groups=new_feature_group,
-    #                               columns_metadata=new_columns_metadata)
-    #     new_df.index = deleted_df.index
-    #     return self.concat_two(deleted_df, new_df)
-    #
-    # def split(self, indexes, type="iloc"):
-    #     assert type in ("loc", "iloc")
-    #     for index in indexes:
-    #         if type == "iloc":
-    #             yield GenericDataFrame(self.iloc[index, :], feature_groups=self.feature_groups,
-    #                                    columns_metadata=self.columns_metadata)
-    #         elif type == "loc":
-    #             yield GenericDataFrame(self.loc[index, :], feature_groups=self.feature_groups,
-    #                                    columns_metadata=self.columns_metadata)
+    def filter_feature_groups(self, feature_group: Union[List, str], copy=True, isin=True):  # , inplace=False
+        if feature_group == "all":  # todo 用正则表达式判断
+            feature_group = np.unique(self.feature_groups).tolist()
+        # 用于过滤feature_groups
+        if isinstance(feature_group, str):
+            feature_group = [feature_group]
+        result = copy_data_container_structure(self)
+        loc = result.feature_groups.isin(feature_group)  # 实际操作的部分
+        if not isin:
+            loc = (~loc)
+        filter_data=self.data.loc[:, self.columns[loc]]
+        if copy:
+            filter_data=deepcopy(filter_data)
+        result.data = filter_data
+        result.set_feature_groups(result.feature_groups[loc])
+        # 不需要考虑column_descriptions
+        return result
+
+    def concat_to(self, other):
+        assert isinstance(other, DataFrameContainer)
+        new_df = pd.concat([self.data, other.data], axis=1)
+        dataset_metadata = deepcopy(self.dataset_metadata)
+        dataset_metadata.update(other.dataset_metadata)
+        columns, index2newName = process_duplicated_columns(new_df.columns)
+        if index2newName:
+            new_df.columns = columns
+            new_index2newName = deepcopy(dataset_metadata.get("index2newName", {}))
+            new_index2newName.update(index2newName)
+            dataset_metadata.update({"index2newName": new_index2newName})
+        new_feature_groups = pd.concat([self.feature_groups, other.feature_groups], ignore_index=True)
+        result = DataFrameContainer(self.dataset_type, dataset_instance=new_df,
+                                    resource_manager=self.resource_manager,
+                                    dataset_metadata=dataset_metadata)
+        result.set_feature_groups(new_feature_groups)
+        # 不需要考虑column_descriptions
+        return result
+
+    def replace_feature_groups(self, old_feature_group: Union[List[str], str],
+                               values: Union[np.ndarray, pd.DataFrame],
+                               new_feature_group: Union[str, List[str], pd.Series]):
+        if old_feature_group == "all":
+            old_feature_group = np.unique(self.feature_groups).tolist()
+        if isinstance(old_feature_group, str):
+            old_feature_group = [old_feature_group]
+
+        # 将 new_feature_groups 从str表达为list # fixme 类似[num]的情况， 会触发 assert
+        if isinstance(new_feature_group, str):
+            new_feature_group = [new_feature_group] * values.shape[1]
+        assert len(new_feature_group) == values.shape[1]
+        new_feature_group = pd.Series(new_feature_group)
+
+        # 实值是ndarray的情况
+        if isinstance(values, np.ndarray):
+            # new_df 的 columns
+            replaced_columns = self.columns[self.feature_groups.isin(old_feature_group)]
+            if len(replaced_columns) == values.shape[1]:
+                columns = replaced_columns
+            else:
+                # 特征数发生改变，一共有一对多，多对多，多对一三种情况
+                # todo: 这里先采用简单的实现方法，期待新的解决方法
+                columns = [f"{x}_{i}" for i, x in enumerate(new_feature_group)]
+            values = pd.DataFrame(values, columns=columns)
+
+        deleted_df = self.filter_feature_groups(old_feature_group, True, False)
+        new_df = DataFrameContainer(self.dataset_type, dataset_instance=values,
+                                    resource_manager=self.resource_manager,
+                                    dataset_metadata=self.dataset_metadata)
+        new_df.set_feature_groups(new_feature_group)
+        new_df.index = deleted_df.index
+        return deleted_df.concat_to(new_df)
+
+    def sub_sample(self, index):
+        new_df = copy_data_container_structure(self)
+        new_df.data = deepcopy(self.data.iloc[index, :])
+        return new_df
 
     @property
     def columns(self):
@@ -213,7 +218,7 @@ class DataFrameContainer(DataContainer):
         self.data.dtypes = dtypes_
 
     def __str__(self):
-        return f"{self.__class__.__name__}: \n" + str(self.data)
+        return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {list(self.feature_groups)}"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}: \n" + repr(self.data)
+        return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {list(self.feature_groups)}"

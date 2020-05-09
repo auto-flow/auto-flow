@@ -21,7 +21,7 @@ hdl_constructor=HDL_Constructor(
                 "imp->{cat_name=cat,num_name=num}": "operate.split.cat_num",
                 "cat->num": [
                     "encode.cat_boost",
-                    {"_name":"encode.label","__proba":0.8},
+                    {"_name":"encode.ordinal","__proba":0.8},
                 ],
                 "num->num":["scale.normalize",{"_name":"None","__proba":0.8}],
                 "num->target": {"_name":"catboost","_vanilla":False}
