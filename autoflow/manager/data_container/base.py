@@ -11,9 +11,11 @@ from autoflow.utils.logging_ import get_logger
 class DataContainer():
     VALID_INSTANCE = None
 
-    def __init__(self, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
+    def __init__(self, dataset_type, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
                  dataset_metadata=frozendict()):
+        self.dataset_type = dataset_type
         self.dataset_metadata = dict(dataset_metadata)
+        self.dataset_metadata.update(dataset_type=dataset_type)
         from autoflow.manager.resource_manager import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
@@ -53,3 +55,7 @@ class DataContainer():
     @property
     def shape(self):
         return self.data.shape
+
+    @property
+    def size(self):
+        return self.data.size

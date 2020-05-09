@@ -14,10 +14,22 @@ def add_prefix_in_dict_keys(dict_: Dict[str, Any], prefix: str) -> Dict[str, Any
         result[f"{prefix}{key}"] = value
     return result
 
-def pop_dict_key(dict_:dict,key_name):
-    dict_=deepcopy(dict_)
+
+def pop_dict_key(dict_: dict, key_name):
+    dict_ = deepcopy(dict_)
     if key_name in dict_:
         dict_.pop(key_name)
+    return dict_
+
+
+def parse_value_to_values(dict_: dict):
+    dict_ = deepcopy(dict_)
+    for k, v in dict_.items():
+        if not isinstance(v, (list, tuple)):
+            v = [v]
+        if isinstance(v, tuple):
+            v = list(v)
+        dict_[k] = v
     return dict_
 
 

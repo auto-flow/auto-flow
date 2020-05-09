@@ -21,7 +21,7 @@ trained_pipeline = AutoFlowClassifier(
 )
 # if not os.path.exists("autoflow_classification.bz2"):
 trained_pipeline.fit(
-    X_train="cf0eaa2e15b0fa5e85594ecae78bc6f6", X_test="798b258fabf1b0b21fb7b1f9b0f55fee",
+    X_train="53504d6c7acf98fb1fceca330d4ab4bc", X_test="bd5594be7ff050661d3472bcd544bee0",
     splitter=KFold(n_splits=3, shuffle=True, random_state=42)
 )
 joblib.dump(trained_pipeline, "autoflow_classification.bz2")

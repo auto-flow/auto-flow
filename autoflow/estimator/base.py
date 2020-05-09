@@ -19,7 +19,7 @@ from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.manager.data_container.dataframe import DataframeDataContainer
+from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import r2, accuracy
@@ -152,9 +152,9 @@ class AutoFlowEstimator(BaseEstimator):
 
     def fit(
             self,
-            X_train: Union[np.ndarray, pd.DataFrame, DataframeDataContainer, str],
+            X_train: Union[np.ndarray, pd.DataFrame, DataFrameContainer, str],
             y_train=None,
-            X_test: Union[np.ndarray, pd.DataFrame, DataframeDataContainer, str] = None,
+            X_test: Union[np.ndarray, pd.DataFrame, DataFrameContainer, str] = None,
             y_test=None,
             sub_sample_indexes=None,
             sub_feature_indexes=None,
