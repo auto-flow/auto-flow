@@ -10,6 +10,7 @@ from scipy.sparse import issparse
 from autoflow.utils.dataframe import get_object_columns
 from autoflow.utils.dict_ import sort_dict
 
+
 def get_hash_of_file(fname):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
@@ -83,8 +84,10 @@ def get_hash_of_dataframe(df: pd.DataFrame, m=None, L=500):
     sp0 = df.shape[0]
     N = ceil(sp0 / L)
     result = ""
+    s = df.iloc[:0,:].to_csv(float_format="%.3f", index=False).encode()
+    get_hash_of_str(s, m)
     for i in range(N):
-        s = df.iloc[i * L:min(sp0, (i + 1) * L)].to_csv(float_format="%.3f", index=False).encode()
+        s = df.iloc[i * L:min(sp0, (i + 1) * L)].to_csv(float_format="%.3f", index=False, header=None).encode()
         result = get_hash_of_str(s, m)
     return result
 

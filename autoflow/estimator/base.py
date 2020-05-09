@@ -135,7 +135,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.hdl_constructors = sequencing(hdl_constructor, HDL_Constructor)
         self.hdl_constructor = self.hdl_constructors[0]
         # ---resource_manager-----------------------------------
-        self.resource_manager = instancing(resource_manager, ResourceManager, kwargs)
+        self.resource_manager: ResourceManager = instancing(resource_manager, ResourceManager, kwargs)
         # ---member_variable------------------------------------
         self.estimator = None
         self.ensemble_estimator = None
@@ -156,6 +156,8 @@ class AutoFlowEstimator(BaseEstimator):
             y_train=None,
             X_test: Union[np.ndarray, pd.DataFrame, DataframeDataContainer, str] = None,
             y_test=None,
+            sub_sample_indexes=None,
+            sub_feature_indexes=None,
             column_descriptions: Optional[Dict] = frozendict(),
             metric=None,
             splitter=KFold(5, True, 42),
@@ -173,9 +175,9 @@ class AutoFlowEstimator(BaseEstimator):
         Parameters
         ----------
         X_train: :class:`numpy.ndarray` or :class:`pandas.DataFrame`
-        y_train: :class:`numpy.ndarray` or str
+        y_train: :class:`numpy.ndarray` or :class:`pandas.Series` or str
         X_test: :class:`numpy.ndarray` or :class:`pandas.DataFrame` or None
-        y_test: :class:`numpy.ndarray` or str or None
+        y_test: :class:`numpy.ndarray` or :class:`pandas.Series` or str
         column_descriptions: dict
             Description about each columns' feature_group, you can find full definition in :class:`autoflow.manager.data_manager.DataManager` .
         dataset_metadata: dict
@@ -202,6 +204,8 @@ class AutoFlowEstimator(BaseEstimator):
         -------
         self
         '''
+        self.sub_sample_indexes = sub_sample_indexes
+        self.sub_feature_indexes = sub_feature_indexes
         dataset_metadata = dict(dataset_metadata)
         additional_info = dict(additional_info)
         task_metadata = dict(task_metadata)
@@ -237,7 +241,8 @@ class AutoFlowEstimator(BaseEstimator):
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
         self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter,
-                                                    specific_task_token, dataset_metadata, task_metadata)
+                                                    specific_task_token, dataset_metadata, task_metadata,
+                                                    sub_sample_indexes, sub_feature_indexes)
         self.resource_manager.close_task_table()
         # store other params
         self.splitter = splitter
@@ -260,16 +265,27 @@ class AutoFlowEstimator(BaseEstimator):
             # prepare for transfer learn. load runhistory record from old task database to new database
             self.smbo_transfer_learn(transfer_tasks, transfer_hdls)
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
+            experiment_config = {
+                "should_finally_fit": self.should_finally_fit,
+                "should_calc_all_metric": self.should_calc_all_metrics,
+                "should_store_intermediate_result": self.should_store_intermediate_result,
+                "fit_ensemble_params": str(fit_ensemble_params),
+                "transfer_tasks": transfer_tasks,
+                "transfer_hdls": transfer_hdls,
+                "highR_nan_threshold": self.highR_nan_threshold,
+                "highR_cat_threshold": self.highR_cat_threshold,
+                "consider_ordinal_as_cat": self.consider_ordinal_as_cat,
+                "random_state": self.random_state,
+                "log_file": self.log_file,
+                "log_config": self.log_config,
+            }
             self.resource_manager.insert_to_experiment_table(general_experiment_timestamp,
                                                              current_experiment_timestamp,
                                                              self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
-                                                             self.tuners, tuner, self.should_calc_all_metrics,
+                                                             self.tuners, tuner,
                                                              self.data_manager,
-                                                             column_descriptions,
                                                              dataset_metadata, metric, splitter,
-                                                             self.should_store_intermediate_result,
-                                                             fit_ensemble_params,
-                                                             additional_info, self.should_finally_fit)
+                                                             experiment_config, additional_info)
             self.resource_manager.close_experiment_table()
             self.task_id = self.resource_manager.task_id
             self.hdl_id = self.resource_manager.hdl_id
@@ -318,7 +334,6 @@ class AutoFlowEstimator(BaseEstimator):
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
         tuners = [deepcopy(tuner) for i in range(n_jobs)]
         processes = []
-        # todo: 重构 sync_dict
         for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in \
                 zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states):
             args = (tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict)

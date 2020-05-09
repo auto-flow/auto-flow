@@ -21,7 +21,7 @@ from autoflow.manager.data_manager import DataManager
 from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts
 from autoflow.utils.dict_ import update_data_structure
-from autoflow.utils.hash import get_hash_of_Xy, get_hash_of_str, get_hash_of_dict
+from autoflow.utils.hash import get_hash_of_str, get_hash_of_dict
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
@@ -170,6 +170,7 @@ class ResourceManager(StrSignatureMixin):
         self.close_task_table()
         self.close_hdl_table()
         self.close_trial_table()
+        self.close_dataset_table()
         self.file_system.close_fs()
 
     def __reduce__(self):
@@ -553,24 +554,27 @@ class ResourceManager(StrSignatureMixin):
             current_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
             hdl_id = pw.CharField(default="")
             task_id = pw.CharField(default="")
+            train_set_id = pw.CharField(default="")  # fixme
+            test_set_id = pw.CharField(default="")  # fixme
             hdl_constructors = self.JSONField(default=[])
             hdl_constructor = pw.TextField(default="")
             raw_hdl = self.JSONField(default={})
             hdl = self.JSONField(default={})
             tuners = self.JSONField(default=[])
             tuner = pw.TextField(default="")
-            should_calc_all_metric = pw.BooleanField(default=True)
+            # should_calc_all_metric = pw.BooleanField(default=True)
             data_manager_path = pw.TextField(default="")
             resource_manager_path = pw.TextField(default="")
-            column_descriptions = self.JSONField(default={})
-            column2feature_groups = self.JSONField(default={})
+            # column_descriptions = self.JSONField(default={})
+            # column2feature_groups = self.JSONField(default={})
             dataset_metadata = self.JSONField(default={})
-            metric = pw.CharField(default=""),
+            metric = pw.CharField(default="")
             splitter = pw.CharField(default="")
             ml_task = pw.CharField(default="")
-            should_store_intermediate_result = pw.BooleanField(default=False)
-            fit_ensemble_params = pw.TextField(default="auto"),
-            should_finally_fit = pw.BooleanField(default=False)
+            # should_store_intermediate_result = pw.BooleanField(default=False)
+            # fit_ensemble_params = pw.TextField(default="auto")
+            # should_finally_fit = pw.BooleanField(default=False)
+            experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来 # fixme
             additional_info = self.JSONField(default={})  # trials与experiments同时存储
             user = pw.CharField(default=getuser)
 
@@ -603,16 +607,12 @@ class ResourceManager(StrSignatureMixin):
             hdl,
             tuners,
             tuner,
-            should_calc_all_metric,
             data_manager,
-            column_descriptions,
             dataset_metadata,
             metric,
             splitter,
-            should_store_intermediate_result,
-            fit_ensemble_params,
+            experiment_config,
             additional_info,
-            should_finally_fit,
             set_id=True
     ):
         self.close_all()
@@ -638,25 +638,22 @@ class ResourceManager(StrSignatureMixin):
             current_experiment_timestamp=current_experiment_timestamp,
             hdl_id=self.hdl_id,
             task_id=self.task_id,
+            train_set_id=data_manager.train_set_hash,
+            test_set_id=data_manager.test_set_hash,
             hdl_constructors=[str(item) for item in hdl_constructors],
             hdl_constructor=str(hdl_constructor),
             raw_hdl=raw_hdl,
             hdl=hdl,
             tuners=[str(item) for item in tuners],
             tuner=str(tuner),
-            should_calc_all_metric=should_calc_all_metric,
             data_manager_path=data_manager_path,
             resource_manager_path=resource_manager_path,
-            column_descriptions=column_descriptions,
-            column2feature_groups=data_manager.column2feature_groups,  # todo
             dataset_metadata=dataset_metadata,
             metric=metric.name,
             splitter=str(splitter),
             ml_task=str(data_manager.ml_task),
-            should_store_intermediate_result=should_store_intermediate_result,
-            fit_ensemble_params=str(fit_ensemble_params),
+            experiment_config=experiment_config,
             additional_info=additional_info,
-            should_finally_fit=should_finally_fit
         )
         fetched_experiment_id = experiment_record.experiment_id
         if fetched_experiment_id != experiment_id:
@@ -679,18 +676,15 @@ class ResourceManager(StrSignatureMixin):
     # ----------tasks_model------------------------------------------------------------------
     def get_task_model(self) -> pw.Model:
         class Task(pw.Model):
-            # task_id = md5(X_train, y_train, X_test, y_test, splitter, metric)
             task_id = pw.CharField(primary_key=True)
             metric = pw.CharField(default="")
             splitter = pw.CharField(default="")
             ml_task = pw.CharField(default="")
             specific_task_token = pw.CharField(default="")
-            # Xy_train
-            Xy_train_hash = pw.CharField(default="")
-            Xy_train_path = pw.TextField(default="")
-            # Xy_test
-            Xy_test_hash = pw.CharField(default="")
-            Xy_test_path = pw.TextField(default="")
+            train_set_id = pw.CharField(default="")
+            test_set_id = pw.CharField(default="")
+            sub_sample_indexes = self.JSONField()
+            sub_feature_indexes = self.JSONField()
             # meta info
             meta_data = self.JSONField(default={})
 
@@ -703,17 +697,23 @@ class ResourceManager(StrSignatureMixin):
     def insert_to_tasks_table(self, data_manager: DataManager,
                               metric: Scorer, splitter,
                               specific_task_token, dataset_metadata,
-                              task_metadata, set_id=True):
+                              task_metadata, sub_sample_indexes, sub_feature_indexes, set_id=True):
         self.init_task_table()
-        Xy_train_hash = get_hash_of_Xy(data_manager.X_train, data_manager.y_train)
-        Xy_test_hash = get_hash_of_Xy(data_manager.X_test, data_manager.y_test)
+        train_set_id = data_manager.train_set_hash
+        test_set_id = data_manager.test_set_hash
         metric_str = metric.name
         splitter_str = str(splitter)
         ml_task_str = str(data_manager.ml_task)
+        if sub_sample_indexes is None:
+            sub_sample_indexes = []
+        if not isinstance(sub_sample_indexes, list):
+            sub_sample_indexes = list(sub_sample_indexes)
+        subsample_indexes_str = str(sub_sample_indexes)
         # ---task_id----------------------------------------------------
         m = hashlib.md5()
-        get_hash_of_Xy(data_manager.X_train, data_manager.y_train, m)
-        get_hash_of_Xy(data_manager.X_test, data_manager.y_test, m)
+        get_hash_of_str(train_set_id, m)
+        get_hash_of_str(test_set_id, m)
+        get_hash_of_str(subsample_indexes_str, m)
         get_hash_of_str(metric_str, m)
         get_hash_of_str(splitter_str, m)
         get_hash_of_str(ml_task_str, m)
@@ -726,32 +726,16 @@ class ResourceManager(StrSignatureMixin):
         )
         # ---store_task_record----------------------------------------------------
         if len(records) == 0:
-            # ---store_datasets----------------------------------------------------
-            Xy_train = [data_manager.X_train, data_manager.y_train]
-            Xy_test = [data_manager.X_test, data_manager.y_test]
-            Xy_train_path = self.file_system.join(self.datasets_dir,
-                                                  f"{Xy_train_hash}.{self.compress_suffix}")
-            self.file_system.dump_pickle(Xy_train, Xy_train_path)
-
-            if Xy_test_hash:
-                Xy_test_path = self.file_system.join(self.datasets_dir,
-                                                     f"{Xy_test_hash}.{self.compress_suffix}")
-                self.file_system.dump_pickle(Xy_test, Xy_test_path)
-            else:
-                Xy_test_path = ""
-
             self.TaskModel.create(
                 task_id=task_id,
                 metric=metric_str,
                 splitter=splitter_str,
                 ml_task=ml_task_str,
                 specific_task_token=specific_task_token,
-                # Xy_train
-                Xy_train_hash=Xy_train_hash,
-                Xy_train_path=Xy_train_path,
-                # Xy_test
-                Xy_test_hash=Xy_test_hash,
-                Xy_test_path=Xy_test_path,
+                train_set_id=train_set_id,
+                test_set_id=test_set_id,
+                sub_sample_indexes=sub_sample_indexes,
+                sub_feature_indexes=sub_feature_indexes,
                 meta_data=meta_data
             )
         else:
@@ -836,8 +820,8 @@ class ResourceManager(StrSignatureMixin):
                                             help_text="Experiment ID. The operation of a program is called an experiment.")
             estimator = pw.CharField(default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
             loss = pw.FloatField(default=65535,
-                                   help_text="Loss value, is calculated by metric's current-value and 'optimal-value' and 'greater-is-better'. \n"
-                                             "For instance, r2 is 'greater-is-better' and 'optimal-value'=1, now the r2=0.55, so loss=0.45 . ")
+                                 help_text="Loss value, is calculated by metric's current-value and 'optimal-value' and 'greater-is-better'. \n"
+                                           "For instance, r2 is 'greater-is-better' and 'optimal-value'=1, now the r2=0.55, so loss=0.45 . ")
             losses = self.JSONField(default=[])
             test_loss = self.JSONField(default=[])  # 测试集
             all_score = self.JSONField(default={})
