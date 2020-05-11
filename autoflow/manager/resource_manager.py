@@ -893,7 +893,8 @@ class ResourceManager(StrSignatureMixin):
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
             # todo: 改用数据集存储？变成Json字段，item是dataset ID
-            intermediate_result_path = pw.TextField(default="")
+            # intermediate_result_path = pw.TextField(default="")
+            intermediate_results = self.JSONField(default=[])
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
             user = pw.CharField(max_length=32, default=getuser)

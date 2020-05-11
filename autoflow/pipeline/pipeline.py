@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from sklearn import clone
-from sklearn.pipeline import Pipeline
+from sklearn.base import BaseEstimator
 from sklearn.utils import _print_elapsed_time
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
@@ -29,7 +29,7 @@ def _fit_transform_one(transformer,
     return result, transformer
 
 
-class GenericPipeline(Pipeline):
+class GenericPipeline(BaseEstimator):
     # 可以当做Transformer，又可以当做estimator！
     resource_manager = None
 
