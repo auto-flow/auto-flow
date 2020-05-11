@@ -17,7 +17,7 @@ from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
-from autoflow.pipeline.pipeline import GenericPipeline
+from autoflow.workflow.pipeline import MLWorkflow
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
@@ -100,13 +100,13 @@ class TrainEvaluator(BaseEvaluator):
 
     def get_Xy(self):
         # fixme: 会出现结果被改变的情况！
-        #  目前这个bug在autoflow.pipeline.components.preprocessing.operate.merge.Merge 出现过
+        #  目前这个bug在autoflow.workflow.components.preprocessing.operate.merge.Merge 出现过
         # fixme: autoflow.manager.data_container.dataframe.DataFrameContainer#sub_sample 函数采用deepcopy，
         #  应该能从源头上解决X_train数据集的问题，但是要注意X_test
         return (self.X_train), (self.y_train), deepcopy(self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def evaluate(self, model: GenericPipeline, X, y, X_test, y_test):
+    def evaluate(self, model: MLWorkflow, X, y, X_test, y_test):
         assert self.resource_manager is not None
         warning_info = StringIO()
         with redirect_stderr(warning_info):
@@ -287,7 +287,7 @@ class TrainEvaluator(BaseEvaluator):
             out_feature_groups = None
         return in_feature_groups, out_feature_groups
 
-    def create_preprocessor(self, dhp: Dict) -> Optional[GenericPipeline]:
+    def create_preprocessor(self, dhp: Dict) -> Optional[MLWorkflow]:
         preprocessing_dict: dict = dhp[PHASE1]
         pipeline_list = []
         for key, value in preprocessing_dict.items():
@@ -300,13 +300,13 @@ class TrainEvaluator(BaseEvaluator):
                                                  )
             pipeline_list.extend(preprocessor)
         if pipeline_list:
-            return GenericPipeline(pipeline_list)
+            return MLWorkflow(pipeline_list)
         else:
             return None
 
-    def create_estimator(self, dhp: Dict) -> GenericPipeline:
+    def create_estimator(self, dhp: Dict) -> MLWorkflow:
         # 根据超参构造一个估计器
-        return GenericPipeline(self.create_component(dhp[PHASE2], PHASE2, self.ml_task.role))
+        return MLWorkflow(self.create_component(dhp[PHASE2], PHASE2, self.ml_task.role))
 
     def _create_component(self, key1, key2, params):
         if key2 in self.model_registry:

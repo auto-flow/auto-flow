@@ -20,7 +20,7 @@ def get_class_name_of_module(input_module):
 
 
 def get_class_object_in_pipeline_components(key1, key2):
-    module_path = f"autoflow.pipeline.components.{key1}.{key2}"
+    module_path = f"autoflow.workflow.components.{key1}.{key2}"
     _class = get_class_name_of_module(module_path)
     M = import_module(
         module_path

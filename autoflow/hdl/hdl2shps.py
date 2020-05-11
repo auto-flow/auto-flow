@@ -38,7 +38,7 @@ class HDL2SHPS(StrSignatureMixin):
         hit = []
         models = get_origin_models(models)
         for model in models:
-            module_path = f"autoflow.pipeline.components.{self.ml_task.mainTask}.{model}"
+            module_path = f"autoflow.workflow.components.{self.ml_task.mainTask}.{model}"
             _class = get_class_name_of_module(module_path)
             if _class is not None:
                 M = import_module(module_path)

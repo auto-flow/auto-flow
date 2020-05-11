@@ -9,7 +9,7 @@ from sklearn.model_selection import KFold
 
 from autoflow import AutoFlowClassifier
 from autoflow.hdl.utils import get_default_hdl_bank
-from autoflow.pipeline.components.classification import AutoFlowClassificationAlgorithm
+from autoflow.workflow.components.classification import AutoFlowClassificationAlgorithm
 from sklearn.neural_network import MLPClassifier as SklearnMLPClassifier
 
 
