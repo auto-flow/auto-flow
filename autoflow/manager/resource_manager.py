@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+import socket
 from copy import deepcopy
 from getpass import getuser
 from math import ceil
@@ -147,6 +148,8 @@ class ResourceManager(StrSignatureMixin):
         self.is_init_dataset = False
         self.is_init_redis = False
         self.is_master = False
+        self.is_init_record_db = False
+        self.is_init_dataset_db = False
         # --some specific path based on file_system---
         self.datasets_dir = self.file_system.join(self.store_path, "datasets")
         self.databases_dir = self.file_system.join(self.store_path, "databases")
@@ -160,9 +163,8 @@ class ResourceManager(StrSignatureMixin):
         self.JSONField = get_JSONField(self.db_type)
         # --database_name---------------------------------
         # None means didn't create database
-        self._meta_record_db_name = None  # meta records database
-        self._task_db_name = None
         self._dataset_db_name = None
+        self._record_db_name = None
 
     def close_all(self):
         self.close_redis()
@@ -171,6 +173,8 @@ class ResourceManager(StrSignatureMixin):
         self.close_hdl_table()
         self.close_trial_table()
         self.close_dataset_table()
+        self.close_dataset_db()
+        self.close_record_db()
         self.file_system.close_fs()
 
     def __reduce__(self):
@@ -296,91 +300,105 @@ class ResourceManager(StrSignatureMixin):
         self.is_master = is_master
 
     # ----------runhistory------------------------------------------------------------------
-    def get_runhistory_db_params(self, task_id):
-        return self.update_db_params(self.get_task_db_name(task_id))
 
     @property
     def runhistory_db_params(self):
-        return self.get_runhistory_db_params(self.task_id)
+        self.init_record_db()
+        return self.update_db_params(self.record_db_name)
 
     def get_runhistory_table_name(self, hdl_id):
-        return f"runhistory_{hdl_id}"
+        return "run_history"
 
     @property
     def runhistory_table_name(self):
         return self.get_runhistory_table_name(self.hdl_id)
 
     def migrate_runhistory(self, old_task_id, old_hdl_id, new_task_id, new_hdl_id):
-        from dsmac.runhistory.runhistory_db import RunHistoryDB
-        # 1. 把 f"task_{old_task_id}".f"runhistory_{old_hdl_id}" 的所有数据records抽出来
-        old_runhistory_db = RunHistoryDB(
-            config_space=None,
-            runhistory=None,
-            db_type=self.db_type,
-            db_params=self.get_runhistory_db_params(old_task_id),
-            db_table_name=self.get_runhistory_table_name(old_hdl_id)
-        ).get_model()
-        new_runhistory_db = RunHistoryDB(
-            config_space=None,
-            runhistory=None,
-            db_type=self.db_type,
-            db_params=self.get_runhistory_db_params(new_task_id),
-            db_table_name=self.get_runhistory_table_name(new_hdl_id)
-        ).get_model()
-        old_runhistory_records = old_runhistory_db.select().dicts()
-        if len(old_runhistory_records) == 0:
-            self.logger.warning(f"SMBO Transfer learning warning: old_runhistory_db have no records!")
-        else:
-            self.logger.info(f"SMBO Transfer learning will migrate {len(old_runhistory_records)} "
-                             f"records from old_runhistory_records.")
-            transfer_cnt = 0
-            for record in old_runhistory_records:
-                fetched = new_runhistory_db.select().where(new_runhistory_db.run_id == record["run_id"])
-                if len(fetched) == 0:
-                    transfer_cnt += 1
-                    new_runhistory_db.create(**record)
-                else:
-                    self.logger.warning(f'''run_id '{record["run_id"]}' in new_runhistory_db is already exist.''')
-            if transfer_cnt:
-                self.logger.info(
-                    f"SMBO Transfer learning successfully migrate {transfer_cnt} records to new_runhistory_db.")
-            else:
-                self.logger.warning(
-                    f"Unfortunately, all the migrates failed, "
-                    f"please check if you have done SMBO transfer learning in previous tasks.")
+        # todo: 设置一个 init_instances params
+        pass
+        # from dsmac.runhistory.runhistory_db import RunHistoryDB
+        # # 1. 把 f"task_{old_task_id}".f"runhistory_{old_hdl_id}" 的所有数据records抽出来
+        # old_runhistory_db = RunHistoryDB(
+        #     config_space=None,
+        #     runhistory=None,
+        #     db_type=self.db_type,
+        #     db_params=self.get_runhistory_db_params(old_task_id),
+        #     db_table_name=self.get_runhistory_table_name(old_hdl_id)
+        # ).get_model()
+        # new_runhistory_db = RunHistoryDB(
+        #     config_space=None,
+        #     runhistory=None,
+        #     db_type=self.db_type,
+        #     db_params=self.get_runhistory_db_params(new_task_id),
+        #     db_table_name=self.get_runhistory_table_name(new_hdl_id)
+        # ).get_model()
+        # old_runhistory_records = old_runhistory_db.select().dicts()
+        # if len(old_runhistory_records) == 0:
+        #     self.logger.warning(f"SMBO Transfer learning warning: old_runhistory_db have no records!")
+        # else:
+        #     self.logger.info(f"SMBO Transfer learning will migrate {len(old_runhistory_records)} "
+        #                      f"records from old_runhistory_records.")
+        #     transfer_cnt = 0
+        #     for record in old_runhistory_records:
+        #         fetched = new_runhistory_db.select().where(new_runhistory_db.run_id == record["run_id"])
+        #         if len(fetched) == 0:
+        #             transfer_cnt += 1
+        #             new_runhistory_db.create(**record)
+        #         else:
+        #             self.logger.warning(f'''run_id '{record["run_id"]}' in new_runhistory_db is already exist.''')
+        #     if transfer_cnt:
+        #         self.logger.info(
+        #             f"SMBO Transfer learning successfully migrate {transfer_cnt} records to new_runhistory_db.")
+        #     else:
+        #         self.logger.warning(
+        #             f"Unfortunately, all the migrates failed, "
+        #             f"please check if you have done SMBO transfer learning in previous tasks.")
 
-    # ----------database name------------------------------------------------------------------
-
-    @property
-    def meta_record_db_name(self):
-        if self._meta_record_db_name is not None:
-            return self._meta_record_db_name
-        self._meta_record_db_name = "meta_record"
-        create_database(self._meta_record_db_name, self.db_type, self.db_params)
-        return self._meta_record_db_name
-
-    def get_task_db_name(self, task_id):
-        return f"task_{task_id}"
-
-    @property
-    def task_db_name(self):
-        if self._task_db_name is not None:
-            return self._task_db_name
-        self._task_db_name = self.get_task_db_name(self.task_id)
-        create_database(self._task_db_name, self.db_type, self.db_params)
-        return self._task_db_name
-
+    # ----------autoflow_dataset------------------------------------------------------------------
     @property
     def dataset_db_name(self):
         if self._dataset_db_name is not None:
             return self._dataset_db_name
-        self._dataset_db_name = "dataset"
+        self._dataset_db_name = "autoflow_dataset"
         create_database(self._dataset_db_name, self.db_type, self.db_params)
         return self._dataset_db_name
 
+    def init_dataset_db(self):
+        if self.is_init_dataset_db:
+            return self.dataset_db
+        else:
+            self.is_init_dataset_db = True
+            self.dataset_db: pw.Database = self.Datebase(**self.update_db_params(self.dataset_db_name))
+            return self.dataset_db
+
+    def close_dataset_db(self):
+        self.dataset_db = None
+        self.is_init_dataset_db = False
+
+    # ----------autoflow_record------------------------------------------------------------------
+
+    @property
+    def record_db_name(self):
+        if self._record_db_name is not None:
+            return self._record_db_name
+        self._record_db_name = "autoflow_record"
+        create_database(self._record_db_name, self.db_type, self.db_params)
+        return self._record_db_name
+
+    def init_record_db(self):
+        if self.is_init_record_db:
+            return self.record_db
+        else:
+            self.is_init_record_db = True
+            self.record_db: pw.Database = self.Datebase(**self.update_db_params(self.record_db_name))
+            return self.record_db
+
+    def close_record_db(self):
+        self.record_db = None
+        self.is_init_record_db = False
+
     # ----------redis------------------------------------------------------------------
 
-    # todo: 重构redis并增加测试与样例
     def connect_redis(self):
         if self.is_init_redis:
             return True
@@ -427,19 +445,19 @@ class ResourceManager(StrSignatureMixin):
     # ----------dataset_model------------------------------------------------------------------
     def get_dataset_model(self) -> pw.Model:
         class Dataset_meta_record(pw.Model):
-            dataset_id = pw.CharField(primary_key=True)
+            dataset_id = pw.FixedCharField(max_length=128, primary_key=True)
             dataset_metadata = self.JSONField(default={})
-            dataset_path = pw.CharField(default="")
-            upload_type = pw.CharField(default="")
+            dataset_path = pw.CharField(max_length=512,default="")
+            upload_type = pw.CharField(max_length=16,default="")
             column_descriptions = self.JSONField(default={})
             columns_mapper = self.JSONField(default={})
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
 
             class Meta:
-                database = self.dataset_db
+                database = self.record_db
 
-        self.dataset_db.create_tables([Dataset_meta_record])
+        self.record_db.create_tables([Dataset_meta_record])
         return Dataset_meta_record
 
     def insert_to_dataset_table(
@@ -477,23 +495,19 @@ class ResourceManager(StrSignatureMixin):
 
         return L, dataset_id
 
-    def get_dataset_db(self) -> pw.Database:
-        return self.Datebase(**self.update_db_params(self.dataset_db_name))
-
     def init_dataset_table(self):
         if self.is_init_dataset:
             return
         self.is_init_dataset = True
-        self.dataset_db: pw.Database = self.get_dataset_db()
+        self.init_record_db()
         self.DatasetModel = self.get_dataset_model()
 
     def close_dataset_table(self):
         self.is_init_dataset = False
-        self.dataset_db = None
         self.DatasetModel = None
 
     def upload_df_to_table(self, df, dataset_hash):
-        dataset_db = self.get_dataset_db()
+        dataset_db = self.init_dataset_db()
 
         class Meta:
             database = dataset_db
@@ -513,7 +527,7 @@ class ResourceManager(StrSignatureMixin):
             sub_df = replace_nan_to_None(sub_df)
             dicts = sub_df.to_dict('records')
             DataframeModel.insert_many(dicts).execute()
-        dataset_db = None
+        # dataset_db = None
 
     def query_dataset_record(self, dataset_hash):
         self.init_dataset_table()
@@ -521,7 +535,7 @@ class ResourceManager(StrSignatureMixin):
         return list(records)
 
     def download_df_of_table(self, dataset_hash):
-        dataset_db = self.get_dataset_db()
+        dataset_db = self.init_dataset_db()
         models = generate_models(dataset_db)
         table_name = f"dataset_{dataset_hash}"
         if table_name not in models:
@@ -543,45 +557,39 @@ class ResourceManager(StrSignatureMixin):
         # 删除第一列数据库主键列
         database_id = df.columns[0]
         df.pop(database_id)
-        dataset_db = None
         return df
 
     # ----------experiment_model------------------------------------------------------------------
     def get_experiment_model(self) -> pw.Model:
         class Experiment(pw.Model):
             experiment_id = pw.AutoField(primary_key=True)
-            general_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
-            current_experiment_timestamp = pw.DateTimeField(default=datetime.datetime.now)
-            hdl_id = pw.CharField(default="")
-            task_id = pw.CharField(default="")
-            train_set_id = pw.CharField(default="")  # fixme
-            test_set_id = pw.CharField(default="")  # fixme
+            general_experiment_time = pw.DateTimeField(default=datetime.datetime.now)
+            current_experiment_time = pw.DateTimeField(default=datetime.datetime.now)
+            modify_time = pw.DateTimeField(default=datetime.datetime.now)
+            hdl_id = pw.FixedCharField(max_length=128,default="")
+            task_id = pw.FixedCharField(max_length=128,default="")
+            train_set_id = pw.FixedCharField(max_length=128,default="")  # fixme
+            test_set_id = pw.FixedCharField(max_length=128,default="")  # fixme
             hdl_constructors = self.JSONField(default=[])
             hdl_constructor = pw.TextField(default="")
             raw_hdl = self.JSONField(default={})
             hdl = self.JSONField(default={})
             tuners = self.JSONField(default=[])
             tuner = pw.TextField(default="")
-            # should_calc_all_metric = pw.BooleanField(default=True)
-            data_manager_path = pw.TextField(default="")
-            resource_manager_path = pw.TextField(default="")
-            # column_descriptions = self.JSONField(default={})
-            # column2feature_groups = self.JSONField(default={})
-            dataset_metadata = self.JSONField(default={})
-            metric = pw.CharField(default="")
-            splitter = pw.CharField(default="")
-            ml_task = pw.CharField(default="")
-            # should_store_intermediate_result = pw.BooleanField(default=False)
-            # fit_ensemble_params = pw.TextField(default="auto")
-            # should_finally_fit = pw.BooleanField(default=False)
+            data_manager_path = pw.CharField(max_length=512,default="")
+            resource_manager_path =  pw.CharField(max_length=512,default="")
+            dataset_metadata =  pw.CharField(max_length=512,default={})
+            metric = pw.CharField(max_length=64,default="")  # task 的冗余字段
+            splitter = pw.TextField(default="")  # task 的冗余字段
+            ml_task = pw.CharField(max_length=64,default="")  # task 的冗余字段
             experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来 # fixme
             additional_info = self.JSONField(default={})  # trials与experiments同时存储
             user = pw.CharField(default=getuser)
 
             class Meta:
-                database = self.experiment_db
+                database = self.record_db
 
-        self.experiment_db.create_tables([Experiment])
+        self.record_db.create_tables([Experiment])
         return Experiment
 
     def get_experiment_id_by_task_id(self, task_id):
@@ -599,8 +607,8 @@ class ResourceManager(StrSignatureMixin):
 
     def insert_to_experiment_table(
             self,
-            general_experiment_timestamp,
-            current_experiment_timestamp,
+            general_experiment_time,
+            current_experiment_time,
             hdl_constructors,
             hdl_constructor,
             raw_hdl,
@@ -634,8 +642,8 @@ class ResourceManager(StrSignatureMixin):
         self.file_system.dump_pickle(copied_resource_manager, resource_manager_path)
         self.additional_info = additional_info
         experiment_record = self.ExperimentModel.create(
-            general_experiment_timestamp=general_experiment_timestamp,
-            current_experiment_timestamp=current_experiment_timestamp,
+            general_experiment_time=general_experiment_time,
+            current_experiment_time=current_experiment_time,
             hdl_id=self.hdl_id,
             task_id=self.task_id,
             train_set_id=data_manager.train_set_hash,
@@ -665,33 +673,34 @@ class ResourceManager(StrSignatureMixin):
         if self.is_init_experiment:
             return
         self.is_init_experiment = True
-        self.experiment_db: pw.Database = self.Datebase(**self.update_db_params(self.meta_record_db_name))
+        self.init_record_db()
         self.ExperimentModel = self.get_experiment_model()
 
     def close_experiment_table(self):
         self.is_init_experiment = False
-        self.experiment_db = None
         self.ExperimentModel = None
 
     # ----------tasks_model------------------------------------------------------------------
     def get_task_model(self) -> pw.Model:
         class Task(pw.Model):
-            task_id = pw.CharField(primary_key=True)
-            metric = pw.CharField(default="")
-            splitter = pw.CharField(default="")
-            ml_task = pw.CharField(default="")
-            specific_task_token = pw.CharField(default="")
-            train_set_id = pw.CharField(default="")
-            test_set_id = pw.CharField(default="")
+            task_id = pw.FixedCharField(max_length=128, primary_key=True)
+            metric = pw.CharField(max_length=64,default="")
+            splitter = pw.TextField(default="")
+            ml_task = pw.CharField(max_length=64,default="")
+            specific_task_token = pw.CharField(max_length=128,default="")
+            train_set_id = pw.FixedCharField(max_length=128,default="")
+            test_set_id = pw.FixedCharField(max_length=128,default="")
             sub_sample_indexes = self.JSONField()
             sub_feature_indexes = self.JSONField()
+            create_time = pw.DateTimeField(default=datetime.datetime.now)
+            modify_time = pw.DateTimeField(default=datetime.datetime.now)
             # meta info
             meta_data = self.JSONField(default={})
 
             class Meta:
-                database = self.task_db
+                database = self.record_db
 
-        self.task_db.create_tables([Task])
+        self.record_db.create_tables([Task])
         return Task
 
     def insert_to_tasks_table(self, data_manager: DataManager,
@@ -753,34 +762,38 @@ class ResourceManager(StrSignatureMixin):
         if self.is_init_task:
             return
         self.is_init_task = True
-        self.task_db: pw.Database = self.Datebase(**self.update_db_params(self.meta_record_db_name))
+        self.init_record_db()
         self.TaskModel = self.get_task_model()
 
     def close_task_table(self):
         self.is_init_task = False
-        self.task_db = None
         self.TaskModel = None
 
     # ----------hdl_model------------------------------------------------------------------
     def get_hdl_model(self) -> pw.Model:
         class Hdl(pw.Model):
-            hdl_id = pw.CharField(primary_key=True)
+            task_id = pw.FixedCharField(max_length=128, default="")
+            hdl_id = pw.FixedCharField(max_length=128, default="")
             hdl = self.JSONField(default={})
             meta_data = self.JSONField(default={})
+            create_time = pw.DateTimeField(default=datetime.datetime.now)
+            modify_time = pw.DateTimeField(default=datetime.datetime.now)
 
             class Meta:
-                database = self.hdl_db
+                database = self.record_db
+                primary_key = pw.CompositeKey('task_id', 'hdl_id')
 
-        self.hdl_db.create_tables([Hdl])
+        self.record_db.create_tables([Hdl])
         return Hdl
 
     def insert_to_hdl_table(self, hdl, hdl_metadata, set_id=True):
         self.init_hdl_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
-        records = self.HdlModel.select().where(self.HdlModel.hdl_id == hdl_id)
+        records = self.HdlModel.select().where((self.HdlModel.task_id == self.task_id) & (self.HdlModel.hdl_id == hdl_id))
         if len(records) == 0:
             self.HdlModel.create(
+                task_id=self.task_id,
                 hdl_id=hdl_id,
                 hdl=hdl,
                 meta_data=hdl_metadata
@@ -798,12 +811,11 @@ class ResourceManager(StrSignatureMixin):
         if self.is_init_hdl:
             return
         self.is_init_hdl = True
-        self.hdl_db: pw.Database = self.Datebase(**self.update_db_params(self.task_db_name))
+        self.init_record_db()
         self.HdlModel = self.get_hdl_model()
 
     def close_hdl_table(self):
         self.is_init_hdl = False
-        self.hdl_db = None
         self.HdlModel = None
 
     # ----------trial_model------------------------------------------------------------------
@@ -812,15 +824,16 @@ class ResourceManager(StrSignatureMixin):
         class Trial(pw.Model):
             trial_id = pw.AutoField(primary_key=True,
                                     help_text="Trial ID. One experiment consists of many experiments.")
-            config_id = pw.CharField(default="",
-                                     help_text="Configuration ID. Calculated by hash value of Configuration array.")
-            task_id = pw.CharField(default="",
-                                   help_text="Task ID. Task ID is calculated by hash(TrainSet, TestSet, metric, splitter, ml_task, specific_task_token)")
-            hdl_id = pw.CharField(default="",
-                                  help_text="Hyper-param Descriptions Language ID, calculated by hash(hdl)")
+            config_id = pw.FixedCharField(max_length=128, default="",
+                                          help_text="Configuration ID. Calculated by hash value of Configuration array.")
+            task_id = pw.FixedCharField(max_length=128, default="",
+                                        help_text="Task ID. Task ID is calculated by hash(TrainSet, TestSet, metric, splitter, ml_task, specific_task_token)",
+                                        index=True)  # 加索引
+            hdl_id = pw.FixedCharField(max_length=128, default="",
+                                       help_text="Hyper-param Descriptions Language ID, calculated by hash(hdl)")
             experiment_id = pw.IntegerField(default=0,
                                             help_text="Experiment ID. The operation of a program is called an experiment.")
-            estimator = pw.CharField(default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
+            estimator = pw.CharField(max_length=32, default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
             loss = pw.FloatField(default=65535,
                                  help_text="Loss value, is calculated by metric's current-value and 'optimal-value' and 'greater-is-better'. \n"
                                            "For instance, r2 is 'greater-is-better' and 'optimal-value'=1, now the r2=0.55, so loss=0.45 . ")
@@ -829,39 +842,41 @@ class ResourceManager(StrSignatureMixin):
             all_score = self.JSONField(default={})
             all_scores = self.JSONField(default=[])
             test_all_score = self.JSONField(default={})  # 测试集
-            models_path = pw.TextField(default="")
-            final_model_path = pw.TextField(default="")
-            y_info_path = pw.TextField(default="")
+            models_path = pw.CharField(max_length=512, default="")
+            final_model_path = pw.CharField(max_length=512, default="")
+            y_info_path = pw.CharField(max_length=512, default="")
             # ------------被附加的额外信息---------------
             additional_info = self.JSONField(default={})
             # -------------------------------------
             smac_hyper_param = PickleField(default=0)
             dict_hyper_param = self.JSONField(default={})
             cost_time = pw.FloatField(default=65535)
-            status = pw.CharField(default="SUCCESS")
+            status = pw.CharField(max_length=16, default="SUCCESS")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
-            intermediate_result_path = pw.TextField(default=""),
-            timestamp = pw.DateTimeField(default=datetime.datetime.now)
-            user = pw.CharField(default=getuser)
+            # todo: 改用数据集存储？变成Json字段，item是dataset ID
+            intermediate_result_path = pw.TextField(default="")
+            create_time = pw.DateTimeField(default=datetime.datetime.now)
+            modify_time = pw.DateTimeField(default=datetime.datetime.now)
+            user = pw.CharField(max_length=32, default=getuser)
             pid = pw.IntegerField(default=os.getpid)
+            host = pw.CharField(max_length=32, default=socket.gethostname)
 
             class Meta:
-                database = self.trials_db
+                database = self.record_db
 
-        self.trials_db.create_tables([Trial])
+        self.record_db.create_tables([Trial])
         return Trial
 
     def init_trial_table(self):
         if self.is_init_trial:
             return
         self.is_init_trial = True
-        self.trials_db: pw.Database = self.Datebase(**self.update_db_params(self.task_db_name))
+        self.init_record_db()
         self.TrialsModel = self.get_trial_model()
 
     def close_trial_table(self):
         self.is_init_trial = False
-        self.trials_db = None
         self.TrialsModel = None
 
     def insert_to_trial_table(self, info: Dict):
@@ -915,7 +930,7 @@ class ResourceManager(StrSignatureMixin):
         #     estimators.append(record.estimator)
         # for estimator in estimators:
         # .where(self.TrialsModel.estimator == estimator)
-        should_delete = self.TrialsModel.select().order_by(
+        should_delete = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id).order_by(
             self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
         if len(should_delete):
             for record in should_delete:

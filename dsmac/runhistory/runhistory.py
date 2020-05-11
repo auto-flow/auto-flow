@@ -49,6 +49,7 @@ class RunHistory(object):
             overwrite_existing_runs: bool = False,
             file_system=LocalFS(),
             config_space=None,
+            instance_id="",
             db_type="sqlite",
             db_params=frozendict(),
             db_table_name="runhistory"
@@ -64,7 +65,7 @@ class RunHistory(object):
             algorithm-instance-seed were measured
             multiple times
         """
-        self.db: RunHistoryDB = RunHistoryDB(config_space, self, db_type, db_params, db_table_name)
+        self.db: RunHistoryDB = RunHistoryDB(config_space, self, db_type, db_params, db_table_name,instance_id=instance_id)
         self.file_system = file_system
         self.logger = PickableLoggerAdapter(
             self.__module__ + "." + self.__class__.__name__

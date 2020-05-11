@@ -248,9 +248,9 @@ class AutoFlowEstimator(BaseEstimator):
         self.splitter = splitter
         assert len(self.hdl_constructors) == len(self.tuners)
         n_step = len(self.hdl_constructors)
-        general_experiment_timestamp = datetime.datetime.now()
+        general_experiment_time = datetime.datetime.now()
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
-            current_experiment_timestamp = datetime.datetime.now()
+            current_experiment_time = datetime.datetime.now()
             hdl_constructor.run(self.data_manager, self.random_state)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
@@ -279,8 +279,8 @@ class AutoFlowEstimator(BaseEstimator):
                 "log_file": self.log_file,
                 "log_config": self.log_config,
             }
-            self.resource_manager.insert_to_experiment_table(general_experiment_timestamp,
-                                                             current_experiment_timestamp,
+            self.resource_manager.insert_to_experiment_table(general_experiment_time,
+                                                             current_experiment_time,
                                                              self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
                                                              self.tuners, tuner,
                                                              self.data_manager,
@@ -390,6 +390,7 @@ class AutoFlowEstimator(BaseEstimator):
         replace_phps(tuner.shps, "random_state", int(random_state))
         tuner.shps.seed(random_state)
         # todo : 增加 n_jobs ? 调研默认值
+        self.instance_id = resource_manager.task_id + "-" + resource_manager.hdl_id
         tuner.run(
             initial_configs=initial_configs,
             evaluator_params=dict(
@@ -403,7 +404,7 @@ class AutoFlowEstimator(BaseEstimator):
                 should_finally_fit=self.should_finally_fit,
                 model_registry=self.model_registry
             ),
-            instance_id=resource_manager.task_id,
+            instance_id=self.instance_id,
             rh_db_type=resource_manager.db_type,
             rh_db_params=resource_manager.runhistory_db_params,
             rh_db_table_name=resource_manager.runhistory_table_name
@@ -459,7 +460,7 @@ class AutoFlowEstimator(BaseEstimator):
 
     def _predict(
             self,
-            X_test:Union[DataFrameContainer, pd.DataFrame, np.ndarray],
+            X_test: Union[DataFrameContainer, pd.DataFrame, np.ndarray],
             task_id=None,
             trial_id=None,
             experiment_id=None,

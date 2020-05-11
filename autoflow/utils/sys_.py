@@ -1,6 +1,7 @@
 import cgitb
 import datetime
 import os
+import socket
 import sys
 import traceback
 from pathlib import Path
@@ -64,3 +65,9 @@ def get_info():
 def print_run(cmd):
     print(cmd)
     os.system(cmd)
+
+def get_ip():
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    print("Your Computer Name is:" + hostname)
+    print("Your Computer IP Address is:" + IPAddr)

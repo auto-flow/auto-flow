@@ -17,8 +17,9 @@ from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, PickleFi
 class RunHistoryDB():
 
     def __init__(self, config_space: ConfigurationSpace, runhistory, db_type="sqlite",
-                 db_params=frozendict(), db_table_name="runhistory"):
+                 db_params=frozendict(), db_table_name="runhistory", instance_id=""):
 
+        self.instance_id = instance_id
         self.db_table_name = db_table_name
         self.runhistory = runhistory
         self.db_type = db_type
@@ -34,21 +35,22 @@ class RunHistoryDB():
 
     def get_model(self) -> pw.Model:
         class Run_History(pw.Model):
-            run_id = pw.CharField(primary_key=True)
-            config_id = pw.CharField(default="")
+            run_id = pw.FixedCharField(max_length=256, primary_key=True)
+            config_id = pw.FixedCharField(max_length=128, default="")
             config = self.JSONField(default={})
             config_bin = PickleField(default=b"")
-            config_origin = pw.TextField(default="")
+            config_origin = pw.CharField(max_length=64, default="")
             cost = pw.FloatField(default=65535)
             time = pw.FloatField(default=0.0)
-            instance_id = pw.CharField(default="")
+            instance_id = pw.FixedCharField(max_length=128, default="", index=True)  # 设置索引
             seed = pw.IntegerField(default=0)
             status = pw.IntegerField(default=0)
-            additional_info = pw.CharField(default="")
+            additional_info = self.JSONField(default="")
             origin = pw.IntegerField(default=0)
             weight = pw.FloatField(default=0.0)
-            pid = pw.IntegerField(default=os.getpid)
-            timestamp = pw.DateTimeField(default=datetime.datetime.now)
+            pid = pw.IntegerField(default=os.getpid)  # todo: 改为 worker id
+            create_time = pw.DateTimeField(default=datetime.datetime.now)
+            modify_time = pw.DateTimeField(default=datetime.datetime.now)
 
             class Meta:
                 database = self.db
@@ -98,6 +100,7 @@ class RunHistoryDB():
                 status=status.value,
                 additional_info=dict(additional_info),
                 origin=origin.value,
+                modify_time=datetime.datetime.now()
             ).save()
         except Exception as e:
             pass
@@ -108,9 +111,10 @@ class RunHistoryDB():
             n_del = self.Model.delete().where(self.Model.origin < 0).execute()
             if n_del > 0:
                 self.logger.info(f"Delete {n_del} invalid records in run_history database.")
-            query = self.Model.select().where(self.Model.origin >= 0)
+            query = self.Model.select().where(self.Model.instance_id == self.instance_id).where(self.Model.origin >= 0)
         else:
-            query = self.Model.select().where(self.Model.pid != os.getpid()).where(self.Model.origin >= 0)
+            query = self.Model.select().where(self.Model.instance_id == self.instance_id).where(
+                self.Model.pid != os.getpid()).where(self.Model.origin >= 0)
         for model in query:
             run_id = model.run_id
             config_id = model.config_id
@@ -124,17 +128,11 @@ class RunHistoryDB():
             status = model.status
             additional_info = model.additional_info
             origin = model.origin
-            timestamp = model.timestamp
             try:
                 config = pickle.loads(config_bin)
             except Exception as e:
                 self.logger.error(f"{e}\nUsing config json instead to build Configuration.")
                 config = Configuration(self.config_space, values=config, origin=config_origin)
-            try:
-                additional_info = json.loads(additional_info)
-            except Exception as e:
-                self.logger.error(f"{e}\nSet default to additional_info.")
-                additional_info = {}
             self.runhistory.add(config, cost, time, StatusType(status), instance_id, seed, additional_info,
                                 DataOrigin(origin))
         self.timestamp = datetime.datetime.now()

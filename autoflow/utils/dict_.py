@@ -176,12 +176,15 @@ def update_data_structure(old_dict: dict, additional_dict: dict) -> dict:
 
 
 if __name__ == '__main__':
-    updated_dict = update_data_structure(
-        {"key1": "a", "key2": [1, True, {"a", (2,)}], "key3": {"a": 1, "b": 2}},
-        {"key1": "b", "key2": [1, False], "key3": {"a": {"b": 2}}, "key4": "new_value"}
-    )
-    wanted = {"key1": "b", "key2": [1, True, {"a", (2,)}, 1, False], "key3": {"a": {"b": 2}, "b": 2},
-              "key4": "new_value"}
-    print(updated_dict)
-    print(wanted)
-    print(updated_dict == wanted)
+    # updated_dict = update_data_structure(
+    #     {"key1": "a", "key2": [1, True, {"a", (2,)}], "key3": {"a": 1, "b": 2}},
+    #     {"key1": "b", "key2": [1, False], "key3": {"a": {"b": 2}}, "key4": "new_value"}
+    # )
+    # wanted = {"key1": "b", "key2": [1, True, {"a", (2,)}, 1, False], "key3": {"a": {"b": 2}, "b": 2},
+    #           "key4": "new_value"}
+    # print(updated_dict)
+    # print(wanted)
+    # print(updated_dict == wanted)
+    lst=[3,2,1]
+    s=sort_dict(lst)
+    print(s)

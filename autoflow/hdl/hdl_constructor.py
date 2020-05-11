@@ -9,7 +9,7 @@ from frozendict import frozendict
 from autoflow.constants import PHASE1, PHASE2, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.hdl.smac import _encode
 from autoflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
-from autoflow.utils.dict_ import add_prefix_in_dict_keys
+from autoflow.utils.dict_ import add_prefix_in_dict_keys, sort_dict
 from autoflow.utils.graphviz import ColorSelector
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
@@ -284,8 +284,11 @@ class HDL_Constructor(StrSignatureMixin):
         if contain_highR_nan or "nan" in self.data_manager.feature_groups:
             DAG_workflow["nan->imputed"] = self.included_nan_imputers
             if len(nan_fg_set) > 1:
-                DAG_workflow[f"imputed->{','.join(nan_fg_set)}"] = {"_name": "operate.split",
-                                                                    "column2fg": _encode(nan_column2essential_fg)}
+                sorted_nan_column2essential_fg = sort_dict(nan_column2essential_fg)
+                sorted_nan_fg = sort_dict(list(nan_fg_set))
+                DAG_workflow[f"imputed->{','.join(sorted_nan_fg)}"] = {"_name": "operate.split",
+                                                                       "column2fg": _encode(
+                                                                           sorted_nan_column2essential_fg)}
             elif len(nan_fg_set) == 1:
                 elem = list(nan_fg_set)[0]
                 DAG_workflow[f"imputed->{elem}"] = "operate.merge"

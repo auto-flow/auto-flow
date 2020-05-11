@@ -15,9 +15,7 @@ from autoflow.constants import VARIABLE_PATTERN
 from autoflow.manager.data_container.base import DataContainer
 from autoflow.manager.data_container.utils import copy_data_container_structure
 from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns
-from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict
-
-
+from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict, get_hash_of_str
 
 
 class DataFrameContainer(DataContainer):
@@ -55,6 +53,7 @@ class DataFrameContainer(DataContainer):
     def get_hash(self):
         assert self.column_descriptions is not None
         m = hashlib.md5()
+        get_hash_of_str(self.dataset_type, m)
         get_hash_of_dict(self.column_descriptions, m)
         return get_hash_of_dataframe(self.data, m)
 
@@ -98,21 +97,21 @@ class DataFrameContainer(DataContainer):
             if isinstance(item_list, str):
                 if item_list not in self.columns:
                     column_descriptions[feat_grp] = []
-                    self.logger.info(f"'{item_list}' didn't exist in {self.dataset_type}'s columns, ignore.")
+                    self.logger.debug(f"'{item_list}' didn't exist in {self.dataset_type}'s columns, ignore.")
             else:
                 ans = []
                 for i, elem in enumerate(item_list):
                     if elem in self.columns:
                         ans.append(elem)
                     else:
-                        self.logger.info(f"'{elem}' didn't exist in {self.dataset_type}'s columns, ignore.")
+                        self.logger.debug(f"'{elem}' didn't exist in {self.dataset_type}'s columns, ignore.")
                 column_descriptions[feat_grp] = ans
         should_pop = []
         for key, value in column_descriptions.items():
             if isinstance(value, list) and len(value) == 0:
                 should_pop.append(key)
         for key in should_pop:
-            self.logger.info(
+            self.logger.debug(
                 f"After processing, feature_gourp '{key}' is empty, should discard in {self.dataset_type}.")
             column_descriptions.pop(key)
         self.column_descriptions = column_descriptions

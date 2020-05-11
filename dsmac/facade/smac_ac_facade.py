@@ -227,10 +227,15 @@ class SMAC4AC(object):
         if runhistory_kwargs is not None:
             runhistory_def_kwargs.update(runhistory_kwargs)
         if runhistory is None:
+            if hasattr(self.scenario, "train_insts") and len(self.scenario.train_insts) > 0:
+                instance_id = self.scenario.train_insts[0]
+            else:
+                instance_id = ""
             runhistory = RunHistory(
                 **runhistory_def_kwargs,
                 config_space=self.scenario.cs,
                 file_system=scenario.file_system,
+                instance_id=instance_id,
                 db_type=scenario.db_type,
                 db_params=scenario.db_params,
                 db_table_name=scenario.db_table_name
@@ -353,8 +358,8 @@ class SMAC4AC(object):
             'par_factor': scenario.par_factor,
             'cost_for_crash': scenario.cost_for_crash,
             'abort_on_first_run_crash': scenario.abort_on_first_run_crash,
-            'use_pynisher' :scenario.use_pynisher,
-            'memory_limit':scenario.memory_limit
+            'use_pynisher': scenario.use_pynisher,
+            'memory_limit': scenario.memory_limit
         }
         if tae_runner_kwargs is not None:
             tae_def_kwargs.update(tae_runner_kwargs)
