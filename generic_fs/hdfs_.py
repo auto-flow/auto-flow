@@ -2,7 +2,7 @@ import logging
 import os
 from fnmatch import fnmatchcase
 
-from autoflow.utils.dict_ import remove_None_value
+from generic_fs.utils.utils import remove_None_value
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +120,18 @@ class HDFS(FileSystem):
         tmp_path = self.join("/tmp", self.basename(path))
         self.client.download(path, tmp_path, overwrite=True)
         return load(tmp_path)
+
+    def upload(self, path, local_path):
+        if self.exists(path):
+            logger.warning(f"{path} already exists, don't upload.")
+            return
+        self.connect_fs()
+        self.client.upload_remote(path, local_path)
+        os.remove(local_path)
+
+    def download(self, path, local_path):
+        self.connect_fs()
+        self.client.download(path, local_path, overwrite=True)
 
 
 if __name__ == '__main__':

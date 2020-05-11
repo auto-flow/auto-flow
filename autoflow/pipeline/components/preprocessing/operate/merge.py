@@ -1,7 +1,7 @@
 from typing import Optional
 
 from autoflow.manager.data_container.dataframe import DataFrameContainer
-from autoflow.manager.data_container.utils import copy_data_container_structure
+from autoflow.manager.data_container.base import copy_data_container_structure
 from autoflow.pipeline.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
 __all__ = ["Merge"]

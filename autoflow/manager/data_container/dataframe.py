@@ -3,6 +3,7 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 import hashlib
+from collections import defaultdict
 from copy import deepcopy
 from typing import Union, List
 
@@ -11,22 +12,22 @@ import numpy as np
 import pandas as pd
 from frozendict import frozendict
 
-from autoflow.constants import VARIABLE_PATTERN
-from autoflow.manager.data_container.base import DataContainer
-from autoflow.manager.data_container.utils import copy_data_container_structure
+from autoflow.constants import VARIABLE_PATTERN, UNIQUE_FEATURE_GROUPS
+from autoflow.manager.data_container.base import DataContainer, copy_data_container_structure
 from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns
 from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict, get_hash_of_str
 
 
 class DataFrameContainer(DataContainer):
     VALID_INSTANCE = (np.ndarray, pd.DataFrame)
+    dataset_type = "dataframe"
 
-    def __init__(self, dataset_type, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
+    def __init__(self, dataset_source, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
                  dataset_metadata=frozendict()):
         self.column_descriptions = None
         self.feature_groups = pd.Series([])
         self.columns_mapper = {}
-        super(DataFrameContainer, self).__init__(dataset_type, dataset_path, dataset_instance, dataset_id,
+        super(DataFrameContainer, self).__init__(dataset_source, dataset_path, dataset_instance, dataset_id,
                                                  resource_manager, dataset_metadata)
 
     def process_dataset_instance(self, dataset_instance):
@@ -54,6 +55,8 @@ class DataFrameContainer(DataContainer):
         assert self.column_descriptions is not None
         m = hashlib.md5()
         get_hash_of_str(self.dataset_type, m)
+        get_hash_of_str(self.dataset_source, m)
+        get_hash_of_str(str(list(self.columns)), m)
         get_hash_of_dict(self.column_descriptions, m)
         return get_hash_of_dataframe(self.data, m)
 
@@ -63,14 +66,19 @@ class DataFrameContainer(DataContainer):
         else:
             raise NotImplementedError
 
-    def upload(self):
+    def upload(self, upload_type="table"):
+        assert upload_type in ("table", "fs")
         self.dataset_hash = self.get_hash()
-        L, dataset_id = self.resource_manager.insert_to_dataset_table(
-            self.dataset_hash, self.dataset_metadata, "dataframe", self.column_descriptions, self.columns_mapper)
+        L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
+            self.dataset_hash, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
+            self.columns_mapper, list(self.columns))
         if L != 0:
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, will not upload. ")
         else:
-            self.resource_manager.upload_df_to_table(self.data, self.dataset_hash)
+            if upload_type == "table":
+                self.resource_manager.upload_df_to_table(self.data, self.dataset_hash)
+            else:
+                self.resource_manager.upload_df_to_fs(self.data, dataset_path)
 
     def download(self, dataset_id):
         records = self.resource_manager.query_dataset_record(dataset_id)
@@ -79,9 +87,18 @@ class DataFrameContainer(DataContainer):
         record = records[0]
         self.column_descriptions = record["column_descriptions"]
         self.columns_mapper = record["columns_mapper"]
-        df = self.resource_manager.download_df_of_table(dataset_id)
+        self.dataset_source=record["dataset_source"]
+        self.dataset_metadata=record["dataset_metadata"]
+        upload_type=record["upload_type"]
+        columns = record["columns"]
+        if upload_type=="table":
+            df = self.resource_manager.download_df_of_table(dataset_id, columns)
+        else:
+            df = self.resource_manager.download_df_of_table(dataset_id, columns)
         inverse_columns_mapper = inverse_dict(self.columns_mapper)
         df.columns = df.columns.map(inverse_columns_mapper)
+        # todo: 将各种信息补齐
+        # todo: 建立本地缓存，防止二次下载
         return df
 
     def set_feature_groups(self, feature_groups):
@@ -89,6 +106,16 @@ class DataFrameContainer(DataContainer):
             feature_groups = pd.Series(feature_groups)
         assert len(feature_groups) == self.shape[1], "feature_groups' length should equal to features' length."
         self.feature_groups = feature_groups
+        self.column_descriptions = self.feature_groups2column_descriptions(feature_groups)
+
+    def feature_groups2column_descriptions(self, feature_groups):
+        result = defaultdict(list)
+        for column, feature_group in zip(self.columns, feature_groups):
+            if feature_group in UNIQUE_FEATURE_GROUPS:
+                result[feature_group] = column
+            else:
+                result[feature_group].append(column)
+        return dict(result)
 
     def set_column_descriptions(self, column_descriptions):
         assert isinstance(column_descriptions, dict)
@@ -97,14 +124,14 @@ class DataFrameContainer(DataContainer):
             if isinstance(item_list, str):
                 if item_list not in self.columns:
                     column_descriptions[feat_grp] = []
-                    self.logger.debug(f"'{item_list}' didn't exist in {self.dataset_type}'s columns, ignore.")
+                    self.logger.debug(f"'{item_list}' didn't exist in {self.dataset_source}'s columns, ignore.")
             else:
                 ans = []
                 for i, elem in enumerate(item_list):
                     if elem in self.columns:
                         ans.append(elem)
                     else:
-                        self.logger.debug(f"'{elem}' didn't exist in {self.dataset_type}'s columns, ignore.")
+                        self.logger.debug(f"'{elem}' didn't exist in {self.dataset_source}'s columns, ignore.")
                 column_descriptions[feat_grp] = ans
         should_pop = []
         for key, value in column_descriptions.items():
@@ -112,7 +139,7 @@ class DataFrameContainer(DataContainer):
                 should_pop.append(key)
         for key in should_pop:
             self.logger.debug(
-                f"After processing, feature_gourp '{key}' is empty, should discard in {self.dataset_type}.")
+                f"After processing, feature_gourp '{key}' is empty, should discard in {self.dataset_source}.")
             column_descriptions.pop(key)
         self.column_descriptions = column_descriptions
 
@@ -126,9 +153,9 @@ class DataFrameContainer(DataContainer):
         loc = result.feature_groups.isin(feature_group)  # 实际操作的部分
         if not isin:
             loc = (~loc)
-        filter_data=self.data.loc[:, self.columns[loc]]
+        filter_data = self.data.loc[:, self.columns[loc]]
         if copy:
-            filter_data=deepcopy(filter_data)
+            filter_data = deepcopy(filter_data)
         result.data = filter_data
         result.set_feature_groups(result.feature_groups[loc])
         # 不需要考虑column_descriptions
@@ -146,7 +173,7 @@ class DataFrameContainer(DataContainer):
             new_index2newName.update(index2newName)
             dataset_metadata.update({"index2newName": new_index2newName})
         new_feature_groups = pd.concat([self.feature_groups, other.feature_groups], ignore_index=True)
-        result = DataFrameContainer(self.dataset_type, dataset_instance=new_df,
+        result = DataFrameContainer(self.dataset_source, dataset_instance=new_df,
                                     resource_manager=self.resource_manager,
                                     dataset_metadata=dataset_metadata)
         result.set_feature_groups(new_feature_groups)
@@ -180,7 +207,7 @@ class DataFrameContainer(DataContainer):
             values = pd.DataFrame(values, columns=columns)
 
         deleted_df = self.filter_feature_groups(old_feature_group, True, False)
-        new_df = DataFrameContainer(self.dataset_type, dataset_instance=values,
+        new_df = DataFrameContainer(self.dataset_source, dataset_instance=values,
                                     resource_manager=self.resource_manager,
                                     dataset_metadata=self.dataset_metadata)
         new_df.set_feature_groups(new_feature_group)

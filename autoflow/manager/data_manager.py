@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from frozendict import frozendict
 
-from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS
+from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNIQUE_FEATURE_GROUPS
 from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.pipeline.components.utils import stack_Xs
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
@@ -109,11 +109,12 @@ class DataManager(StrSignatureMixin):
         if self.final_column_descriptions is None:
             final_column_descriptions = defaultdict(list)
             final_column_descriptions.update(self.column_descriptions)
+            # 先将非唯一的特征组处理为列表
             for feat_grp, cols in final_column_descriptions.items():
-                if feat_grp not in ("id", "target"):
+                if feat_grp not in UNIQUE_FEATURE_GROUPS:
                     if isinstance(cols, str):
                         final_column_descriptions[feat_grp] = [cols]
-
+            # 然后开始更新
             for column, essential_feature_group in self.column2essential_feature_groups.items():
                 if column not in final_column_descriptions[essential_feature_group]:
                     final_column_descriptions[essential_feature_group].append(column)
@@ -190,7 +191,7 @@ class DataManager(StrSignatureMixin):
             X = pd.merge([X, y], axis=1)
         return X
 
-    def parse_data_container(self, dataset_type, X, y) -> Tuple[Optional[DataFrameContainer], str]:
+    def parse_data_container(self, dataset_source, X, y) -> Tuple[Optional[DataFrameContainer], str]:
         if X is None:
             return X, ""
         input_dataset_hash = ""
@@ -198,12 +199,12 @@ class DataManager(StrSignatureMixin):
         if isinstance(X, str):
             if os.path.exists(X):
                 self.logger.info(f"'{X}' will be treated as a file path.")
-                X = DataFrameContainer(dataset_type, dataset_path=X, resource_manager=self.resource_manager,
+                X = DataFrameContainer(dataset_source, dataset_path=X, resource_manager=self.resource_manager,
                                        dataset_metadata=self.dataset_metadata)
             else:
                 self.logger.info(f"'{X}' will be treated as dataset ID, and download from database.")
                 input_dataset_hash = X
-                X = DataFrameContainer(dataset_type, dataset_id=X, resource_manager=self.resource_manager,
+                X = DataFrameContainer(dataset_source, dataset_id=X, resource_manager=self.resource_manager,
                                        dataset_metadata=self.dataset_metadata)
                 self.final_column_descriptions = deepcopy(X.column_descriptions)
         elif isinstance(X, DataFrameContainer):
@@ -213,7 +214,7 @@ class DataManager(StrSignatureMixin):
                 X = pd.DataFrame(X,
                                  columns=[f"column_{i}" for i in range(len(X.shape[1]))])
             X = self.concat_y(X, y)
-            X = DataFrameContainer(dataset_type, dataset_instance=X, resource_manager=self.resource_manager,
+            X = DataFrameContainer(dataset_source, dataset_instance=X, resource_manager=self.resource_manager,
                                    dataset_metadata=self.dataset_metadata)
         return X, input_dataset_hash
 

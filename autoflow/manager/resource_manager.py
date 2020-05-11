@@ -447,10 +447,13 @@ class ResourceManager(StrSignatureMixin):
         class Dataset_meta_record(pw.Model):
             dataset_id = pw.FixedCharField(max_length=128, primary_key=True)
             dataset_metadata = self.JSONField(default={})
-            dataset_path = pw.CharField(max_length=512,default="")
-            upload_type = pw.CharField(max_length=16,default="")
+            dataset_path = pw.CharField(max_length=512, default="")
+            upload_type = pw.CharField(max_length=16, default="")
+            dataset_type = pw.CharField(max_length=16, default="")
+            dataset_source = pw.CharField(max_length=32, default="")
             column_descriptions = self.JSONField(default={})
             columns_mapper = self.JSONField(default={})
+            columns = self.JSONField(default={})
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
 
@@ -465,35 +468,37 @@ class ResourceManager(StrSignatureMixin):
             dataset_hash,
             dataset_metadata,
             upload_type,
+            dataset_source,
             column_descriptions,
-            columns_mapper
-    ) -> Tuple[int, int]:
+            columns_mapper,
+            columns
+    ) -> Tuple[int, str, str]:
         self.init_dataset_table()
-        records = self.DatasetModel.select().where(self.DatasetModel.dataset_id == dataset_hash).dicts()
+        records = self.DatasetModel.select().where(self.DatasetModel.dataset_id == dataset_hash)
         L = len(records)
+        dataset_path = ""
         if L != 0:
             record = records[0]
-            record.update({
-                "dataset_metadata": dataset_metadata,
-                "modify_time": datetime.datetime.now(),
-                "column_descriptions": column_descriptions,
-                "columns_mapper": columns_mapper
-            })
-            self.DatasetModel(
-                **record
-            ).save()
-            dataset_id = record["dataset_id"]
+            record.modify_time = datetime.datetime.now(),
+            record.dataset_metadata = dataset_metadata
+            record.save()
         else:
+            if upload_type == "fs":
+                dataset_path = self.file_system.join(self.datasets_dir, f"{dataset_hash}.h5")
             record = self.DatasetModel().create(
                 dataset_id=dataset_hash,
                 dataset_metadata=dataset_metadata,
+                dataset_path=dataset_path,
+                dataset_type="dataframe",
                 upload_type=upload_type,
+                dataset_source=dataset_source,
                 column_descriptions=column_descriptions,
-                columns_mapper=columns_mapper
+                columns_mapper=columns_mapper,
+                columns=columns
             )
-            dataset_id = record.dataset_id
+        dataset_id = record.dataset_id
 
-        return L, dataset_id
+        return L, dataset_id, dataset_path
 
     def init_dataset_table(self):
         if self.is_init_dataset:
@@ -527,14 +532,20 @@ class ResourceManager(StrSignatureMixin):
             sub_df = replace_nan_to_None(sub_df)
             dicts = sub_df.to_dict('records')
             DataframeModel.insert_many(dicts).execute()
-        # dataset_db = None
 
-    def query_dataset_record(self, dataset_hash):
+    def upload_df_to_fs(self, df: pd.DataFrame, dataset_path):
+        tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        df.to_hdf(tmp_path, "dataset")
+        self.file_system.upload(dataset_path, tmp_path)
+
+    def query_dataset_record(self, dataset_hash) -> List[Dict[str, Any]]:
         self.init_dataset_table()
         records = self.DatasetModel.select().where(self.DatasetModel.dataset_id == dataset_hash).dicts()
         return list(records)
 
-    def download_df_of_table(self, dataset_hash):
+    def download_df_of_table(self, dataset_hash, columns=None):
         dataset_db = self.init_dataset_db()
         models = generate_models(dataset_db)
         table_name = f"dataset_{dataset_hash}"
@@ -557,6 +568,16 @@ class ResourceManager(StrSignatureMixin):
         # 删除第一列数据库主键列
         database_id = df.columns[0]
         df.pop(database_id)
+        if columns is not None:
+            df = df[columns]
+        return df
+
+    def download_df_of_fs(self, dataset_path, columns=None):
+        tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
+        self.file_system.download(dataset_path, tmp_path)
+        df: pd.DataFrame = pd.read_hdf(tmp_path, "dataset")
+        if columns is not None:
+            df = df[columns]
         return df
 
     # ----------experiment_model------------------------------------------------------------------
@@ -566,25 +587,25 @@ class ResourceManager(StrSignatureMixin):
             general_experiment_time = pw.DateTimeField(default=datetime.datetime.now)
             current_experiment_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
-            hdl_id = pw.FixedCharField(max_length=128,default="")
-            task_id = pw.FixedCharField(max_length=128,default="")
-            train_set_id = pw.FixedCharField(max_length=128,default="")  # fixme
-            test_set_id = pw.FixedCharField(max_length=128,default="")  # fixme
+            hdl_id = pw.FixedCharField(max_length=128, default="")
+            task_id = pw.FixedCharField(max_length=128, default="")
+            train_set_id = pw.FixedCharField(max_length=128, default="")  # fixme
+            test_set_id = pw.FixedCharField(max_length=128, default="")  # fixme
             hdl_constructors = self.JSONField(default=[])
             hdl_constructor = pw.TextField(default="")
             raw_hdl = self.JSONField(default={})
             hdl = self.JSONField(default={})
             tuners = self.JSONField(default=[])
             tuner = pw.TextField(default="")
-            data_manager_path = pw.CharField(max_length=512,default="")
-            resource_manager_path =  pw.CharField(max_length=512,default="")
-            dataset_metadata =  pw.CharField(max_length=512,default={})
-            metric = pw.CharField(max_length=64,default="")  # task 的冗余字段
+            data_manager_path = pw.CharField(max_length=512, default="")
+            resource_manager_path = pw.CharField(max_length=512, default="")
+            dataset_metadata = pw.CharField(max_length=512, default={})
+            metric = pw.CharField(max_length=64, default="")  # task 的冗余字段
             splitter = pw.TextField(default="")  # task 的冗余字段
-            ml_task = pw.CharField(max_length=64,default="")  # task 的冗余字段
+            ml_task = pw.CharField(max_length=64, default="")  # task 的冗余字段
             experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来 # fixme
             additional_info = self.JSONField(default={})  # trials与experiments同时存储
-            user = pw.CharField(default=getuser)
+            user = pw.CharField(max_length=64, default=getuser)
 
             class Meta:
                 database = self.record_db
@@ -684,12 +705,12 @@ class ResourceManager(StrSignatureMixin):
     def get_task_model(self) -> pw.Model:
         class Task(pw.Model):
             task_id = pw.FixedCharField(max_length=128, primary_key=True)
-            metric = pw.CharField(max_length=64,default="")
+            metric = pw.CharField(max_length=64, default="")
             splitter = pw.TextField(default="")
-            ml_task = pw.CharField(max_length=64,default="")
-            specific_task_token = pw.CharField(max_length=128,default="")
-            train_set_id = pw.FixedCharField(max_length=128,default="")
-            test_set_id = pw.FixedCharField(max_length=128,default="")
+            ml_task = pw.CharField(max_length=64, default="")
+            specific_task_token = pw.CharField(max_length=128, default="")
+            train_set_id = pw.FixedCharField(max_length=128, default="")
+            test_set_id = pw.FixedCharField(max_length=128, default="")
             sub_sample_indexes = self.JSONField()
             sub_feature_indexes = self.JSONField()
             create_time = pw.DateTimeField(default=datetime.datetime.now)
@@ -790,7 +811,8 @@ class ResourceManager(StrSignatureMixin):
         self.init_hdl_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
-        records = self.HdlModel.select().where((self.HdlModel.task_id == self.task_id) & (self.HdlModel.hdl_id == hdl_id))
+        records = self.HdlModel.select().where(
+            (self.HdlModel.task_id == self.task_id) & (self.HdlModel.hdl_id == hdl_id))
         if len(records) == 0:
             self.HdlModel.create(
                 task_id=self.task_id,

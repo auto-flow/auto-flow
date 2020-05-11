@@ -1,10 +1,15 @@
+import logging
 import os
+import shutil
 from glob import glob
 from pathlib import Path
+
 import pandas as pd
 from joblib import dump, load
 
 from generic_fs import FileSystem
+
+logger = logging.getLogger(__name__)
 
 
 class LocalFS(FileSystem):
@@ -51,8 +56,19 @@ class LocalFS(FileSystem):
     def load_pickle(self, path):
         return load(path)
 
-    def dump_csv(self, data:pd.DataFrame, path,**kwargs):
-        data.to_csv(path,**kwargs)
+    def dump_csv(self, data: pd.DataFrame, path, **kwargs):
+        data.to_csv(path, **kwargs)
 
-    def load_csv(self, path,**kwargs) ->pd.DataFrame:
-        return pd.read_csv(path,**kwargs)
+    def load_csv(self, path, **kwargs) -> pd.DataFrame:
+        return pd.read_csv(path, **kwargs)
+
+    def upload(self, path, local_path):
+        if os.path.exists(path):
+            logger.warning(f"{path} already exists, don't upload.")
+            return
+        shutil.move(local_path, path)
+
+    def download(self, path, local_path):
+        if os.path.exists(local_path):
+            os.remove(local_path)
+        shutil.copy(path, local_path)

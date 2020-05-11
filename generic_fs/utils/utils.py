@@ -12,4 +12,11 @@ def dumps_pickle(data):
 def loads_pickle(bits):
     return pickle.loads(bits)
 
+def remove_None_value(dict_: dict) -> dict:
+    result = {}
+    for k, v in dict_.items():
+        if v is not None:
+            result[k] = v
+    return result
+
 

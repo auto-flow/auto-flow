@@ -4,6 +4,7 @@
 # @Contact    : tqichun@gmail.com
 from copy import deepcopy
 from pickle import dumps
+from typing import Optional
 
 import numpy as np
 from frozendict import frozendict
@@ -13,19 +14,20 @@ from autoflow.utils.logging_ import get_logger
 
 class DataContainer():
     VALID_INSTANCE = None
+    dataset_type = None
 
-    def __init__(self, dataset_type, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
+    def __init__(self, dataset_source, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
                  dataset_metadata=frozendict()):
-        self.dataset_type = dataset_type
+        self.dataset_source = dataset_source
         self.dataset_metadata = dict(dataset_metadata)
-        self.dataset_metadata.update(dataset_type=dataset_type)
+        self.dataset_metadata.update(dataset_source=dataset_source)
         from autoflow.manager.resource_manager import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
             self.logger.warning(
                 "In DataContainer __init__, resource_manager is None, create a default local resource_manager.")
             resource_manager = ResourceManager()
-        self.resource_manager = resource_manager
+        self.resource_manager: ResourceManager = resource_manager
         data_indicators = [dataset_path, dataset_instance, dataset_id]
         data_indicators = np.array(list(map(lambda x: x is not None, data_indicators)), dtype='int32')
         assert data_indicators.sum() == 1
@@ -82,3 +84,16 @@ class DataContainer():
         res = dumps(self)
         self.data = tmp_data
         return res
+
+    def sub_sample(self, index):
+        raise NotImplementedError
+
+
+def copy_data_container_structure(obj: Optional[DataContainer]):
+    if obj is None:
+        return None
+    data = obj.data
+    obj.data = None
+    obj_ = deepcopy(obj)
+    obj.data = data
+    return obj_

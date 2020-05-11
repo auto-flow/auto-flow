@@ -50,6 +50,12 @@ class FileSystem():
     def load_pickle(self, path):
         raise NotImplementedError
 
+    def upload(self,  path, local_path):
+        raise NotImplementedError
+
+    def download(self, path,local_path):
+        raise NotImplementedError
+
     def dump_csv(self, data:pd.DataFrame, path,**kwargs):
         raise NotImplementedError
 
