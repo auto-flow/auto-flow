@@ -10,9 +10,10 @@ from frozendict import frozendict
 
 from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNIQUE_FEATURE_GROUPS
 from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.pipeline.components.utils import stack_Xs
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
-from autoflow.utils.dataframe import  get_unique_col_name
+from autoflow.utils.dataframe import get_unique_col_name
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask, get_ml_task_from_y
@@ -27,6 +28,7 @@ def pop_if_exists(df: Union[pd.DataFrame, DataFrameContainer], col: str) -> Opti
         return df.pop(col)
     else:
         return None
+
 
 class DataManager(StrSignatureMixin):
     '''
@@ -149,8 +151,16 @@ class DataManager(StrSignatureMixin):
             self.X_test.set_feature_groups(self.feature_groups)
         # --设置参数--
         y_train = to_array(y_train)
+        if y_train is not None:
+            y_train = NdArrayContainer("TrainSetLabel", dataset_instance=y_train,
+                                       resource_manager=self.resource_manager)
+            y_train.upload()
         y_test = to_array(y_test)
-        self.ml_task: MLTask = get_ml_task_from_y(y_train)
+        if y_test is not None:
+            y_test = NdArrayContainer("TestSetLabel", dataset_instance=y_test,
+                                       resource_manager=self.resource_manager)
+            y_test.upload()
+        self.ml_task: MLTask = get_ml_task_from_y(y_train.data)
         self.y_train = y_train
         self.y_test = y_test
         if self.X_train is not None:

@@ -1,7 +1,10 @@
+from typing import Optional
+
 import pandas as pd
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_container.base import copy_data_container_structure
+from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.pipeline.components.base import AutoFlowComponent
 
 
@@ -22,6 +25,7 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
         if y_train is not None:
             X_train, y_train = self._transform(X_train, y_train)
         if (not self.need_y) and sample_X_test:
+            # fixme: 这部分是否要保留
             X_valid, _ = self._transform(X_valid, None)
             X_test, _ = self._transform(X_test, None)
         return {
@@ -31,12 +35,15 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
             "y_train": y_train
         }
 
-    def _transform(self, X: DataFrameContainer, y):
-        X_data, y_ = self._transform_proc(X.data, y)
+    def _transform(self, X: DataFrameContainer, y: Optional[NdArrayContainer]):
+        y_data = y.data
+        X_data, y_data = self._transform_proc(X.data, y_data)
         X = copy_data_container_structure(X)
+        y = copy_data_container_structure(y)
         X_data = pd.DataFrame(X_data, columns=X.columns, index=X.index)
         X.data = X_data
-        return X, y_
+        y.data = y_data
+        return X, y
 
     def _transform_proc(self, X_train, y_train):
         return self.estimator.fit_sample(X_train, y_train)

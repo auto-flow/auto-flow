@@ -45,9 +45,6 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
         return X
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
-        X_train = X_train.data if X_train is not None else None
-        X_valid = X_valid.data if X_valid is not None else None
-        X_test = X_test.data if X_test is not None else None
         if not self.need_y:
             return stack_Xs(X_train, X_valid, X_test)
         else:

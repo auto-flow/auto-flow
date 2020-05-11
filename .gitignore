@@ -5,6 +5,7 @@ __pycache__/
 move.py
 *.db
 *.gv
+*.h5
 *.pdf
 run
 .virtual_documents

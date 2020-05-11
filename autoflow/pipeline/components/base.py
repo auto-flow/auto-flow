@@ -9,6 +9,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 
 from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.utils.hash import get_hash_of_Xy, get_hash_of_dict
 from autoflow.utils.logging_ import get_logger
 
@@ -74,10 +75,14 @@ class AutoFlowComponent(BaseEstimator):
         return estimator
 
     def before_fit_X(self, X: DataFrameContainer):
-        return X
+        if X is None:
+            return None
+        return X.data
 
-    def before_fit_y(self, y):
-        return y
+    def before_fit_y(self, y: NdArrayContainer):
+        if y is None:
+            return None
+        return y.data
 
     # def _pred_or_trans(self, X_train_, X_valid_=None, X_test_=None, X_train=None, X_valid=None, X_test=None,
     #                    y_train=None):
@@ -135,20 +140,21 @@ class AutoFlowComponent(BaseEstimator):
         X_test = self.filter_feature_groups(X_test)
         self.shape = X_train.shape
         self.build_proxy_estimator()
+        feature_groups=X_train.feature_groups
         # 对数据进行预处理（比如有的preprocessor只能处理X>0的数据）
-        X_train = self.before_fit_X(X_train)
-        y_train = self.before_fit_y(y_train)
-        X_test = self.before_fit_X(X_test)
-        y_test = self.before_fit_y(y_test)
-        X_valid = self.before_fit_X(X_valid)
-        y_valid = self.before_fit_y(y_valid)
+        X_train_ = self.before_fit_X(X_train)
+        y_train_ = self.before_fit_y(y_train)
+        X_test_ = self.before_fit_X(X_test)
+        y_test_ = self.before_fit_y(y_test)
+        X_valid_ = self.before_fit_X(X_valid)
+        y_valid_ = self.before_fit_y(y_valid)
         # 对代理的estimator进行预处理
-        self.estimator = self.after_process_estimator(self.estimator, X_train, y_train, X_valid, y_valid, X_test,
-                                                      y_test)
+        self.estimator = self.after_process_estimator(self.estimator, X_train_, y_train_, X_valid_,
+                                                      y_valid_, X_test_, y_test_)
         # todo: 测试特征全部删除的情况
         if len(X_train.shape) > 1 and X_train.shape[1] > 0:
-            self.estimator = self._fit(self.estimator, X_train, y_train, X_valid, y_valid, X_test,
-                                       y_test)
+            self.estimator = self._fit(self.estimator, X_train_, y_train_, X_valid_,
+                                       y_valid_, X_test_, y_test_,feature_groups)
             self.is_fit = True
         else:
             self.logger.warning(
@@ -156,15 +162,12 @@ class AutoFlowComponent(BaseEstimator):
         return self
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None) -> pd.DataFrame:
-        return X_train.data
+        return X_train
 
-    def _fit(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
-             y_test=None):
+    def _fit(self, estimator, X_train, y_train=None, X_valid=None,
+             y_valid=None, X_test=None, y_test=None, feature_groups=None):
         # 保留其他数据集的参数，方便模型拓展
         X = self.prepare_X_to_fit(X_train, X_valid, X_test)
-        X_valid = X_valid.data if X_valid is not None else None
-        X_test = X_test.data if X_valid is not None else None
-        feature_groups = X_train.feature_groups
         if self.store_intermediate:
             # fixme: 考虑将这个部分移植到Workflow的实现中
             if self.resource_manager is None:

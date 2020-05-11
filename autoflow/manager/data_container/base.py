@@ -16,7 +16,7 @@ class DataContainer():
     VALID_INSTANCE = None
     dataset_type = None
 
-    def __init__(self, dataset_source, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
+    def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
                  dataset_metadata=frozendict()):
         self.dataset_source = dataset_source
         self.dataset_metadata = dict(dataset_metadata)

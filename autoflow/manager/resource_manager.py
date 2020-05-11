@@ -7,6 +7,7 @@ from getpass import getuser
 from math import ceil
 from typing import Dict, Tuple, List, Union, Any
 
+import h5py
 import numpy as np
 import pandas as pd
 # import json5 as json
@@ -479,7 +480,7 @@ class ResourceManager(StrSignatureMixin):
         dataset_path = ""
         if L != 0:
             record = records[0]
-            record.modify_time = datetime.datetime.now(),
+            record.modify_time = datetime.datetime.now()
             record.dataset_metadata = dataset_metadata
             record.save()
         else:
@@ -540,6 +541,14 @@ class ResourceManager(StrSignatureMixin):
         df.to_hdf(tmp_path, "dataset")
         self.file_system.upload(dataset_path, tmp_path)
 
+    def upload_ndarray_to_fs(self, arr: np.ndarray, dataset_path):
+        tmp_path = f"/tmp/tmp_arr_{os.getpid()}.h5"
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        with h5py.File(tmp_path, 'w') as hf:
+            hf.create_dataset("dataset", data=arr)
+        self.file_system.upload(dataset_path, tmp_path)
+
     def query_dataset_record(self, dataset_hash) -> List[Dict[str, Any]]:
         self.init_dataset_table()
         records = self.DatasetModel.select().where(self.DatasetModel.dataset_id == dataset_hash).dicts()
@@ -579,6 +588,13 @@ class ResourceManager(StrSignatureMixin):
         if columns is not None:
             df = df[columns]
         return df
+
+    def download_arr_of_fs(self, dataset_path):
+        tmp_path = f"/tmp/tmp_arr_{os.getpid()}.h5"
+        self.file_system.download(dataset_path, tmp_path)
+        with h5py.File(tmp_path, 'r') as hf:
+            arr = hf['dataset'][:]
+        return arr
 
     # ----------experiment_model------------------------------------------------------------------
     def get_experiment_model(self) -> pw.Model:

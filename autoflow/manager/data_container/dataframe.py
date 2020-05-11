@@ -73,7 +73,7 @@ class DataFrameContainer(DataContainer):
             self.dataset_hash, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
             self.columns_mapper, list(self.columns))
         if L != 0:
-            self.logger.info(f"Dataset ID: {dataset_id} is already exists, will not upload. ")
+            self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:
             if upload_type == "table":
                 self.resource_manager.upload_df_to_table(self.data, self.dataset_hash)

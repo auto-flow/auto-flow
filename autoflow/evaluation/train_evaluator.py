@@ -119,12 +119,13 @@ class TrainEvaluator(BaseEvaluator):
             all_scores = []
             status = "SUCCESS"
             failed_info = ""
-            for train_index, valid_index in self.splitter.split(X.data, y):
+            for train_index, valid_index in self.splitter.split(X.data, y.data):
                 cloned_model = deepcopy(model)
                 X: DataFrameContainer
                 X_train = X.sub_sample(train_index)
                 X_valid = X.sub_sample(valid_index)
-                y_train, y_valid = y[train_index], y[valid_index]
+                y_train = y.sub_sample(train_index)
+                y_valid = y.sub_sample(valid_index)
                 if self.should_store_intermediate_result:
                     intermediate_result = []
                 else:
@@ -144,10 +145,11 @@ class TrainEvaluator(BaseEvaluator):
                 y_true_indexes.append(valid_index)
                 y_pred = procedure_result["pred_valid"]
                 y_test_pred = procedure_result["pred_test"]
+                # todo: 取出处理后的y_pred
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
                     y_test_preds.append(y_test_pred)
-                loss, all_score = self.loss(y_valid, y_pred)
+                loss, all_score = self.loss(y_valid.data, y_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 losses.append(float(loss))
                 all_scores.append(all_score)
             # finally fit
@@ -204,7 +206,7 @@ class TrainEvaluator(BaseEvaluator):
                         y_test_pred = vote_predicts(y_test_preds)
                     else:
                         y_test_pred = mean_predicts(y_test_preds)
-                test_loss, test_all_score = self.loss(y_test, y_test_pred)
+                test_loss, test_all_score = self.loss(y_test.data, y_test_pred) # todo: 非1d-array情况下的用户自定义评估器
                 info.update({
                     "test_loss": test_loss,
                     "test_all_score": test_all_score,
