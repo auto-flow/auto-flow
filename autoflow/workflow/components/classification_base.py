@@ -25,16 +25,16 @@ class AutoFlowClassificationAlgorithm(AutoFlowComponent, ClassifierMixin):
         return estimator
 
     def predict(self, X):
-        return self.estimator.predict(self.before_pred_X(X))
+        return self.component.predict(self.before_pred_X(X))
 
     def predict_proba(self, X: DataFrameContainer):
         X = self.filter_feature_groups(X)
-        if not self.estimator:
+        if not self.component:
             raise NotImplementedError()
         if not hasattr(self, "predict_proba"):
             if hasattr(self, "decision_function"):
-                df = self.estimator.decision_function(self.before_pred_X(X))
+                df = self.component.decision_function(self.before_pred_X(X))
                 return softmax(df)
             else:
                 raise NotImplementedError()
-        return self.estimator.predict_proba(self.before_pred_X(X))
+        return self.component.predict_proba(self.before_pred_X(X))

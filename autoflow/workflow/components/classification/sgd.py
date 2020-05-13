@@ -15,5 +15,5 @@ class SGD(
         if self.hyperparams["loss"] in ["log", "modified_huber"]:
             return super(SGD, self).predict_proba(X)
         else:
-            df = self.estimator.decision_function(X.data)
+            df = self.component.decision_function(X.data)
             return softmax(df)

@@ -69,6 +69,8 @@ class DataFrameContainer(DataContainer):
     def upload(self, upload_type="table"):
         assert upload_type in ("table", "fs")
         self.dataset_hash = self.get_hash()
+        if self.dataset_hash==self.uploaded_hash:
+            return
         L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
             self.dataset_hash, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
             self.columns_mapper, list(self.columns))
@@ -79,6 +81,7 @@ class DataFrameContainer(DataContainer):
                 self.resource_manager.upload_df_to_table(self.data, self.dataset_hash)
             else:
                 self.resource_manager.upload_df_to_fs(self.data, dataset_path)
+        super(DataFrameContainer, self).upload(upload_type)
 
     def download(self, dataset_id):
         records = self.resource_manager.query_dataset_record(dataset_id)

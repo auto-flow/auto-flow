@@ -31,7 +31,7 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
         if X is None:
             return None
         else:
-            return self.estimator.transform(X)
+            return self.component.transform(X)
 
     def _transform(self, X: DataFrameContainer):
         if X is None:

@@ -46,4 +46,4 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
         return X, y
 
     def _transform_proc(self, X_train, y_train):
-        return self.estimator.fit_sample(X_train, y_train)
+        return self.component.fit_sample(X_train, y_train)

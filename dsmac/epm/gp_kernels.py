@@ -100,7 +100,7 @@ class MagicMixin:
         Parameters
         ----------
         deep : boolean, optional
-            If True, will return the parameters for this estimator and
+            If True, will return the parameters for this component and
             contained subobjects that are estimators.
 
         Returns

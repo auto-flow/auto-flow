@@ -46,7 +46,7 @@ class _PredictScorer(Scorer):
         Returns
         -------
         score : float
-            Score function applied to prediction of estimator on X.
+            Score function applied to prediction of component on X.
         """
         type_true = type_of_target(y_true)
         if len(y_pred.shape) == 1 or y_pred.shape[1] == 1 or \
@@ -89,7 +89,7 @@ class _ProbaScorer(Scorer):
         Returns
         -------
         score : float
-            Score function applied to prediction of estimator on X.
+            Score function applied to prediction of component on X.
         """
         if sample_weight is not None:
             return self._sign * self._score_func(y_true, y_pred,
@@ -117,7 +117,7 @@ class _ThresholdScorer(Scorer):
         Returns
         -------
         score : float
-            Score function applied to prediction of estimator on X.
+            Score function applied to prediction of component on X.
         """
         y_type = type_of_target(y_true)
         if y_type not in ("binary", "multilabel-indicator"):

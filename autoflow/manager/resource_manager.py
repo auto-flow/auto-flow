@@ -74,7 +74,6 @@ class ResourceManager(StrSignatureMixin):
             redis_params=frozendict(),
             max_persistent_estimators=50,
             compress_suffix="bz2"
-
     ):
         '''
 
@@ -209,7 +208,7 @@ class ResourceManager(StrSignatureMixin):
             estimated_id = 1
         return estimated_id
 
-    def persistent_evaluated_model(self, info: Dict, model_id) -> Tuple[str, str, str, str]:
+    def persistent_evaluated_model(self, info: Dict, model_id) -> Tuple[str, str, str]:
         y_info = {
             # 这个变量还是很有必要的，因为可能用户指定的切分器每次切的数据不一样
             "y_true_indexes": info.get("y_true_indexes"),
@@ -222,12 +221,7 @@ class ResourceManager(StrSignatureMixin):
         # ----get specific URL---------
         models_path = self.file_system.join(self.trial_dir, f"{model_id}_models.{self.compress_suffix}")
         y_info_path = self.file_system.join(self.trial_dir, f"{model_id}_y-info.{self.compress_suffix}")
-        if info["intermediate_result"] is not None:
-            intermediate_result_path = self.file_system.join(self.trial_dir,
-                                                             f"{model_id}_inter-res.{self.compress_suffix}")
-        else:
-            intermediate_result_path = ""
-        if info["finally_fit_model"] is not None:
+        if info.get("finally_fit_model") is not None:
             finally_fit_model_path = self.file_system.join(self.trial_dir,
                                                            f"{model_id}_final.{self.compress_suffix}")
         else:
@@ -235,12 +229,10 @@ class ResourceManager(StrSignatureMixin):
         # ----do dump---------------
         self.file_system.dump_pickle(info["models"], models_path)
         self.file_system.dump_pickle(y_info, y_info_path)
-        if intermediate_result_path:
-            self.file_system.dump_pickle(info["intermediate_result"], intermediate_result_path)
         if finally_fit_model_path:
             self.file_system.dump_pickle(info["finally_fit_model"], finally_fit_model_path)
         # ----return----------------
-        return models_path, intermediate_result_path, finally_fit_model_path, y_info_path
+        return models_path, finally_fit_model_path, y_info_path
 
     def get_ensemble_needed_info(self, task_id) -> Tuple[MLTask, Any, Any]:
         self.task_id = task_id
@@ -267,6 +259,7 @@ class ResourceManager(StrSignatureMixin):
         return estimator
 
     def load_best_dhp(self):
+        # fixme: 限制hdl_id
         trial_id = self.get_best_k_trials(1)[0]
         record = self.TrialsModel.select().where(self.TrialsModel.trial_id == trial_id)[0]
         return record.dict_hyper_param
@@ -449,8 +442,8 @@ class ResourceManager(StrSignatureMixin):
             dataset_id = pw.FixedCharField(max_length=128, primary_key=True)
             dataset_metadata = self.JSONField(default={})
             dataset_path = pw.CharField(max_length=512, default="")
-            upload_type = pw.CharField(max_length=16, default="")
-            dataset_type = pw.CharField(max_length=16, default="")
+            upload_type = pw.CharField(max_length=32, default="")
+            dataset_type = pw.CharField(max_length=32, default="")
             dataset_source = pw.CharField(max_length=32, default="")
             column_descriptions = self.JSONField(default={})
             columns_mapper = self.JSONField(default={})
@@ -889,7 +882,7 @@ class ResourceManager(StrSignatureMixin):
             smac_hyper_param = PickleField(default=0)
             dict_hyper_param = self.JSONField(default={})
             cost_time = pw.FloatField(default=65535)
-            status = pw.CharField(max_length=16, default="SUCCESS")
+            status = pw.CharField(max_length=32, default="SUCCESS")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
             # todo: 改用数据集存储？变成Json字段，item是dataset ID
@@ -921,7 +914,7 @@ class ResourceManager(StrSignatureMixin):
     def insert_to_trial_table(self, info: Dict):
         self.init_trial_table()
         config_id = info.get("config_id")
-        models_path, intermediate_result_path, finally_fit_model_path, y_info_path = \
+        models_path, finally_fit_model_path, y_info_path = \
             self.persistent_evaluated_model(info, config_id)
         additional_info = deepcopy(self.additional_info)
         additional_info.update(info["additional_info"])
@@ -930,7 +923,7 @@ class ResourceManager(StrSignatureMixin):
             task_id=self.task_id,
             hdl_id=self.hdl_id,
             experiment_id=self.experiment_id,
-            estimator=info.get("estimator", ""),
+            estimator=info.get("component", ""),
             loss=info.get("loss", 65535),
             losses=info.get("losses", []),
             test_loss=info.get("test_loss", 65535),
@@ -947,7 +940,7 @@ class ResourceManager(StrSignatureMixin):
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),
             warning_info=info.get("warning_info", ""),
-            intermediate_result_path=intermediate_result_path,
+            intermediate_results=info.get("intermediate_results", []),
         )
 
     def delete_models(self):
@@ -964,11 +957,11 @@ class ResourceManager(StrSignatureMixin):
             return True
         self.init_trial_table()
         # estimators = []
-        # for record in self.TrialsModel.select(self.TrialsModel.trial_id, self.TrialsModel.estimator).group_by(
-        #         self.TrialsModel.estimator):
-        #     estimators.append(record.estimator)
-        # for estimator in estimators:
-        # .where(self.TrialsModel.estimator == estimator)
+        # for record in self.TrialsModel.select(self.TrialsModel.trial_id, self.TrialsModel.component).group_by(
+        #         self.TrialsModel.component):
+        #     estimators.append(record.component)
+        # for component in estimators:
+        # .where(self.TrialsModel.component == component)
         should_delete = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id).order_by(
             self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
         if len(should_delete):

@@ -9,6 +9,7 @@ import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNIQUE_FEATURE_GROUPS
+from autoflow.manager.data_container.base import get_container_data
 from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.workflow.components.utils import stack_Xs
@@ -125,11 +126,11 @@ class DataManager(StrSignatureMixin):
         # ---set column descriptions, upload to dataset-----------------------------------------------------
         if self.X_train is not None:
             self.X_train.set_column_descriptions(self.final_column_descriptions)
-            self.X_train.upload()
+            self.X_train.upload("table")
             self.logger.info(f"TrainSet's DataSet ID = {self.X_train.dataset_hash}")
         if self.X_test is not None:
             self.X_test.set_column_descriptions(self.final_column_descriptions)
-            self.X_test.upload()
+            self.X_test.upload("table")
             self.logger.info(f"TestSet's DataSet ID = {self.X_test.dataset_hash}")
         # ---origin hash-----------------------------------------------------
         self.train_set_hash = self.X_train.get_hash() if self.X_train is not None else ""
@@ -190,6 +191,7 @@ class DataManager(StrSignatureMixin):
         return y_train, y_test
 
     def concat_y(self, X, y):
+        # if isinstance(y,)
         if isinstance(y, (np.ndarray, pd.Series)):
             # 添加y为target列并与X合并，更新column_descriptions
             y = pd.Series(y)
@@ -198,7 +200,7 @@ class DataManager(StrSignatureMixin):
             self.column_descriptions.update({"target": target_col_name})
             y.index = X.index
             assert y.shape[0] == X.shape[0]
-            X = pd.merge([X, y], axis=1)
+            X = pd.concat([X, y], axis=1)
         return X
 
     def parse_data_container(self, dataset_source, X, y) -> Tuple[Optional[DataFrameContainer], str]:
@@ -269,7 +271,7 @@ class DataManager(StrSignatureMixin):
         column2feature_groups.update(deepcopy(userDefined_column2feature_groups))
         column2essential_feature_groups = deepcopy(column2feature_groups)
         # ----尝试将X_train与X_test拼在一起，然后做解析---------
-        X = stack_Xs(self.X_train.data, None, self.X_test.data)  # fixme:target列会变成nan
+        X = stack_Xs(get_container_data(self.X_train), None, get_container_data(self.X_test))  # fixme:target列会变成nan
         # --识别用户自定义列中的nan--
         for column, feature_group in list(column2feature_groups.items()):
             if feature_group in AUXILIARY_FEATURE_GROUPS:  # ("id", "target", "ignore")

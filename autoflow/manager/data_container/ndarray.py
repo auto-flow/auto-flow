@@ -25,8 +25,10 @@ class NdArrayContainer(DataContainer):
         get_hash_of_str(self.dataset_source, m)
         return get_hash_of_array(self.data, m)  # todo ： 测试在存储与加载后hash值是否会改变
 
-    def upload(self):
+    def upload(self, upload_type="fs"):
         self.dataset_hash = self.get_hash()
+        if self.dataset_hash==self.uploaded_hash:
+            return
         L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
             self.dataset_hash, self.dataset_metadata, "fs", self.dataset_source, {},
             {}, [])
@@ -34,6 +36,7 @@ class NdArrayContainer(DataContainer):
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:
             self.resource_manager.upload_ndarray_to_fs(self.data, dataset_path)
+        super(NdArrayContainer, self).upload(upload_type)
 
     def download(self, dataset_id):
         records = self.resource_manager.query_dataset_record(dataset_id)

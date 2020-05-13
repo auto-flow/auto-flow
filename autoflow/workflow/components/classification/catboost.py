@@ -21,7 +21,7 @@ class CatBoostClassifier(AutoFlowClassificationAlgorithm):
             eval_set = (X_valid, y_valid)
         else:
             eval_set = None
-        return self.estimator.fit(
+        return self.component.fit(
             X, y, cat_features=categorical_features_indices,
             eval_set=eval_set, silent=True
         )

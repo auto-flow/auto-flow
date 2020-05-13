@@ -22,7 +22,7 @@ class LGBMClassifier(AutoFlowClassificationAlgorithm):
         early_stopping_rounds=self.hyperparams.get("early_stopping_rounds")
         if eval_set is None:
             early_stopping_rounds=None
-        return self.estimator.fit(
+        return self.component.fit(
             X, y, categorical_feature=categorical_features_indices,
             eval_set=eval_set, verbose=False,
             early_stopping_rounds=early_stopping_rounds

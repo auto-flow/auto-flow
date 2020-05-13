@@ -27,7 +27,7 @@ class AutoFlowComponent(BaseEstimator):
 
     def __init__(self, **kwargs):
         self.resource_manager = None
-        self.estimator = None
+        self.component = None
         self.in_feature_groups = None
         self.out_feature_groups = None
         self.hyperparams = kwargs
@@ -93,7 +93,7 @@ class AutoFlowComponent(BaseEstimator):
     #     X_train_ = self.filter_feature_groups(X_train)
     #     X_valid_ = self.filter_feature_groups(X_valid)
     #     X_test_ = self.filter_feature_groups(X_test)
-    #     if not self.estimator:
+    #     if not self.component:
     #         raise NotImplementedError()
     #     return self._pred_or_trans(X_train_, X_valid_, X_test_, X_train, X_valid, X_test, y_train)
 
@@ -126,7 +126,7 @@ class AutoFlowComponent(BaseEstimator):
         self.processed_params = self.filter_invalid(
             cls, self.after_process_hyperparams(self.hyperparams)
         )
-        self.estimator = cls(
+        self.component = cls(
             **self.processed_params
         )
 
@@ -149,12 +149,12 @@ class AutoFlowComponent(BaseEstimator):
         X_valid_ = self.before_fit_X(X_valid)
         y_valid_ = self.before_fit_y(y_valid)
         # 对代理的estimator进行预处理
-        self.estimator = self.after_process_estimator(self.estimator, X_train_, y_train_, X_valid_,
+        self.component = self.after_process_estimator(self.component, X_train_, y_train_, X_valid_,
                                                       y_valid_, X_test_, y_test_)
         # todo: 测试特征全部删除的情况
         if len(X_train.shape) > 1 and X_train.shape[1] > 0:
-            self.estimator = self._fit(self.estimator, X_train_, y_train_, X_valid_,
-                                       y_valid_, X_test_, y_test_,feature_groups)
+            self.component = self._fit(self.component, X_train_, y_train_, X_valid_,
+                                       y_valid_, X_test_, y_test_, feature_groups)
             self.is_fit = True
         else:
             self.logger.warning(
@@ -199,7 +199,7 @@ class AutoFlowComponent(BaseEstimator):
             setattr(self, key, value)
 
     def get_estimator(self):
-        return self.estimator
+        return self.component
 
     def before_parse_escape_hyperparameters(self, hyperparams):
         return hyperparams

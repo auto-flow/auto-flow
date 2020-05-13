@@ -16,11 +16,14 @@ class DataContainer():
     VALID_INSTANCE = None
     dataset_type = None
 
-    def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
+    def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None,
+                 resource_manager=None,
                  dataset_metadata=frozendict()):
+        self.dataset_hash = None
         self.dataset_source = dataset_source
         self.dataset_metadata = dict(dataset_metadata)
         self.dataset_metadata.update(dataset_source=dataset_source)
+        self.uploaded_hash=None
         from autoflow.manager.resource_manager import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
@@ -48,8 +51,8 @@ class DataContainer():
     def get_hash(self):
         raise NotImplementedError
 
-    def upload(self):
-        raise NotImplementedError
+    def upload(self, upload_type):
+        self.uploaded_hash = self.get_hash()
 
     def download(self, dataset_id):
         raise NotImplementedError
@@ -97,3 +100,9 @@ def copy_data_container_structure(obj: Optional[DataContainer]):
     obj_ = deepcopy(obj)
     obj.data = data
     return obj_
+
+
+def get_container_data(X: DataContainer):
+    if X is None:
+        return None
+    return X.data

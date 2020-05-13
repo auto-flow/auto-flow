@@ -281,7 +281,7 @@ class HorseshoePrior(Prior):
         """
         # We computed it exactly as in the original spearmint code, they basically say that there's no analytical form
         # of the horseshoe prior, but that the multiplier is bounded between 2 and 4 and that they used the middle
-        # See "The horseshoe estimator for sparse signals" by Carvalho, Poloson and Scott (2010), Equation 1.
+        # See "The horseshoe component for sparse signals" by Carvalho, Poloson and Scott (2010), Equation 1.
         # https://www.jstor.org/stable/25734098
         # Compared to the paper by Carvalho, there's a constant multiplicator missing
         # Compared to Spearmint we first have to undo the log space transformation of the theta

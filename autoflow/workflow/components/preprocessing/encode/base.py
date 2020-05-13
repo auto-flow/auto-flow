@@ -10,7 +10,7 @@ class BaseEncoder(AutoFlowFeatureEngineerAlgorithm):
             return None
         else:
             X_ = X.astype(str)
-            trans = self.estimator.transform(X_)
+            trans = self.component.transform(X_)
             return trans
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,

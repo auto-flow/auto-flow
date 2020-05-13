@@ -40,7 +40,7 @@ class SelectFromModelBase(SklearnSelectMixin, AutoFlowFeatureEngineerAlgorithm):
 
     def after_process_hyperparams(self, hyperparams):
         hyperparams = super(SelectFromModelBase, self).after_process_hyperparams(hyperparams)
-        estimator_ = hyperparams["estimator"]
+        estimator_ = hyperparams["component"]
         splitted = estimator_.split(".")
         class_ = splitted[-1]
         module_ = ".".join(splitted[:-1])
@@ -50,7 +50,7 @@ class SelectFromModelBase(SklearnSelectMixin, AutoFlowFeatureEngineerAlgorithm):
         if "max_features" in base_estimator_hp:
             base_estimator_hp.pop("max_features")
         base_estimator = cls(**base_estimator_hp)
-        hyperparams["estimator"] = base_estimator
+        hyperparams["component"] = base_estimator
         hyperparams["threshold"] = -np.inf
         return hyperparams
 
@@ -63,7 +63,7 @@ class REF_Base(SklearnSelectMixin, AutoFlowFeatureEngineerAlgorithm):
 
     def after_process_hyperparams(self, hyperparams):
         hyperparams = super(REF_Base, self).after_process_hyperparams(hyperparams)
-        estimator_ = hyperparams["estimator"]
+        estimator_ = hyperparams["component"]
         splitted = estimator_.split(".")
         class_ = splitted[-1]
         module_ = ".".join(splitted[:-1])
@@ -73,7 +73,7 @@ class REF_Base(SklearnSelectMixin, AutoFlowFeatureEngineerAlgorithm):
         if "max_features" in base_estimator_hp:
             base_estimator_hp.pop("max_features")
         base_estimator = cls(**base_estimator_hp)
-        hyperparams["estimator"] = base_estimator
+        hyperparams["component"] = base_estimator
         return hyperparams
 
 

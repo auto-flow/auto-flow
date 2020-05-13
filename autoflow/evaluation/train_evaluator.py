@@ -17,13 +17,13 @@ from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
-from autoflow.workflow.pipeline import MLWorkflow
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline
 from autoflow.utils.sys_ import get_trance_back_msg
+from autoflow.workflow.ml_workflow import ML_Workflow
 from dsmac.runhistory.utils import get_id_of_config
 
 
@@ -106,7 +106,7 @@ class TrainEvaluator(BaseEvaluator):
         return (self.X_train), (self.y_train), deepcopy(self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def evaluate(self, model: MLWorkflow, X, y, X_test, y_test):
+    def evaluate(self, model: ML_Workflow, X, y, X_test, y_test):
         assert self.resource_manager is not None
         warning_info = StringIO()
         with redirect_stderr(warning_info):
@@ -119,6 +119,7 @@ class TrainEvaluator(BaseEvaluator):
             all_scores = []
             status = "SUCCESS"
             failed_info = ""
+            intermediate_results = []
             for train_index, valid_index in self.splitter.split(X.data, y.data):
                 cloned_model = deepcopy(model)
                 X: DataFrameContainer
@@ -126,14 +127,9 @@ class TrainEvaluator(BaseEvaluator):
                 X_valid = X.sub_sample(valid_index)
                 y_train = y.sub_sample(train_index)
                 y_valid = y.sub_sample(valid_index)
-                if self.should_store_intermediate_result:
-                    intermediate_result = []
-                else:
-                    intermediate_result = None
                 try:
                     procedure_result = cloned_model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid, X_test,
-                                                              y_test,
-                                                              self.resource_manager, intermediate_result)
+                                                              y_test)
                 except Exception as e:
                     failed_info = get_trance_back_msg()
                     status = "FAILED"
@@ -141,6 +137,7 @@ class TrainEvaluator(BaseEvaluator):
                         self.logger.error("re-raise exception")
                         raise sys.exc_info()[1]
                     break
+                intermediate_results.append(cloned_model.intermediate_result)
                 models.append(cloned_model)
                 y_true_indexes.append(valid_index)
                 y_pred = procedure_result["pred_valid"]
@@ -192,7 +189,7 @@ class TrainEvaluator(BaseEvaluator):
                 "finally_fit_model": finally_fit_model,
                 "y_true_indexes": y_true_indexes,
                 "y_preds": y_preds,
-                "intermediate_result": intermediate_result,
+                "intermediate_results": intermediate_results,
                 "status": status,
                 "failed_info": failed_info
             }
@@ -206,7 +203,7 @@ class TrainEvaluator(BaseEvaluator):
                         y_test_pred = vote_predicts(y_test_preds)
                     else:
                         y_test_pred = mean_predicts(y_test_preds)
-                test_loss, test_all_score = self.loss(y_test.data, y_test_pred) # todo: 非1d-array情况下的用户自定义评估器
+                test_loss, test_all_score = self.loss(y_test.data, y_test_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 info.update({
                     "test_loss": test_loss,
                     "test_all_score": test_all_score,
@@ -231,7 +228,7 @@ class TrainEvaluator(BaseEvaluator):
         info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
-        info["estimator"] = estimator
+        info["component"] = estimator
         info["cost_time"] = cost_time
         info["additional_info"] = {
             "config_origin": getattr(shp, "origin", "unk")
@@ -287,7 +284,7 @@ class TrainEvaluator(BaseEvaluator):
             out_feature_groups = None
         return in_feature_groups, out_feature_groups
 
-    def create_preprocessor(self, dhp: Dict) -> Optional[MLWorkflow]:
+    def create_preprocessor(self, dhp: Dict) -> Optional[ML_Workflow]:
         preprocessing_dict: dict = dhp[PHASE1]
         pipeline_list = []
         for key, value in preprocessing_dict.items():
@@ -300,13 +297,14 @@ class TrainEvaluator(BaseEvaluator):
                                                  )
             pipeline_list.extend(preprocessor)
         if pipeline_list:
-            return MLWorkflow(pipeline_list)
+            return ML_Workflow(pipeline_list,self.should_store_intermediate_result, self.resource_manager)
         else:
             return None
 
-    def create_estimator(self, dhp: Dict) -> MLWorkflow:
+    def create_estimator(self, dhp: Dict) -> ML_Workflow:
         # 根据超参构造一个估计器
-        return MLWorkflow(self.create_component(dhp[PHASE2], PHASE2, self.ml_task.role))
+        return ML_Workflow(self.create_component(dhp[PHASE2], PHASE2, self.ml_task.role),
+                           self.should_store_intermediate_result, self.resource_manager)
 
     def _create_component(self, key1, key2, params):
         if key2 in self.model_registry:
