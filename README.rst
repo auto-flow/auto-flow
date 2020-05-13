@@ -32,7 +32,7 @@ In other words, it can implement AutoML for tabular data.
 Documentation
 --------------
 
-The documentation can be found `here <https://auto-flow.github.io/autoflow/>`_.
+The documentation can be found `here <https://auto-flow.github.io/auto-flow/>`_.
 
 Installation
 --------------
