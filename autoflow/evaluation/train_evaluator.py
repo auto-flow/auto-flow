@@ -103,7 +103,7 @@ class TrainEvaluator(BaseEvaluator):
         #  目前这个bug在autoflow.workflow.components.preprocessing.operate.merge.Merge 出现过
         # fixme: autoflow.manager.data_container.dataframe.DataFrameContainer#sub_sample 函数采用deepcopy，
         #  应该能从源头上解决X_train数据集的问题，但是要注意X_test
-        return (self.X_train), (self.y_train), deepcopy(self.X_test), (self.y_test)
+        return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
     def evaluate(self, model: ML_Workflow, X, y, X_test, y_test):
@@ -121,7 +121,7 @@ class TrainEvaluator(BaseEvaluator):
             failed_info = ""
             intermediate_results = []
             for train_index, valid_index in self.splitter.split(X.data, y.data):
-                cloned_model = deepcopy(model)
+                cloned_model = model.copy()
                 X: DataFrameContainer
                 X_train = X.sub_sample(train_index)
                 X_valid = X.sub_sample(valid_index)

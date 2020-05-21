@@ -1,7 +1,6 @@
 from typing import Optional
 
 from autoflow.manager.data_container.dataframe import DataFrameContainer
-from autoflow.manager.data_container.base import copy_data_container_structure
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
 __all__ = ["Merge"]
@@ -20,8 +19,7 @@ class Merge(AutoFlowFeatureEngineerAlgorithm):
         if isinstance(self.out_feature_groups, (list, tuple)):
             assert len(self.out_feature_groups) == 1
             self.out_feature_groups = self.out_feature_groups[0]
-        X_ = copy_data_container_structure(X)
-        X_.data = X.data
+        X_ = X.copy()
         X_.set_feature_groups(X_.feature_groups.replace(self.in_feature_groups, self.out_feature_groups))
         return X_
 

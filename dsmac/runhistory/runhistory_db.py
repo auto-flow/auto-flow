@@ -45,7 +45,7 @@ class RunHistoryDB():
             instance_id = pw.FixedCharField(max_length=128, default="", index=True)  # 设置索引
             seed = pw.IntegerField(default=0)
             status = pw.IntegerField(default=0)
-            additional_info = self.JSONField(default="")
+            additional_info = self.JSONField(default={})
             origin = pw.IntegerField(default=0)
             weight = pw.FloatField(default=0.0)
             pid = pw.IntegerField(default=os.getpid)  # todo: 改为 worker id

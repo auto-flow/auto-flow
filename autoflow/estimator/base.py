@@ -508,6 +508,7 @@ class AutoFlowEstimator(BaseEstimator):
         return res
 
     def pickle(self):
+        # todo: 怎么做保证不触发self.resource_manager的__reduce__
         from pickle import dumps
         tmp_dm = self.data_manager
         self.data_manager = self.data_manager.copy()

@@ -41,7 +41,7 @@ def replace_dicts(dicts, from_, to_):
         replace_dict(dict_, from_, to_)
 
 
-def get_unique_col_name(columns: pd.Index, wanted: str):
+def get_unique_col_name(columns: Union[pd.Index,pd.Series], wanted: str):
     while np.sum(columns == wanted) > 1:
         wanted = wanted + "_"
     return wanted

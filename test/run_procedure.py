@@ -17,7 +17,7 @@ test_df = pd.read_csv(examples_path / "data/test_classification.csv")
 trained_pipeline = AutoFlowClassifier(
     initial_runs=1, run_limit=1, n_jobs=1,
     included_classifiers=["lightgbm"], debug=True,
-    should_store_intermediate_result=True,  # 测试对中间结果存储的正确性
+    # should_store_intermediate_result=True,  # 测试对中间结果存储的正确性
 )
 column_descriptions = {
     "id": "PassengerId",

@@ -12,12 +12,12 @@ from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNI
 from autoflow.manager.data_container.base import get_container_data
 from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_container.ndarray import NdArrayContainer
-from autoflow.workflow.components.utils import stack_Xs
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
 from autoflow.utils.dataframe import get_unique_col_name
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask, get_ml_task_from_y
+from autoflow.workflow.components.utils import stack_Xs
 
 
 def pop_if_exists(df: Union[pd.DataFrame, DataFrameContainer], col: str) -> Optional[pd.DataFrame]:
@@ -159,7 +159,7 @@ class DataManager(StrSignatureMixin):
         y_test = to_array(y_test)
         if y_test is not None:
             y_test = NdArrayContainer("TestSetLabel", dataset_instance=y_test,
-                                       resource_manager=self.resource_manager)
+                                      resource_manager=self.resource_manager)
             y_test.upload()
         self.ml_task: MLTask = get_ml_task_from_y(y_train.data)
         self.y_train = y_train
@@ -351,22 +351,40 @@ class DataManager(StrSignatureMixin):
         self.X_test = self.process_X(self.X_test, X_test)
 
     def copy(self):
-        tmp_X_train = self.X_train
-        tmp_X_test = self.X_test
+        X_train = self.X_train
+        X_test = self.X_test
+        y_train = self.y_train
+        y_test = self.y_test
+        rm = self.resource_manager
         self.X_train = None
         self.X_test = None
+        self.y_train = None
+        self.y_test = None
+        self.resource_manager = None
         res = deepcopy(self)
-        self.X_train = tmp_X_train
-        self.X_test = tmp_X_test
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
+        self.resource_manager = rm
         return res
 
     def pickle(self):
         from pickle import dumps
-        tmp_X_train = self.X_train
-        tmp_X_test = self.X_test
+        X_train = self.X_train
+        X_test = self.X_test
+        y_train = self.y_train
+        y_test = self.y_test
+        rm = self.resource_manager
         self.X_train = None
         self.X_test = None
+        self.y_train = None
+        self.y_test = None
+        self.resource_manager = None
         res = dumps(self)
-        self.X_train = tmp_X_train
-        self.X_test = tmp_X_test
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
+        self.resource_manager = rm
         return res

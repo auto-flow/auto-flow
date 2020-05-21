@@ -5,7 +5,7 @@
 import hashlib
 from copy import deepcopy
 
-from autoflow.manager.data_container.base import DataContainer, copy_data_container_structure
+from autoflow.manager.data_container.base import DataContainer
 import numpy as np
 
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_array
@@ -53,6 +53,6 @@ class NdArrayContainer(DataContainer):
         pass
 
     def sub_sample(self, index):
-        new_arr = copy_data_container_structure(self)
+        new_arr = self.copy()
         new_arr.data = deepcopy(self.data[index])  # fixme: 是否有copy的必要？
         return new_arr

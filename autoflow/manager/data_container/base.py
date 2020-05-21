@@ -23,7 +23,7 @@ class DataContainer():
         self.dataset_source = dataset_source
         self.dataset_metadata = dict(dataset_metadata)
         self.dataset_metadata.update(dataset_source=dataset_source)
-        self.uploaded_hash=None
+        self.uploaded_hash = None
         from autoflow.manager.resource_manager import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
@@ -75,31 +75,35 @@ class DataContainer():
         return f"{self.__class__.__name__}: \n" + repr(self.data)
 
     def copy(self):
-        tmp_data = self.data
+        if self is None:
+            return None
+        data = self.data
+        rm = self.resource_manager
         self.data = None
-        res = deepcopy(self)
-        self.data = tmp_data
-        return res
+        self.resource_manager = None
+        self_res = deepcopy(self)
+        self_res.resource_manager = rm
+        self_res.data = data
+        self.data=data
+        self.resource_manager=rm
+        return self_res
 
     def pickle(self):
-        tmp_data = self.data
+        if self is None:
+            return None
+        data = self.data
+        rm = self.resource_manager
         self.data = None
-        res = dumps(self)
-        self.data = tmp_data
-        return res
+        self.resource_manager = None
+        self_res = dumps(self)
+        self_res.resource_manager = rm
+        self_res.data = data
+        return self_res
 
     def sub_sample(self, index):
         raise NotImplementedError
 
 
-def copy_data_container_structure(obj: Optional[DataContainer]):
-    if obj is None:
-        return None
-    data = obj.data
-    obj.data = None
-    obj_ = deepcopy(obj)
-    obj.data = data
-    return obj_
 
 
 def get_container_data(X: DataContainer):

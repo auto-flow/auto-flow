@@ -1,11 +1,18 @@
+import hashlib
+import pickle
+from copy import deepcopy
 from typing import Dict
 
 from sklearn.pipeline import Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
+
+from autoflow.manager.data_container.base import DataContainer
+from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.utils.hash import get_hash_of_dict, get_hash_of_str
+from autoflow.utils.logging_ import get_logger
+from autoflow.utils.ml_task import MLTask
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
-from autoflow.manager.data_container.base import DataContainer, copy_data_container_structure
-from autoflow.utils.ml_task import MLTask
 
 
 class ML_Workflow(Pipeline):
@@ -19,6 +26,7 @@ class ML_Workflow(Pipeline):
         self.verbose = False
         self._validate_steps()
         self.intermediate_result = {}
+        self.logger = get_logger(self)
 
     # def __reduce__(self):
     #     self.resource_manager = None  # fixme: 防止序列化后数据库连接的元数据泄露
@@ -31,10 +39,10 @@ class ML_Workflow(Pipeline):
             is_estimator = True
         return is_estimator
 
-    def update_data_container_to_dataset_id(self, step_name, name: str, data_container: DataContainer, dict_: Dict[str, str]):
+    def update_data_container_to_dataset_id(self, step_name, name: str, data_container: DataContainer,
+                                            dict_: Dict[str, str]):
         if data_container is not None:
-            data_copied = copy_data_container_structure(data_container)
-            data_copied.data=data_container.data
+            data_copied = data_container.copy()
             data_copied.dataset_source = "IntermediateResult"
             task_id = getattr(self.resource_manager, "task_id", "")
             experiment_id = getattr(self.resource_manager, "experiment_id", "")
@@ -49,18 +57,51 @@ class ML_Workflow(Pipeline):
              step_name,
              transformer) in self._iter(with_final=(not self.is_estimator),
                                         filter_passthrough=False):
-            fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
-            result = transformer.transform(X_train, X_valid, X_test, y_train)
+            # todo : 做中间结果的存储
+            store_intermediate = False
+            hyperparams = {}
+            if getattr(transformer, "store_intermediate", False):
+                if self.resource_manager is None:
+                    self.logger.warning(
+                        f"In ML Workflow step '{step_name}', 'store_intermediate' is set to True, but resource_manager is None.")
+                else:
+                    hyperparams = getattr(transformer, "hyperparams")
+                    if not isinstance(hyperparams, dict):
+                        self.logger.warning(f"In ML Workflow step '{step_name}', transformer haven't 'hyperparams'.")
+                    else:
+                        store_intermediate = True
+            if store_intermediate:
+                if hasattr(transformer, "prepare_X_to_fit"):
+                    X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)
+                    X_stack = DataFrameContainer("CalculateCache", dataset_instance=X_stack_,
+                                                 resource_manager=self.resource_manager)
+
+                else:
+                    self.logger.warning(
+                        f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
+                    X_stack = X_train
+                dataset_hash = X_stack.get_hash()
+                component_name = transformer.__class__.__name__
+                m = hashlib.md5()
+                get_hash_of_str(component_name, m)
+                component_hash = get_hash_of_dict(hyperparams, m)
+                redis_key = f"{component_hash}-{dataset_hash}"
+                redis_result = self.resource_manager.redis_hgetall(redis_key)
+                if b"component" in redis_result and b"result" in redis_result:
+                    result = pickle.loads(redis_result[b"result"])
+                    fitted_transformer = pickle.loads(redis_result[b"component"])
+                else:
+                    fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+                    result = transformer.transform(X_train, X_valid, X_test, y_train)
+                    self.resource_manager.redis_hset()
+                    # todo: 增加一些元信息
+            else:
+                fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+                result = transformer.transform(X_train, X_valid, X_test, y_train)
             X_train = result["X_train"]
             X_valid = result.get("X_valid")
             X_test = result.get("X_test")
             y_train = result.get("y_train")
-            # if intermediate_result is not None and isinstance(intermediate_result, list):
-            #     intermediate_result.append({
-            #         "X_train": deepcopy(X_train),
-            #         "X_valid": deepcopy(X_valid),
-            #         "X_test": deepcopy(X_test),
-            #     })
             if self.should_store_intermediate_result:
                 current_dict = {}
                 self.update_data_container_to_dataset_id(step_name, "X_train", X_train, current_dict)
@@ -120,3 +161,10 @@ class ML_Workflow(Pipeline):
         result = self.transform(X)
         X = result["X_train"]
         return self.steps[-1][-1].predict_proba(X)
+
+    def copy(self):
+        tmp = self.resource_manager
+        self.resource_manager = None
+        res = deepcopy(self)
+        self.resource_manager = tmp
+        return res

@@ -13,7 +13,7 @@ import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import VARIABLE_PATTERN, UNIQUE_FEATURE_GROUPS
-from autoflow.manager.data_container.base import DataContainer, copy_data_container_structure
+from autoflow.manager.data_container.base import DataContainer
 from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns
 from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict, get_hash_of_str
 
@@ -78,7 +78,7 @@ class DataFrameContainer(DataContainer):
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:
             if upload_type == "table":
-                self.resource_manager.upload_df_to_table(self.data, self.dataset_hash)
+                self.resource_manager.upload_df_to_table(self.data, self.dataset_hash,self.columns_mapper)
             else:
                 self.resource_manager.upload_df_to_fs(self.data, dataset_path)
         super(DataFrameContainer, self).upload(upload_type)
@@ -152,7 +152,7 @@ class DataFrameContainer(DataContainer):
         # 用于过滤feature_groups
         if isinstance(feature_group, str):
             feature_group = [feature_group]
-        result = copy_data_container_structure(self)
+        result = self.copy()
         loc = result.feature_groups.isin(feature_group)  # 实际操作的部分
         if not isin:
             loc = (~loc)
@@ -218,8 +218,8 @@ class DataFrameContainer(DataContainer):
         return deleted_df.concat_to(new_df)
 
     def sub_sample(self, index):
-        new_df = copy_data_container_structure(self)
-        new_df.data = deepcopy(self.data.iloc[index, :])
+        new_df = self.copy()
+        new_df.data = deepcopy(new_df.data.iloc[index, :])
         return new_df
 
     @property

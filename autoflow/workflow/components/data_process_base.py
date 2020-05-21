@@ -2,7 +2,6 @@ from typing import Optional
 
 import pandas as pd
 
-from autoflow.manager.data_container.base import copy_data_container_structure
 from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.workflow.components.base import AutoFlowComponent
@@ -38,8 +37,8 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
     def _transform(self, X: DataFrameContainer, y: Optional[NdArrayContainer]):
         y_data = y.data
         X_data, y_data = self._transform_proc(X.data, y_data)
-        X = copy_data_container_structure(X)
-        y = copy_data_container_structure(y)
+        X = X.copy()
+        y = y.copy()
         X_data = pd.DataFrame(X_data, columns=X.columns, index=X.index)
         X.data = X_data
         y.data = y_data

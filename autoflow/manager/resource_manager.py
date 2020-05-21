@@ -432,6 +432,17 @@ class ResourceManager(StrSignatureMixin):
         else:
             return None
 
+    def redis_hset(self, name, key, value):
+        if self.connect_redis():
+            try:
+                self.redis_client.hset(name, key, value)
+            except Exception as e:
+                pass
+
+    def redis_hgetall(self,name):
+        if self.connect_redis():
+            self.redis_client.hgetall(name)
+
     def redis_delete(self, name):
         if self.connect_redis():
             self.redis_client.delete(name)
@@ -505,13 +516,15 @@ class ResourceManager(StrSignatureMixin):
         self.is_init_dataset = False
         self.DatasetModel = None
 
-    def upload_df_to_table(self, df, dataset_hash):
+    def upload_df_to_table(self, df, dataset_hash, column_mapper):
         dataset_db = self.init_dataset_db()
 
         class Meta:
             database = dataset_db
             table_name = f"dataset_{dataset_hash}"
 
+        origin_columns = deepcopy(df.columns)
+        df.columns = pd.Series(df.columns).map(column_mapper)
         database_id = get_unique_col_name(df.columns, "id")
         dict_ = {"Meta": Meta, database_id: pw.AutoField()}
         for col_name, dtype in zip(df.columns, df.dtypes):
@@ -526,6 +539,7 @@ class ResourceManager(StrSignatureMixin):
             sub_df = replace_nan_to_None(sub_df)
             dicts = sub_df.to_dict('records')
             DataframeModel.insert_many(dicts).execute()
+        df.columns = origin_columns
 
     def upload_df_to_fs(self, df: pd.DataFrame, dataset_path):
         tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
@@ -609,7 +623,7 @@ class ResourceManager(StrSignatureMixin):
             data_manager_path = pw.CharField(max_length=512, default="")
             resource_manager_path = pw.CharField(max_length=512, default="")
             dataset_metadata = pw.CharField(max_length=512, default={})
-            metric = pw.CharField(max_length=64, default="")  # task 的冗余字段
+            metric = pw.CharField(max_length=256, default="")  # task 的冗余字段
             splitter = pw.TextField(default="")  # task 的冗余字段
             ml_task = pw.CharField(max_length=64, default="")  # task 的冗余字段
             experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来 # fixme
@@ -653,23 +667,24 @@ class ResourceManager(StrSignatureMixin):
             additional_info,
             set_id=True
     ):
-        self.close_all()
-        copied_resource_manager = deepcopy(self)
-        data_manager = data_manager.copy()
+        # todo: 不再保存data_manager
+        # self.close_all()
+        # copied_resource_manager = deepcopy(self)
+        # data_manager = data_manager.copy()
         self.init_experiment_table()
         # estimate new experiment_id
         experiment_id = self.forecast_new_id(self.ExperimentModel, "experiment_id")
         # todo: 是否需要删除data_manager的Xy
-        data_manager.X_train = None
-        data_manager.X_test = None
-        data_manager.y_train = None
-        data_manager.y_test = None
+        # data_manager.X_train = None
+        # data_manager.X_test = None
+        # data_manager.y_train = None
+        # data_manager.y_test = None
         self.experiment_dir = self.file_system.join(self.parent_experiments_dir, str(experiment_id))
         self.file_system.mkdir(self.experiment_dir)
         data_manager_path = self.file_system.join(self.experiment_dir, f"data_manager.{self.compress_suffix}")
         resource_manager_path = self.file_system.join(self.experiment_dir, f"resource_manager.{self.compress_suffix}")
-        self.file_system.dump_pickle(data_manager, data_manager_path)
-        self.file_system.dump_pickle(copied_resource_manager, resource_manager_path)
+        # self.file_system.dump_pickle(data_manager, data_manager_path)
+        # self.file_system.dump_pickle(copied_resource_manager, resource_manager_path)
         self.additional_info = additional_info
         experiment_record = self.ExperimentModel.create(
             general_experiment_time=general_experiment_time,
@@ -749,15 +764,19 @@ class ResourceManager(StrSignatureMixin):
             sub_feature_indexes = []
         if not isinstance(sub_sample_indexes, list):
             sub_sample_indexes = list(sub_sample_indexes)
-        subsample_indexes_str = str(sub_sample_indexes)
+        if not isinstance(sub_feature_indexes, list):
+            sub_feature_indexes = list(sub_feature_indexes)
+        sub_sample_indexes_str = str(sub_sample_indexes)
+        sub_feature_indexes_str = str(sub_feature_indexes)
         # ---task_id----------------------------------------------------
         m = hashlib.md5()
         get_hash_of_str(train_set_id, m)
         get_hash_of_str(test_set_id, m)
-        get_hash_of_str(subsample_indexes_str, m)
         get_hash_of_str(metric_str, m)
         get_hash_of_str(splitter_str, m)
         get_hash_of_str(ml_task_str, m)
+        get_hash_of_str(sub_sample_indexes_str, m)
+        get_hash_of_str(sub_feature_indexes_str, m)
         get_hash_of_str(specific_task_token, m)
         task_hash = m.hexdigest()
         task_id = task_hash
@@ -864,7 +883,7 @@ class ResourceManager(StrSignatureMixin):
                                        help_text="Hyper-param Descriptions Language ID, calculated by hash(hdl)")
             experiment_id = pw.IntegerField(default=0,
                                             help_text="Experiment ID. The operation of a program is called an experiment.")
-            estimator = pw.CharField(max_length=32, default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
+            estimator = pw.CharField(max_length=256, default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
             loss = pw.FloatField(default=65535,
                                  help_text="Loss value, is calculated by metric's current-value and 'optimal-value' and 'greater-is-better'. \n"
                                            "For instance, r2 is 'greater-is-better' and 'optimal-value'=1, now the r2=0.55, so loss=0.45 . ")
