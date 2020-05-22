@@ -350,7 +350,7 @@ class DataManager(StrSignatureMixin):
         self.X_train = self.process_X(self.X_train, X_train)
         self.X_test = self.process_X(self.X_test, X_test)
 
-    def copy(self):
+    def copy(self, keep_data=True):
         X_train = self.X_train
         X_test = self.X_test
         y_train = self.y_train
@@ -362,14 +362,15 @@ class DataManager(StrSignatureMixin):
         self.y_test = None
         self.resource_manager = None
         res = deepcopy(self)
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
+        if keep_data:
+            self.X_train = X_train
+            self.X_test = X_test
+            self.y_train = y_train
+            self.y_test = y_test
         self.resource_manager = rm
         return res
 
-    def pickle(self):
+    def pickle(self, keep_data=True):
         from pickle import dumps
         X_train = self.X_train
         X_test = self.X_test
@@ -382,9 +383,10 @@ class DataManager(StrSignatureMixin):
         self.y_test = None
         self.resource_manager = None
         res = dumps(self)
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
+        if keep_data:
+            self.X_train = X_train
+            self.X_test = X_test
+            self.y_train = y_train
+            self.y_test = y_test
         self.resource_manager = rm
         return res

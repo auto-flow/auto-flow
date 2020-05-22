@@ -502,7 +502,7 @@ class AutoFlowEstimator(BaseEstimator):
 
     def copy(self):
         tmp_dm = self.data_manager
-        self.data_manager = self.data_manager.copy()
+        self.data_manager = self.data_manager.copy(keep_data=False)
         res = deepcopy(self)
         self.data_manager = tmp_dm
         return res
@@ -511,7 +511,7 @@ class AutoFlowEstimator(BaseEstimator):
         # todo: 怎么做保证不触发self.resource_manager的__reduce__
         from pickle import dumps
         tmp_dm = self.data_manager
-        self.data_manager = self.data_manager.copy()
+        self.data_manager = self.data_manager.copy(keep_data=False)
         res = dumps(self)
         self.data_manager = tmp_dm
         return res

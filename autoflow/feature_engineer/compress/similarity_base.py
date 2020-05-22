@@ -65,7 +65,7 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
             self.to_delete.append(X.columns[ix])
         self.to_delete = self.to_delete[:int(X.shape[1] * self.max_delete)]
         end = time()
-        self.logger.debug("use time:", end - start)
+        self.logger.info("use time:", end - start)
         return self
 
     def transform(self, X, y=None):
@@ -77,6 +77,6 @@ class SimilarityBase(TransformerMixin, BaseEstimator):
         col_before = X.shape[1]
         X = X.drop(self.to_delete, axis=1)
         col_after = X.shape[1]
-        self.logger.debug(f"features were deleted by {self.name}")
-        self.logger.debug(f"features before {col_before} , after {col_after}, {col_before - col_after} were deleted")
+        self.logger.info(f"features were deleted by {self.name}")
+        self.logger.info(f"features before {col_before} , after {col_after}, {col_before - col_after} were deleted")
         return X

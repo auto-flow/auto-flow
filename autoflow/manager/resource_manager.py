@@ -441,7 +441,9 @@ class ResourceManager(StrSignatureMixin):
 
     def redis_hgetall(self,name):
         if self.connect_redis():
-            self.redis_client.hgetall(name)
+            return self.redis_client.hgetall(name)
+        else:
+            return None
 
     def redis_delete(self, name):
         if self.connect_redis():

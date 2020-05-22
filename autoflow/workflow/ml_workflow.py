@@ -80,6 +80,7 @@ class ML_Workflow(Pipeline):
                     self.logger.warning(
                         f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
                     X_stack = X_train
+                X_stack.column_descriptions = {}
                 dataset_hash = X_stack.get_hash()
                 component_name = transformer.__class__.__name__
                 m = hashlib.md5()
@@ -93,7 +94,8 @@ class ML_Workflow(Pipeline):
                 else:
                     fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
                     result = transformer.transform(X_train, X_valid, X_test, y_train)
-                    self.resource_manager.redis_hset()
+                    self.resource_manager.redis_hset(redis_key,"component", pickle.dumps(fitted_transformer))
+                    self.resource_manager.redis_hset(redis_key,"result", pickle.dumps(result))
                     # todo: 增加一些元信息
             else:
                 fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
@@ -167,4 +169,5 @@ class ML_Workflow(Pipeline):
         self.resource_manager = None
         res = deepcopy(self)
         self.resource_manager = tmp
+        res.resource_manager = tmp
         return res

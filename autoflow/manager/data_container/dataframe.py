@@ -201,13 +201,14 @@ class DataFrameContainer(DataContainer):
         if isinstance(values, np.ndarray):
             # new_df 的 columns
             replaced_columns = self.columns[self.feature_groups.isin(old_feature_group)]
+            index=self.index
             if len(replaced_columns) == values.shape[1]:
                 columns = replaced_columns
             else:
                 # 特征数发生改变，一共有一对多，多对多，多对一三种情况
                 # todo: 这里先采用简单的实现方法，期待新的解决方法
                 columns = [f"{x}_{i}" for i, x in enumerate(new_feature_group)]
-            values = pd.DataFrame(values, columns=columns)
+            values = pd.DataFrame(values, columns=columns, index=index)
 
         deleted_df = self.filter_feature_groups(old_feature_group, True, False)
         new_df = DataFrameContainer(self.dataset_source, dataset_instance=values,
