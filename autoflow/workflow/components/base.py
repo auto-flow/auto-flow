@@ -4,6 +4,7 @@ from copy import deepcopy
 from importlib import import_module
 from typing import Dict, Optional
 
+import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 
@@ -108,6 +109,8 @@ class AutoFlowComponent(BaseEstimator):
         return df
 
     def build_proxy_estimator(self):
+        if self.component is not None:
+            return
         # 默认采用代理模式（但可以颠覆这种模式，完全重写这个类）
         cls = self.get_estimator_class()
         # 根据构造函数构造代理估计器
@@ -157,7 +160,6 @@ class AutoFlowComponent(BaseEstimator):
         # 保留其他数据集的参数，方便模型拓展
         X = self.prepare_X_to_fit(X_train, X_valid, X_test)
         fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, feature_groups)
-        self.resource_manager = None  # avoid can not pickle error
         return fitted_estimator
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
@@ -229,3 +231,43 @@ class AutoFlowComponent(BaseEstimator):
 
     def before_pred_X(self, X: DataFrameContainer):
         return X.data
+
+
+class AutoFlowIterComponent(AutoFlowComponent):
+    def iterative_fit(self, X, y, X_valid, y_valid, n_iter):
+        self.component.n_estimators += n_iter
+        self.component.n_estimators = min(self.component.n_estimators,
+                                          self.max_iterations)
+        self.iteration_ = self.component.n_estimators
+        self.component.fit(X, y)
+        early_stopping_tol = getattr(self, "early_stopping_tol", 0.001)
+        performance = self.component.score(X_valid, y_valid)
+        if np.any(performance - early_stopping_tol > self.performance_history):
+            self.performance_history[self.iter_ix % len(self.performance_history)] = performance
+        else:
+            self.fully_fitted_ = True
+
+    def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feature_groups=None):
+        # 迭代式地训练，并引入早停机制
+        iter_inc = getattr(self, "iter_inc", 10)
+        early_stopping_rounds = getattr(self, "early_stopping_rounds", 20)
+        self.performance_history = np.full(early_stopping_rounds, np.inf)
+        self.iter_ix = 0
+        while not self.fully_fitted:
+            self.iterative_fit(X, y, X_valid, y_valid, iter_inc)
+            self.iter_ix += 1
+
+    @property
+    def fully_fitted(self) -> bool:
+        if self.iteration > self.max_iterations:
+            return True
+        return getattr(self, "fully_fitted_", False)
+
+    @property
+    def max_iterations(self):
+        return getattr(self, "max_iterations_", 1000)
+
+    @property
+    def iteration(self):
+        return getattr(self, "iteration_", 1)
