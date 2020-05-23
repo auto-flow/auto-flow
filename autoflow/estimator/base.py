@@ -240,9 +240,10 @@ class AutoFlowEstimator(BaseEstimator):
                 raise NotImplementedError()
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_to_tasks_table(self.data_manager, metric, splitter,
-                                                    specific_task_token, dataset_metadata, task_metadata,
-                                                    sub_sample_indexes, sub_feature_indexes)
+        self.resource_manager.insert_to_tasks_table(
+            data_manager=self.data_manager, metric=metric, splitter=splitter,
+            specific_task_token=specific_task_token, dataset_metadata=dataset_metadata, task_metadata=task_metadata,
+            sub_sample_indexes=sub_sample_indexes, sub_feature_indexes=sub_feature_indexes)
         self.resource_manager.close_task_table()
         # store other params
         self.splitter = splitter
@@ -279,13 +280,7 @@ class AutoFlowEstimator(BaseEstimator):
                 "log_file": self.log_file,
                 "log_config": self.log_config,
             }
-            self.resource_manager.insert_to_experiment_table(general_experiment_time,
-                                                             current_experiment_time,
-                                                             self.hdl_constructors, hdl_constructor, raw_hdl, hdl,
-                                                             self.tuners, tuner,
-                                                             self.data_manager,
-                                                             dataset_metadata, metric, splitter,
-                                                             experiment_config, additional_info)
+            self.resource_manager.insert_to_experiment_table(experiment_config, additional_info)
             self.resource_manager.close_experiment_table()
             self.task_id = self.resource_manager.task_id
             self.hdl_id = self.resource_manager.hdl_id
@@ -439,8 +434,7 @@ class AutoFlowEstimator(BaseEstimator):
         estimator_list, y_true_indexes_list, y_preds_list = TrainedDataFetcher(
             task_id, hdl_id, trial_ids, self.resource_manager).fetch()
         # todo: 在这里，只取了验证集的数据，没有取测试集的数据。待拓展
-        ml_task, Xy_train, Xy_test = self.resource_manager.get_ensemble_needed_info(task_id)
-        y_true = Xy_train[1]
+        ml_task, y_true = self.resource_manager.get_ensemble_needed_info(task_id)
         ensemble_estimator_package_name = f"autoflow.ensemble.{ensemble_type}.{ml_task.role}"
         ensemble_estimator_package = import_module(ensemble_estimator_package_name)
         ensemble_estimator_class_name = get_class_name_of_module(ensemble_estimator_package_name)
@@ -449,10 +443,10 @@ class AutoFlowEstimator(BaseEstimator):
         # todo: 集成学习部分，存在无法处理K折验证以外问题的情况（不完整的y_pred）
         ensemble_estimator.fit_trained_data(estimator_list, y_true_indexes_list, y_preds_list, y_true)
         self.ensemble_estimator = ensemble_estimator
-        if return_Xy_test:
-            return self.ensemble_estimator, Xy_test
-        else:
-            return self.ensemble_estimator
+        # if return_Xy_test:
+        #     return self.ensemble_estimator, Xy_test
+        # else:
+        return self.ensemble_estimator
 
     def auto_fit_ensemble(self):
         # todo: 调研stacking等ensemble方法的表现评估

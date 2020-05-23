@@ -1,9 +1,7 @@
 import datetime
 import hashlib
 import os
-import socket
 from copy import deepcopy
-from getpass import getuser
 from math import ceil
 from typing import Dict, Tuple, List, Union, Any
 
@@ -19,9 +17,10 @@ from redis import Redis
 
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
+from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.metrics import Scorer
-from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts
+from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict
 from autoflow.utils.dict_ import update_data_structure
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_dict
 from autoflow.utils.klass import StrSignatureMixin
@@ -72,7 +71,7 @@ class ResourceManager(StrSignatureMixin):
             db_type="sqlite",
             db_params=frozendict(),
             redis_params=frozendict(),
-            max_persistent_estimators=50,
+            max_persistent_estimators=-1,
             compress_suffix="bz2"
     ):
         '''
@@ -234,22 +233,23 @@ class ResourceManager(StrSignatureMixin):
         # ----return----------------
         return models_path, finally_fit_model_path, y_info_path
 
-    def get_ensemble_needed_info(self, task_id) -> Tuple[MLTask, Any, Any]:
+    def get_ensemble_needed_info(self, task_id) -> Tuple[MLTask, Any]:
         self.task_id = task_id
         self.init_task_table()
         task_record = self.TaskModel.select().where(self.TaskModel.task_id == task_id)[0]
         ml_task_str = task_record.ml_task
         ml_task = eval(ml_task_str)
-        Xy_train_path = task_record.Xy_train_path
-        Xy_train = self.file_system.load_pickle(Xy_train_path)
-        Xy_test_path = task_record.Xy_test_path
-        Xy_test = self.file_system.load_pickle(Xy_test_path)
-
-        return ml_task, Xy_train, Xy_test
+        train_set_id = task_record.train_set_id
+        test_set_id = task_record.test_set_id
+        # todo: 更聪明的做法
+        X_train = DataFrameContainer(dataset_id=train_set_id, resource_manager=self)
+        target_col = X_train.column_descriptions["target"]
+        y_train = np.array(X_train.data[target_col])
+        return ml_task, y_train
 
     def load_best_estimator(self, ml_task: MLTask):
         self.init_trial_table()
-        record = self.TrialsModel.select() \
+        record = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id) \
             .order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
         models = self.file_system.load_pickle(record.models_path)
         if ml_task.mainTask == "classification":
@@ -267,7 +267,8 @@ class ResourceManager(StrSignatureMixin):
     def get_best_k_trials(self, k):
         self.init_trial_table()
         trial_ids = []
-        records = self.TrialsModel.select().order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
+        records = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id) \
+            .order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
         for record in records:
             trial_ids.append(record.trial_id)
         return trial_ids
@@ -439,7 +440,7 @@ class ResourceManager(StrSignatureMixin):
             except Exception as e:
                 pass
 
-    def redis_hgetall(self,name):
+    def redis_hgetall(self, name):
         if self.connect_redis():
             return self.redis_client.hgetall(name)
         else:
@@ -452,7 +453,7 @@ class ResourceManager(StrSignatureMixin):
     # ----------dataset_model------------------------------------------------------------------
     def get_dataset_model(self) -> pw.Model:
         class Dataset_meta_record(pw.Model):
-            dataset_id = pw.FixedCharField(max_length=128, primary_key=True)
+            dataset_id = pw.FixedCharField(max_length=32, primary_key=True)
             dataset_metadata = self.JSONField(default={})
             dataset_path = pw.CharField(max_length=512, default="")
             upload_type = pw.CharField(max_length=32, default="")
@@ -563,7 +564,8 @@ class ResourceManager(StrSignatureMixin):
         records = self.DatasetModel.select().where(self.DatasetModel.dataset_id == dataset_hash).dicts()
         return list(records)
 
-    def download_df_of_table(self, dataset_hash, columns=None):
+    def download_df_of_table(self, dataset_hash, columns, columns_mapper):
+        inv_columns_mapper = inverse_dict(columns_mapper)
         dataset_db = self.init_dataset_db()
         models = generate_models(dataset_db)
         table_name = f"dataset_{dataset_hash}"
@@ -586,6 +588,7 @@ class ResourceManager(StrSignatureMixin):
         # 删除第一列数据库主键列
         database_id = df.columns[0]
         df.pop(database_id)
+        df.columns = df.columns.map(inv_columns_mapper)
         if columns is not None:
             df = df[columns]
         return df
@@ -609,28 +612,12 @@ class ResourceManager(StrSignatureMixin):
     def get_experiment_model(self) -> pw.Model:
         class Experiment(pw.Model):
             experiment_id = pw.AutoField(primary_key=True)
-            general_experiment_time = pw.DateTimeField(default=datetime.datetime.now)
-            current_experiment_time = pw.DateTimeField(default=datetime.datetime.now)
-            modify_time = pw.DateTimeField(default=datetime.datetime.now)
-            hdl_id = pw.FixedCharField(max_length=128, default="")
-            task_id = pw.FixedCharField(max_length=128, default="")
-            train_set_id = pw.FixedCharField(max_length=128, default="")  # fixme
-            test_set_id = pw.FixedCharField(max_length=128, default="")  # fixme
-            hdl_constructors = self.JSONField(default=[])
-            hdl_constructor = pw.TextField(default="")
-            raw_hdl = self.JSONField(default={})
-            hdl = self.JSONField(default={})
-            tuners = self.JSONField(default=[])
-            tuner = pw.TextField(default="")
-            data_manager_path = pw.CharField(max_length=512, default="")
-            resource_manager_path = pw.CharField(max_length=512, default="")
-            dataset_metadata = pw.CharField(max_length=512, default={})
-            metric = pw.CharField(max_length=256, default="")  # task 的冗余字段
-            splitter = pw.TextField(default="")  # task 的冗余字段
-            ml_task = pw.CharField(max_length=64, default="")  # task 的冗余字段
+            hdl_id = pw.FixedCharField(max_length=32, default="")
+            task_id = pw.FixedCharField(max_length=32, default="")
             experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来 # fixme
             additional_info = self.JSONField(default={})  # trials与experiments同时存储
-            user = pw.CharField(max_length=64, default=getuser)
+            create_time = pw.DateTimeField(default=datetime.datetime.now)
+            modify_time = pw.DateTimeField(default=datetime.datetime.now)
 
             class Meta:
                 database = self.record_db
@@ -653,68 +640,18 @@ class ResourceManager(StrSignatureMixin):
 
     def insert_to_experiment_table(
             self,
-            general_experiment_time,
-            current_experiment_time,
-            hdl_constructors,
-            hdl_constructor,
-            raw_hdl,
-            hdl,
-            tuners,
-            tuner,
-            data_manager,
-            dataset_metadata,
-            metric,
-            splitter,
             experiment_config,
             additional_info,
-            set_id=True
     ):
-        # todo: 不再保存data_manager
-        # self.close_all()
-        # copied_resource_manager = deepcopy(self)
-        # data_manager = data_manager.copy()
         self.init_experiment_table()
-        # estimate new experiment_id
-        experiment_id = self.forecast_new_id(self.ExperimentModel, "experiment_id")
-        # todo: 是否需要删除data_manager的Xy
-        # data_manager.X_train = None
-        # data_manager.X_test = None
-        # data_manager.y_train = None
-        # data_manager.y_test = None
-        self.experiment_dir = self.file_system.join(self.parent_experiments_dir, str(experiment_id))
-        self.file_system.mkdir(self.experiment_dir)
-        data_manager_path = self.file_system.join(self.experiment_dir, f"data_manager.{self.compress_suffix}")
-        resource_manager_path = self.file_system.join(self.experiment_dir, f"resource_manager.{self.compress_suffix}")
-        # self.file_system.dump_pickle(data_manager, data_manager_path)
-        # self.file_system.dump_pickle(copied_resource_manager, resource_manager_path)
         self.additional_info = additional_info
         experiment_record = self.ExperimentModel.create(
-            general_experiment_time=general_experiment_time,
-            current_experiment_time=current_experiment_time,
             hdl_id=self.hdl_id,
             task_id=self.task_id,
-            train_set_id=data_manager.train_set_hash,
-            test_set_id=data_manager.test_set_hash,
-            hdl_constructors=[str(item) for item in hdl_constructors],
-            hdl_constructor=str(hdl_constructor),
-            raw_hdl=raw_hdl,
-            hdl=hdl,
-            tuners=[str(item) for item in tuners],
-            tuner=str(tuner),
-            data_manager_path=data_manager_path,
-            resource_manager_path=resource_manager_path,
-            dataset_metadata=dataset_metadata,
-            metric=metric.name,
-            splitter=str(splitter),
-            ml_task=str(data_manager.ml_task),
             experiment_config=experiment_config,
             additional_info=additional_info,
         )
-        fetched_experiment_id = experiment_record.experiment_id
-        if fetched_experiment_id != experiment_id:
-            self.logger.warning("fetched_experiment_id != experiment_id")
-        if set_id:
-            self.experiment_id = experiment_id
+        self.experiment_id = experiment_record.experiment_id
 
     def init_experiment_table(self):
         if self.is_init_experiment:
@@ -730,19 +667,18 @@ class ResourceManager(StrSignatureMixin):
     # ----------tasks_model------------------------------------------------------------------
     def get_task_model(self) -> pw.Model:
         class Task(pw.Model):
-            task_id = pw.FixedCharField(max_length=128, primary_key=True)
-            metric = pw.CharField(max_length=64, default="")
+            task_id = pw.FixedCharField(max_length=32, primary_key=True)
+            metric = pw.CharField(max_length=256, default="")
             splitter = pw.TextField(default="")
             ml_task = pw.CharField(max_length=64, default="")
             specific_task_token = pw.CharField(max_length=128, default="")
-            train_set_id = pw.FixedCharField(max_length=128, default="")
-            test_set_id = pw.FixedCharField(max_length=128, default="")
-            sub_sample_indexes = self.JSONField()
-            sub_feature_indexes = self.JSONField()
+            train_set_id = pw.FixedCharField(max_length=32, default="")
+            test_set_id = pw.FixedCharField(max_length=32, default="")
+            sub_sample_indexes = self.JSONField(default=[])
+            sub_feature_indexes = self.JSONField(default=[])
+            task_metadata = self.JSONField(default={})
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
-            # meta info
-            meta_data = self.JSONField(default={})
 
             class Meta:
                 database = self.record_db
@@ -783,7 +719,7 @@ class ResourceManager(StrSignatureMixin):
         task_hash = m.hexdigest()
         task_id = task_hash
         records = self.TaskModel.select().where(self.TaskModel.task_id == task_id)
-        meta_data = dict(
+        task_metadata = dict(
             dataset_metadata=dataset_metadata, **task_metadata
         )
         # ---store_task_record----------------------------------------------------
@@ -798,13 +734,13 @@ class ResourceManager(StrSignatureMixin):
                 test_set_id=test_set_id,
                 sub_sample_indexes=sub_sample_indexes,
                 sub_feature_indexes=sub_feature_indexes,
-                meta_data=meta_data
+                task_metadata=task_metadata
             )
         else:
             record = records[0]
-            old_meta_data = record.meta_data
-            new_meta_data = update_data_structure(old_meta_data, meta_data)
-            record.meta_data = new_meta_data
+            old_meta_data = record.task_metadata
+            new_meta_data = update_data_structure(old_meta_data, task_metadata)
+            record.task_metadata = new_meta_data
             record.save()
         if set_id:
             self.task_id = task_id
@@ -826,7 +762,7 @@ class ResourceManager(StrSignatureMixin):
             task_id = pw.FixedCharField(max_length=128, default="")
             hdl_id = pw.FixedCharField(max_length=128, default="")
             hdl = self.JSONField(default={})
-            meta_data = self.JSONField(default={})
+            hdl_metadata = self.JSONField(default={})
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
 
@@ -837,7 +773,7 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Hdl])
         return Hdl
 
-    def insert_to_hdl_table(self, hdl, hdl_metadata, set_id=True):
+    def insert_to_hdl_table(self, hdl, hdl_metadata):
         self.init_hdl_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
@@ -848,16 +784,15 @@ class ResourceManager(StrSignatureMixin):
                 task_id=self.task_id,
                 hdl_id=hdl_id,
                 hdl=hdl,
-                meta_data=hdl_metadata
+                hdl_metadata=hdl_metadata
             )
         else:
             record = records[0]
-            old_meta_data = record.meta_data
+            old_meta_data = record.hdl_metadata
             new_meta_data = update_data_structure(old_meta_data, hdl_metadata)
-            record.meta_data = new_meta_data
+            record.hdl_metadata = new_meta_data
             record.save()
-        if set_id:
-            self.hdl_id = hdl_id
+        self.hdl_id = hdl_id
 
     def init_hdl_table(self):
         if self.is_init_hdl:
@@ -876,15 +811,15 @@ class ResourceManager(StrSignatureMixin):
         class Trial(pw.Model):
             trial_id = pw.AutoField(primary_key=True,
                                     help_text="Trial ID. One experiment consists of many experiments.")
-            config_id = pw.FixedCharField(max_length=128, default="",
+            config_id = pw.FixedCharField(max_length=32, default="",
                                           help_text="Configuration ID. Calculated by hash value of Configuration array.")
-            task_id = pw.FixedCharField(max_length=128, default="",
-                                        help_text="Task ID. Task ID is calculated by hash(TrainSet, TestSet, metric, splitter, ml_task, specific_task_token)",
-                                        index=True)  # 加索引
-            hdl_id = pw.FixedCharField(max_length=128, default="",
-                                       help_text="Hyper-param Descriptions Language ID, calculated by hash(hdl)")
             experiment_id = pw.IntegerField(default=0,
                                             help_text="Experiment ID. The operation of a program is called an experiment.")
+            task_id = pw.FixedCharField(max_length=32, default="",
+                                        help_text="Task ID. Task ID is calculated by hash(TrainSet, TestSet, metric, splitter, ml_task, specific_task_token)",
+                                        index=True)  # 加索引
+            hdl_id = pw.FixedCharField(max_length=32, default="",
+                                       help_text="Hyper-param Descriptions Language ID, calculated by hash(hdl)")
             estimator = pw.CharField(max_length=256, default="", help_text="Estimator. For instance: CNN, LSTM, SVM.")
             loss = pw.FloatField(default=65535,
                                  help_text="Loss value, is calculated by metric's current-value and 'optimal-value' and 'greater-is-better'. \n"
@@ -911,9 +846,6 @@ class ResourceManager(StrSignatureMixin):
             intermediate_results = self.JSONField(default=[])
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
-            user = pw.CharField(max_length=32, default=getuser)
-            pid = pw.IntegerField(default=os.getpid)
-            host = pw.CharField(max_length=32, default=socket.gethostname)
 
             class Meta:
                 database = self.record_db
@@ -983,15 +915,16 @@ class ResourceManager(StrSignatureMixin):
         #     estimators.append(record.component)
         # for component in estimators:
         # .where(self.TrialsModel.component == component)
-        should_delete = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id).order_by(
-            self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
-        if len(should_delete):
-            for record in should_delete:
-                models_path = record.models_path
-                self.logger.info(f"Delete expire Model in path : {models_path}")
-                self.file_system.delete(models_path)
-            self.TrialsModel.delete().where(
-                self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()
+        if self.max_persistent_estimators > 0:
+            should_delete = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id).order_by(
+                self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
+            if len(should_delete):
+                for record in should_delete:
+                    models_path = record.models_path
+                    self.logger.info(f"Delete expire Model in path : {models_path}")
+                    self.file_system.delete(models_path)
+                self.TrialsModel.delete().where(
+                    self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()
         return True
 
 

@@ -46,8 +46,7 @@ class NdArrayContainer(DataContainer):
         self.dataset_source = record["dataset_source"]
         self.dataset_metadata = record["dataset_metadata"]
         arr = self.resource_manager.download_arr_of_fs(dataset_id)
-        return arr
-
+        self.arr=arr
     def read_local(self, path: str):
         # todo: 加载 npy 或 h5
         pass

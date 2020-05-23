@@ -22,7 +22,8 @@ class DataFrameContainer(DataContainer):
     VALID_INSTANCE = (np.ndarray, pd.DataFrame)
     dataset_type = "dataframe"
 
-    def __init__(self, dataset_source, dataset_path=None, dataset_instance=None, dataset_id=None, resource_manager=None,
+    def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None,
+                 resource_manager=None,
                  dataset_metadata=frozendict()):
         self.column_descriptions = None
         self.feature_groups = pd.Series([])
@@ -69,7 +70,7 @@ class DataFrameContainer(DataContainer):
     def upload(self, upload_type="table"):
         assert upload_type in ("table", "fs")
         self.dataset_hash = self.get_hash()
-        if self.dataset_hash==self.uploaded_hash:
+        if self.dataset_hash == self.uploaded_hash:
             return
         L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
             self.dataset_hash, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
@@ -78,7 +79,7 @@ class DataFrameContainer(DataContainer):
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:
             if upload_type == "table":
-                self.resource_manager.upload_df_to_table(self.data, self.dataset_hash,self.columns_mapper)
+                self.resource_manager.upload_df_to_table(self.data, self.dataset_hash, self.columns_mapper)
             else:
                 self.resource_manager.upload_df_to_fs(self.data, dataset_path)
         super(DataFrameContainer, self).upload(upload_type)
@@ -88,21 +89,22 @@ class DataFrameContainer(DataContainer):
         if len(records) == 0:
             raise ValueError(f"dataset_id: {dataset_id} didn't exists.")
         record = records[0]
-        self.column_descriptions = record["column_descriptions"]
+        column_descriptions = record["column_descriptions"]
         self.columns_mapper = record["columns_mapper"]
-        self.dataset_source=record["dataset_source"]
-        self.dataset_metadata=record["dataset_metadata"]
-        upload_type=record["upload_type"]
+        self.dataset_source = record["dataset_source"]
+        self.dataset_metadata = record["dataset_metadata"]
+        upload_type = record["upload_type"]
         columns = record["columns"]
-        if upload_type=="table":
-            df = self.resource_manager.download_df_of_table(dataset_id, columns)
+        if upload_type == "table":
+            df = self.resource_manager.download_df_of_table(dataset_id, columns, self.columns_mapper)
         else:
-            df = self.resource_manager.download_df_of_table(dataset_id, columns)
+            df = self.resource_manager.download_arr_of_fs(dataset_id, columns)
         inverse_columns_mapper = inverse_dict(self.columns_mapper)
-        df.columns = df.columns.map(inverse_columns_mapper)
+        df.columns.map(inverse_columns_mapper)
         # todo: 将各种信息补齐
         # todo: 建立本地缓存，防止二次下载
-        return df
+        self.data = df
+        self.set_column_descriptions(column_descriptions)
 
     def set_feature_groups(self, feature_groups):
         if not isinstance(feature_groups, pd.Series):
@@ -119,6 +121,18 @@ class DataFrameContainer(DataContainer):
             else:
                 result[feature_group].append(column)
         return dict(result)
+
+    def column_descriptions2feature_groups(self, column_descriptions):
+        column2feat_grp = {}
+        for feat_grp, columns in column_descriptions.items():
+            if isinstance(columns, list):
+                for column in columns:
+                    column2feat_grp[column] = feat_grp
+            else:
+                column2feat_grp[columns] = feat_grp
+        feature_groups = pd.Series(self.columns)
+        feature_groups = feature_groups.map(column2feat_grp)
+        return feature_groups
 
     def set_column_descriptions(self, column_descriptions):
         assert isinstance(column_descriptions, dict)
@@ -144,7 +158,9 @@ class DataFrameContainer(DataContainer):
             self.logger.debug(
                 f"After processing, feature_gourp '{key}' is empty, should discard in {self.dataset_source}.")
             column_descriptions.pop(key)
+
         self.column_descriptions = column_descriptions
+        self.feature_groups = self.column_descriptions2feature_groups(column_descriptions)
 
     def filter_feature_groups(self, feature_group: Union[List, str], copy=True, isin=True):  # , inplace=False
         if feature_group == "all":  # todo 用正则表达式判断
@@ -201,7 +217,7 @@ class DataFrameContainer(DataContainer):
         if isinstance(values, np.ndarray):
             # new_df 的 columns
             replaced_columns = self.columns[self.feature_groups.isin(old_feature_group)]
-            index=self.index
+            index = self.index
             if len(replaced_columns) == values.shape[1]:
                 columns = replaced_columns
             else:

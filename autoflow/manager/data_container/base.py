@@ -41,7 +41,7 @@ class DataContainer():
             assert isinstance(dataset_instance, self.VALID_INSTANCE)
             self.data = self.process_dataset_instance(dataset_instance)
         elif dataset_id is not None:
-            self.data = self.download(dataset_id)
+            self.download(dataset_id)
         else:
             raise NotImplementedError
 

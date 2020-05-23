@@ -368,6 +368,7 @@ class DataManager(StrSignatureMixin):
             self.y_train = y_train
             self.y_test = y_test
         self.resource_manager = rm
+        res.resource_manager = rm
         return res
 
     def pickle(self, keep_data=True):
@@ -376,17 +377,18 @@ class DataManager(StrSignatureMixin):
         X_test = self.X_test
         y_train = self.y_train
         y_test = self.y_test
-        rm = self.resource_manager
+        # rm = self.resource_manager
         self.X_train = None
         self.X_test = None
         self.y_train = None
         self.y_test = None
-        self.resource_manager = None
+        # self.resource_manager = None
         res = dumps(self)
         if keep_data:
             self.X_train = X_train
             self.X_test = X_test
             self.y_train = y_train
             self.y_test = y_test
-        self.resource_manager = rm
+        # self.resource_manager = rm
+        # res.resource_manager = rm
         return res

@@ -33,6 +33,12 @@ def parse_value_to_values(dict_: dict):
     return dict_
 
 
+def inverse_dict(dict_: dict):
+    result = deepcopy(dict_)
+    result = {v: k for k, v in result.items()}
+    return result
+
+
 def group_dict_items_before_first_token(dict_: Dict[str, Any], token: str) -> Dict[str, Dict[str, Any]]:
     result = defaultdict(dict)
     for packages, value in dict_.items():
@@ -185,6 +191,6 @@ if __name__ == '__main__':
     # print(updated_dict)
     # print(wanted)
     # print(updated_dict == wanted)
-    lst=[3,2,1]
-    s=sort_dict(lst)
+    lst = [3, 2, 1]
+    s = sort_dict(lst)
     print(s)

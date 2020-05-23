@@ -18,7 +18,7 @@ class Split(AutoFlowFeatureEngineerAlgorithm):
         return self
 
     def process(self, X_origin: Optional[DataFrameContainer]) -> Optional[DataFrameContainer]:
-        if X is None:
+        if X_origin is None:
             return None
         X = X_origin.copy()
         if isinstance(self.out_feature_groups, (list, tuple)):

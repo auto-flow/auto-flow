@@ -28,7 +28,7 @@ column_descriptions = {
 trained_pipeline.fit(
     X_train=train_df, X_test=test_df, column_descriptions=column_descriptions,
     splitter=KFold(n_splits=3, shuffle=True, random_state=42),
-    fit_ensemble_params=False
+    fit_ensemble_params=True
 )
 Path("autoflow_classification.pkl").write_bytes(trained_pipeline.pickle())
 predict_pipeline = pickle.loads(Path("autoflow_classification.pkl").read_bytes())
