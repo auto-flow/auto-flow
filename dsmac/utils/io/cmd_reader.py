@@ -394,7 +394,7 @@ class CMDReader(object):
         req_opts.add_argument("--hydra_iterations",
                               default=3,
                               type=int,
-                              help="[dev] number of hydra iterations. Only active if mode is set to Hydra")
+                              help="[dev] number of hydra iterations_name. Only active if mode is set to Hydra")
         req_opts.add_argument("--hydra_validation",
                               default='train',
                               choices=['train', 'val10', 'val20', 'val30', 'val40', 'val50', 'none'],
@@ -456,9 +456,9 @@ class CMDReader(object):
                                help="[dev] path to a python module containing a class"
                                     "`RandomConfigurationChooserImpl` implementing"
                                     "the interface of `RandomConfigurationChooser`")
-        smac_opts.add_argument("--hydra-iterations", "--hydra_iterations", dest="hydra_iterations",
+        smac_opts.add_argument("--hydra-iterations_name", "--hydra_iterations", dest="hydra_iterations",
                                default=3, type=int,
-                               help="[dev] number of hydra iterations. Only active if mode is set to Hydra")
+                               help="[dev] number of hydra iterations_name. Only active if mode is set to Hydra")
         smac_opts.add_argument("--use-ta-time", "--use_ta_time", dest="use_ta_time",
                                default=False, type=truthy,
                                help="[dev] Instead of measuring SMAC's wallclock time, "

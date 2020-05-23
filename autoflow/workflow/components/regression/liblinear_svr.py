@@ -9,9 +9,11 @@ class LibLinear_SVR(AutoFlowRegressionAlgorithm):
     def before_fit_y(self, y:NdArrayContainer):
         if y is None:
             return None
-        y=y.data
-        self.scaler=StandardScaler(copy=True)
-        return self.scaler.fit(y.reshape((-1,1))).ravel()
+        y = deepcopy(y.data)
+        self.scaler = StandardScaler(copy=True)
+        y = y.ravel().reshape([-1, 1])
+        self.scaler.fit(y)
+        return self.scaler.transform(y)
 
     def after_pred_y(self, y):
         return self.scaler.inverse_transform(y)

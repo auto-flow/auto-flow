@@ -1,11 +1,10 @@
 {
   "classification": {
     "adaboost": {
-      "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
-      "learning_rate": {"_type": "loguniform", "_value": [0.0001,1],"_default": 0.1},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [1,20],"_default": 10},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3},
       "random_state": 42,
-      //todo: n_jobs
     },
     "bernoulli_nb": {
       "alpha": {"_type": "loguniform", "_value": [1e-2,100],"_default": 1},
@@ -14,15 +13,16 @@
     "catboost": {
 //      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
-      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
+      "n_estimators": 5000,
 //      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
       "border_count": {"_type": "int_loguniform","_value": [1,1000], "_default": 0},
-      "early_stopping_rounds": 500,
+      "early_stopping_rounds": 250,
+      "use_best_model": true,
       "n_jobs": 1,
-      "random_state": 42,
+      "random_state": 42
     },
     "decision_tree": {
       "criterion": {"_type": "choice","_value": ["gini","entropy"],"_default": "gini"},
@@ -37,6 +37,10 @@
       "random_state": 42
     },
     "extra_trees": {
+      "n_estimators": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
 //      "max_features": {"_type": "quniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -53,10 +57,13 @@
     "gaussian_nb": {
     },
     "gradient_boosting": {
+      "n_estimators": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "loss": "deviance", // ""exponential" make it performs like adaboost
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
-      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
@@ -75,6 +82,7 @@
       "_n_components-sp1_ratio": {"_type": "quniform", "_value": [0.1,0.9],"_default": 0.5}
     },
     "liblinear_svc": {
+      "max_iter": 3000,
       "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
       "dual": {"_type": "choice", "_value": [true,false],"_default": false},
       "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},
@@ -107,19 +115,19 @@
       "random_state": 42
     },
     "lightgbm": {
+      "n_estimators": 5000,
       "boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"],"_default": "gbdt"},
       "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,100],"_default": 31},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
       "subsample_for_bin": {"_type": "int_quniform","_value": [2e4, 3e5, 2e4],"_default": 2e5},
-      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
       "feature_fraction": {"_type": "quniform","_value": [0.5,1,0.05],"_default": 1},
       "bagging_fraction": {"_type": "quniform","_value": [0.5,1,0.05],"_default": 1},  //alias "subsample" todo
       "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},
       "lambda_l1": {"_type": "loguniform","_value": [1e-7,10], "_default": 0},
       "lambda_l2": {"_type": "loguniform","_value": [1e-7,10], "_default": 0},
       "min_child_weight": {"_type": "loguniform","_value": [1e-7,10], "_default": 1e-3},
-      "early_stopping_rounds": 500,
+      "early_stopping_rounds": 250,
       "n_jobs": 1,
       "random_state": 42
     },
@@ -138,7 +146,10 @@
       "reg_param": {"_type": "quniform", "_value": [0.0,1.0],"_default": 0}
     },
     "random_forest": {
-      "n_estimators": {"_type": "int_loguniform", "_value": [10,1000],"_default": 100},
+      "n_estimators": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,  //todo:  restrict
@@ -152,6 +163,10 @@
       "random_state": 42
     },
     "sgd": {
+      "max_iter": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "loss":  {"_type": "choice", "_value": ["hinge", "log","modified_huber","squared_hinge","perceptron"],"_default": "log"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
@@ -175,8 +190,8 @@
   "regression": {
     "adaboost": {
       "loss": {"_type": "choice", "_value": ["linear", "square", "exponential"],"_default": "linear"},
-      "n_estimators": {"_type": "int_uniform", "_value": [50,500],"_default": 50},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
+      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [1,20],"_default": 10},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3},
       "random_state": 42
     },
@@ -202,13 +217,14 @@
     "catboost": {
 //      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
-      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
+      "n_estimators": 5000,
 //      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
       "border_count": {"_type": "int_loguniform","_value": [1,1000], "_default": 0},
-      "early_stopping_rounds": 500,
+      "early_stopping_rounds": 250,
+      "use_best_model": true,
       "n_jobs": 1,
       "random_state": 42
     },
@@ -235,6 +251,10 @@
       "random_state": 42
     },
     "extra_trees": {
+      "n_estimators": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},//delete "mae"
 //      "max_features": {"_type": "quniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -258,10 +278,13 @@
       "random_state": 42
     },
     "gradient_boosting": {
+      "n_estimators": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "loss": {"_type": "choice", "_value":["ls","lad","huber","quantile"],"_default": "ls"},
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,1],"_default": 0.1},
-      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
       "min_samples_split": {"_type": "int_uniform", "_value": [2,20],"_default": 2},
       "min_samples_leaf": {"_type": "int_loguniform", "_value": [1,200],"_default": 20},
       "max_leaf_nodes": {"_type": "int_loguniform", "_value": [3,2047],"_default": 31},
@@ -316,24 +339,27 @@
       "random_state": 42
     },
     "lightgbm": {
+      "n_estimators": 5000,
       "boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"],"_default": "gbdt"},
       "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,100],"_default": 31},
-      "learning_rate": {"_type": "loguniform", "_value": [1e-3,0.2],"_default": 0.1},
+      "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
       "subsample_for_bin": {"_type": "int_quniform","_value": [2e4, 3e5, 2e4],"_default": 2e5},
-      "_n_estimators-lr_ratio": {"_type": "loguniform", "_value": [0.1,100],"_default": 10},
       "feature_fraction": {"_type": "quniform","_value": [0.5,1,0.05],"_default": 1},
       "bagging_fraction": {"_type": "quniform","_value": [0.5,1,0.05],"_default": 1},  //alias "subsample" todo
       "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},
       "lambda_l1": {"_type": "loguniform","_value": [1e-7,10], "_default": 0},
       "lambda_l2": {"_type": "loguniform","_value": [1e-7,10], "_default": 0},
       "min_child_weight": {"_type": "loguniform","_value": [1e-7,10], "_default": 1e-3},
-      "early_stopping_rounds": 500,
+      "early_stopping_rounds": 250,
       "n_jobs": 1,
       "random_state": 42
     },
     "random_forest": {
-      "n_estimators": {"_type": "int_loguniform", "_value": [10,1000],"_default": 100},
+      "n_estimators": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,  //todo:  restrict
@@ -347,6 +373,10 @@
       "random_state": 42
     },
     "sgd": {
+      "max_iter": 5000,
+      "early_stopping_rounds": 50,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 5,
       "loss":  {"_type": "choice", "_value": ["squared_loss", "huber","epsilon_insensitive","squared_hinge","squared_epsilon_insensitive"],"_default": "squared_loss"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},

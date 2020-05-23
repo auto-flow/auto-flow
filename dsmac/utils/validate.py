@@ -283,7 +283,7 @@ class Validator(object):
                                                        reuse_epm is False):
             raise ValueError("No runhistory specified for validating with EPM!")
         elif reuse_epm is False or self.epm is None:
-            # Create RandomForest
+            # Create RandomForestClassifier
             types, bounds = get_types(self.scen.cs, self.scen.feature_array)
             self.epm = RandomForestWithInstances(
                 configspace=self.scen.cs,

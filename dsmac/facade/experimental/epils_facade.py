@@ -65,7 +65,7 @@ class EPILS(object):
         EI if not set.
     model : AbstractEPM
         Model that implements train() and predict(). Will use a
-        RandomForest if not set.
+        RandomForestClassifier if not set.
     runhistory2epm : RunHistory2EMP
         Object that implements the AbstractRunHistory2EPM. If None,
         will use RunHistory2EPM4Cost if objective is cost or

@@ -67,7 +67,7 @@ class Hydra(object):
         scenario : ~dsmac.scenario.scenario.Scenario
             Scenario object
         n_iterations: int,
-            number of Hydra iterations
+            number of Hydra iterations_name
         val_set: str
             Set to validate incumbent(s) on. [train, valX].
             train => whole training set,

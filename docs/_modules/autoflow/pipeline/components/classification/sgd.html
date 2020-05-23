@@ -173,10 +173,10 @@
 <span class="kn">from</span> <span class="nn">autoflow.pipeline.components.classification_base</span> <span class="kn">import</span> <span class="n">AutoFlowClassificationAlgorithm</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.data</span> <span class="kn">import</span> <span class="n">softmax</span>
 
-<span class="n">__all__</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;SGD&quot;</span><span class="p">]</span>
+<span class="n">__all__</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;SGDClassifier&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="SGD"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.classification.html#autoflow.pipeline.components.classification.sgd.SGD">[docs]</a><span class="k">class</span> <span class="nc">SGD</span><span class="p">(</span>
+<div class="viewcode-block" id="SGD"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.classification.html#autoflow.pipeline.components.classification.sgd.SGD">[docs]</a><span class="k">class</span> <span class="nc">SGDClassifier</span><span class="p">(</span>
     <span class="n">AutoFlowClassificationAlgorithm</span>
 <span class="p">):</span>
     <span class="n">module__</span> <span class="o">=</span> <span class="s2">&quot;sklearn.linear_model.stochastic_gradient&quot;</span>
@@ -184,7 +184,7 @@
 
 <div class="viewcode-block" id="SGD.predict_proba"><a class="viewcode-back" href="../../../../../_module/autoflow.pipeline.components.classification.html#autoflow.pipeline.components.classification.sgd.SGD.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;modified_huber&quot;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SGD</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SGDClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">softmax</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div></div>

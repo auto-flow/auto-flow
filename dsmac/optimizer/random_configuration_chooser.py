@@ -166,7 +166,7 @@ class ChooserCosineAnnealing(RandomConfigurationChooser):
     prob_min : float
         Lowest probility of a random configuration
     restart_iteration : int
-        Restart the annealing schedule every ``restart_iteration`` iterations.
+        Restart the annealing schedule every ``restart_iteration`` iterations_name.
     rng : np.random.RandomState
         Random state
     """

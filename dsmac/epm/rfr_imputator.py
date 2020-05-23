@@ -56,7 +56,7 @@ class RFRImputator(dsmac.epm.base_imputor.BaseImputor):
         change_threshold : float
             Stop imputation if change is less than this.
         max_iter : int
-            Maximum number of imputation iterations.
+            Maximum number of imputation iterations_name.
         """
         super(RFRImputator, self).__init__()
         self.logger = logging.getLogger(self.__module__ + "." + self.__class__.__name__)
@@ -176,7 +176,7 @@ class RFRImputator(dsmac.epm.base_imputor.BaseImputor):
             if it > self.max_iter:
                 break
 
-        self.logger.debug("Imputation used %d/%d iterations, last_change=%f" %
+        self.logger.debug("Imputation used %d/%d iterations_name, last_change=%f" %
                           (it - 1, self.max_iter, change))
 
         # replace all y > cutoff with PAR10 values (i.e., threshold)

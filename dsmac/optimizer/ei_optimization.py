@@ -157,7 +157,7 @@ class LocalSearch(AcquisitionFunctionMaximizer):
     rng : np.random.RandomState or int, optional
 
     max_steps: int
-        Maximum number of iterations that the local search will perform
+        Maximum number of iterations_name that the local search will perform
 
     n_steps_plateau_walk: int
         number of steps during a plateau walk before local search terminates
@@ -584,7 +584,7 @@ class InterleavedLocalAndRandomSearch(AcquisitionFunctionMaximizer):
         [LocalSearch] number of steps during a plateau walk before local search terminates
 
     n_sls_iterations: int
-        [Local Search] number of local search iterations
+        [Local Search] number of local search iterations_name
 
     """
 
@@ -668,7 +668,7 @@ class InterleavedLocalAndRandomSearch(AcquisitionFunctionMaximizer):
         )
 
         # Having the configurations from random search, sorted by their
-        # acquisition function value is important for the first few iterations
+        # acquisition function value is important for the first few iterations_name
         # of SMAC. As long as the random forest predicts constant value, we
         # want to use only random configurations. Having them at the begging of
         # the list ensures this (even after adding the configurations by local

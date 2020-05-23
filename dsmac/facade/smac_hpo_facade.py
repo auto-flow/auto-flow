@@ -74,7 +74,7 @@ class SMAC4HPO(SMAC4AC):
         kwargs['random_configuration_chooser_kwargs'] = random_config_chooser_kwargs
 
         # better improve acquisition function optimization
-        # 1. increase number of sls iterations
+        # 1. increase number of sls iterations_name
         acquisition_function_optimizer_kwargs = kwargs.get('acquisition_function_optimizer_kwargs', dict())
         acquisition_function_optimizer_kwargs['n_sls_iterations'] = 10
         kwargs['acquisition_function_optimizer_kwargs'] = acquisition_function_optimizer_kwargs

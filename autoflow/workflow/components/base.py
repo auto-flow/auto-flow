@@ -7,6 +7,8 @@ from typing import Dict, Optional
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.utils._testing import ignore_warnings
 
 from autoflow.manager.data_container.base import DataContainer
 from autoflow.manager.data_container.dataframe import DataFrameContainer
@@ -234,29 +236,46 @@ class AutoFlowComponent(BaseEstimator):
 
 
 class AutoFlowIterComponent(AutoFlowComponent):
-    def iterative_fit(self, X, y, X_valid, y_valid, n_iter):
-        self.component.n_estimators += n_iter
-        self.component.n_estimators = min(self.component.n_estimators,
-                                          self.max_iterations)
-        self.iteration_ = self.component.n_estimators
+    warm_start_name = "warm_start"
+    iterations_name = "n_estimators"
+
+    @ignore_warnings(category=ConvergenceWarning)
+    def iterative_fit(self, X, y, X_valid, y_valid, iter_inc):
         self.component.fit(X, y)
         early_stopping_tol = getattr(self, "early_stopping_tol", 0.001)
-        performance = self.component.score(X_valid, y_valid)
-        if np.any(performance - early_stopping_tol > self.performance_history):
-            self.performance_history[self.iter_ix % len(self.performance_history)] = performance
-        else:
-            self.fully_fitted_ = True
+        N = len(self.performance_history)
+        if X_valid is not None and y_valid is not None:
+            performance = self.component.score(X_valid, y_valid)
+            if np.any(performance - early_stopping_tol > self.performance_history):
+                index = self.iter_ix % N
+                self.best_estimators[index] = deepcopy(self.component)
+                self.performance_history[index] = performance
+            else:
+                self.fully_fitted_ = True
+                index = np.argmax(self.performance_history)
+                best_estimator = self.best_estimators[index]
+                self.best_estimators = None
+                self.component = best_estimator
+        if not self.fully_fitted:
+            self.iteration_ = getattr(self.component, self.iterations_name)
+            self.iteration_ += iter_inc
+            self.iteration_ = min(self.iteration_, self.max_iterations)
+            setattr(self.component, self.iterations_name, self.iteration_)
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None):
         # 迭代式地训练，并引入早停机制
         iter_inc = getattr(self, "iter_inc", 10)
         early_stopping_rounds = getattr(self, "early_stopping_rounds", 20)
-        self.performance_history = np.full(early_stopping_rounds, np.inf)
+        self.performance_history = np.full(early_stopping_rounds, -np.inf)
+        N = len(self.performance_history)
+        self.best_estimators = np.zeros([N], dtype="object")
+
         self.iter_ix = 0
         while not self.fully_fitted:
             self.iterative_fit(X, y, X_valid, y_valid, iter_inc)
             self.iter_ix += 1
+        return self.component
 
     @property
     def fully_fitted(self) -> bool:
@@ -271,3 +290,14 @@ class AutoFlowIterComponent(AutoFlowComponent):
     @property
     def iteration(self):
         return getattr(self, "iteration_", 1)
+
+    def after_process_hyperparams(self, hyperparams) -> Dict:
+        iter_inc = getattr(self, "iter_inc", 10)
+        hyperparams = super(AutoFlowIterComponent, self).after_process_hyperparams(hyperparams)
+        hyperparams[self.warm_start_name] = True
+        if self.iterations_name in hyperparams:
+            self.max_iterations_ = hyperparams[self.iterations_name]
+        else:
+            self.max_iterations_ = 1000
+        hyperparams[self.iterations_name] = iter_inc
+        return hyperparams

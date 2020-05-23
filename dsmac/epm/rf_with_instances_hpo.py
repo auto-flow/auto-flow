@@ -70,7 +70,7 @@ class RandomForestWithInstancesHPO(RandomForestWithInstances):
         bootstrap : bool
             Turns on / off bootstrapping in the random forest.
         n_iters : int
-            Number of iterations for random search.
+            Number of iterations_name for random search.
         n_splits : int
             Number of cross-validation splits.
         seed : int

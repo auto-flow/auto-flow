@@ -295,7 +295,7 @@ class SMBO(object):
         """
         if X.shape[0] == 0:
             # Only return a single point to avoid an overly high number of
-            # random search iterations
+            # random search iterations_name
             return self._random_search.maximize(
                 runhistory=self.runhistory, stats=self.stats, num_points=1
             )
