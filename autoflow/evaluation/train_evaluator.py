@@ -1,7 +1,6 @@
 import sys
 from collections import defaultdict
 from contextlib import redirect_stderr
-from copy import deepcopy
 from io import StringIO
 from time import time
 from typing import Dict, Optional
@@ -297,7 +296,7 @@ class TrainEvaluator(BaseEvaluator):
                                                  )
             pipeline_list.extend(preprocessor)
         if pipeline_list:
-            return ML_Workflow(pipeline_list,self.should_store_intermediate_result, self.resource_manager)
+            return ML_Workflow(pipeline_list, self.should_store_intermediate_result, self.resource_manager)
         else:
             return None
 

@@ -48,6 +48,6 @@ def get_categorical_features_indices(X):
             col = col.astype("float")
         except Exception:
             pass
-        if type_of_target(col) in ("binary", "multiclass"):  # todo: debug
+        if type_of_target(col) in ( "multiclass",):  # todo: debug
             categorical_features_indices.append(i)
     return categorical_features_indices

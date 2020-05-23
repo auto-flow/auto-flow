@@ -46,6 +46,7 @@ class AutoFlowEstimator(BaseEstimator):
             log_config: Optional[dict] = None,
             highR_nan_threshold=0.5,
             highR_cat_threshold=0.5,
+            n_jobs_in_algorithm=1,
             consider_ordinal_as_cat=False,
             should_store_intermediate_result=False,
             should_finally_fit=False,
@@ -105,6 +106,7 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        self.n_jobs_in_algorithm = n_jobs_in_algorithm
         self.consider_ordinal_as_cat = consider_ordinal_as_cat
         if model_registry is None:
             model_registry = {}
@@ -249,10 +251,8 @@ class AutoFlowEstimator(BaseEstimator):
         self.splitter = splitter
         assert len(self.hdl_constructors) == len(self.tuners)
         n_step = len(self.hdl_constructors)
-        general_experiment_time = datetime.datetime.now()
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
-            current_experiment_time = datetime.datetime.now()
-            hdl_constructor.run(self.data_manager, self.random_state)
+            hdl_constructor.run(self.data_manager)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
@@ -324,7 +324,7 @@ class AutoFlowEstimator(BaseEstimator):
             n_jobs)
         random_states = np.arange(n_jobs) + self.random_state
         sync_dict = self.get_sync_dict(n_jobs, tuner)
-        self.resource_manager.clear_pid_list()
+        # self.resource_manager.clear_pid_list()
         self.resource_manager.close_all()
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
         tuners = [deepcopy(tuner) for i in range(n_jobs)]
@@ -376,13 +376,13 @@ class AutoFlowEstimator(BaseEstimator):
             sync_dict[os.getpid()] = 0
             resource_manager.sync_dict = sync_dict
         resource_manager.set_is_master(is_master)
-        resource_manager.push_pid_list()
+        # resource_manager.push_pid_list()
         # random_state: 1. set_hdl中传给phps 2. 传给所有配置
         tuner.random_state = random_state
         tuner.run_limit = run_limit
         tuner.set_resource_manager(resource_manager)
         # 替换搜索空间中的 random_state
-        replace_phps(tuner.shps, "random_state", int(random_state))
+        replace_phps(tuner.shps, "n_jobs", int(self.n_jobs_in_algorithm))
         tuner.shps.seed(random_state)
         # todo : 增加 n_jobs ? 调研默认值
         self.instance_id = resource_manager.task_id + "-" + resource_manager.hdl_id

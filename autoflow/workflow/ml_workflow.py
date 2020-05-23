@@ -136,7 +136,7 @@ class ML_Workflow(Pipeline):
         else:
             pred_valid = self._final_estimator.predict(X_valid)
             pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
-        self.resource_manager = None
+        self.resource_manager = None  # 避免触发 resource_manager 的__reduce__导致连接池消失
         return {
             "pred_valid": pred_valid,
             "pred_test": pred_test,

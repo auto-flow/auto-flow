@@ -394,13 +394,12 @@ class HDL_Constructor(StrSignatureMixin):
         graph.attr(label=r'WorkFlow Space')
         return graph
 
-    def run(self, data_manager, random_state):
+    def run(self, data_manager):
         '''
 
         Parameters
         ----------
         data_manager: :class:`autoflow.manager.data_manager.DataManager`
-        random_state: int
         highR_cat_threshold: float
 
         '''
@@ -409,7 +408,6 @@ class HDL_Constructor(StrSignatureMixin):
         self.highR_cat_threshold = data_manager.highR_cat_threshold
         self.highR_nan_threshold = data_manager.highR_nan_threshold
         self.consider_ordinal_as_cat = data_manager.consider_ordinal_as_cat
-        self.random_state = random_state
         if isinstance(self.DAG_workflow, str):
             if self.DAG_workflow == "generic_recommend":
                 self.hdl_metadata.update({"source": "generic_recommend"})
