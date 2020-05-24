@@ -268,7 +268,7 @@
         <span class="k">return</span> <span class="n">y_pred</span>
 
 <div class="viewcode-block" id="TrainEvaluator.get_Xy"><a class="viewcode-back" href="../../../_module/autoflow.evaluation.html#autoflow.evaluation.train_evaluator.TrainEvaluator.get_Xy">[docs]</a>    <span class="k">def</span> <span class="nf">get_Xy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># fixme: 会出现结果被改变的情况！  目前这个bug在autoflow.pipeline.components.preprocessing.operate.merge.Merge 出现过</span>
+        <span class="c1"># fixme: 会出现结果被改变的情况！  目前这个bug在autoflow.pipeline.components.preprocessing.operate.keep_going.KeepGoing 出现过</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_test</span><span class="p">)</span></div>
         <span class="c1"># return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)</span>
 

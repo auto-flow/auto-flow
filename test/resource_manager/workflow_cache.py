@@ -20,7 +20,7 @@ trained_pipeline = AutoFlowClassifier(
         "num->compressed": {"_name": "compress.f1score", "threshold": 0.9, "n_jobs": 12,
                             # "store_intermediate":False
                             },
-        "compressed->purified": ["scale.standardize", "operate.merge"],
+        "compressed->purified": ["scale.standardize", "operate.keep_going"],
     }
     # should_store_intermediate_result=True,  # 测试对中间结果存储的正确性
 )

@@ -22,7 +22,7 @@ tuner = Tuner(
 )
 hdl_constructor=HDL_Constructor(
     DAG_workflow={
-                "highR_nan->nan": "operate.merge",
+                "highR_nan->nan": "operate.keep_going",
                 "nan->imp": "impute.fill_abnormal",
                 "imp->{cat_name=cat,num_name=num}": "operate.split.cat_num",
                 "cat->num":  "encode.cat_boost",

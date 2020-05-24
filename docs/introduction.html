@@ -692,7 +692,7 @@ Let me introduce the processing details step by step.</p>
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
    &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
-   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.keep_going}&quot; ];
 }" class="graphviz" /></div>
 <hr class="docutils" />
 <p><strong>Third step</strong>, using <code class="docutils literal notranslate"><span class="pre">operate.split.cat_num</span></code> algorithm to split <a class="reference internal" href="#nan"><span class="std std-ref">nan</span></a> to two
@@ -807,7 +807,7 @@ feature groups: <a class="reference internal" href="#cat-nan"><span class="std s
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
    &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
-   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.keep_going}&quot; ];
    &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
 }" class="graphviz" /></div>
@@ -923,7 +923,7 @@ feature groups: <a class="reference internal" href="#cat-nan"><span class="std s
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
    &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
-   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.keep_going}&quot; ];
    &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
@@ -1042,7 +1042,7 @@ feature groups: <a class="reference internal" href="#highr-cat"><span class="std
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
    &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
-   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.keep_going}&quot; ];
    &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
@@ -1177,7 +1177,7 @@ we encode <a class="reference internal" href="#lowr-cat"><span class="std std-re
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
    &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
-   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.keep_going}&quot; ];
    &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
@@ -1196,7 +1196,7 @@ now we should do estimating. <code class="docutils literal notranslate"><span cl
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
    &quot;data&quot; -&gt; &quot;highR_nan&quot; [ label=&quot;data_manager: highR_nan&quot; ];
-   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.merge}&quot; ];
+   &quot;highR_nan&quot; -&gt; &quot;nan&quot; [ label=&quot;{operate.drop, operate.keep_going}&quot; ];
    &quot;nan&quot; -&gt; &quot;cat_nan&quot; [ label=&quot;operate.split.cat_num: cat_nan&quot; ];
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];

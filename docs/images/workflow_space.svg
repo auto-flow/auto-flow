@@ -129,7 +129,7 @@
 <text text-anchor="start" x="362" y="-537.8" font-family="Times,serif" font-size="14.00">{</text>
 <text text-anchor="start" x="369" y="-537.8" font-family="Times,serif" font-size="14.00" fill="#663366">operate.drop</text>
 <text text-anchor="start" x="438" y="-537.8" font-family="Times,serif" font-size="14.00">, </text>
-<text text-anchor="start" x="446" y="-537.8" font-family="Times,serif" font-size="14.00" fill="#663300">operate.merge</text>
+<text text-anchor="start" x="446" y="-537.8" font-family="Times,serif" font-size="14.00" fill="#663300">operate.keep_going</text>
 <text text-anchor="start" x="525" y="-537.8" font-family="Times,serif" font-size="14.00">}</text>
 </g>
 <!-- cat_nan&#45;&gt;cat -->

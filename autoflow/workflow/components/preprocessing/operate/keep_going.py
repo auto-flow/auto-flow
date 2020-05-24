@@ -3,10 +3,10 @@ from typing import Optional
 from autoflow.manager.data_container.dataframe import DataFrameContainer
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
-__all__ = ["Merge"]
+__all__ = ["KeepGoing"]
 
 
-class Merge(AutoFlowFeatureEngineerAlgorithm):
+class KeepGoing(AutoFlowFeatureEngineerAlgorithm):
 
     def fit(self, X_train: DataFrameContainer, y_train=None,
             X_valid=None, y_valid=None,

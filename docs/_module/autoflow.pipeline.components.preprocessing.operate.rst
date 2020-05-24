@@ -20,10 +20,10 @@ autoflow.pipeline.components.preprocessing.operate.drop module
    :undoc-members:
    :show-inheritance:
 
-autoflow.pipeline.components.preprocessing.operate.merge module
+autoflow.pipeline.components.preprocessing.operate.keep_going module
 ---------------------------------------------------------------
 
-.. automodule:: autoflow.pipeline.components.preprocessing.operate.merge
+.. automodule:: autoflow.pipeline.components.preprocessing.operate.keep_going
    :members:
    :undoc-members:
    :show-inheritance:

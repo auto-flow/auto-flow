@@ -99,7 +99,7 @@ class TrainEvaluator(BaseEvaluator):
 
     def get_Xy(self):
         # fixme: 会出现结果被改变的情况！
-        #  目前这个bug在autoflow.workflow.components.preprocessing.operate.merge.Merge 出现过
+        #  目前这个bug在autoflow.workflow.components.preprocessing.operate.keep_going.KeepGoing 出现过
         # fixme: autoflow.manager.data_container.dataframe.DataFrameContainer#sub_sample 函数采用deepcopy，
         #  应该能从源头上解决X_train数据集的问题，但是要注意X_test
         return (self.X_train), (self.y_train), (self.X_test), (self.y_test)

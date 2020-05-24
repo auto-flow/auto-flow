@@ -24,7 +24,7 @@ trained_pipeline = AutoFlowClassifier(
     included_nan_imputers={"_name": "impute.adaptive_fill", "num_strategy": "mean"},
     num2purified_workflow={
         "num->scaled": "scale.standardize",
-        "scaled->purified": "operate.merge",
+        "scaled->purified": "operate.keep_going",
     },
     text2purified_workflow={
         "text->tokenized": "text.tokenize.simple",

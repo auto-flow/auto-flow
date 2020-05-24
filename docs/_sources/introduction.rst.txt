@@ -204,7 +204,7 @@ This corresponds to this figure:
       "data" -> "num" [ label="data_manager: num" ];
       "data" -> "nan" [ label="data_manager: nan" ];
       "data" -> "highR_nan" [ label="data_manager: highR_nan" ];
-      "highR_nan" -> "nan" [ label="{operate.drop, operate.merge}" ];
+      "highR_nan" -> "nan" [ label="{operate.drop, operate.keep_going}" ];
    }
 
 -----------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ This corresponds to this figure:
       "data" -> "num" [ label="data_manager: num" ];
       "data" -> "nan" [ label="data_manager: nan" ];
       "data" -> "highR_nan" [ label="data_manager: highR_nan" ];
-      "highR_nan" -> "nan" [ label="{operate.drop, operate.merge}" ];
+      "highR_nan" -> "nan" [ label="{operate.drop, operate.keep_going}" ];
       "nan" -> "cat_nan" [ label="operate.split.cat_num: cat_nan" ];
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
    }
@@ -245,7 +245,7 @@ This corresponds to this figure:
       "data" -> "num" [ label="data_manager: num" ];
       "data" -> "nan" [ label="data_manager: nan" ];
       "data" -> "highR_nan" [ label="data_manager: highR_nan" ];
-      "highR_nan" -> "nan" [ label="{operate.drop, operate.merge}" ];
+      "highR_nan" -> "nan" [ label="{operate.drop, operate.keep_going}" ];
       "nan" -> "cat_nan" [ label="operate.split.cat_num: cat_nan" ];
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
@@ -269,7 +269,7 @@ This corresponds to this figure:
       "data" -> "num" [ label="data_manager: num" ];
       "data" -> "nan" [ label="data_manager: nan" ];
       "data" -> "highR_nan" [ label="data_manager: highR_nan" ];
-      "highR_nan" -> "nan" [ label="{operate.drop, operate.merge}" ];
+      "highR_nan" -> "nan" [ label="{operate.drop, operate.keep_going}" ];
       "nan" -> "cat_nan" [ label="operate.split.cat_num: cat_nan" ];
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
@@ -297,7 +297,7 @@ This corresponds to this figure:
       "data" -> "num" [ label="data_manager: num" ];
       "data" -> "nan" [ label="data_manager: nan" ];
       "data" -> "highR_nan" [ label="data_manager: highR_nan" ];
-      "highR_nan" -> "nan" [ label="{operate.drop, operate.merge}" ];
+      "highR_nan" -> "nan" [ label="{operate.drop, operate.keep_going}" ];
       "nan" -> "cat_nan" [ label="operate.split.cat_num: cat_nan" ];
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
@@ -322,7 +322,7 @@ This corresponds to this figure:
       "data" -> "num" [ label="data_manager: num" ];
       "data" -> "nan" [ label="data_manager: nan" ];
       "data" -> "highR_nan" [ label="data_manager: highR_nan" ];
-      "highR_nan" -> "nan" [ label="{operate.drop, operate.merge}" ];
+      "highR_nan" -> "nan" [ label="{operate.drop, operate.keep_going}" ];
       "nan" -> "cat_nan" [ label="operate.split.cat_num: cat_nan" ];
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
