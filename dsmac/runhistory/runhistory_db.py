@@ -1,7 +1,7 @@
 import datetime
-import json
 import os
 import pickle
+from typing import Tuple, Optional
 
 import peewee as pw
 from ConfigSpace import ConfigurationSpace, Configuration
@@ -62,20 +62,25 @@ class RunHistoryDB():
     def get_run_id(self, instance_id, config_id):
         return instance_id + "-" + config_id
 
-    def appointment_config(self, config, instance_id) -> bool:
+    def appointment_config(self, config, instance_id) -> Tuple[bool, Optional[pw.Model]]:
         config_id = get_id_of_config(config)
         run_id = self.get_run_id(instance_id, config_id)
         query = self.Model.select().where(self.Model.run_id == run_id)
-        if query.exists():
-            return False
+        if len(query) > 0:
+            query_=query[0]
+            if query_.origin >= 0:
+                record = query_
+            else:
+                record = None
+            return False, record
         try:
             self.Model.create(
                 run_id=run_id,
                 origin=-1
             )
         except Exception as e:
-            return False
-        return True
+            return False, None
+        return True, None
 
     def insert_runhistory(self, config: Configuration, cost: float, time: float,
                           status: StatusType, instance_id: str = "",

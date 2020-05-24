@@ -1,4 +1,5 @@
 import logging
+import pickle
 import time
 import typing
 from collections import Counter
@@ -182,7 +183,17 @@ class Intensifier(object):
             challengers[target], challengers[0] = challengers[0], challengers[target]
 
         for challenger in challengers:
-            if not run_history.db.appointment_config(challenger, self.instance):
+            appoint_success, record = run_history.db.appointment_config(challenger, self.instance)
+            if not appoint_success:
+                if record is not None:
+                    cost = record.cost
+                    config = record.config_bin
+                    if isinstance(config,bytes):
+                        config=pickle.loads(config)
+                    run_history.add(config, cost, record.time, record.status,
+                                    record.instance_id)
+                    if cost < run_history.get_cost(incumbent):
+                        incumbent = config
                 continue
             if challenger == incumbent:
                 self.logger.debug("Challenger was the same as the current incumbent; Skipping challenger")

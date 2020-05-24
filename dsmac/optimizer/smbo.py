@@ -160,12 +160,14 @@ class SMBO(object):
         # To be on the safe side -> never return "None" as incumbent
         if not self.incumbent:
             self.incumbent = self.scenario.cs.get_default_configuration()
+        return self.incumbent
 
-    def start_(self):
+    def start_(self, warm_start=True):
         self.instance_id=self.intensifier.instance
-        self.runhistory.db.fetch_new_runhistory(True)
+        if warm_start:
+            self.runhistory.db.fetch_new_runhistory(True)
         self.incumbent = self.runhistory.get_incumbent(self.instance_id)
-        self.start(self.incumbent)
+        return self.start(self.incumbent)
 
     def run_(self):
         self.instance_id = self.intensifier.instance

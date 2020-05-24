@@ -1,13 +1,14 @@
 import inspect
 import os
-from typing import Dict, Optional, Callable, Union
+import re
+from collections import OrderedDict
+from copy import deepcopy
+from typing import Dict, Optional, Callable, Union, List
 
 import numpy as np
-from ConfigSpace import ConfigurationSpace
+from ConfigSpace import ConfigurationSpace, Configuration
 from frozendict import frozendict
 
-from dsmac.facade.smac_hpo_facade import SMAC4HPO
-from dsmac.scenario.scenario import Scenario
 from autoflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
@@ -18,11 +19,15 @@ from autoflow.utils.config_space import get_random_initial_configs, get_grid_ini
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
+from dsmac.facade.smac_hpo_facade import SMAC4HPO
+from dsmac.scenario.scenario import Scenario
+
 
 class Tuner(StrSignatureMixin):
     '''
     ``Tuner`` if class who agent an abstract search process.
     '''
+
     def __init__(
             self,
             evaluator: Union[Callable, str] = "TrainEvaluator",
@@ -129,7 +134,7 @@ class Tuner(StrSignatureMixin):
             self.evaluator = evaluator()
         self.evaluator.debug = self.debug
         self.search_method_params = search_method_params
-        assert search_method in ("smac", "grid", "random")
+        assert search_method in ("smac", "grid", "random", "beam")
         if search_method in ("grid", "random"):
             initial_runs = 0
         self.initial_runs = initial_runs
@@ -144,8 +149,6 @@ class Tuner(StrSignatureMixin):
         if exit_processes is None:
             exit_processes = max(self.n_jobs // 3, 1)
         self.exit_processes = exit_processes
-
-
 
     def set_random_state(self, random_state):
         self.random_state = random_state
@@ -182,6 +185,8 @@ class Tuner(StrSignatureMixin):
             return get_grid_initial_configs(self.shps, self.run_limit, self.random_state)
         elif self.search_method == "random":
             return get_random_initial_configs(self.shps, self.run_limit, self.random_state)
+        elif self.search_method == "beam":
+            return get_random_initial_configs(self.shps, self.run_limit, self.random_state)
         else:
             raise NotImplementedError
 
@@ -190,6 +195,33 @@ class Tuner(StrSignatureMixin):
             return self.run_limit
         else:
             return 0
+
+    def prepare_beam_search_configs(self, config_space: ConfigurationSpace, cs_key: str, search_range: List[str]):
+        configs = []
+        for value in search_range:
+            # todo: 超出范围的异常检测？
+            config_space.get_hyperparameter(cs_key).default_value = value
+            configs.append(config_space.get_default_configuration())
+        return configs
+
+    def match_cs_key(self, step_name: str, config: Configuration):
+        candidate_result = []
+        for key in config.get_dictionary():
+            if re.match(rf".*{step_name}.*", key):
+                candidate_result.append(key)
+        assert len(candidate_result) > 0
+        lens = [len(result) for result in candidate_result]
+        result = candidate_result[int(np.argmin(lens))]
+        self.logger.info(f"Original beam_search step name '{step_name}' is parsed as '{result}'")
+        return result
+
+    def set_beam_search_result_to_cs_default(self, config_space: ConfigurationSpace, beam_result: dict):
+        config_space = deepcopy(config_space)
+        for cs_key, best_value in beam_result.items():
+            hp = config_space.get_hyperparameter(cs_key)
+            # if isinstance(hp, CategoricalHyperparameter):
+            hp.default_value = best_value
+        return config_space
 
     def run(
             self,
@@ -227,18 +259,37 @@ class Tuner(StrSignatureMixin):
             use_pynisher=self.limit_resource
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
-        smac = SMAC4HPO(
-            scenario=self.scenario,
-            rng=np.random.RandomState(self.random_state),
-            tae_runner=self.evaluator,
-            initial_configurations=initial_configs
-        )
-        smac.solver.initial_configurations = initial_configs
-        smac.solver.start_()
-        run_limit = self.get_run_limit()
-        for i in range(run_limit):
-            smac.solver.run_()
-            should_continue = self.evaluator.resource_manager.delete_models()
-            if not should_continue:
-                self.logger.info(f"PID = {os.getpid()} is exiting.")
-                break
+        if self.search_method == "beam":
+            beam_steps = self.search_method_params["beam_steps"]
+            beam_result = OrderedDict()
+            for step_name, search_range in beam_steps.items():
+                shps_ = self.set_beam_search_result_to_cs_default(self.shps, beam_result)
+                default_config = shps_.get_default_configuration()
+                cs_key = self.match_cs_key(step_name, default_config)
+                sampled_configs = self.prepare_beam_search_configs(shps_, cs_key, search_range)
+                smac = SMAC4HPO(
+                    scenario=self.scenario,
+                    rng=np.random.RandomState(self.random_state),
+                    tae_runner=self.evaluator,
+                    initial_configurations=sampled_configs
+                )
+                smac.solver.initial_configurations = sampled_configs
+                incumbent = smac.solver.start_(warm_start=False)
+                best_value = incumbent.get(cs_key)
+                beam_result[cs_key] = best_value
+        else:
+            smac = SMAC4HPO(
+                scenario=self.scenario,
+                rng=np.random.RandomState(self.random_state),
+                tae_runner=self.evaluator,
+                initial_configurations=initial_configs
+            )
+            smac.solver.initial_configurations = initial_configs
+            smac.solver.start_()
+            run_limit = self.get_run_limit()
+            for i in range(run_limit):
+                smac.solver.run_()
+                should_continue = self.evaluator.resource_manager.delete_models()
+                if not should_continue:
+                    self.logger.info(f"PID = {os.getpid()} is exiting.")
+                    break
