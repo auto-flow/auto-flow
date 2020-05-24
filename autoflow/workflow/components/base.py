@@ -154,7 +154,7 @@ class AutoFlowComponent(BaseEstimator):
                 f"Component: {self.__class__.__name__} is fitting a empty data.\nShape of X_train_ = {X_train.shape}.")
         return self
 
-    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None) -> pd.DataFrame:
+    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None, **kwargs) -> pd.DataFrame:
         return self.before_fit_X(X_train)
 
     def _fit(self, estimator, X_train, y_train=None, X_valid=None,

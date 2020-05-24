@@ -82,11 +82,14 @@ def is_cat(s: Union[pd.Series, np.ndarray], consider_ordinal_as_cat):
             else:
                 return True
         s = s.astype('float32')
-        if consider_ordinal_as_cat:
-            s = s.dropna()
-            tp = type_of_target(s)
-            if tp in ("multiclass",):
-                return True
+    if consider_ordinal_as_cat:
+        valid_types = ["multiclass"]
+        if consider_ordinal_as_cat in (2, "binary"):
+            valid_types += ["binary"]
+        s = s.dropna()
+        tp = type_of_target(s)
+        if tp in valid_types:
+            return True
     return False
 
 
@@ -147,7 +150,7 @@ def is_date(s, cat_been_checked=False):
             return False
     s = s.dropna()
     s = s.astype(str)
-    return all(bool(list(find_dates(elem,strict=True))) for elem in s)
+    return all(bool(list(find_dates(elem, strict=True))) for elem in s)
 
 
 if __name__ == '__main__':
@@ -181,4 +184,3 @@ if __name__ == '__main__':
         '456',
         '256'
     ]))
-

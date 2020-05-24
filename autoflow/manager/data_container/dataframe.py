@@ -14,7 +14,7 @@ from frozendict import frozendict
 
 from autoflow.constants import VARIABLE_PATTERN, UNIQUE_FEATURE_GROUPS
 from autoflow.manager.data_container.base import DataContainer
-from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns
+from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns, get_unique_col_name
 from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict, get_hash_of_str
 
 
@@ -37,10 +37,10 @@ class DataFrameContainer(DataContainer):
                                             columns=[f"column_{i}" for i in range(dataset_instance.shape[1])])
         elif isinstance(dataset_instance, pd.DataFrame):
             origin_columns = dataset_instance.columns
-            columns = deepcopy(origin_columns)
-            for column in columns:
+            columns = pd.Series(origin_columns)
+            for i, column in enumerate(columns):
                 if not VARIABLE_PATTERN.match(column):
-                    raise ValueError(f"Column '{column}' in DataFrame is invalid.")
+                    columns[i] = get_unique_col_name(dataset_instance.columns, "col")
             columns = [inflection.underscore(column).lower() for column in columns]
 
             unique_col, counts = np.unique(columns, return_counts=True)
@@ -67,7 +67,7 @@ class DataFrameContainer(DataContainer):
         else:
             raise NotImplementedError
 
-    def upload(self, upload_type="table"):
+    def upload(self, upload_type="fs"):
         assert upload_type in ("table", "fs")
         self.dataset_hash = self.get_hash()
         if self.dataset_hash == self.uploaded_hash:
@@ -93,12 +93,13 @@ class DataFrameContainer(DataContainer):
         self.columns_mapper = record["columns_mapper"]
         self.dataset_source = record["dataset_source"]
         self.dataset_metadata = record["dataset_metadata"]
+        dataset_path = record["dataset_path"]
         upload_type = record["upload_type"]
         columns = record["columns"]
         if upload_type == "table":
             df = self.resource_manager.download_df_of_table(dataset_id, columns, self.columns_mapper)
         else:
-            df = self.resource_manager.download_arr_of_fs(dataset_id, columns)
+            df = self.resource_manager.download_df_of_fs(dataset_path, columns)
         inverse_columns_mapper = inverse_dict(self.columns_mapper)
         df.columns.map(inverse_columns_mapper)
         # todo: 将各种信息补齐

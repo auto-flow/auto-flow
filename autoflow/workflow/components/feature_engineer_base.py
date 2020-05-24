@@ -44,7 +44,7 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
     def before_trans_X(self, X):
         return X
 
-    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None):
+    def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None, **kwargs):
         X_train = self.before_fit_X(X_train)
         X_valid = self.before_fit_X(X_valid)
         X_test = self.before_fit_X(X_test)

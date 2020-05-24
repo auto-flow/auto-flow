@@ -28,10 +28,6 @@ class ML_Workflow(Pipeline):
         self.intermediate_result = {}
         self.logger = get_logger(self)
 
-    # def __reduce__(self):
-    #     self.resource_manager = None  # fixme: 防止序列化后数据库连接的元数据泄露
-    #     super(ML_Workflow, self).__reduce__()
-
     @property
     def is_estimator(self):
         is_estimator = False
@@ -51,6 +47,15 @@ class ML_Workflow(Pipeline):
             data_copied.upload("fs")
             dataset_hash = data_copied.dataset_hash
             dict_[name] = dataset_hash
+
+    def assemble_result(self, name, X, X_transformed_stack: DataFrameContainer, result):
+        # fixme: 不支持重采样的preprocess
+        if X is not None:
+            data_container = X_transformed_stack.sub_sample(X.index)
+            data_container.resource_manager = self.resource_manager
+            result[name] = data_container
+        else:
+            result[name] = None
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, fit_final_estimator=True):
         for (step_idx,
@@ -72,15 +77,19 @@ class ML_Workflow(Pipeline):
                         store_intermediate = True
             if store_intermediate:
                 if hasattr(transformer, "prepare_X_to_fit"):
-                    X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)
-                    X_stack = DataFrameContainer("CalculateCache", dataset_instance=X_stack_,
-                                                 resource_manager=self.resource_manager)
+                    def stack_X(X_train, X_valid, X_test, **kwargs):
+                        X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)
+                        X_stack = DataFrameContainer("CalculateCache", dataset_instance=X_stack_,
+                                                     resource_manager=self.resource_manager)
+                        X_stack.set_feature_groups(X_train.feature_groups)
+                        return X_stack
 
                 else:
-                    self.logger.warning(
-                        f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
-                    X_stack = X_train
-                X_stack.column_descriptions = {}
+                    def stack_X(X_train, X_valid, X_test, **kwargs):
+                        self.logger.warning(
+                            f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
+                        return X_train
+                X_stack = stack_X(X_train, X_valid, X_test)
                 dataset_hash = X_stack.get_hash()
                 component_name = transformer.__class__.__name__
                 m = hashlib.md5()
@@ -88,14 +97,20 @@ class ML_Workflow(Pipeline):
                 component_hash = get_hash_of_dict(hyperparams, m)
                 redis_key = f"{component_hash}-{dataset_hash}"
                 redis_result = self.resource_manager.redis_hgetall(redis_key)
-                if b"component" in redis_result and b"result" in redis_result:
-                    result = pickle.loads(redis_result[b"result"])
+                if isinstance(redis_result, dict) and b"component" in redis_result and b"result" in redis_result:
+                    X_transformed_stack = pickle.loads(redis_result[b"result"])
                     fitted_transformer = pickle.loads(redis_result[b"component"])
+                    result = {"y_train": y_train}
+                    self.assemble_result("X_train", X_train, X_transformed_stack, result)
+                    self.assemble_result("X_valid", X_valid, X_transformed_stack, result)
+                    self.assemble_result("X_test", X_test, X_transformed_stack, result)
                 else:
                     fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
                     result = transformer.transform(X_train, X_valid, X_test, y_train)
-                    self.resource_manager.redis_hset(redis_key,"component", pickle.dumps(fitted_transformer))
-                    self.resource_manager.redis_hset(redis_key,"result", pickle.dumps(result))
+                    X_transformed_stack = stack_X(**result)
+                    X_transformed_stack.resource_manager = None
+                    self.resource_manager.redis_hset(redis_key, "component", pickle.dumps(fitted_transformer))
+                    self.resource_manager.redis_hset(redis_key, "result", pickle.dumps(X_transformed_stack))
                     # todo: 增加一些元信息
             else:
                 fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)

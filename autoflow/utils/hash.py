@@ -78,17 +78,30 @@ def get_hash_of_dataframe_deprecated(df: pd.DataFrame, m=None):
     return get_hash_of_array(df_.values, m)
 
 
-def get_hash_of_dataframe(df: pd.DataFrame, m=None, L=500):
+def get_hash_of_dataframe_csv(df: pd.DataFrame, m=None, L=500):
     if m is None:
         m = hashlib.md5()
     sp0 = df.shape[0]
     N = ceil(sp0 / L)
     result = ""
-    s = df.iloc[:0,:].to_csv(float_format="%.3f", index=False).encode()
+    s = df.iloc[:0, :].to_csv(float_format="%.3f", index=False).encode()
     get_hash_of_str(s, m)
     for i in range(N):
         s = df.iloc[i * L:min(sp0, (i + 1) * L)].to_csv(float_format="%.3f", index=False, header=None).encode()
         result = get_hash_of_str(s, m)
+    return result
+
+
+def get_hash_of_dataframe(df: pd.DataFrame, m=None, L=500):
+    if m is None:
+        m = hashlib.md5()
+    eq_obj = (df.dtypes == object)
+    if np.any(eq_obj):
+        get_hash_of_dataframe_csv(df.select_dtypes(include=object), m, L)
+        result = get_hash_of_array(df.select_dtypes(exclude=object).values, m)
+    else:
+        result = get_hash_of_array(df.values, m)
+
     return result
 
 

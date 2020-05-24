@@ -18,7 +18,8 @@ class DataContainer():
 
     def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None,
                  resource_manager=None,
-                 dataset_metadata=frozendict()):
+                 dataset_metadata=frozendict(),upload_type="fs"):
+        self.upload_type = upload_type
         self.dataset_hash = None
         self.dataset_source = dataset_source
         self.dataset_metadata = dict(dataset_metadata)

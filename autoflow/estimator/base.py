@@ -1,4 +1,3 @@
-import datetime
 import inspect
 import math
 import multiprocessing
@@ -158,6 +157,7 @@ class AutoFlowEstimator(BaseEstimator):
             y_train=None,
             X_test: Union[np.ndarray, pd.DataFrame, DataFrameContainer, str] = None,
             y_test=None,
+            upload_type="fs",
             sub_sample_indexes=None,
             sub_feature_indexes=None,
             column_descriptions: Optional[Dict] = frozendict(),
@@ -170,7 +170,7 @@ class AutoFlowEstimator(BaseEstimator):
             dataset_metadata: dict = frozenset(),
             task_metadata: dict = frozendict(),
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
-
+            is_not_realy_run=False,
     ):
         '''
 
@@ -206,6 +206,7 @@ class AutoFlowEstimator(BaseEstimator):
         -------
         self
         '''
+        self.upload_type = upload_type
         self.sub_sample_indexes = sub_sample_indexes
         self.sub_feature_indexes = sub_feature_indexes
         dataset_metadata = dict(dataset_metadata)
@@ -220,7 +221,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.data_manager = DataManager(
             self.resource_manager,
             X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
-            self.highR_cat_threshold, self.consider_ordinal_as_cat
+            self.highR_cat_threshold, self.consider_ordinal_as_cat, upload_type
         )
         self.ml_task = self.data_manager.ml_task
         if self.checked_mainTask is not None:
@@ -260,6 +261,9 @@ class AutoFlowEstimator(BaseEstimator):
                 self.logger.debug(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
             else:
                 hdl = raw_hdl
+            self.hdl = hdl
+            if is_not_realy_run:
+                break
             # get hdl_id, and insert record into "{task_id}.hdls" database
             self.resource_manager.insert_to_hdl_table(hdl, hdl_constructor.hdl_metadata)
             self.resource_manager.close_hdl_table()

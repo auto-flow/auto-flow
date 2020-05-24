@@ -48,6 +48,7 @@ class DataManager(StrSignatureMixin):
             highR_nan_threshold: float = 0.5,
             highR_cat_threshold: float = 0.5,
             consider_ordinal_as_cat=False,
+            upload_type="fs"
     ):
         '''
 
@@ -80,6 +81,7 @@ class DataManager(StrSignatureMixin):
         highR_nan_threshold: float
             high ratio NaN threshold, you can find examples and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
         '''
+        self.upload_type = upload_type
         from autoflow.manager.resource_manager import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
@@ -124,13 +126,13 @@ class DataManager(StrSignatureMixin):
             self.final_column_descriptions = final_column_descriptions
         self.final_column_descriptions = dict(self.final_column_descriptions)
         # ---set column descriptions, upload to dataset-----------------------------------------------------
-        if self.X_train is not None:
+        if self.X_train is not None and upload_type is not None:
             self.X_train.set_column_descriptions(self.final_column_descriptions)
-            self.X_train.upload("table")
+            self.X_train.upload(self.upload_type)
             self.logger.info(f"TrainSet's DataSet ID = {self.X_train.dataset_hash}")
-        if self.X_test is not None:
+        if self.X_test is not None and upload_type is not None:
             self.X_test.set_column_descriptions(self.final_column_descriptions)
-            self.X_test.upload("table")
+            self.X_test.upload(self.upload_type)
             self.logger.info(f"TestSet's DataSet ID = {self.X_test.dataset_hash}")
         # ---origin hash-----------------------------------------------------
         self.train_set_hash = self.X_train.get_hash() if self.X_train is not None else ""
@@ -281,6 +283,7 @@ class DataManager(StrSignatureMixin):
                 column2feature_groups[column] = nan_col
                 # 只会涉及 feature_groups, 不会涉及essential_feature_groups
         # ----对于没有标注的列，打上nan, highR_nan, cat, highR_cat num三种标记---
+        # 实测发现这个循环很耗时
         for column in X.columns:
             if column not in column2feature_groups:
                 feature_group = self.parse_feature_group(X[column], consider_nan=True)
