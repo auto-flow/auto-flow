@@ -38,9 +38,9 @@
     },
     "extra_trees": {
       "n_estimators": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
 //      "max_features": {"_type": "quniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -58,9 +58,9 @@
     },
     "gradient_boosting": {
       "n_estimators": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "loss": "deviance", // ""exponential" make it performs like adaboost
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
@@ -165,9 +165,9 @@
     },
     "sgd": {
       "max_iter": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "loss":  {"_type": "choice", "_value": ["hinge", "log","modified_huber","squared_hinge","perceptron"],"_default": "log"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
@@ -194,7 +194,7 @@
       "_n_estimators__lr_ratio": {"_type": "loguniform", "_value": [1,20],"_default": 10},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
       "max_depth": {"_type": "int_uniform", "_value": [1,10],"_default": 3},
-      "random_state": 42
+      "random_state": 42,
     },
     "bayesian_ridge": {
       "n_iter": {"_type": "int_quniform","_value": [300, 3000, 100], "_default": 600},
@@ -253,9 +253,9 @@
     },
     "extra_trees": {
       "n_estimators": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},//delete "mae"
 //      "max_features": {"_type": "quniform", "_value": [0,1],"_default": 0.5},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
@@ -281,9 +281,9 @@
     },
     "gradient_boosting": {
       "n_estimators": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "loss": {"_type": "choice", "_value":["ls","lad","huber","quantile"],"_default": "ls"},
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,1],"_default": 0.1},
@@ -359,9 +359,9 @@
     },
     "random_forest": {
       "n_estimators": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,  //todo:  restrict
