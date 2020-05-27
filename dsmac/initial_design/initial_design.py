@@ -1,4 +1,5 @@
 import logging
+import pickle
 import typing
 
 import numpy as np
@@ -155,9 +156,9 @@ class InitialDesign:
             initial_incumbent.origin = 'Initial design'
 
         # add this incumbent right away to have an entry to time point 0
-        self.traj_logger.add_entry(train_perf=2 ** 31,
-                                   incumbent_id=1,
-                                   incumbent=initial_incumbent)
+        # self.traj_logger.add_entry(train_perf=2 ** 31,
+        #                            incumbent_id=1,
+        #                            incumbent=initial_incumbent)
         rand_inst = self.rng.choice(self.scenario.train_insts)
 
         if self.scenario.deterministic:
@@ -166,6 +167,16 @@ class InitialDesign:
             initial_seed = self.rng.randint(0, constants.MAXINT)
 
         try:
+            appoint_success, record = self.runhistory.db.appointment_config(initial_incumbent, rand_inst)
+            if not appoint_success:
+                if record is not None:
+                    cost = record.cost
+                    config = record.config_bin
+                    if isinstance(config, bytes):
+                        config = pickle.loads(config)
+                    self.runhistory.add(config, cost, record.time, record.status,
+                                        record.instance_id)
+                    return initial_incumbent
             status, cost, runtime, _ = self.tae_runner.start(
                 initial_incumbent,
                 instance=rand_inst,
@@ -173,6 +184,7 @@ class InitialDesign:
                 seed=initial_seed,
                 instance_specific=self.scenario.instance_specific.get(rand_inst,
                                                                       "0"))
+
         except FirstRunCrashedException as err:
             if self.scenario.abort_on_first_run_crash:
                 raise err
@@ -185,9 +197,9 @@ class InitialDesign:
 
         self.stats.inc_changed += 1  # first incumbent
 
-        self.traj_logger.add_entry(train_perf=cost,
-                                   incumbent_id=self.stats.inc_changed,
-                                   incumbent=initial_incumbent)
+        # self.traj_logger.add_entry(train_perf=cost,
+        #                            incumbent_id=self.stats.inc_changed,
+        #                            incumbent=initial_incumbent)
 
         return initial_incumbent
 

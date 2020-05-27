@@ -67,7 +67,7 @@ class RunHistoryDB():
         run_id = self.get_run_id(instance_id, config_id)
         query = self.Model.select().where(self.Model.run_id == run_id)
         if len(query) > 0:
-            query_=query[0]
+            query_ = query[0]
             if query_.origin >= 0:
                 record = query_
             else:
@@ -76,6 +76,7 @@ class RunHistoryDB():
         try:
             self.Model.create(
                 run_id=run_id,
+                instance_id=instance_id,
                 origin=-1
             )
         except Exception as e:
@@ -111,15 +112,17 @@ class RunHistoryDB():
             pass
         self.timestamp = datetime.datetime.now()
 
-    def fetch_new_runhistory(self, is_init=False):
+    def fetch_new_runhistory(self, instance_id, is_init=False):
         if is_init:
             n_del = self.Model.delete().where(self.Model.origin < 0).execute()
             if n_del > 0:
                 self.logger.info(f"Delete {n_del} invalid records in run_history database.")
-            query = self.Model.select().where(self.Model.instance_id == self.instance_id).where(self.Model.origin >= 0)
+            query = self.Model.select(). \
+                where((self.Model.origin >= 0) & (self.Model.instance_id == instance_id))
         else:
-            query = self.Model.select().where(self.Model.instance_id == self.instance_id).where(
-                self.Model.pid != os.getpid()).where(self.Model.origin >= 0)
+            query = self.Model.select(). \
+                where(
+                (self.Model.origin >= 0) & (self.Model.instance_id == instance_id) & (self.Model.pid != os.getpid()))
         for model in query:
             run_id = model.run_id
             config_id = model.config_id

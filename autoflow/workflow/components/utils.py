@@ -50,4 +50,6 @@ def get_categorical_features_indices(X):
             pass
         if type_of_target(col) in ( "multiclass",):  # todo: debug
             categorical_features_indices.append(i)
+    if not categorical_features_indices:
+        return None
     return categorical_features_indices

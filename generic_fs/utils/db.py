@@ -21,6 +21,7 @@ def create_database(database,db_type, db_params: dict):
             user=db_params.get("user", "postgres"),
             host=db_params.get("host", "0.0.0.0"),
             port=db_params.get("port", 5432),
+            password=db_params.get("password", None)
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()

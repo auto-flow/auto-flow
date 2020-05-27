@@ -625,19 +625,6 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Experiment])
         return Experiment
 
-    def get_experiment_id_by_task_id(self, task_id):
-        self.init_task_table()
-        return self.TaskModel.select(self.TaskModel.experiment_id).where(self.TaskModel.task_id == task_id)[
-            0].experiment_id
-
-    def load_data_manager_by_experiment_id(self, experiment_id):
-        self.init_experiment_table()
-        experiment_id = int(experiment_id)
-        record = self.ExperimentModel.select().where(self.ExperimentModel.experiment_id == experiment_id)[0]
-        data_manager_path = record.data_manager_path
-        data_manager = self.file_system.load_pickle(data_manager_path)
-        return data_manager
-
     def insert_to_experiment_table(
             self,
             experiment_config,
@@ -670,8 +657,8 @@ class ResourceManager(StrSignatureMixin):
             task_id = pw.FixedCharField(max_length=32, primary_key=True)
             metric = pw.CharField(max_length=256, default="")
             splitter = pw.TextField(default="")
-            ml_task = pw.CharField(max_length=64, default="")
-            specific_task_token = pw.CharField(max_length=128, default="")
+            ml_task = pw.CharField(max_length=256, default="")
+            specific_task_token = pw.CharField(max_length=256, default="")
             train_set_id = pw.FixedCharField(max_length=32, default="")
             test_set_id = pw.FixedCharField(max_length=32, default="")
             sub_sample_indexes = self.JSONField(default=[])
@@ -759,8 +746,8 @@ class ResourceManager(StrSignatureMixin):
     # ----------hdl_model------------------------------------------------------------------
     def get_hdl_model(self) -> pw.Model:
         class Hdl(pw.Model):
-            task_id = pw.FixedCharField(max_length=128, default="")
-            hdl_id = pw.FixedCharField(max_length=128, default="")
+            task_id = pw.FixedCharField(max_length=32, default="")
+            hdl_id = pw.FixedCharField(max_length=32, default="")
             hdl = self.JSONField(default={})
             hdl_metadata = self.JSONField(default={})
             create_time = pw.DateTimeField(default=datetime.datetime.now)
@@ -777,6 +764,7 @@ class ResourceManager(StrSignatureMixin):
         self.init_hdl_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
+        # task_id 和 hdl_id 是 联合主键
         records = self.HdlModel.select().where(
             (self.HdlModel.task_id == self.task_id) & (self.HdlModel.hdl_id == hdl_id))
         if len(records) == 0:
@@ -864,8 +852,7 @@ class ResourceManager(StrSignatureMixin):
         self.is_init_trial = False
         self.TrialsModel = None
 
-    def insert_to_trial_table(self, info: Dict):
-        self.init_trial_table()
+    def do_insert_to_trial_table(self, info: Dict):
         config_id = info.get("config_id")
         models_path, finally_fit_model_path, y_info_path = \
             self.persistent_evaluated_model(info, config_id)
@@ -896,6 +883,27 @@ class ResourceManager(StrSignatureMixin):
             intermediate_results=info.get("intermediate_results", []),
         )
 
+    def insert_to_trial_table(self, info: Dict):
+        self.init_trial_table()
+        success = False
+        max_try_times = 3
+        for i in range(max_try_times):
+            try:
+                self.do_insert_to_trial_table(info)
+                success = True
+            except Exception as e:
+                self.logger.error(f"Insert 'trial' table failed, {i + 1} try.")
+                # 关闭连接池， 重新连接
+                self.close_trial_table()
+                self.close_record_db()
+                self.init_record_db()
+                self.init_trial_table()
+            if success:
+                break
+        if not success:
+            self.logger.error(f"After {max_try_times} times try, trial info cannot insert into trial table.")
+        # todo: 把无法保存的info序列化到savedpath
+
     def delete_models(self):
         if hasattr(self, "sync_dict"):
             exit_processes = self.sync_dict.get("exit_processes", 3)
@@ -916,6 +924,7 @@ class ResourceManager(StrSignatureMixin):
         # for component in estimators:
         # .where(self.TrialsModel.component == component)
         if self.max_persistent_estimators > 0:
+            # 只删除这次task中表现最差的模型
             should_delete = self.TrialsModel.select().where(self.TrialsModel.task_id == self.task_id).order_by(
                 self.TrialsModel.loss, self.TrialsModel.cost_time).offset(self.max_persistent_estimators)
             if len(should_delete):

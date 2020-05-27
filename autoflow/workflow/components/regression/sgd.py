@@ -6,6 +6,8 @@ from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.workflow.components.base import AutoFlowIterComponent
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
+__all__ = ["SGDRegressor"]
+
 
 class SGDRegressor(AutoFlowIterComponent, AutoFlowRegressionAlgorithm):
     module__ = "sklearn.linear_model.stochastic_gradient"

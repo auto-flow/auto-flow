@@ -24,7 +24,7 @@ from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import r2, accuracy
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
-from autoflow.utils.config_space import replace_phps, estimate_config_space_numbers
+from autoflow.utils.config_space import estimate_config_space_numbers
 from autoflow.utils.dict_ import update_mask_from_other_dict
 from autoflow.utils.klass import instancing, sequencing
 from autoflow.utils.logging_ import get_logger, setup_logger
@@ -386,7 +386,7 @@ class AutoFlowEstimator(BaseEstimator):
         tuner.run_limit = run_limit
         tuner.set_resource_manager(resource_manager)
         # 替换搜索空间中的 random_state
-        replace_phps(tuner.shps, "n_jobs", int(self.n_jobs_in_algorithm))
+
         tuner.shps.seed(random_state)
         # todo : 增加 n_jobs ? 调研默认值
         self.instance_id = resource_manager.task_id + "-" + resource_manager.hdl_id
@@ -459,44 +459,8 @@ class AutoFlowEstimator(BaseEstimator):
     def _predict(
             self,
             X_test: Union[DataFrameContainer, pd.DataFrame, np.ndarray],
-            task_id=None,
-            trial_id=None,
-            experiment_id=None,
-            column_descriptions: Optional[Dict] = None,
-            highR_nan_threshold=0.5
     ):
-        is_set_X_test = False
-        if hasattr(self, "data_manager") and self.data_manager is not None:
-            self.logger.info(
-                "'data_manager' is existing in AutoFlowEstimator, will not load it from database or create it.")
-        else:
-            if task_id is not None:
-                _experiment_id = self.resource_manager.get_experiment_id_by_task_id(task_id)
-            elif experiment_id is not None:
-                _experiment_id = experiment_id
-            elif hasattr(self, "experiment_id") and self.experiment_id is not None:
-                _experiment_id = self.experiment_id
-            else:
-                _experiment_id = None
-            if _experiment_id is None:
-                self.logger.info(
-                    "'_experiment_id' is not exist, initializing data_manager by user given parameters.")
-                self.data_manager: DataManager = DataManager(self.resource_manager, X_test,
-                                                             column_descriptions=column_descriptions,
-                                                             highR_nan_threshold=highR_nan_threshold)
-                is_set_X_test = True
-            else:
-                self.logger.info(
-                    "'_experiment_id' is exist, loading data_manager by query meta_record.experiments database.")
-                self.data_manager: DataManager = self.resource_manager.load_data_manager_by_experiment_id(
-                    _experiment_id)
-        if not is_set_X_test:
-            self.data_manager.set_data(X_test=X_test)
-        if self.estimator is None:
-            self.logger.warning(
-                f"'{self.__class__.__name__}' 's estimator is None, maybe you didn't use fit method to train the data.\n"
-                f"We try to query trials database if you seed trial_id specifically.")
-            raise NotImplementedError
+        self.data_manager.set_data(X_test=X_test)
 
     def copy(self):
         tmp_dm = self.data_manager

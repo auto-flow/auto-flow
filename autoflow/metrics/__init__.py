@@ -7,9 +7,9 @@ import pandas as pd
 import sklearn.metrics
 from sklearn.utils.multiclass import type_of_target
 
-from autoflow.utils.ml_task import MLTask
 from autoflow.metrics import classification_metrics
 from autoflow.utils.array import sanitize_array
+from autoflow.utils.ml_task import MLTask
 
 
 class Scorer(object, metaclass=ABCMeta):
@@ -19,6 +19,7 @@ class Scorer(object, metaclass=ABCMeta):
         self._score_func = score_func
         self._optimum = optimum
         self._sign = sign
+        self.score=None
 
     @abstractmethod
     def __call__(self, y_true, y_pred, sample_weight=None):
@@ -63,12 +64,13 @@ class _PredictScorer(Scorer):
             raise ValueError(type_true)
 
         if sample_weight is not None:
-            return self._sign * self._score_func(y_true, y_pred,
-                                                 sample_weight=sample_weight,
-                                                 **self._kwargs)
+            self.score = self._score_func(y_true, y_pred,
+                                          sample_weight=sample_weight,
+                                          **self._kwargs)
         else:
-            return self._sign * self._score_func(y_true, y_pred,
-                                                 **self._kwargs)
+            self.score = self._score_func(y_true, y_pred,
+                                          **self._kwargs)
+        return self._sign * self.score
 
 
 class _ProbaScorer(Scorer):
@@ -92,11 +94,13 @@ class _ProbaScorer(Scorer):
             Score function applied to prediction of component on X.
         """
         if sample_weight is not None:
-            return self._sign * self._score_func(y_true, y_pred,
-                                                 sample_weight=sample_weight,
-                                                 **self._kwargs)
+            self.score = self._score_func(y_true, y_pred,
+                                          sample_weight=sample_weight,
+                                          **self._kwargs)
         else:
-            return self._sign * self._score_func(y_true, y_pred, **self._kwargs)
+            self.score = self._score_func(y_true, y_pred,
+                                          **self._kwargs)
+        return self._sign * self.score
 
 
 class _ThresholdScorer(Scorer):
@@ -129,11 +133,13 @@ class _ThresholdScorer(Scorer):
             y_pred = np.vstack([p[:, -1] for p in y_pred]).T
 
         if sample_weight is not None:
-            return self._sign * self._score_func(y_true, y_pred,
-                                                 sample_weight=sample_weight,
-                                                 **self._kwargs)
+            self.score = self._score_func(y_true, y_pred,
+                                          sample_weight=sample_weight,
+                                          **self._kwargs)
         else:
-            return self._sign * self._score_func(y_true, y_pred, **self._kwargs)
+            self.score = self._score_func(y_true, y_pred,
+                                          **self._kwargs)
+        return self._sign * self.score
 
 
 def make_scorer(name, score_func, optimum=1, greater_is_better=True,
@@ -280,14 +286,16 @@ def calculate_score(solution, prediction, ml_task: MLTask, metric,
         solution = solution.values
     if should_calc_all_metric:
         score = dict()
+        true_score={}
         if ml_task.mainTask == "regression":
             # TODO put this into the regression metric itself
             cprediction = sanitize_array(prediction)
             metric_dict = copy.copy(REGRESSION_METRICS)
             metric_dict[metric.name] = metric
             for metric_ in REGRESSION_METRICS:
-                func = REGRESSION_METRICS[metric_]
+                func:Scorer = REGRESSION_METRICS[metric_]
                 score[func.name] = func(solution, cprediction)
+                true_score[func.name]=func.score
 
         else:
             metric_dict = copy.copy(CLASSIFICATION_METRICS)
@@ -300,6 +308,7 @@ def calculate_score(solution, prediction, ml_task: MLTask, metric,
 
                 try:
                     score[func.name] = float(func(solution, prediction))
+                    true_score[func.name] = func.score
                 except ValueError as e:
                     if e.args[0] == 'multiclass format is not supported':
                         continue
@@ -321,4 +330,4 @@ def calculate_score(solution, prediction, ml_task: MLTask, metric,
         else:
             score = metric(solution, prediction)
 
-    return score
+    return score, true_score

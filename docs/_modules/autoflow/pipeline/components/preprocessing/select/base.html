@@ -181,7 +181,7 @@
 
 
 <div class="viewcode-block" id="SklearnSelectMixin"><a class="viewcode-back" href="../../../../../../_module/autoflow.pipeline.components.preprocessing.select.html#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin">[docs]</a><span class="k">class</span> <span class="nc">SklearnSelectMixin</span><span class="p">():</span>
-    <span class="n">max_feature_name</span> <span class="o">=</span> <span class="s2">&quot;_max_features-sp1_percent&quot;</span>
+    <span class="n">max_feature_name</span> <span class="o">=</span> <span class="s2">&quot;_max_features__sp1_percent&quot;</span>
 
     <span class="k">def</span> <span class="nf">_transform_procedure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -206,7 +206,7 @@
     <span class="n">class__</span> <span class="o">=</span> <span class="s2">&quot;SelectFromModel&quot;</span>
     <span class="n">module__</span> <span class="o">=</span> <span class="s2">&quot;sklearn.feature_selection&quot;</span>
     <span class="n">need_y</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">max_feature_name</span> <span class="o">=</span> <span class="s2">&quot;_max_features-sp1_percent&quot;</span>
+    <span class="n">max_feature_name</span> <span class="o">=</span> <span class="s2">&quot;_max_features__sp1_percent&quot;</span>
 
 <div class="viewcode-block" id="SelectFromModelBase.after_process_hyperparams"><a class="viewcode-back" href="../../../../../../_module/autoflow.pipeline.components.preprocessing.select.html#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.after_process_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">):</span>
         <span class="n">hyperparams</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SelectFromModelBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_process_hyperparams</span><span class="p">(</span><span class="n">hyperparams</span><span class="p">)</span>
@@ -229,7 +229,7 @@
     <span class="n">class__</span> <span class="o">=</span> <span class="s2">&quot;RFE&quot;</span>
     <span class="n">module__</span> <span class="o">=</span> <span class="s2">&quot;sklearn.feature_selection&quot;</span>
     <span class="n">need_y</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">max_feature_name</span> <span class="o">=</span> <span class="s2">&quot;_n_features_to_select-sp1_percent&quot;</span>
+    <span class="n">max_feature_name</span> <span class="o">=</span> <span class="s2">&quot;_n_features_to_select__sp1_percent&quot;</span>
 
 <div class="viewcode-block" id="REF_Base.after_process_hyperparams"><a class="viewcode-back" href="../../../../../../_module/autoflow.pipeline.components.preprocessing.select.html#autoflow.pipeline.components.preprocessing.select.base.REF_Base.after_process_hyperparams">[docs]</a>    <span class="k">def</span> <span class="nf">after_process_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparams</span><span class="p">):</span>
         <span class="n">hyperparams</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">REF_Base</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_process_hyperparams</span><span class="p">(</span><span class="n">hyperparams</span><span class="p">)</span>

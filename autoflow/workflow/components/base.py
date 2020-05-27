@@ -65,7 +65,7 @@ class AutoFlowComponent(BaseEstimator):
             if key.startswith("_") and (not key.startswith("__")):
                 should_pop.append(key)
                 key = key[1:]
-                new_key, indicator = key.split("-")
+                new_key, indicator = key.split("__")
                 updated[new_key] = self.parse_escape_hyperparameters(indicator, hyperparams, value)
         for key in should_pop:
             hyperparams.pop(key)

@@ -2,6 +2,8 @@ from typing import Dict
 
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
+__all__ = ["KNearestNeighborsRegressor"]
+
 
 class KNearestNeighborsRegressor(AutoFlowRegressionAlgorithm):
     class__ = "KNeighborsRegressor"

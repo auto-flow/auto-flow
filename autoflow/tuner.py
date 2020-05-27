@@ -3,7 +3,8 @@ import os
 import re
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Dict, Optional, Callable, Union, List
+from itertools import product
+from typing import Dict, Optional, Callable, Union, List, Any
 
 import numpy as np
 from ConfigSpace import ConfigurationSpace, Configuration
@@ -15,7 +16,7 @@ from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.utils.concurrence import parse_n_jobs
-from autoflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs
+from autoflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs, replace_phps
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
@@ -41,6 +42,7 @@ class Tuner(StrSignatureMixin):
             per_run_time_limit: float = 60,
             per_run_memory_limit: float = 3072,
             time_left_for_this_task: float = None,
+            n_jobs_in_algorithm=1,
             debug=False
     ):
         '''
@@ -108,6 +110,7 @@ class Tuner(StrSignatureMixin):
 
             Exception will be re-raised if ``debug = True``
         '''
+        self.n_jobs_in_algorithm = n_jobs_in_algorithm
         self.debug = debug
         self.per_run_memory_limit = per_run_memory_limit
         self.time_left_for_this_task = time_left_for_this_task
@@ -166,6 +169,7 @@ class Tuner(StrSignatureMixin):
         # todo: 泛化ML管线后，可能存在多个preprocessing
         self.shps: ConfigurationSpace = self.hdl2shps(hdl)
         self.shps.seed(self.random_state)
+        replace_phps(self.shps, "n_jobs", int(self.n_jobs_in_algorithm))
 
     def set_resource_manager(self, resource_manager: ResourceManager):
         self.resource_manager = resource_manager
@@ -196,11 +200,13 @@ class Tuner(StrSignatureMixin):
         else:
             return 0
 
-    def prepare_beam_search_configs(self, config_space: ConfigurationSpace, cs_key: str, search_range: List[str]):
+    def prepare_beam_search_configs(self, config_space: ConfigurationSpace,
+                                    cs_keys: List[str], search_ranges: List[List[Any]]):
         configs = []
-        for value in search_range:
+        for values in product(*search_ranges):
             # todo: 超出范围的异常检测？
-            config_space.get_hyperparameter(cs_key).default_value = value
+            for cs_key,value in zip(cs_keys, values):
+                config_space.get_hyperparameter(cs_key).default_value = value
             configs.append(config_space.get_default_configuration())
         return configs
 
@@ -260,13 +266,21 @@ class Tuner(StrSignatureMixin):
         )
         # todo 将 file_system 传入，或者给file_system添加 runtime 参数
         if self.search_method == "beam":
-            beam_steps = self.search_method_params["beam_steps"]
+            beam_steps: List[Dict[str, Any]] = self.search_method_params["beam_steps"]
             beam_result = OrderedDict()
-            for step_name, search_range in beam_steps.items():
+            # for step_name, search_range in beam_steps.items():
+            for step in beam_steps:
+                # 根据历史最好配置
                 shps_ = self.set_beam_search_result_to_cs_default(self.shps, beam_result)
                 default_config = shps_.get_default_configuration()
-                cs_key = self.match_cs_key(step_name, default_config)
-                sampled_configs = self.prepare_beam_search_configs(shps_, cs_key, search_range)
+                sampled_configs = []
+                cs_keys = []
+                search_ranges=[]
+                for step_name, search_range in step.items():
+                    cs_key = self.match_cs_key(step_name, default_config)
+                    cs_keys.append(cs_key)
+                    search_ranges.append(search_range)
+                sampled_configs += self.prepare_beam_search_configs(shps_, cs_keys, search_ranges)
                 smac = SMAC4HPO(
                     scenario=self.scenario,
                     rng=np.random.RandomState(self.random_state),
@@ -275,8 +289,9 @@ class Tuner(StrSignatureMixin):
                 )
                 smac.solver.initial_configurations = sampled_configs
                 incumbent = smac.solver.start_(warm_start=False)
-                best_value = incumbent.get(cs_key)
-                beam_result[cs_key] = best_value
+                for cs_key in cs_keys:
+                    best_value = incumbent.get(cs_key)
+                    beam_result[cs_key] = best_value
         else:
             smac = SMAC4HPO(
                 scenario=self.scenario,

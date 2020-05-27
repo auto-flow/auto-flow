@@ -69,13 +69,13 @@ class TrainEvaluator(BaseEvaluator):
         self.should_finally_fit = should_finally_fit
 
     def loss(self, y_true, y_hat):
-        score = calculate_score(
+        score, true_score = calculate_score(
             y_true, y_hat, self.ml_task, self.metric,
             should_calc_all_metric=self.should_calc_all_metric)
 
         if isinstance(score, dict):
             err = self.metric._optimum - score[self.metric.name]
-            all_score = score
+            all_score = true_score
         elif isinstance(score, (int, float)):
             err = self.metric._optimum - score
             all_score = None

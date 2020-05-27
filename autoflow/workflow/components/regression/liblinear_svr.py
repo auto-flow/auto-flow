@@ -1,12 +1,18 @@
+from copy import deepcopy
+
+from sklearn.preprocessing import StandardScaler
+
 from autoflow.manager.data_container.ndarray import NdArrayContainer
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
-from sklearn.preprocessing import StandardScaler
+
+__all__ = ["LibLinear_SVR"]
+
 
 class LibLinear_SVR(AutoFlowRegressionAlgorithm):
     class__ = "LinearSVR"
     module__ = "sklearn.svm"
 
-    def before_fit_y(self, y:NdArrayContainer):
+    def before_fit_y(self, y: NdArrayContainer):
         if y is None:
             return None
         y = deepcopy(y.data)
