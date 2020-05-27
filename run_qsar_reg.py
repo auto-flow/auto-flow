@@ -22,22 +22,25 @@ except Exception:
 
 @click.command()
 @click.option("--file", "-f", help="input file name", type=click.Path())
-@click.option("--inst", "-i", help="instance id",default=0, type=int)
+@click.option("--inst", "-i", help="instance id", default=0, type=int)
 @click.option("--target", "-t", help="target column name", type=str)
 @click.option("--ignore", "-g", help="ignore column name", type=str, multiple=True)
 @click.option("--id", help="id column name", type=str)
-@click.option("--n_jobs","-n",default=5,  help="n_jobs_in_algorithm", type=str)
+@click.option("--n_jobs", "-n", default=5, help="n_jobs_in_algorithm", type=str)
 def main(file, inst, target, ignore, id, n_jobs):
     if inst is None:
-        inst=0
+        inst = 0
     examples_path = Path(autoflow.__file__).parent.parent / "data"
     # 加载pickle格式的数据
     train_df = joblib.load(examples_path / file)
     # train_df = load("qsar")
     estimators = [
-        "adaboost", "bayesian_ridge",
-        "catboost",
-        "decision_tree", "elasticnet", "extra_trees",
+        "adaboost",
+        "bayesian_ridge",
+        # "catboost",
+        "decision_tree",
+        "elasticnet",
+        "extra_trees",
         # "gradient_boosting",
         "k_nearest_neighbors",
         "lightgbm"
@@ -64,20 +67,38 @@ def main(file, inst, target, ignore, id, n_jobs):
     hdl_constructors = [hdl_constructor] * 2
 
     tuners = [
+        # Tuner(
+        #     search_method="beam",
+        #     search_method_params={
+        #         "beam_steps": [
+        #             {
+        #                 "estimating": estimators,
+        #                 "num->selected.*_select_percent": [10 + inst * 5, 30 + inst * 5],
+        #             },
+        #             {
+        #                 "num->selected.*_select_percent": [i for i in range(10, 70, 10)]
+        #             }
+        #         ]
+        #     },
+        #     debug=False,
+        #     per_run_time_limit=1200,
+        #     per_run_memory_limit=30 * 1024,
+        #     n_jobs_in_algorithm=n_jobs
+        # ),
         Tuner(
-            search_method="beam",
+            search_method="random",
             search_method_params={
-                "beam_steps": [
-                    {
-                        "estimating": estimators,
-                        "num->selected.*_select_percent": [10 + inst * 5, 30 + inst * 5],
-                    },
-                    {
-                        "num->selected.*_select_percent": [i for i in range(10, 70, 10)]
-                    }
-                ]
+                "specific_allocate": {
+                    ("estimating", "bayesian_ridge"): 20,
+                    ("estimating", "lightgbm"): 1,
+                    ("estimating", "adaboost"): 1,
+                    ("estimating", "decision_tree"): 1,
+                    ("estimating", "elasticnet"): 1,
+                    ("estimating", "extra_trees"): 1,
+                    ("estimating", "k_nearest_neighbors"): 1,
+                }
             },
-            debug=False,
+            # run_limit=50,
             per_run_time_limit=1200,
             per_run_memory_limit=30 * 1024,
             n_jobs_in_algorithm=n_jobs
@@ -121,10 +142,10 @@ def main(file, inst, target, ignore, id, n_jobs):
         splitter=KFold(n_splits=5, shuffle=True, random_state=0),
         fit_ensemble_params=False,
         dataset_metadata={
-            "name":file
+            "name": file
         },
         task_metadata={
-            "instance_id":inst
+            "instance_id": inst
         },
         specific_task_token=str(inst)
         # is_not_realy_run=True
