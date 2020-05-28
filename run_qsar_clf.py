@@ -21,15 +21,19 @@ except Exception:
 
 
 @click.command()
-@click.option("--file", "-f", help="input file name", type=click.Path())
-@click.option("--inst", "-i", help="instance id", default=0, type=int)
+@click.option("--file", "-f", default="~/autoflow", help="input file name", type=click.Path())
+@click.option("--store", "-s", help="path to store", type=click.Path())
+@click.option("--method", "-m", help="search method", type=str)
+@click.option("--inst", "-i", help="instance id", default=0, type=str)
 @click.option("--target", "-t", help="target column name", type=str)
 @click.option("--ignore", "-g", help="ignore column name", type=str, multiple=True)
 @click.option("--id", help="id column name", type=str)
 @click.option("--n_jobs", "-n", default=5, help="n_jobs_in_algorithm", type=str)
-def main(file, inst, target, ignore, id, n_jobs):
+def main(file, store,method , inst, target, ignore, id, n_jobs):
     if inst is None:
         inst = 0
+    if store is None:
+        store = "~/autoflow"
     examples_path = Path(autoflow.__file__).parent.parent / "data"
     # 加载pickle格式的数据
     train_df = joblib.load(examples_path / file)
@@ -41,10 +45,10 @@ def main(file, inst, target, ignore, id, n_jobs):
         "k_nearest_neighbors",
         "liblinear_svc",
         "libsvm_svc",
-        "lightgbm"
-        "logistic_regression"
-        "random_forest"
-        "sgd"
+        "lightgbm",
+        "logistic_regression",
+        "random_forest",
+        "sgd",
     ]
 
     hdl_constructor = HDL_Constructor(
@@ -52,7 +56,9 @@ def main(file, inst, target, ignore, id, n_jobs):
             "num->selected": {
                 "_name": "select.from_model_clf",
                 "_vanilla": True,
-                "estimator": "sklearn.ensemble.ExtraTreesClassifier",
+                "estimator": {"_type": "choice", "_value":
+                    ["sklearn.ensemble.ExtraTreesClassifier", "sklearn.linear_model.LogisticRegression"],
+                              "_default": "sklearn.ensemble.ExtraTreesClassifier"},
                 "n_estimators": 10,
                 "max_depth": 7,
                 "min_samples_split": 10,
@@ -64,43 +70,53 @@ def main(file, inst, target, ignore, id, n_jobs):
             "selected->target": estimators
         }
     )
-
-    hdl_constructors = [hdl_constructor] * 2
-
-    tuners = [
-        Tuner(
-            search_method="random",
-            search_method_params={
-                "specific_allocate": {
-                    ("estimating", "adaboost"): 1,
-                    ("estimating", "decision_tree"): 2,
-                    ("estimating", "extra_trees"): 5,
-                    ("estimating", "k_nearest_neighbors"): 1,
-                    ("estimating", "liblinear_svc"): 1,
-                    ("estimating", "libsvm_svc"): 1,
-                    ("estimating", "lightgbm"): 10,
-                    ("estimating", "logistic_regression"): 5,
-                    ("estimating", "random_forest"): 5,
-                    ("estimating", "sgd"): 2,
-                }
-            },
-            # run_limit=50,
-            per_run_time_limit=1200,
-            per_run_memory_limit=30 * 1024,
-            n_jobs_in_algorithm=n_jobs
-        ),
-        Tuner(
-            search_method="smac",
-            run_limit=100,
-            initial_runs=1,
-            debug=False,
-            per_run_time_limit=1200,
-            per_run_memory_limit=30 * 1024,
-            n_jobs_in_algorithm=n_jobs
-        )
-    ]
+    if method == "random":
+        hdl_constructors=[hdl_constructor]
+        tuners=[
+            Tuner(
+                search_method="random",
+                run_limit=100,
+                per_run_time_limit=1200,
+                per_run_memory_limit=30 * 1024,
+                n_jobs_in_algorithm=n_jobs
+            ),
+        ]
+    else:
+        hdl_constructors = [hdl_constructor] * 2
+        tuners = [
+            Tuner(
+                search_method="random",
+                search_method_params={
+                    "specific_allocate": {
+                        ("estimating:__choice__", "adaboost"): 3,
+                        ("estimating:__choice__", "decision_tree"): 2,
+                        ("estimating:__choice__", "extra_trees"): 5,
+                        ("estimating:__choice__", "k_nearest_neighbors"): 2,
+                        ("estimating:__choice__", "liblinear_svc"): 2,
+                        ("estimating:__choice__", "libsvm_svc"): 2,
+                        ("estimating:__choice__", "lightgbm"): 5,
+                        ("estimating:__choice__", "logistic_regression"): 5,
+                        ("estimating:__choice__", "random_forest"): 5,
+                        ("estimating:__choice__", "sgd"): 3,
+                    }
+                },
+                per_run_time_limit=1200,
+                per_run_memory_limit=30 * 1024,
+                n_jobs_in_algorithm=n_jobs
+            ),
+            Tuner(
+                search_method="smac",
+                run_limit=66,
+                initial_runs=0,
+                debug=False,
+                per_run_time_limit=1200,
+                per_run_memory_limit=30 * 1024,
+                n_jobs_in_algorithm=n_jobs
+            )
+        ]
 
     trained_pipeline = AutoFlowClassifier(
+        store_path=store,
         consider_ordinal_as_cat=False,
         tuner=tuners,
         hdl_constructor=hdl_constructors,

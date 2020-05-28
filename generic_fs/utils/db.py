@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_database(database,db_type, db_params: dict):
+    return
     if db_type == "sqlite":
         pass
     elif db_type == "postgresql":

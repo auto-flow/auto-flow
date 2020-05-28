@@ -10,7 +10,7 @@ import joblib
 from sklearn.model_selection import KFold
 
 import autoflow
-from autoflow import AutoFlowRegressor, HDL_Constructor
+from autoflow import HDL_Constructor, AutoFlowClassifier
 from autoflow.tuner import Tuner
 
 try:
@@ -21,7 +21,7 @@ except Exception:
 
 
 @click.command()
-@click.option("--file", "-f", help="input file name", type=click.Path())
+@click.option("--file", "-f", default="~/autoflow", help="input file name", type=click.Path())
 @click.option("--store", "-s", help="path to store", type=click.Path())
 @click.option("--inst", "-i", help="instance id", default=0, type=int)
 @click.option("--target", "-t", help="target column name", type=str)
@@ -39,23 +39,23 @@ def main(file, store, inst, target, ignore, id, n_jobs):
     # train_df = load("qsar")
     estimators = [
         "adaboost",
-        "bayesian_ridge",
-        # "catboost",
         "decision_tree",
-        "elasticnet",
         "extra_trees",
-        "random_forest",
-        # "gradient_boosting",
         "k_nearest_neighbors",
-        "lightgbm"
+        "liblinear_svc",
+        "libsvm_svc",
+        "lightgbm",
+        "logistic_regression",
+        "random_forest",
+        "sgd",
     ]
 
     hdl_constructor = HDL_Constructor(
         DAG_workflow={
             "num->selected": {
-                "_name": "select.from_model_reg",
+                "_name": "select.from_model_clf",
                 "_vanilla": True,
-                "estimator": "sklearn.ensemble.ExtraTreesRegressor",
+                "estimator": "sklearn.ensemble.ExtraTreesClassifier",
                 "n_estimators": 10,
                 "max_depth": 7,
                 "min_samples_split": 10,
@@ -64,7 +64,9 @@ def main(file, store, inst, target, ignore, id, n_jobs):
                 "n_jobs": 1,
                 "_select_percent": {"_type": "quniform", "_value": [10, 60, 1], "_default": 40}
             },
-            "selected->target": estimators
+            "selected->scaled": ["operate.keep_going", "scale.minmax", "scale.standardize"],
+            "scaled->transformed": ["operate.keep_going", "transform.power"],
+            "transformed->target": estimators
         }
     )
 
@@ -75,14 +77,16 @@ def main(file, store, inst, target, ignore, id, n_jobs):
             search_method="random",
             search_method_params={
                 "specific_allocate": {
-                    ("estimating:__choice__", "adaboost"): 1,
-                    ("estimating:__choice__", "bayesian_ridge"): 5,
-                    ("estimating:__choice__", "decision_tree"): 1,
-                    ("estimating:__choice__", "elasticnet"): 1,
-                    ("estimating:__choice__", "extra_trees"): 3,
-                    ("estimating:__choice__", "random_forest"): 3,
-                    ("estimating:__choice__", "k_nearest_neighbors"): 1,
-                    ("estimating:__choice__", "lightgbm"): 5,
+                    ("estimating:__choice__", "adaboost"): 2,
+                    ("estimating:__choice__", "decision_tree"): 2,
+                    ("estimating:__choice__", "extra_trees"): 5,
+                    ("estimating:__choice__", "k_nearest_neighbors"): 2,
+                    ("estimating:__choice__", "liblinear_svc"): 3,
+                    ("estimating:__choice__", "libsvm_svc"): 3,
+                    ("estimating:__choice__", "lightgbm"): 10,
+                    ("estimating:__choice__", "logistic_regression"): 5,
+                    ("estimating:__choice__", "random_forest"): 5,
+                    ("estimating:__choice__", "sgd"): 3,
                 }
             },
             # run_limit=50,
@@ -101,8 +105,8 @@ def main(file, store, inst, target, ignore, id, n_jobs):
         )
     ]
 
-    trained_pipeline = AutoFlowRegressor(
-        store=store,
+    trained_pipeline = AutoFlowClassifier(
+        store_path=store,
         consider_ordinal_as_cat=False,
         tuner=tuners,
         hdl_constructor=hdl_constructors,

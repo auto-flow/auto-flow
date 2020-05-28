@@ -88,6 +88,7 @@
       "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},
       "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
       "multi_class": "ovr",
+      "random_state": 42,
       "__forbidden": [
           {"penalty": "l1","loss": "hinge"},
           {"penalty": "l2","dual": false,"loss": "hinge"},
@@ -102,7 +103,7 @@
       "gamma":{"_type": "loguniform", "_value": [1e-05, 8],"_default": 0.1},
       "coef0":{"_type": "quniform", "_value": [-1,1],"_default": 0},
       "shrinking": {"_type": "choice", "_value": [true,false],"_default": true},
-      "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": null},
+      "class_weight":{"_type": "choice", "_value": ["balanced",null],"_default": "balanced"},
       "probability": true,
       "decision_function_shape": "ovr",
       "__activate":{
@@ -137,7 +138,11 @@
       "l1_ratio": {"_type": "quniform", "_value": [0,1,0.05],"_default": 0.5},
       "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
       "random_state": 42,
-      "n_jobs": 1
+      "n_jobs": 1,
+      "max_iter": 5000,
+      "early_stopping_rounds": 10,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 100
     },
     "multinomial_nb": {
       "alpha": {"_type": "loguniform", "_value": [1e-2, 100],"_default": 1.0},
@@ -167,7 +172,7 @@
       "max_iter": 5000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 25,
+      "iter_inc": 100,
       "loss":  {"_type": "choice", "_value": ["hinge", "log","modified_huber","squared_hinge","perceptron"],"_default": "log"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
@@ -241,10 +246,12 @@
       "random_state": 42
     },
     "elasticnet": {
-      // todo : 修改为热启动形式
-      "max_iter":  {"_type": "int_quniform","_value": [300,3000,100], "_default": 600},
-      "alpha": {"_type": "loguniform", "_value": [1e-2,10],"_default": 1.0},
-      "l1_ratio": {"_type": "quniform", "_value": [0,1,0.05],"_default": 0.5},
+      "max_iter":  5000,
+      "early_stopping_rounds": 10,
+      "early_stopping_tol": 0.0,
+      "iter_inc": 100,
+      "alpha": {"_type": "loguniform", "_value": [1e-2, 10],"_default": 1.0},
+      "l1_ratio": {"_type": "quniform", "_value": [0, 1, 0.05],"_default": 0.5},
       "normalize": {"_type": "choice", "_value": [true,false],"_default": true},
       "positive": {"_type": "choice", "_value": [true,false],"_default": false},
       "selection": {"_type": "choice", "_value": ["cyclic","random"],"_default": "cyclic"},
@@ -376,9 +383,9 @@
     },
     "sgd": {
       "max_iter": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 100,
       "loss":  {"_type": "choice", "_value": ["squared_loss", "huber","epsilon_insensitive","squared_hinge","squared_epsilon_insensitive"],"_default": "squared_loss"},
       "penalty": {"_type": "choice", "_value": ["l1", "l2","elasticnet"],"_default": "l2"},
       "alpha":  {"_type": "loguniform", "_value": [ 1e-7, 1e-1],"_default": 0.0001},
@@ -590,7 +597,10 @@
         "_step__sp1_dev": 20
       },
       "rfe_reg": {
-        "estimator":{"_type": "choice", "_value": ["sklearn.ensemble.ExtraTreesRegressor", "sklearn.linear_model.Ridge"],"_default": "sklearn.ensemble.ExtraTreesRegressor"},
+        "estimator":{"_type": "choice",
+          "_value": ["sklearn.ensemble.ExtraTreesRegressor",
+                     "sklearn.linear_model.Ridge"],
+          "_default": "sklearn.ensemble.ExtraTreesRegressor"},
         "n_estimators": 10,
         "max_depth": 7,
         "min_samples_split": 10,
@@ -643,7 +653,7 @@
       }
     },
     "transform": {
-
+       "power": {}
     }
   }
 }

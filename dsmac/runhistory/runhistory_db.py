@@ -114,9 +114,9 @@ class RunHistoryDB():
 
     def fetch_new_runhistory(self, instance_id, is_init=False):
         if is_init:
-            n_del = self.Model.delete().where(self.Model.origin < 0).execute()
-            if n_del > 0:
-                self.logger.info(f"Delete {n_del} invalid records in run_history database.")
+            # n_del = self.Model.delete().where(self.Model.origin < 0).execute()
+            # if n_del > 0:
+            #     self.logger.info(f"Delete {n_del} invalid records in run_history database.")
             query = self.Model.select(). \
                 where((self.Model.origin >= 0) & (self.Model.instance_id == instance_id))
         else:

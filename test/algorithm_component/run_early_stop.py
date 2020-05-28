@@ -16,10 +16,13 @@ from autoflow.workflow.components.classification.extra_trees import ExtraTreesCl
 from autoflow.workflow.components.classification.gradient_boosting import GradientBoostingClassifier
 from autoflow.workflow.components.classification.random_forest import RandomForestClassifier
 from autoflow.workflow.components.classification.sgd import SGDClassifier
+from autoflow.workflow.components.classification.logistic_regression import LogisticRegression
+
 from autoflow.workflow.components.regression.extra_trees import ExtraTreesRegressor
 from autoflow.workflow.components.regression.gradient_boosting import GradientBoostingRegressor
 from autoflow.workflow.components.regression.random_forest import RandomForestRegressor
 from autoflow.workflow.components.regression.sgd import SGDRegressor
+from autoflow.workflow.components.regression.elasticnet import ElasticNet
 
 
 def get_hp_of_cls(cls, hdl_bank, key1):
@@ -44,10 +47,11 @@ def run_classification():
 
     hdl_bank = get_default_hdl_bank()
     est_cls_list = [
+        LogisticRegression,
         GradientBoostingClassifier,
         RandomForestClassifier,
         ExtraTreesClassifier,
-        SGDClassifier
+        SGDClassifier,
     ]
     for cls in est_cls_list:
         print("=========================")
@@ -86,6 +90,7 @@ def run_regression():
 
     hdl_bank = get_default_hdl_bank()
     est_cls_list = [
+        ElasticNet,
         GradientBoostingRegressor,
         RandomForestRegressor,
         ExtraTreesRegressor,
@@ -118,4 +123,5 @@ def run_regression():
 
 if __name__ == '__main__':
     run_regression()
+    # run_classification()
 
