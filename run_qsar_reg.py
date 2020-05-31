@@ -23,29 +23,45 @@ except Exception:
 @click.command()
 @click.option("--file", "-f", help="input file name", type=click.Path())
 @click.option("--store", "-s", help="path to store", type=click.Path())
-@click.option("--inst", "-i", help="instance id", default=0, type=int)
+@click.option("--method", "-m", help="search method", type=str)
+@click.option("--inst", "-i", help="instance id", default=0, type=str)
 @click.option("--target", "-t", help="target column name", type=str)
 @click.option("--ignore", "-g", help="ignore column name", type=str, multiple=True)
 @click.option("--id", help="id column name", type=str)
 @click.option("--n_jobs", "-n", default=5, help="n_jobs_in_algorithm", type=str)
-def main(file, store, inst, target, ignore, id, n_jobs):
+def main(file, store, method, inst, target, ignore, id, n_jobs):
     if inst is None:
-        inst = 0
+        inst = "0"
+    random_state_str = ""
+    for c in inst:
+        c: str
+        if c.isdigit():
+            random_state_str += c
+    if not random_state_str:
+        random_state_str = "0"
+    random_state = int(random_state_str)
+    print(f"random state = {random_state}")
+    # 适配nitrogen环境
+    saved_path = os.getenv("SAVEDPATH")
+    if saved_path:
+        print(f"SAVEDPATH = {saved_path}")
+        store = (Path(saved_path) / "autoflow").as_posix()
     if store is None:
         store = "~/autoflow"
-    examples_path = Path(autoflow.__file__).parent.parent / "data"
-    # 加载pickle格式的数据
-    train_df = joblib.load(examples_path / file)
+    # 适配nitrogen环境
+    data_path = os.getenv(
+        "DATAPATH",
+        (Path(autoflow.__file__).parent.parent / "data" / file).as_posix()
+    )
+    train_df = joblib.load(data_path)
     # train_df = load("qsar")
     estimators = [
         "adaboost",
         "bayesian_ridge",
-        # "catboost",
         "decision_tree",
         "elasticnet",
         "extra_trees",
         "random_forest",
-        # "gradient_boosting",
         "k_nearest_neighbors",
         "lightgbm"
     ]
@@ -55,58 +71,69 @@ def main(file, store, inst, target, ignore, id, n_jobs):
             "num->selected": {
                 "_name": "select.from_model_reg",
                 "_vanilla": True,
-                "estimator": "sklearn.ensemble.ExtraTreesRegressor",
+                "estimator": {"_type": "choice", "_value":
+                    ["sklearn.ensemble.ExtraTreesRegressor", "sklearn.ensemble.RandomForestRegressor"],
+                              "_default": "sklearn.ensemble.ExtraTreesRegressor"},
                 "n_estimators": 10,
                 "max_depth": 7,
                 "min_samples_split": 10,
                 "min_samples_leaf": 10,
-                "random_state": inst,
+                "random_state": random_state,
                 "n_jobs": 1,
                 "_select_percent": {"_type": "quniform", "_value": [10, 60, 1], "_default": 40}
             },
             "selected->target": estimators
         }
     )
-
-    hdl_constructors = [hdl_constructor] * 2
-
-    tuners = [
-        Tuner(
-            search_method="random",
-            search_method_params={
-                "specific_allocate": {
-                    ("estimating:__choice__", "adaboost"): 1,
-                    ("estimating:__choice__", "bayesian_ridge"): 5,
-                    ("estimating:__choice__", "decision_tree"): 1,
-                    ("estimating:__choice__", "elasticnet"): 1,
-                    ("estimating:__choice__", "extra_trees"): 3,
-                    ("estimating:__choice__", "random_forest"): 3,
-                    ("estimating:__choice__", "k_nearest_neighbors"): 1,
-                    ("estimating:__choice__", "lightgbm"): 5,
-                }
-            },
-            # run_limit=50,
-            per_run_time_limit=1200,
-            per_run_memory_limit=30 * 1024,
-            n_jobs_in_algorithm=n_jobs
-        ),
-        Tuner(
-            search_method="smac",
-            run_limit=100,
-            initial_runs=1,
-            debug=False,
-            per_run_time_limit=1200,
-            per_run_memory_limit=30 * 1024,
-            n_jobs_in_algorithm=n_jobs
-        )
-    ]
+    if method == "random":
+        hdl_constructors = [hdl_constructor]
+        tuners = [
+            Tuner(
+                search_method="random",
+                run_limit=100,
+                per_run_time_limit=60 * 30,
+                per_run_memory_limit=30 * 1024,
+                n_jobs_in_algorithm=n_jobs
+            ),
+        ]
+    else:
+        hdl_constructors = [hdl_constructor] * 2
+        tuners = [
+            Tuner(
+                search_method="random",
+                search_method_params={
+                    "specific_allocate": {
+                        ("estimating:__choice__", "adaboost"): 3,
+                        ("estimating:__choice__", "bayesian_ridge"): 6,
+                        ("estimating:__choice__", "decision_tree"): 3,
+                        ("estimating:__choice__", "elasticnet"): 3,
+                        ("estimating:__choice__", "extra_trees"): 4,
+                        ("estimating:__choice__", "random_forest"): 4,
+                        ("estimating:__choice__", "k_nearest_neighbors"): 3,
+                        ("estimating:__choice__", "lightgbm"): 6,
+                    }
+                },
+                per_run_time_limit=60 * 30,
+                per_run_memory_limit=30 * 1024,
+                n_jobs_in_algorithm=n_jobs
+            ),
+            Tuner(
+                search_method="smac",
+                run_limit=68,
+                initial_runs=0,
+                debug=False,
+                per_run_time_limit=60 * 30,
+                per_run_memory_limit=30 * 1024,
+                n_jobs_in_algorithm=n_jobs
+            )
+        ]
 
     trained_pipeline = AutoFlowRegressor(
-        store=store,
+        store_path=store,
         consider_ordinal_as_cat=False,
         tuner=tuners,
         hdl_constructor=hdl_constructors,
-        random_state=inst,
+        random_state=random_state,
         db_type="postgresql", db_params={
             "user": "postgres",
             "host": "123.56.90.56",

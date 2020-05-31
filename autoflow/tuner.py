@@ -340,8 +340,12 @@ class Tuner(StrSignatureMixin):
                 tae_runner=self.evaluator,
                 initial_configurations=initial_configs
             )
-            smac.solver.initial_configurations = initial_configs
-            smac.solver.start_()
+            self.logger.info(f"Starting {self.initial_runs} times initial runs for SMAC.")
+            if self.initial_runs:
+                smac.solver.initial_configurations = initial_configs
+                smac.solver.start_()
+            else:
+                smac.solver.start_(only_timing=True)
             run_limit = self.get_run_limit()
             for i in range(run_limit):
                 smac.solver.run_()

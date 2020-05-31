@@ -7,17 +7,20 @@ import numpy as np
 from ConfigSpace import ConfigurationSpace, Configuration, CategoricalHyperparameter, OrdinalHyperparameter, Constant, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter
 
-from autoflow.constants import PHASE1,PHASE2
+from autoflow.constants import PHASE1, PHASE2
 from autoflow.hdl.smac import _encode
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
+
+
 def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state=42) -> List[Configuration]:
     None_name = "None:NoneType"
     shps = deepcopy(shps)
     shps.seed(random_state)
     for config in shps.get_hyperparameters():
         name: str = config.name
-        if name.startswith(PHASE1) and name.endswith("__choice__") and (None_name in config.choices):  # fixme 重构之后 None_name是不是改变了？
+        if name.startswith(PHASE1) and name.endswith("__choice__") and (
+                None_name in config.choices):  # fixme 重构之后 None_name是不是改变了？
             config.default_value = None_name
 
     model_choice = shps.get_hyperparameter(f"{PHASE2}:__choice__")
@@ -30,6 +33,7 @@ def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state
     if len(result) < n_configs:
         result.extend(shps.sample_configuration(n_configs - len(result)))
     elif len(result) > n_configs:
+        # todo: 用随机种子控制
         result = random.sample(result, n_configs)
     return result
 
@@ -198,4 +202,3 @@ class ConfigSpaceGrid:
             grid.append(config_dict)
 
         return grid
-

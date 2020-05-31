@@ -538,9 +538,9 @@ class Intensifier(object):
 
             if log_traj:
                 self.stats.inc_changed += 1
-                self.traj_logger.add_entry(train_perf=chal_perf,
-                                           incumbent_id=self.stats.inc_changed,
-                                           incumbent=challenger)
+                # self.traj_logger.add_entry(train_perf=chal_perf,
+                #                            incumbent_id=self.stats.inc_changed,
+                #                            incumbent=challenger)
             return challenger
 
         # undecided

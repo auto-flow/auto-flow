@@ -2,6 +2,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+assemble_install_all.py
+run_qsar_clf.py
+run_qsar_reg.py
+run_classifier.py
+run_ova_clf.py
+
 move.py
 *.db
 *.gv

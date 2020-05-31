@@ -162,7 +162,9 @@ class SMBO(object):
             self.incumbent = self.scenario.cs.get_default_configuration()
         return self.incumbent
 
-    def start_(self, warm_start=True):
+    def start_(self, warm_start=True, only_timing=False):
+        if only_timing:
+            self.stats.start_timing()
         self.instance_id=self.intensifier.instance
         if warm_start:
             self.runhistory.db.fetch_new_runhistory(self.instance_id,True)

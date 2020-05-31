@@ -29,14 +29,31 @@ except Exception:
 @click.option("--ignore", "-g", help="ignore column name", type=str, multiple=True)
 @click.option("--id", help="id column name", type=str)
 @click.option("--n_jobs", "-n", default=5, help="n_jobs_in_algorithm", type=str)
-def main(file, store,method , inst, target, ignore, id, n_jobs):
+def main(file, store, method, inst, target, ignore, id, n_jobs):
     if inst is None:
-        inst = 0
+        inst = '0'
+    random_state_str = ""
+    for c in inst:
+        c: str
+        if c.isdigit():
+            random_state_str += c
+    if not random_state_str:
+        random_state_str = "0"
+    random_state = int(random_state_str)
+    print(f"random state = {random_state}")
+    # 适配nitrogen环境
+    saved_path = os.getenv("SAVEDPATH")
+    if saved_path:
+        print(f"SAVEDPATH = {saved_path}")
+        store = (Path(saved_path) / "autoflow").as_posix()
     if store is None:
         store = "~/autoflow"
-    examples_path = Path(autoflow.__file__).parent.parent / "data"
-    # 加载pickle格式的数据
-    train_df = joblib.load(examples_path / file)
+    # 适配nitrogen环境
+    data_path = os.getenv(
+        "DATAPATH",
+        (Path(autoflow.__file__).parent.parent / "data" / file).as_posix()
+    )
+    train_df = joblib.load(data_path)
     # train_df = load("qsar")
     estimators = [
         "adaboost",
@@ -57,13 +74,13 @@ def main(file, store,method , inst, target, ignore, id, n_jobs):
                 "_name": "select.from_model_clf",
                 "_vanilla": True,
                 "estimator": {"_type": "choice", "_value":
-                    ["sklearn.ensemble.ExtraTreesClassifier", "sklearn.linear_model.LogisticRegression"],
+                    ["sklearn.ensemble.ExtraTreesClassifier", "sklearn.ensemble.RandomForestClassifier"],
                               "_default": "sklearn.ensemble.ExtraTreesClassifier"},
                 "n_estimators": 10,
                 "max_depth": 7,
                 "min_samples_split": 10,
                 "min_samples_leaf": 10,
-                "random_state": inst,
+                "random_state": random_state,
                 "n_jobs": 1,
                 "_select_percent": {"_type": "quniform", "_value": [10, 60, 1], "_default": 40}
             },
@@ -71,12 +88,12 @@ def main(file, store,method , inst, target, ignore, id, n_jobs):
         }
     )
     if method == "random":
-        hdl_constructors=[hdl_constructor]
-        tuners=[
+        hdl_constructors = [hdl_constructor]
+        tuners = [
             Tuner(
                 search_method="random",
                 run_limit=100,
-                per_run_time_limit=1200,
+                per_run_time_limit=60 * 30,
                 per_run_memory_limit=30 * 1024,
                 n_jobs_in_algorithm=n_jobs
             ),
@@ -100,7 +117,7 @@ def main(file, store,method , inst, target, ignore, id, n_jobs):
                         ("estimating:__choice__", "sgd"): 3,
                     }
                 },
-                per_run_time_limit=1200,
+                per_run_time_limit=60 * 30,
                 per_run_memory_limit=30 * 1024,
                 n_jobs_in_algorithm=n_jobs
             ),
@@ -109,7 +126,7 @@ def main(file, store,method , inst, target, ignore, id, n_jobs):
                 run_limit=66,
                 initial_runs=0,
                 debug=False,
-                per_run_time_limit=1200,
+                per_run_time_limit=60 * 30,
                 per_run_memory_limit=30 * 1024,
                 n_jobs_in_algorithm=n_jobs
             )
@@ -120,7 +137,7 @@ def main(file, store,method , inst, target, ignore, id, n_jobs):
         consider_ordinal_as_cat=False,
         tuner=tuners,
         hdl_constructor=hdl_constructors,
-        random_state=inst,
+        random_state=random_state,
         db_type="postgresql", db_params={
             "user": "postgres",
             "host": "123.56.90.56",

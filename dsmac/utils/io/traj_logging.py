@@ -88,16 +88,17 @@ class TrajLogger(object):
         incumbent: Configuration()
             current incumbent configuration
         """
-        ta_runs = self.stats.ta_runs
-        ta_time_used = self.stats.ta_time_used
-        wallclock_time = self.stats.get_used_wallclock_time()
-        self.trajectory.append(TrajEntry(train_perf, incumbent_id, incumbent,
-                                         ta_runs, ta_time_used, wallclock_time))
-        if self.output_dir is not None:
-            self._add_in_old_format(train_perf, incumbent_id, incumbent,
-                                    ta_time_used, wallclock_time)
-            self._add_in_aclib_format(train_perf, incumbent_id, incumbent,
-                                      ta_time_used, wallclock_time)
+        pass
+        # ta_runs = self.stats.ta_runs
+        # ta_time_used = self.stats.ta_time_used
+        # wallclock_time = self.stats.get_used_wallclock_time()
+        # self.trajectory.append(TrajEntry(train_perf, incumbent_id, incumbent,
+        #                                  ta_runs, ta_time_used, wallclock_time))
+        # if self.output_dir is not None:
+        #     self._add_in_old_format(train_perf, incumbent_id, incumbent,
+        #                             ta_time_used, wallclock_time)
+        #     self._add_in_aclib_format(train_perf, incumbent_id, incumbent,
+        #                               ta_time_used, wallclock_time)
 
     def _add_in_old_format(self, train_perf: float, incumbent_id: int,
                            incumbent: Configuration, ta_time_used: float,
@@ -117,21 +118,21 @@ class TrajLogger(object):
         wallclock_time: float
             Wallclock time used so far
         """
-
-        conf = []
-        for p in incumbent:
-            if not incumbent.get(p) is None:
-                conf.append("%s='%s'" % (p, repr(incumbent[p])))
-
-        txt = ("%f, %f, %f, %d, %f, %s\n" % (
-            ta_time_used,
-            train_perf,
-            wallclock_time,
-            incumbent_id,
-            wallclock_time - ta_time_used,
-            ", ".join(conf)
-        ))
-        self.file_system.write_txt(self.old_traj_fn, txt, append=True)
+        pass
+        # conf = []
+        # for p in incumbent:
+        #     if not incumbent.get(p) is None:
+        #         conf.append("%s='%s'" % (p, repr(incumbent[p])))
+        #
+        # txt = ("%f, %f, %f, %d, %f, %s\n" % (
+        #     ta_time_used,
+        #     train_perf,
+        #     wallclock_time,
+        #     incumbent_id,
+        #     wallclock_time - ta_time_used,
+        #     ", ".join(conf)
+        # ))
+        # self.file_system.write_txt(self.old_traj_fn, txt, append=True)
 
     def _add_in_aclib_format(self, train_perf: float, incumbent_id: int,
                              incumbent: Configuration, ta_time_used: float,
@@ -151,7 +152,7 @@ class TrajLogger(object):
         wallclock_time: float
             Wallclock time used so far
         """
-
+        pass
         conf = []
         for p in incumbent:
             if not incumbent.get(p) is None:
