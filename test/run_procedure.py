@@ -5,15 +5,12 @@
 import pickle
 from pathlib import Path
 
-import pandas as pd
 from sklearn.model_selection import KFold
 
-import autoflow
 from autoflow import AutoFlowClassifier
+from autoflow import datasets
 
-examples_path = Path(autoflow.__file__).parent.parent / "examples"
-train_df = pd.read_csv(examples_path / "data/train_classification.csv")
-test_df = pd.read_csv(examples_path / "data/test_classification.csv")
+train_df, test_df = datasets.load("titanic", return_train_test=True)
 trained_pipeline = AutoFlowClassifier(
     initial_runs=1, run_limit=3, n_jobs=1,
     included_classifiers=["catboost"], debug=True,
@@ -33,6 +30,6 @@ trained_pipeline.fit(
 )
 Path("autoflow_classification.pkl").write_bytes(trained_pipeline.pickle())
 predict_pipeline = pickle.loads(Path("autoflow_classification.pkl").read_bytes())
-test_df = pd.read_csv(examples_path / "data/test_classification.csv")
+_, test_df = datasets.load("titanic", return_train_test=True)
 result = predict_pipeline.predict(test_df)
 print(result)

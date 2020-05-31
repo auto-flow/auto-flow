@@ -239,10 +239,6 @@ class HDL2SHPS(StrSignatureMixin):
         cs = self.recursion(hdl)
         self.__rely_model(cs)
         return cs
-        # return {
-        #     "shps":cs,
-        #     "p":p
-        # }
 
     def __condition(self, item: Dict, store: Dict, leader_model):
         child = add_leader_model(item["_child"], leader_model, SERIES_CONNECT_LEADER_TOKEN)

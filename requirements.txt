@@ -36,3 +36,6 @@ h5py
 datefinder
 tables
 click
+ipython
+jupyter
+graphviz

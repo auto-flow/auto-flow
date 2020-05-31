@@ -322,7 +322,13 @@ class HDL_Constructor(StrSignatureMixin):
         # todo: 处理样本不平衡
         return DAG_workflow
 
-    def draw_workflow_space(self):
+    def draw_workflow_space(
+            self,
+            colorful=True,
+            candidates_colors=("#663366", "#663300", "#666633", "#333366", "#660033"),
+            feature_groups_colors=("#0099CC", "#0066CC", "#339933", "#FFCC33", "#33CC99", "#FF0033", "#663399",
+                                   "#FF6600")
+    ):
         '''
 
         Notes
@@ -343,56 +349,144 @@ class HDL_Constructor(StrSignatureMixin):
             You can find usage of :class:`graphviz.dot.Digraph` in https://graphviz.readthedocs.io/en/stable/manual.html
 
         '''
-        candidates_colors = ["#663366", "#663300", "#666633", "#333366", "#660033"]
-        feature_groups_colors = ["#0099CC", "#0066CC", "#339933", "#FFCC33", "#33CC99", "#FF0033", "#663399", "#FF6600"]
-        cand2c = ColorSelector(candidates_colors)
-        feat2c = ColorSelector(feature_groups_colors)
+        cand2c = ColorSelector(list(candidates_colors))
+        feat2c = ColorSelector(list(feature_groups_colors))
 
-        def parsed_candidates(candidates):
-            parsed_candidates = []
-            for candidate in candidates:
-                if isinstance(candidate, dict):
-                    parsed_candidates.append(candidate["_name"])
+        def parsed_algorithms(algorithms):
+            parsed_algorithms = []
+            for algorithm in algorithms:
+                if isinstance(algorithm, dict):
+                    parsed_algorithms.append(algorithm["_name"])
                 else:
-                    parsed_candidates.append(candidate)
-            return parsed_candidates
+                    parsed_algorithms.append(algorithm)
+            return parsed_algorithms
 
         def get_node_label(node_name):
-            return f'''<<font color="{feat2c[node_name]}">{node_name}</font>>'''
+            if colorful:
+                return f'''<<font color="{feat2c[node_name]}">{node_name}</font>>'''
+            else:
+                return node_name
 
-        from graphviz import Digraph
+        def get_multi_out_edge_label(label_name, tail):
+            if colorful:
+                return f'''<{label_name}: <font color="{feat2c[tail]}">{tail}</font>>'''
+            else:
+                return f'''{label_name}: {tail}'''
+
+        def get_single_algo_edge_label(algorithm):
+            if colorful:
+                return f'<<font color="{cand2c[algorithm]}">{algorithm}</font>>'
+            else:
+                return algorithm
+
+        def get_algo_selection_edge_label(algorithms):
+            if colorful:
+                return "<{" + ", ".join(
+                    [f'<font color="{cand2c[algorithm]}">{algorithm}</font>'
+                     for algorithm in algorithms]) + "}>"
+            else:
+                return "{" + ", ".join(algorithms) + "}"
+
+        try:
+            from graphviz import Digraph
+        except Exception as e:
+            self.logger.warning("Cannot import graphviz!")
+            self.logger.error(str(e))
+            return None
         DAG_workflow = deepcopy(self.DAG_workflow)
         graph = Digraph("workflow_space")
         graph.node("data")
         for parsed_node in pd.unique(self.data_manager.feature_groups):
             graph.node(parsed_node, color=feat2c[parsed_node], label=get_node_label(parsed_node))
             graph.edge("data", parsed_node,
-                       label=f'''<data_manager: <font color="{feat2c[parsed_node]}">{parsed_node}</font>>''')
-        for indicate, candidates in DAG_workflow.items():
+                       label=get_multi_out_edge_label("data_manager", parsed_node))
+        for indicate, algorithms in DAG_workflow.items():
             if "->" not in indicate:
                 continue
             _from, _to = indicate.split("->")
             graph.node(_from, color=feat2c[_from], label=get_node_label(_from))
-            candidates = parsed_candidates(candidates)
-            if _to.startswith("{") and _to.endswith("}"):
-                candidate = candidates[0]
-                _to = _to[1:-1]
+            algorithms = parsed_algorithms(algorithms)
+            if len(_to.split(",")) > 1:
+                algorithm = algorithms[0]
                 tails = []
                 for item in _to.split(","):
                     tails.append(item.split("=")[-1])
                 for tail in tails:
                     graph.node(tail, color=feat2c[tail], label=get_node_label(tail))
-                    graph.edge(_from, tail, f'''<{candidate}: <font color="{feat2c[tail]}">{tail}</font>>''')
+                    graph.edge(_from, tail, get_multi_out_edge_label(algorithm, tail))
             else:
                 graph.node(_to, color=feat2c[_to], label=get_node_label(_to))
-                if len(candidates) == 1:
-                    candidates_str = f'<<font color="{cand2c[candidates[0]]}">{candidates[0]}</font>>'
+                if len(algorithms) == 1:
+                    edge_label = get_single_algo_edge_label(algorithms[0])
                 else:
-                    candidates_str = "<{" + ", ".join(
-                        [f'<font color="{cand2c[candidate]}">{candidate}</font>' for candidate in candidates]) + "}>"
-                graph.edge(_from, _to, candidates_str)
+                    edge_label = get_algo_selection_edge_label(algorithms)
+                graph.edge(_from, _to, edge_label)
         graph.attr(label=r'WorkFlow Space')
         return graph
+
+    def purify_step_name(self, step: str):
+        # autoflow/evaluation/train_evaluator.py:252
+        cnt = ""
+        ix = 0
+        for i, c in enumerate(step):
+            if c.isdigit():
+                cnt += c
+            else:
+                ix = i
+                break
+        cnt = int(cnt) if cnt else -1
+        step = step[ix:]
+        ignored_suffixs = ["(choice)"]
+        for ignored_suffix in ignored_suffixs:
+            if step.endswith(ignored_suffix):
+                step = step[:len(step) - len(ignored_suffix)]
+        return step
+
+    def get_hdl_dataframe(self) -> pd.DataFrame:
+        preprocessing = self.hdl.get(PHASE1)
+        dicts = []
+        tuple_multi_index = []
+
+        def push(step, algorithm_selection, hyper_params):
+            step = self.purify_step_name(step)
+            if hyper_params:
+                for hp_name, hp_dict in hyper_params.items():
+                    tuple_multi_index.append((step, algorithm_selection, hp_name))
+                    if isinstance(hp_dict, dict):
+                        dicts.append({"_type": hp_dict.get("_type"),
+                                      "_value": hp_dict.get("_value"),
+                                      "_default": hp_dict.get("_default")})
+                    else:
+                        dicts.append({"_type": f"constant {hp_dict.__class__.__name__}",
+                                      "_value": hp_dict,
+                                      "_default": ""})
+            else:
+                tuple_multi_index.append((step, algorithm_selection, ""))
+                dicts.append({"_type": "", "_value": "", "_default": ""})
+
+        if preprocessing is not None:
+            for step, algorithm_selections in preprocessing.items():
+                for algorithm_selection, hyper_params in algorithm_selections.items():
+                    push(step, algorithm_selection, hyper_params)
+        step = PHASE2
+        algorithm_selections = self.hdl[f"{step}(choice)"]
+        for algorithm_selection, hyper_params in algorithm_selections.items():
+            push(step, algorithm_selection, hyper_params)
+        df = pd.DataFrame(dicts)
+        multi_index = pd.MultiIndex.from_tuples(tuple_multi_index,
+                                                names=["step", "algorithm_selections", "hyper_param_name"])
+        df.index = multi_index
+        return df
+
+    def interactive_display_workflow_space(self):
+        try:
+            from IPython.display import display
+        except Exception as e:
+            self.logger.warning("Cannot import IPython")
+            self.logger.error(str(e))
+            return None
+        display(self.draw_workflow_space())
+        display(self.get_hdl_dataframe())
 
     def run(self, data_manager):
         '''

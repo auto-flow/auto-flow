@@ -28,7 +28,7 @@ hdl_constructor = HDL_Constructor(
     }
 )
 
-hdl_constructor.run(data_manager, 42)
+hdl_constructor.run(data_manager)
 graph = hdl_constructor.draw_workflow_space()
 open("workflow_space.gv", "w+").write(graph.source)
 cmd = f'''dot -Tpng -Gsize=9,15\! -Gdpi=300 -oworkflow_space.png workflow_space.gv'''
