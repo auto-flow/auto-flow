@@ -38,11 +38,7 @@ class DataFrameContainer(DataContainer):
         elif isinstance(dataset_instance, pd.DataFrame):
             origin_columns = dataset_instance.columns
             columns = pd.Series(origin_columns)
-            for i, column in enumerate(columns):
-                if not VARIABLE_PATTERN.match(column):
-                    columns[i] = get_unique_col_name(columns, "col")
-            columns = pd.Series([inflection.underscore(column).lower() for column in columns])
-
+            # 1. remove duplicated columns
             unique_col, counts = np.unique(columns, return_counts=True)
             dup_cols = unique_col[counts > 1]
             if len(dup_cols) > 0:
@@ -54,8 +50,17 @@ class DataFrameContainer(DataContainer):
                         first_ix=columns.tolist().index(dup_col)  # todo: 更好的办法
                         # 2. replace
                         columns[first_ix]=get_unique_col_name(columns,dup_col)
-            self.columns_mapper = dict(zip(origin_columns, columns))
+            # set unique columns to dataset_instance
             dataset_instance.columns = columns
+            # 2. rename dirty columns
+            for i, column in enumerate(columns):
+                if not VARIABLE_PATTERN.match(column):
+                    columns[i] = get_unique_col_name(columns, "col")
+            # 3. adapt to database standard
+            columns = pd.Series([inflection.underscore(column).lower() for column in columns])
+            # fixme: 可能出现 NAME name 的情况导致重名
+            # 4. assemble columns_mapper
+            self.columns_mapper = dict(zip(origin_columns, columns))
         else:
             raise NotImplementedError
         return dataset_instance

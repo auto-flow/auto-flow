@@ -3,7 +3,7 @@ from pathlib import Path
 
 from autoflow import DataManager, HDL_Constructor
 from autoflow.datasets import load
-from autoflow.test.base import LocalResourceTestCase
+from autoflow.tests.base import LocalResourceTestCase
 
 
 class TestHDL_Visualize(LocalResourceTestCase):

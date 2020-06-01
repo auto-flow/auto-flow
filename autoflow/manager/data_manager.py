@@ -226,7 +226,7 @@ class DataManager(StrSignatureMixin):
         else:
             if isinstance(X, np.ndarray):
                 X = pd.DataFrame(X,
-                                 columns=[f"column_{i}" for i in range(len(X.shape[1]))])
+                                 columns=[f"column_{i}" for i in range((X.shape[1]))])
             X = self.concat_y(X, y)
             X = DataFrameContainer(dataset_source, dataset_instance=X, resource_manager=self.resource_manager,
                                    dataset_metadata=self.dataset_metadata)

@@ -1,8 +1,8 @@
-from typing import Optional, Dict
-
 from sklearn.base import RegressorMixin
 
-from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.core.base import AutoFlowEstimator
+
+__all__ = ["AutoFlowRegressor"]
 
 
 class AutoFlowRegressor(AutoFlowEstimator, RegressorMixin):

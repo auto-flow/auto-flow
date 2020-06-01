@@ -14,7 +14,7 @@ from autoflow import datasets
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
 from autoflow.hdl.utils import get_default_hp_of_cls
-from autoflow.test.base import LocalResourceTestCase
+from autoflow.tests.base import LocalResourceTestCase
 from autoflow.workflow.components.classification.liblinear_svc import LibLinear_SVC
 # todo: 调研并增加超参数
 from autoflow.workflow.components.preprocessing.balance.under_sample.all_knn import AllKNN

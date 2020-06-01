@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import ShuffleSplit
 
-from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.core.base import AutoFlowEstimator
 from autoflow.hdl.hdl_constructor import HDL_Constructor
 from autoflow.tuner import Tuner
 

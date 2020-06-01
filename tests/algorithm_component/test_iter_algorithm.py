@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
 from autoflow.hdl.utils import get_default_hp_of_cls
-from autoflow.test.base import LocalResourceTestCase
+from autoflow.tests.base import LocalResourceTestCase
 from autoflow.workflow.components.classification.extra_trees import ExtraTreesClassifier
 from autoflow.workflow.components.classification.gradient_boosting import GradientBoostingClassifier
 from autoflow.workflow.components.classification.logistic_regression import LogisticRegression

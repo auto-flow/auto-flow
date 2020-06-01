@@ -13,7 +13,7 @@ from autoflow import datasets
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
 from autoflow.hdl.utils import get_default_hp_of_cls
-from autoflow.test.base import LocalResourceTestCase
+from autoflow.tests.base import LocalResourceTestCase
 from autoflow.workflow.components.classification.random_forest import RandomForestClassifier
 from autoflow.workflow.components.preprocessing.text.tokenize.simple import SimpleTokenlizer
 from autoflow.workflow.components.preprocessing.text.topic.lda import LdaTransformer

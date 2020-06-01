@@ -5,7 +5,7 @@
 import shutil
 import unittest
 
-from autoflow.test.mock import get_mock_resource_manager
+from autoflow.tests.mock import get_mock_resource_manager
 
 
 class LocalResourceTestCase(unittest.TestCase):

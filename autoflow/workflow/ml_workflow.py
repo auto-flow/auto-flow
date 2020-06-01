@@ -60,6 +60,13 @@ class ML_Workflow(Pipeline):
             result[name] = None
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, fit_final_estimator=True):
+        # set default `self.last_data` to prevent exception in only classifier cases
+        self.last_data = {
+            "X_train": X_train,
+            "y_train": y_train,
+            "X_test": X_test,
+            "X_valid": X_valid,
+        }
         for (step_idx,
              step_name,
              transformer) in self._iter(with_final=(not self.is_estimator),

@@ -370,13 +370,13 @@ class ResourceManager(StrSignatureMixin):
         self.dataset_db = None
         self.is_init_dataset_db = False
 
-    # ----------autoflow_record------------------------------------------------------------------
+    # ----------autoflow------------------------------------------------------------------
 
     @property
     def record_db_name(self):
         if self._record_db_name is not None:
             return self._record_db_name
-        self._record_db_name = "autoflow_record"
+        self._record_db_name = "autoflow"
         create_database(self._record_db_name, self.db_type, self.db_params)
         return self._record_db_name
 

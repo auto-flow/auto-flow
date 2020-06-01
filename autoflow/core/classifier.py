@@ -1,8 +1,8 @@
-from typing import Optional, Dict
-
 from sklearn.base import ClassifierMixin
 
-from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.core.base import AutoFlowEstimator
+
+__all__ = ["AutoFlowClassifier"]
 
 
 class AutoFlowClassifier(AutoFlowEstimator, ClassifierMixin):

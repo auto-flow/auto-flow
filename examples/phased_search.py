@@ -1,6 +1,6 @@
 import pandas as pd
 
-from autoflow.estimator.base import AutoFlowEstimator
+from autoflow.core.base import AutoFlowEstimator
 from autoflow.hdl.hdl_constructor import HDL_Constructor
 from autoflow.tuner import Tuner
 

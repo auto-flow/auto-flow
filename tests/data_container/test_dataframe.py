@@ -8,7 +8,7 @@ from pandas import Index
 
 from autoflow.data_container import DataFrameContainer
 from autoflow.datasets import load
-from autoflow.test.base import LocalResourceTestCase
+from autoflow.tests.base import LocalResourceTestCase
 
 
 class TestDataFrameContainer(LocalResourceTestCase):
