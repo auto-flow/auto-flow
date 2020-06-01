@@ -1,9 +1,8 @@
-from copy import deepcopy
 from typing import Optional
 
 import pandas as pd
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
 __all__ = ["Split"]

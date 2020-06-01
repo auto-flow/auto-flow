@@ -2,8 +2,8 @@ from typing import Optional
 
 import pandas as pd
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
-from autoflow.manager.data_container.ndarray import NdArrayContainer
+from autoflow.data_container import DataFrameContainer
+from autoflow.data_container import NdArrayContainer
 from autoflow.workflow.components.base import AutoFlowComponent
 
 

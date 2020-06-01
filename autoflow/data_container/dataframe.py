@@ -13,7 +13,7 @@ import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import VARIABLE_PATTERN, UNIQUE_FEATURE_GROUPS
-from autoflow.manager.data_container.base import DataContainer
+from autoflow.data_container.base import DataContainer
 from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns, get_unique_col_name
 from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict, get_hash_of_str
 
@@ -40,14 +40,22 @@ class DataFrameContainer(DataContainer):
             columns = pd.Series(origin_columns)
             for i, column in enumerate(columns):
                 if not VARIABLE_PATTERN.match(column):
-                    columns[i] = get_unique_col_name(dataset_instance.columns, "col")
-            columns = [inflection.underscore(column).lower() for column in columns]
+                    columns[i] = get_unique_col_name(columns, "col")
+            columns = pd.Series([inflection.underscore(column).lower() for column in columns])
 
             unique_col, counts = np.unique(columns, return_counts=True)
-            dup_col = unique_col[counts > 1]
-            if len(dup_col) > 0:
-                raise ValueError(f"Column {dup_col} are duplicated!")
+            dup_cols = unique_col[counts > 1]
+            if len(dup_cols) > 0:
+                self.logger.warning(f"Column {dup_cols.tolist()} are duplicated!")
+                for dup_col in dup_cols:
+                    # in this loop target is eliminate duplicated column `dup_col`
+                    while np.sum(columns == dup_col) >= 1:
+                        # 1. find first position `dup_col` appear
+                        first_ix=columns.tolist().index(dup_col)  # todo: 更好的办法
+                        # 2. replace
+                        columns[first_ix]=get_unique_col_name(columns,dup_col)
             self.columns_mapper = dict(zip(origin_columns, columns))
+            dataset_instance.columns = columns
         else:
             raise NotImplementedError
         return dataset_instance
@@ -102,7 +110,6 @@ class DataFrameContainer(DataContainer):
             df = self.resource_manager.download_df_of_fs(dataset_path, columns)
         inverse_columns_mapper = inverse_dict(self.columns_mapper)
         df.columns.map(inverse_columns_mapper)
-        # todo: 将各种信息补齐
         # todo: 建立本地缓存，防止二次下载
         self.data = df
         self.set_column_descriptions(column_descriptions)
@@ -209,6 +216,7 @@ class DataFrameContainer(DataContainer):
             old_feature_group = [old_feature_group]
 
         # 将 new_feature_groups 从str表达为list # fixme 类似[num]的情况， 会触发 assert
+        # fixme: 有可能出现列名重复的情况
         if isinstance(new_feature_group, str):
             new_feature_group = [new_feature_group] * values.shape[1]
         assert len(new_feature_group) == values.shape[1]

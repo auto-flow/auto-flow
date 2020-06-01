@@ -12,7 +12,7 @@ from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERI
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
 from autoflow.hdl.shp2dhp import SHP2DHP
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score

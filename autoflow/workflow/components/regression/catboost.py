@@ -3,9 +3,8 @@ from typing import Dict
 
 import numpy as np
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
-from autoflow.workflow.components.utils import get_categorical_features_indices
 
 __all__ = ["CatBoostRegressor"]
 

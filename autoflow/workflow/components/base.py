@@ -10,9 +10,9 @@ from sklearn.base import BaseEstimator
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils._testing import ignore_warnings
 
-from autoflow.manager.data_container.base import DataContainer
-from autoflow.manager.data_container.dataframe import DataFrameContainer
-from autoflow.manager.data_container.ndarray import NdArrayContainer
+from autoflow.data_container.base import DataContainer
+from autoflow.data_container import DataFrameContainer
+from autoflow.data_container import NdArrayContainer
 from autoflow.utils.logging_ import get_logger
 
 

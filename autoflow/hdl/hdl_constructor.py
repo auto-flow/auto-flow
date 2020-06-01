@@ -349,8 +349,8 @@ class HDL_Constructor(StrSignatureMixin):
             You can find usage of :class:`graphviz.dot.Digraph` in https://graphviz.readthedocs.io/en/stable/manual.html
 
         '''
-        cand2c = ColorSelector(list(candidates_colors))
-        feat2c = ColorSelector(list(feature_groups_colors))
+        cand2c = ColorSelector(list(candidates_colors), colorful)
+        feat2c = ColorSelector(list(feature_groups_colors), colorful)
 
         def parsed_algorithms(algorithms):
             parsed_algorithms = []

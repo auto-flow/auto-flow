@@ -1,7 +1,7 @@
 from sklearn.base import ClassifierMixin
 from sklearn.multiclass import OneVsRestClassifier
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.workflow.components.base import AutoFlowComponent
 from autoflow.utils.data import softmax
 from autoflow.utils.ml_task import get_ml_task_from_y

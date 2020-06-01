@@ -17,7 +17,7 @@ from redis import Redis
 
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict

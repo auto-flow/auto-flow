@@ -1,4 +1,4 @@
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.utils.data import softmax
 from autoflow.workflow.components.base import AutoFlowIterComponent
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm

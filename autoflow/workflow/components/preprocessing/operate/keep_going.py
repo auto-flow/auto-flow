@@ -1,6 +1,6 @@
 from typing import Optional
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
 __all__ = ["KeepGoing"]

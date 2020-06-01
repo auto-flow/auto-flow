@@ -1,6 +1,6 @@
 from sklearn.base import TransformerMixin
 
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.workflow.components.base import AutoFlowComponent
 from autoflow.workflow.components.utils import stack_Xs
 

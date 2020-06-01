@@ -6,8 +6,8 @@ from typing import Dict
 from sklearn.pipeline import Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from autoflow.manager.data_container.base import DataContainer
-from autoflow.manager.data_container.dataframe import DataFrameContainer
+from autoflow.data_container.base import DataContainer
+from autoflow.data_container import DataFrameContainer
 from autoflow.utils.hash import get_hash_of_dict, get_hash_of_str
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask

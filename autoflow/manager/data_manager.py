@@ -9,9 +9,9 @@ import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNIQUE_FEATURE_GROUPS
-from autoflow.manager.data_container.base import get_container_data
-from autoflow.manager.data_container.dataframe import DataFrameContainer
-from autoflow.manager.data_container.ndarray import NdArrayContainer
+from autoflow.data_container.base import get_container_data
+from autoflow.data_container import DataFrameContainer
+from autoflow.data_container import NdArrayContainer
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
 from autoflow.utils.dataframe import get_unique_col_name
 from autoflow.utils.klass import StrSignatureMixin

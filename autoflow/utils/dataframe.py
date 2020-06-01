@@ -1,9 +1,8 @@
 from copy import deepcopy
-from typing import Optional, List, Union, Tuple, Dict
+from typing import List, Union, Tuple, Dict
 
 import numpy as np
 import pandas as pd
-
 
 
 def process_dataframe(X: Union[pd.DataFrame, np.ndarray], copy=True) -> pd.DataFrame:
@@ -27,9 +26,6 @@ def replace_nan_to_None(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-
-
-
 def replace_dict(dict_: dict, from_, to_):
     for k, v in dict_.items():
         if v == from_:
@@ -41,9 +37,14 @@ def replace_dicts(dicts, from_, to_):
         replace_dict(dict_, from_, to_)
 
 
-def get_unique_col_name(columns: Union[pd.Index,pd.Series], wanted: str):
-    while np.sum(columns == wanted) > 1:
-        wanted = wanted + "_"
+def get_unique_col_name(columns: Union[pd.Index, pd.Series], wanted: str):
+    cnt = 1
+    while np.sum(columns == wanted) >= 1:
+        ix = wanted.rfind("_")
+        if ix<0:
+            ix=len(wanted)
+        wanted = wanted[:ix] + f"_{cnt}"
+        cnt += 1
     return wanted
 
 

@@ -9,7 +9,6 @@ import pandas as pd
 
 from autoflow.hdl.hdl_constructor import HDL_Constructor
 from autoflow.manager.data_manager import DataManager
-from autoflow.manager.data_container.dataframe import DataFrameContainer
 
 X = pd.DataFrame(np.random.rand(3, 3),columns=['c1','c2','c3'])
 column_descriptions={

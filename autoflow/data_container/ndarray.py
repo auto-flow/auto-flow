@@ -5,7 +5,7 @@
 import hashlib
 from copy import deepcopy
 
-from autoflow.manager.data_container.base import DataContainer
+from autoflow.data_container.base import DataContainer
 import numpy as np
 
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_array
