@@ -39,7 +39,7 @@ class AutoFlowDataProcessAlgorithm(AutoFlowComponent):
         X_data, y_data = self._transform_proc(X.data, y_data)
         X = X.copy()
         y = y.copy()
-        X_data = pd.DataFrame(X_data, columns=X.columns, index=X.index)
+        X_data = pd.DataFrame(X_data, columns=X.columns)
         X.data = X_data
         y.data = y_data
         return X, y

@@ -126,6 +126,7 @@ class ML_Workflow(Pipeline):
                 self.update_data_container_to_dataset_id(step_name, "X_train", X_train, current_dict)
                 self.update_data_container_to_dataset_id(step_name, "X_valid", X_valid, current_dict)
                 self.update_data_container_to_dataset_id(step_name, "X_test", X_test, current_dict)
+                self.update_data_container_to_dataset_id(step_name, "y_train", y_train, current_dict)
                 self.intermediate_result.update({step_name: current_dict})
 
             self.last_data = result

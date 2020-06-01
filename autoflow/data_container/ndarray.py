@@ -5,16 +5,15 @@
 import hashlib
 from copy import deepcopy
 
-from autoflow.data_container.base import DataContainer
 import numpy as np
 
+from autoflow.data_container.base import DataContainer
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_array
 
 
 class NdArrayContainer(DataContainer):
     VALID_INSTANCE = np.ndarray
     dataset_type = "ndarray"
-
 
     def process_dataset_instance(self, dataset_instance):
         return dataset_instance
@@ -27,7 +26,7 @@ class NdArrayContainer(DataContainer):
 
     def upload(self, upload_type="fs"):
         self.dataset_hash = self.get_hash()
-        if self.dataset_hash==self.uploaded_hash:
+        if self.dataset_hash == self.uploaded_hash:
             return
         L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
             self.dataset_hash, self.dataset_metadata, "fs", self.dataset_source, {},
@@ -45,8 +44,9 @@ class NdArrayContainer(DataContainer):
         record = records[0]
         self.dataset_source = record["dataset_source"]
         self.dataset_metadata = record["dataset_metadata"]
-        arr = self.resource_manager.download_arr_of_fs(dataset_id)
-        self.arr=arr
+        arr = self.resource_manager.download_arr_of_fs(record["dataset_path"])
+        self.data = arr
+
     def read_local(self, path: str):
         # todo: 加载 npy 或 h5
         pass

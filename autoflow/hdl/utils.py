@@ -75,10 +75,10 @@ def get_default_hp_of_cls(cls):
     hp = deepcopy(hdl_bank)
     for x in module.split("."):
         hp = hp.get(x, {})
-
+    res={}
     for k, v in hp.items():
         if isinstance(v, dict) and "_default" in v:
-            hp[k] = v["_default"]
+            res[k] = v["_default"]
     print(f"default hyperparams of {cls.__name__} :")
-    pprint(hp)
-    return hp
+    pprint(res)
+    return res

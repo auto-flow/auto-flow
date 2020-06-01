@@ -25,7 +25,6 @@ hdl_constructor = HDL_Constructor(
             "balance.over_sample.adasyn",
             "balance.over_sample.borderline_smote",
             "balance.over_sample.kmeans_smote",
-            "balance.over_sample.random",
             "balance.over_sample.smote",
             # "balance.over_sample.smotenc",
             "balance.over_sample.svmsmote",
