@@ -39,3 +39,4 @@ click
 ipython
 jupyter
 graphviz
+gensim

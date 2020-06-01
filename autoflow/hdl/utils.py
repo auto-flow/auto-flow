@@ -1,10 +1,13 @@
+from copy import deepcopy
 from pathlib import Path
+from pprint import pprint
 from typing import Dict, List, Iterator
 
 import json5 as json
+from joblib import Memory
 
 from autoflow import hdl
-from autoflow.constants import SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
+from autoflow.constants import SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, JOBLIB_CACHE
 
 
 def is_hdl_bottom(key, value):
@@ -27,8 +30,12 @@ def get_hdl_bank(path: str, logger=None) -> Dict:
         return get_default_hdl_bank()
 
 
-def get_default_hdl_bank() -> Dict:
+def _get_default_hdl_bank() -> Dict:
     return json.loads((Path(hdl.__file__).parent / f"hdl_bank.json").read_text())
+
+
+memory = Memory(JOBLIB_CACHE, verbose=1)
+get_default_hdl_bank = memory.cache(_get_default_hdl_bank)
 
 
 def get_origin_models(raw_models: List[str]):
@@ -59,3 +66,19 @@ def add_leader_model(key, leader_model, SERIES_CONNECT_LEADER_TOKEN):
 def purify_keys(dict_: dict) -> Iterator[str]:
     for key in dict_.keys():
         yield purify_key(key)
+
+
+def get_default_hp_of_cls(cls):
+    module = cls.__module__
+    module = module.replace("autoflow.workflow.components.", "")
+    hdl_bank = get_default_hdl_bank()
+    hp = deepcopy(hdl_bank)
+    for x in module.split("."):
+        hp = hp.get(x, {})
+
+    for k, v in hp.items():
+        if isinstance(v, dict) and "_default" in v:
+            hp[k] = v["_default"]
+    print(f"default hyperparams of {cls.__name__} :")
+    pprint(hp)
+    return hp

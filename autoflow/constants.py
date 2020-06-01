@@ -15,3 +15,4 @@ AUXILIARY_FEATURE_GROUPS = ("id", "target", "ignore")
 UNIQUE_FEATURE_GROUPS = ("id", "target")
 NAN_FEATURE_GROUPS = ("nan", "highR_nan")
 VARIABLE_PATTERN = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")
+JOBLIB_CACHE="/tmp/joblib_cache"
