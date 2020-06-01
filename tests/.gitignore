@@ -2,3 +2,6 @@
 #run_*
 autoflow*
 *.png
+*.html
+*.xls
+*.xlsx

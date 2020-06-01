@@ -40,3 +40,4 @@ ipython
 jupyter
 graphviz
 gensim
+openpyxl
