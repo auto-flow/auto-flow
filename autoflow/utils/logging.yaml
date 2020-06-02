@@ -51,6 +51,11 @@ loggers:
     handlers: [file_handler, console]
     propagate: false
 
+  ResourceManager.close_all:
+    level: DEBUG
+    handlers: [file_handler]
+    propagate: false
+
   peewee:
     level: INFO
     handlers: [file_handler]

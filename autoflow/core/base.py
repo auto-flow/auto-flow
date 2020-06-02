@@ -329,9 +329,11 @@ class AutoFlowEstimator(BaseEstimator):
         random_states = np.arange(n_jobs) + self.random_state
         sync_dict = self.get_sync_dict(n_jobs, tuner)
         # self.resource_manager.clear_pid_list()
+        self.resource_manager.start_safe_close()
         self.resource_manager.close_all()
         resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
         tuners = [deepcopy(tuner) for i in range(n_jobs)]
+        self.resource_manager.end_safe_close()
         processes = []
         for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in \
                 zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states):

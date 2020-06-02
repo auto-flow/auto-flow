@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+import traceback
 from copy import deepcopy
 from math import ceil
 from typing import Dict, Tuple, List, Union, Any
@@ -8,16 +9,17 @@ from typing import Dict, Tuple, List, Union, Any
 import h5py
 import numpy as np
 import pandas as pd
-# import json5 as json
 import peewee as pw
 from frozendict import frozendict
 from playhouse.fields import PickleField
 from playhouse.reflection import generate_models
 from redis import Redis
 
+from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POOL_CLOSE_MSG, START_SAFE_CLOSE_MSG, \
+    END_SAFE_CLOSE_MSG
+from autoflow.data_container import DataFrameContainer
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
-from autoflow.data_container import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict
@@ -115,6 +117,7 @@ class ResourceManager(StrSignatureMixin):
         '''
         # --logger-------------------
         self.logger = get_logger(self)
+        self.close_all_logger = get_logger(RESOURCE_MANAGER_CLOSE_ALL_LOGGER)
         # --preprocessing------------
         file_system_params = dict(file_system_params)
         db_params = dict(db_params)
@@ -175,6 +178,15 @@ class ResourceManager(StrSignatureMixin):
         self.close_dataset_db()
         self.close_record_db()
         self.file_system.close_fs()
+        self.close_all_logger.warning(CONNECTION_POOL_CLOSE_MSG)
+        stack_txt = "".join(traceback.format_stack())
+        self.close_all_logger.info(stack_txt)
+
+    def start_safe_close(self):
+        self.close_all_logger.info(START_SAFE_CLOSE_MSG)
+
+    def end_safe_close(self):
+        self.close_all_logger.info(END_SAFE_CLOSE_MSG)
 
     def __reduce__(self):
         self.close_all()

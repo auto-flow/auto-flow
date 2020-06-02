@@ -15,4 +15,16 @@ AUXILIARY_FEATURE_GROUPS = ("id", "target", "ignore")
 UNIQUE_FEATURE_GROUPS = ("id", "target")
 NAN_FEATURE_GROUPS = ("nan", "highR_nan")
 VARIABLE_PATTERN = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")
-JOBLIB_CACHE="/tmp/joblib_cache"
+JOBLIB_CACHE = "/tmp/joblib_cache"
+RESOURCE_MANAGER_CLOSE_ALL_LOGGER = "ResourceManager.close_all"
+CONNECTION_POOL_CLOSE_MSG = "Connection pool in ResourceManger all closed."
+START_SAFE_CLOSE_MSG = "Start to safely close connection pool..."
+END_SAFE_CLOSE_MSG = "The connection pool has been safely closed."
+LOGGING_LEVELS = {
+    "CRITICAL": 50,
+    "ERROR": 40,
+    "WARNING": 30,
+    "INFO": 20,
+    "DEBUG": 10,
+    "NOTSET": 0,
+}
