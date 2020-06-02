@@ -9,9 +9,9 @@ import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNIQUE_FEATURE_GROUPS
-from autoflow.data_container.base import get_container_data
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
+from autoflow.data_container.base import get_container_data
 from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
 from autoflow.utils.dataframe import get_unique_col_name
 from autoflow.utils.klass import StrSignatureMixin
@@ -101,6 +101,7 @@ class DataManager(StrSignatureMixin):
         #             train set 靠后，以train set 的column_descriptions为准
         self.X_train, self.input_train_hash = self.parse_data_container("TrainSet", X_train, y_train)
         # --migrate column descriptions------------------------------
+        # if X is dataset_id , remote data_container's column_descriptions will assigned to  final_column_descriptions
         if self.final_column_descriptions is not None:
             self.column_descriptions = deepcopy(self.final_column_descriptions)
         # --column descriptions------------------------------
@@ -111,6 +112,8 @@ class DataManager(StrSignatureMixin):
         self.target_col_name = self.column_descriptions["target"]
         # todo: 测试集预测的情况
         # --final column descriptions------------------------------
+        # 用户定义的 column descriptions 和 remote 下载的column description都不应该包含nan的内容
+        # update `column2essential_feature_groups` to `final_column_descriptions`
         if self.final_column_descriptions is None:
             final_column_descriptions = defaultdict(list)
             final_column_descriptions.update(self.column_descriptions)
@@ -126,11 +129,11 @@ class DataManager(StrSignatureMixin):
             self.final_column_descriptions = final_column_descriptions
         self.final_column_descriptions = dict(self.final_column_descriptions)
         # ---set column descriptions, upload to dataset-----------------------------------------------------
-        if self.X_train is not None and upload_type is not None:
+        if self.X_train is not None:
             self.X_train.set_column_descriptions(self.final_column_descriptions)
             self.X_train.upload(self.upload_type)
             self.logger.info(f"TrainSet's DataSet ID = {self.X_train.dataset_hash}")
-        if self.X_test is not None and upload_type is not None:
+        if self.X_test is not None:
             self.X_test.set_column_descriptions(self.final_column_descriptions)
             self.X_test.upload(self.upload_type)
             self.logger.info(f"TestSet's DataSet ID = {self.X_test.dataset_hash}")
@@ -208,13 +211,19 @@ class DataManager(StrSignatureMixin):
     def parse_data_container(self, dataset_source, X, y) -> Tuple[Optional[DataFrameContainer], str]:
         if X is None:
             return X, ""
+        # input_dataset_hash only work if X is dataset_id
+        # keep input_dataset_hash to do sample test
+        # make sure dataset is invariant in upload and download process
         input_dataset_hash = ""
         self.final_column_descriptions = None
+        # filepath or dataset_id
         if isinstance(X, str):
+            # filepath
             if os.path.exists(X):
                 self.logger.info(f"'{X}' will be treated as a file path.")
                 X = DataFrameContainer(dataset_source, dataset_path=X, resource_manager=self.resource_manager,
                                        dataset_metadata=self.dataset_metadata)
+            # dataset_id
             else:
                 self.logger.info(f"'{X}' will be treated as dataset ID, and download from database.")
                 input_dataset_hash = X
@@ -224,9 +233,11 @@ class DataManager(StrSignatureMixin):
         elif isinstance(X, DataFrameContainer):
             pass
         else:
+            # we should create a columns and concat X and y
             if isinstance(X, np.ndarray):
                 X = pd.DataFrame(X,
                                  columns=[f"column_{i}" for i in range((X.shape[1]))])
+            # in this step, column_descriptions will implicitly update "target" field
             X = self.concat_y(X, y)
             X = DataFrameContainer(dataset_source, dataset_instance=X, resource_manager=self.resource_manager,
                                    dataset_metadata=self.dataset_metadata)
@@ -242,7 +253,7 @@ class DataManager(StrSignatureMixin):
         elif is_cat(series, self.consider_ordinal_as_cat):
             if is_date(series, True):
                 feature_group = "date"
-            elif is_text(series, True):  # todo 用数据清洗的方式处理text
+            elif is_text(series, True):
                 feature_group = "text"
             else:
                 if is_highR_cat(series, self.highR_cat_threshold):
@@ -263,19 +274,25 @@ class DataManager(StrSignatureMixin):
         # --用户自定义列--
         userDefined_column2feature_groups = {}
         column2feature_groups = {}
-        for key, values in self.column_descriptions.items():
-            # if key in ("id", "target", "ignore"):
-            #     continue
-            if isinstance(values, str):
-                values = [values]
-            for value in values:
-                userDefined_column2feature_groups[value] = key
+        # if user defined column_descriptions or download dataset from remote
+        # this process will gather `userDefined_column2feature_groups`
+        for feat_grp, columns in self.column_descriptions.items():
+            if isinstance(columns, str):
+                columns = [columns]
+            for column in columns:
+                userDefined_column2feature_groups[column] = feat_grp
+        # `column2feature_groups` and `column2essential_feature_groups` 's k-v will
         column2feature_groups.update(deepcopy(userDefined_column2feature_groups))
         column2essential_feature_groups = deepcopy(column2feature_groups)
         # ----尝试将X_train与X_test拼在一起，然后做解析---------
-        X = stack_Xs(get_container_data(self.X_train), None, get_container_data(self.X_test))  # fixme:target列会变成nan
+        X = stack_Xs(
+            get_container_data(self.X_train),
+            None,
+            get_container_data(self.X_test)
+        )  # fixme:target列会变成nan
         # --识别用户自定义列中的nan--
         for column, feature_group in list(column2feature_groups.items()):
+            # 注意，此时feature_groups与columns不是一一匹配的，删除了辅助特征组
             if feature_group in AUXILIARY_FEATURE_GROUPS:  # ("id", "target", "ignore")
                 continue
             nan_col = self.detect_nan_feature_group(X[column])
@@ -283,19 +300,23 @@ class DataManager(StrSignatureMixin):
                 column2feature_groups[column] = nan_col
                 # 只会涉及 feature_groups, 不会涉及essential_feature_groups
         # ----对于没有标注的列，打上nan, highR_nan, cat, highR_cat num三种标记---
-        # 实测发现这个循环很耗时
+        # 实测发现这个循环很耗时(cat多的情况)
         for column in X.columns:
             if column not in column2feature_groups:
+                # if nan appear, will be consider as nan
                 feature_group = self.parse_feature_group(X[column], consider_nan=True)
+                # set column2feature_groups
                 column2feature_groups[column] = feature_group
+                # set column2essential_feature_groups
                 if column not in column2essential_feature_groups:
-                    if feature_group in NAN_FEATURE_GROUPS:
+                    if feature_group in NAN_FEATURE_GROUPS:  # ("nan", "highR_nan")
                         essential_feature_group = self.parse_feature_group(X[column], consider_nan=False)
                     else:
                         essential_feature_group = feature_group
                     column2essential_feature_groups[column] = essential_feature_group
         feature_groups = []
         essential_feature_groups = []
+        # assemble `feature_groups` , `essential_feature_groups`
         for column in X.columns:
             feature_group = column2feature_groups[column]
             if feature_group not in AUXILIARY_FEATURE_GROUPS:
@@ -303,12 +324,12 @@ class DataManager(StrSignatureMixin):
             essential_feature_group = column2essential_feature_groups[column]
             if essential_feature_group not in AUXILIARY_FEATURE_GROUPS:
                 essential_feature_groups.append(essential_feature_group)
+        # reindex X_train and X_test
         L1 = self.X_train.shape[0] if self.X_train is not None else 0
         if self.X_test is not None:
             L2 = self.X_test.shape[0]
             self.X_test.index = range(L1, L1 + L2)
         self.X_train.index = range(L1)
-        # todo y_train 为None的情况
         self.feature_groups = feature_groups
         self.column2feature_groups = column2feature_groups
         self.userDefined_column2feature_groups = userDefined_column2feature_groups

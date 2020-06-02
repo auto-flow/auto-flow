@@ -6,23 +6,27 @@ import hashlib
 from copy import deepcopy
 
 import numpy as np
+import pandas as pd
 
 from autoflow.data_container.base import DataContainer
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_array
 
 
 class NdArrayContainer(DataContainer):
-    VALID_INSTANCE = np.ndarray
+    VALID_INSTANCE = (np.ndarray, list, tuple, pd.Series)
     dataset_type = "ndarray"
 
     def process_dataset_instance(self, dataset_instance):
-        return dataset_instance
+        if isinstance(dataset_instance, np.ndarray):
+            return dataset_instance
+        else:
+            return np.array(dataset_instance)
 
     def get_hash(self):
         m = hashlib.md5()
         get_hash_of_str(self.dataset_type, m)
         get_hash_of_str(self.dataset_source, m)
-        return get_hash_of_array(self.data, m)  # todo ： 测试在存储与加载后hash值是否会改变
+        return get_hash_of_array(self.data, m)
 
     def upload(self, upload_type="fs"):
         self.dataset_hash = self.get_hash()

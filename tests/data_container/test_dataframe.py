@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 from pandas import Index
@@ -53,7 +55,22 @@ class TestDataFrameContainer(LocalResourceTestCase):
         columns[6] = "ok"
         titanic_df.columns = columns
         dc = DataFrameContainer(dataset_instance=titanic_df, resource_manager=self.mock_resource_manager)
-        wanted=Index(['col', 'same_1', 'same_2', 'same_3', 'col_1', 'ok_1', 'ok_2', 'col_2',
-               'col_3', 'col_4', 'col_5', 'col_6'],
-              dtype='object')
-        self.assertTrue(np.all(dc.columns==wanted))
+        wanted = Index(['col', 'same_1', 'same_2', 'same_3', 'col_1', 'ok_1', 'ok_2', 'col_2',
+                        'col_3', 'col_4', 'col_5', 'col_6'],
+                       dtype='object')
+        self.assertTrue(np.all(dc.columns == wanted))
+
+    def test_set_column_descriptions(self):
+        final_column_descriptions = {'id': 'PassengerId',
+                                     'target': 'Survived',
+                                     'text': ['Name'],
+                                     'num': ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare'],
+                                     'cat': ['Sex', 'Cabin', 'Embarked'],
+                                     'highR_cat': ['Ticket']}
+        train_df, test_df = load("titanic", return_train_test=True)
+        origin = deepcopy(test_df)
+        test_dc = DataFrameContainer("Unittest", dataset_instance=test_df, resource_manager=self.mock_resource_manager)
+        test_dc.set_column_descriptions(final_column_descriptions)
+        self.assertTrue(np.all(test_dc.feature_groups == pd.Series(
+            ['id', 'num', 'text', 'cat', 'num', 'num', 'num', 'highR_cat', 'num', 'cat', 'cat'])))
+        self.assertTrue(np.all(origin.columns == test_dc.columns))
