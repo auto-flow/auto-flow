@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 from sklearn.base import BaseEstimator
 
+from autoflow.data_container.base import get_container_data
 from autoflow.utils import typing_
 
 
@@ -11,12 +12,15 @@ class EnsembleEstimator(BaseEstimator):
 
     def build_prediction_list(self):
         prediction_list = []
-        for y_true_indexes, y_preds in zip(self.y_true_indexes_list, self.y_preds_list):
-            prediction = np.zeros_like(np.vstack(y_preds))
-            for y_index, y_pred in zip(y_true_indexes, y_preds):
-                prediction[y_index] = y_pred
-            prediction_list.append(prediction)
+        assert len(self.y_true_indexes_list) > 1
+        # splitter 的 random_state都是相同的， 所以认为  y_true_indexes_list 的每个 y_true_indexes 都相同
+        assert not np.any(np.array([np.hstack(y_true_indexes) for y_true_indexes in  self.y_true_indexes_list]).var(axis=0))
+        for y_preds in self.y_preds_list:
+            prediction_list.append(np.concatenate(y_preds))  # concat in axis 0
         self.prediction_list = prediction_list
+        y_true_indexes = self.y_true_indexes_list[0]
+        self.stacked_y_true = self.y_true[np.hstack(y_true_indexes)]
+        assert self.prediction_list[0].shape[0] == self.stacked_y_true.shape[0]
 
     def fit_trained_data(
             self,
@@ -28,4 +32,5 @@ class EnsembleEstimator(BaseEstimator):
         self.y_preds_list = y_preds_list
         self.y_true_indexes_list = y_true_indexes_list
         self.estimators_list = estimators_list
+        self.y_true = get_container_data(y_true)
         self.build_prediction_list()

@@ -124,5 +124,6 @@ class TestEstimators(LocalResourceTestCase):
         # score = accuracy_score(y_test, y_pred)
         score = pipe.score(X_test, y_test)
         print(score)
+        self.assertGreater(score,0.9)
         self.assertTrue(
             np.all(pipe.data_manager.label_encoder.classes_ == array(['apple', 'banana', 'pear'], dtype=object)))

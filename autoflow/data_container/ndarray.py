@@ -48,7 +48,7 @@ class NdArrayContainer(DataContainer):
         record = records[0]
         self.dataset_source = record["dataset_source"]
         self.dataset_metadata = record["dataset_metadata"]
-        arr = self.resource_manager.download_arr_of_fs(record["dataset_path"])
+        arr = self.resource_manager.download_arr_from_fs(record["dataset_path"])
         self.data = arr
 
     def read_local(self, path: str):

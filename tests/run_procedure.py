@@ -13,7 +13,7 @@ from autoflow import datasets
 train_df, test_df = datasets.load("titanic", return_train_test=True)
 trained_pipeline = AutoFlowClassifier(
     initial_runs=1, run_limit=3, n_jobs=1,
-    included_classifiers=["dogboost"],
+    included_classifiers=["catboost"],
     debug=True,
     n_jobs_in_algorithm=5
     # should_store_intermediate_result=True,  # 测试对中间结果存储的正确性

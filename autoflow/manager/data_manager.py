@@ -167,16 +167,18 @@ class DataManager(StrSignatureMixin):
             y_train = self.label_encoder.fit_transform(y_train)
             y_test = self.encode_label(y_test)
         if y_train is not None:
-            y_train = NdArrayContainer("TrainSetLabel", dataset_instance=y_train,
+            y_train = NdArrayContainer("TrainLabel", dataset_instance=y_train,
                                        resource_manager=self.resource_manager)
             y_train.upload()
         if y_test is not None:
-            y_test = NdArrayContainer("TestSetLabel", dataset_instance=y_test,
+            y_test = NdArrayContainer("TestLabel", dataset_instance=y_test,
                                       resource_manager=self.resource_manager)
             y_test.upload()
         self.ml_task: MLTask = get_ml_task_from_y(y_train.data)
         self.y_train = y_train
         self.y_test = y_test
+        self.train_label_hash = self.y_train.get_hash() if self.y_train is not None else ""
+        self.test_label_hash = self.y_test.get_hash() if self.y_test is not None else ""
         if self.X_train is not None:
             self.columns = self.X_train.columns
         else:
@@ -187,7 +189,10 @@ class DataManager(StrSignatureMixin):
 
     def encode_label(self, y):
         if self.label_encoder is not None:
-            return self.label_encoder.transform(y) if y is not None else None
+            try:
+                return self.label_encoder.transform(y) if y is not None else None
+            except Exception as e:
+                return y
         return y
 
     def pop_auxiliary_feature_groups(self):

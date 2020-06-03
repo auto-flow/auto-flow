@@ -246,6 +246,8 @@ class ResourceManager(StrSignatureMixin):
         return models_path, finally_fit_model_path, y_info_path
 
     def get_ensemble_needed_info(self, task_id) -> Tuple[MLTask, Any]:
+        from autoflow import NdArrayContainer
+
         self.task_id = task_id
         self.init_task_table()
         task_record = self.TaskModel.select().where(self.TaskModel.task_id == task_id)[0]
@@ -253,10 +255,9 @@ class ResourceManager(StrSignatureMixin):
         ml_task = eval(ml_task_str)
         train_set_id = task_record.train_set_id
         test_set_id = task_record.test_set_id
-        # todo: 更聪明的做法
-        X_train = DataFrameContainer(dataset_id=train_set_id, resource_manager=self)
-        target_col = X_train.column_descriptions["target"]
-        y_train = np.array(X_train.data[target_col])
+        train_label_id = task_record.train_label_id
+        test_label_id = task_record.test_label_id
+        y_train = NdArrayContainer(dataset_id=train_label_id, resource_manager=self)
         return ml_task, y_train
 
     def load_best_estimator(self, ml_task: MLTask):
@@ -319,47 +320,6 @@ class ResourceManager(StrSignatureMixin):
     @property
     def runhistory_table_name(self):
         return self.get_runhistory_table_name(self.hdl_id)
-
-    def migrate_runhistory(self, old_task_id, old_hdl_id, new_task_id, new_hdl_id):
-        # todo: 设置一个 init_instances params
-        pass
-        # from dsmac.runhistory.runhistory_db import RunHistoryDB
-        # # 1. 把 f"task_{old_task_id}".f"runhistory_{old_hdl_id}" 的所有数据records抽出来
-        # old_runhistory_db = RunHistoryDB(
-        #     config_space=None,
-        #     runhistory=None,
-        #     db_type=self.db_type,
-        #     db_params=self.get_runhistory_db_params(old_task_id),
-        #     db_table_name=self.get_runhistory_table_name(old_hdl_id)
-        # ).get_model()
-        # new_runhistory_db = RunHistoryDB(
-        #     config_space=None,
-        #     runhistory=None,
-        #     db_type=self.db_type,
-        #     db_params=self.get_runhistory_db_params(new_task_id),
-        #     db_table_name=self.get_runhistory_table_name(new_hdl_id)
-        # ).get_model()
-        # old_runhistory_records = old_runhistory_db.select().dicts()
-        # if len(old_runhistory_records) == 0:
-        #     self.logger.warning(f"SMBO Transfer learning warning: old_runhistory_db have no records!")
-        # else:
-        #     self.logger.info(f"SMBO Transfer learning will migrate {len(old_runhistory_records)} "
-        #                      f"records from old_runhistory_records.")
-        #     transfer_cnt = 0
-        #     for record in old_runhistory_records:
-        #         fetched = new_runhistory_db.select().where(new_runhistory_db.run_id == record["run_id"])
-        #         if len(fetched) == 0:
-        #             transfer_cnt += 1
-        #             new_runhistory_db.create(**record)
-        #         else:
-        #             self.logger.warning(f'''run_id '{record["run_id"]}' in new_runhistory_db is already exist.''')
-        #     if transfer_cnt:
-        #         self.logger.info(
-        #             f"SMBO Transfer learning successfully migrate {transfer_cnt} records to new_runhistory_db.")
-        #     else:
-        #         self.logger.warning(
-        #             f"Unfortunately, all the migrates failed, "
-        #             f"please check if you have done SMBO transfer learning in previous tasks.")
 
     # ----------autoflow_dataset------------------------------------------------------------------
     @property
@@ -464,7 +424,7 @@ class ResourceManager(StrSignatureMixin):
 
     # ----------dataset_model------------------------------------------------------------------
     def get_dataset_model(self) -> pw.Model:
-        class Dataset_meta_record(pw.Model):
+        class Dataset(pw.Model):
             dataset_id = pw.FixedCharField(max_length=32, primary_key=True)
             dataset_metadata = self.JSONField(default={})
             dataset_path = pw.CharField(max_length=512, default="")
@@ -480,8 +440,8 @@ class ResourceManager(StrSignatureMixin):
             class Meta:
                 database = self.record_db
 
-        self.record_db.create_tables([Dataset_meta_record])
-        return Dataset_meta_record
+        self.record_db.create_tables([Dataset])
+        return Dataset
 
     def insert_to_dataset_table(
             self,
@@ -576,7 +536,7 @@ class ResourceManager(StrSignatureMixin):
         records = self.DatasetModel.select().where(self.DatasetModel.dataset_id == dataset_hash).dicts()
         return list(records)
 
-    def download_df_of_table(self, dataset_hash, columns, columns_mapper):
+    def download_df_from_table(self, dataset_hash, columns, columns_mapper):
         inv_columns_mapper = inverse_dict(columns_mapper)
         dataset_db = self.init_dataset_db()
         models = generate_models(dataset_db)
@@ -605,7 +565,7 @@ class ResourceManager(StrSignatureMixin):
             df = df[columns]
         return df
 
-    def download_df_of_fs(self, dataset_path, columns=None):
+    def download_df_from_fs(self, dataset_path, columns=None):
         tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
         self.file_system.download(dataset_path, tmp_path)
         df: pd.DataFrame = pd.read_hdf(tmp_path, "dataset")
@@ -613,7 +573,7 @@ class ResourceManager(StrSignatureMixin):
             df = df[columns]
         return df
 
-    def download_arr_of_fs(self, dataset_path):
+    def download_arr_from_fs(self, dataset_path):
         tmp_path = f"/tmp/tmp_arr_{os.getpid()}.h5"
         self.file_system.download(dataset_path, tmp_path)
         with h5py.File(tmp_path, 'r') as hf:
@@ -673,6 +633,8 @@ class ResourceManager(StrSignatureMixin):
             specific_task_token = pw.CharField(max_length=256, default="")
             train_set_id = pw.FixedCharField(max_length=32, default="")
             test_set_id = pw.FixedCharField(max_length=32, default="")
+            train_label_id = pw.FixedCharField(max_length=32, default="")
+            test_label_id = pw.FixedCharField(max_length=32, default="")
             sub_sample_indexes = self.JSONField(default=[])
             sub_feature_indexes = self.JSONField(default=[])
             task_metadata = self.JSONField(default={})
@@ -692,6 +654,8 @@ class ResourceManager(StrSignatureMixin):
         self.init_task_table()
         train_set_id = data_manager.train_set_hash
         test_set_id = data_manager.test_set_hash
+        train_label_id = data_manager.train_label_hash
+        test_label_id = data_manager.test_label_hash
         metric_str = metric.name
         splitter_str = str(splitter)
         ml_task_str = str(data_manager.ml_task)
@@ -709,6 +673,8 @@ class ResourceManager(StrSignatureMixin):
         m = hashlib.md5()
         get_hash_of_str(train_set_id, m)
         get_hash_of_str(test_set_id, m)
+        get_hash_of_str(train_label_id, m)
+        get_hash_of_str(test_label_id, m)
         get_hash_of_str(metric_str, m)
         get_hash_of_str(splitter_str, m)
         get_hash_of_str(ml_task_str, m)
@@ -731,6 +697,8 @@ class ResourceManager(StrSignatureMixin):
                 specific_task_token=specific_task_token,
                 train_set_id=train_set_id,
                 test_set_id=test_set_id,
+                train_label_id=train_label_id,
+                test_label_id=test_label_id,
                 sub_sample_indexes=sub_sample_indexes,
                 sub_feature_indexes=sub_feature_indexes,
                 task_metadata=task_metadata
@@ -904,6 +872,7 @@ class ResourceManager(StrSignatureMixin):
                 self.do_insert_to_trial_table(info)
                 success = True
             except Exception as e:
+                self.logger.error(e)
                 self.logger.error(f"Insert 'trial' table failed, {i + 1} try.")
                 # 关闭连接池， 重新连接
                 self.close_trial_table()

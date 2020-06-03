@@ -25,5 +25,4 @@ class TrainedDataFetcher(StrSignatureMixin):
     ]:
         estimator_list, y_true_indexes_list, y_preds_list = \
             self.resource_manager.load_estimators_in_trials(self.trial_ids)
-        # self.resource_manager.close_trials_db()
         return estimator_list, y_true_indexes_list, y_preds_list

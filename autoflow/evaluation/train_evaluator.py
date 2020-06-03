@@ -45,8 +45,8 @@ class TrainEvaluator(BaseEvaluator):
     ):
         self.model_registry = model_registry
         self.random_state = random_state
-        if hasattr(splitter, "random_state"):
-            setattr(splitter, "random_state", self.random_state)
+        if not hasattr(splitter, "random_state"):
+            setattr(splitter, "random_state", 42) # random state is required, and is certain
         self.splitter = splitter
         self.data_manager = data_manager
         self.X_train = self.data_manager.X_train

@@ -4,7 +4,7 @@
 # @Contact    : tqichun@gmail.com
 from copy import deepcopy
 from pickle import dumps
-from typing import Optional
+from typing import Any
 
 import numpy as np
 from frozendict import frozendict
@@ -18,7 +18,7 @@ class DataContainer():
 
     def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None,
                  resource_manager=None,
-                 dataset_metadata=frozendict(),upload_type="fs"):
+                 dataset_metadata=frozendict(), upload_type="fs"):
         self.upload_type = upload_type
         self.dataset_hash = None
         self.dataset_source = dataset_source
@@ -85,8 +85,8 @@ class DataContainer():
         self_res = deepcopy(self)
         self_res.resource_manager = rm
         self_res.data = data
-        self.data=data
-        self.resource_manager=rm
+        self.data = data
+        self.resource_manager = rm
         return self_res
 
     def pickle(self):
@@ -105,9 +105,9 @@ class DataContainer():
         raise NotImplementedError
 
 
-
-
-def get_container_data(X: DataContainer):
+def get_container_data(X: Any):
     if X is None:
         return None
-    return X.data
+    if isinstance(X, DataContainer):
+        return X.data
+    return X

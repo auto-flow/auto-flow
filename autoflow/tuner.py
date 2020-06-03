@@ -340,7 +340,7 @@ class Tuner(StrSignatureMixin):
                 tae_runner=self.evaluator,
                 initial_configurations=initial_configs
             )
-            self.logger.info(f"Starting {self.initial_runs} times initial runs for SMAC.")
+            self.logger.info(f"Starting {min(self.initial_runs, len(initial_configs))} times initial runs for SMAC.")
             if self.initial_runs:
                 smac.solver.initial_configurations = initial_configs
                 smac.solver.start_()

@@ -110,9 +110,9 @@ class DataFrameContainer(DataContainer):
         upload_type = record["upload_type"]
         columns = record["columns"]
         if upload_type == "table":
-            df = self.resource_manager.download_df_of_table(dataset_id, columns, self.columns_mapper)
+            df = self.resource_manager.download_df_from_table(dataset_id, columns, self.columns_mapper)
         else:
-            df = self.resource_manager.download_df_of_fs(dataset_path, columns)
+            df = self.resource_manager.download_df_from_fs(dataset_path, columns)
         inverse_columns_mapper = inverse_dict(self.columns_mapper)
         df.columns.map(inverse_columns_mapper)
         # todo: 建立本地缓存，防止二次下载

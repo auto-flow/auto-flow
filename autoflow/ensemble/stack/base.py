@@ -40,7 +40,7 @@ class StackEstimator(EnsembleEstimator):
     ):
         super(StackEstimator, self).fit_trained_data(estimators_list, y_preds_list, y_true_indexes_list, y_true)
         meta_features = self.predict_meta_features(None, True)
-        self.meta_learner.fit(meta_features, y_true)
+        self.meta_learner.fit(meta_features, self.stacked_y_true)
 
     def predict_meta_features(self, X, is_train):
         raise NotImplementedError
