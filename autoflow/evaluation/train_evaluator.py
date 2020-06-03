@@ -3,16 +3,16 @@ from collections import defaultdict
 from contextlib import redirect_stderr
 from io import StringIO
 from time import time
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import numpy as np
 from ConfigSpace import Configuration
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
+from autoflow.data_container import DataFrameContainer
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
 from autoflow.hdl.shp2dhp import SHP2DHP
-from autoflow.data_container import DataFrameContainer
 from autoflow.manager.data_manager import DataManager
 from autoflow.manager.resource_manager import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
@@ -36,6 +36,7 @@ class TrainEvaluator(BaseEvaluator):
             random_state,
             data_manager: DataManager,
             metric: Scorer,
+            groups: List[int],
             should_calc_all_metric: bool,
             splitter,
             should_store_intermediate_result: bool,
@@ -43,10 +44,11 @@ class TrainEvaluator(BaseEvaluator):
             should_finally_fit: bool,
             model_registry: dict
     ):
+        self.groups = groups
         self.model_registry = model_registry
         self.random_state = random_state
         if not hasattr(splitter, "random_state"):
-            setattr(splitter, "random_state", 42) # random state is required, and is certain
+            setattr(splitter, "random_state", 42)  # random state is required, and is certain
         self.splitter = splitter
         self.data_manager = data_manager
         self.X_train = self.data_manager.X_train
@@ -119,7 +121,8 @@ class TrainEvaluator(BaseEvaluator):
             status = "SUCCESS"
             failed_info = ""
             intermediate_results = []
-            for train_index, valid_index in self.splitter.split(X.data, y.data):
+
+            for train_index, valid_index in self.splitter.split(X.data, y.data, self.groups):
                 cloned_model = model.copy()
                 X: DataFrameContainer
                 X_train = X.sub_sample(train_index)

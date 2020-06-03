@@ -162,6 +162,7 @@ class DataManager(StrSignatureMixin):
         y_test = to_array(y_test)
         # encode label
         assert y_train is not None, f"{self.target_col_name} does not exist!"
+        self.label_encoder = None
         if is_target_need_label_encode(y_train):
             self.label_encoder = LabelEncoder()
             y_train = self.label_encoder.fit_transform(y_train)

@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 def get_random_initial_configs(shps: ConfigurationSpace, n_configs, random_state=42) -> List[Configuration]:
     shps = deepcopy(shps)
     shps.seed(random_state)
-    return shps.sample_configuration(n_configs)
+    results = shps.sample_configuration(n_configs)
+    if not isinstance(results, list):
+        results = [results]
+    return results
 
 
 def replace_phps(shps: ConfigurationSpace, key, value):
