@@ -20,14 +20,17 @@ def get_class_name_of_module(input_module):
 
 
 def get_class_object_in_pipeline_components(key1, key2):
-    module_path = f"autoflow.workflow.components.{key1}.{key2}"
-    _class = get_class_name_of_module(module_path)
-    M = import_module(
-        module_path
-    )
-    assert hasattr(M, _class)
-    cls = getattr(M, _class)
-    return cls
+    try:
+        module_path = f"autoflow.workflow.components.{key1}.{key2}"
+        _class = get_class_name_of_module(module_path)
+        M = import_module(
+            module_path
+        )
+        assert hasattr(M, _class)
+        cls = getattr(M, _class)
+        return cls
+    except Exception:
+        return None
 
 
 def find_components(package, directory, base_class):

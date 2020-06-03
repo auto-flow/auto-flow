@@ -14,6 +14,7 @@ from autoflow.utils.graphviz import ColorSelector
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.math_ import get_int_length
+from autoflow.utils.packages import get_class_object_in_pipeline_components
 
 
 class HDL_Constructor(StrSignatureMixin):
@@ -212,6 +213,7 @@ class HDL_Constructor(StrSignatureMixin):
         self.data_manager = None
 
     def parse_item(self, value: Union[dict, str]) -> Tuple[str, dict, bool]:
+        value = deepcopy(value)
         if isinstance(value, dict):
             packages = value.pop("_name")
             if "_vanilla" in value:
@@ -521,9 +523,9 @@ class HDL_Constructor(StrSignatureMixin):
 
         # ---- 开始将 DAG_workflow 解析成 HDL
         DAG_workflow = deepcopy(self.DAG_workflow)
-        for key in DAG_workflow.keys():
-            if key.split("->")[-1] == "target":
-                target_key = key
+        for step in DAG_workflow.keys():
+            if step.split("->")[-1] == "target":
+                target_key = step
         estimator_values = DAG_workflow.pop(target_key)
         if not isinstance(estimator_values, (list, tuple)):
             estimator_values = [estimator_values]
@@ -533,11 +535,14 @@ class HDL_Constructor(StrSignatureMixin):
         # 遍历DAG_describe，构造preprocessing
         n_steps = len(DAG_workflow)
         int_len = get_int_length(n_steps)
-        for i, (key, values) in enumerate(DAG_workflow.items()):
-            formed_key = f"{i:0{int_len}d}{key}(choice)"
+        for i, (step, values) in enumerate(DAG_workflow.items()):
+            formed_key = f"{i:0{int_len}d}{step}(choice)"
             sub_dict = {}
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
+                assert get_class_object_in_pipeline_components("preprocessing", packages) is not None,\
+                    f"In step '{step}', user defined packege : '{packages}' does not exist!"
+                # todo: 适配用户自定义模型
                 params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE1, mainTask)
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)
@@ -546,6 +551,8 @@ class HDL_Constructor(StrSignatureMixin):
         estimator_dict = {}
         for estimator_value in estimator_values:
             packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
+            assert get_class_object_in_pipeline_components("preprocessing", packages) is not None, \
+                f"In step '{target_key}', user defined packege : '{packages}' does not exist!"
             params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE2, mainTask)
             estimator_dict[packages] = params
             estimator_dict[packages].update(addition_dict)
