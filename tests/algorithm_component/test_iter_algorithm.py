@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+import os
+import shutil
 from time import time
 
 import numpy as np
+import pylab as plt
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 
@@ -25,6 +28,13 @@ from autoflow.workflow.components.regression.sgd import SGDRegressor
 
 
 class TestIterAlforithm(LocalResourceTestCase):
+    def setUp(self) -> None:
+        super(TestIterAlforithm, self).setUp()
+        self.plot_dir = os.getcwd() + "/test_iter_algorithm"
+    #     if os.path.exists(self.plot_dir):
+    #         shutil.rmtree(self.plot_dir)
+        from pathlib import Path
+        Path(self.plot_dir).mkdir(parents=True, exist_ok=True)
 
     def test_classifier(self):
         X, y = datasets.load_digits(return_X_y=True)
@@ -58,6 +68,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             print("time:", end - start)
             self.assertTrue(score == np.max(est.performance_history))
             print("max_iterations:", est.max_iterations)
+            print("final_iteration:", est.final_iteration)
             print("early_stopping_rounds:", est.early_stopping_rounds)
             print("early_stopping_tol:", est.early_stopping_tol)
             print("iter_inc:", est.iter_inc)
@@ -65,7 +76,21 @@ class TestIterAlforithm(LocalResourceTestCase):
             print("iter_ix:", est.iter_ix)
             print("min_performance:", np.min(est.performance_history))
             print("max_performance:", np.max(est.performance_history))
+            print("learning_curve:", est.learning_curve)
+            print("estimator:", est)
             print('\n' * 2)
+            learning_curve = est.learning_curve
+            plt.grid()
+            plt.plot(learning_curve[0], learning_curve[1], label="Train Set")
+            plt.plot(learning_curve[0], learning_curve[2], label="Valid Set")
+            plt.xlabel( est.iterations_name)
+            plt.ylabel("Accuracy")
+            title = cls.__name__
+            plt.title(title)
+            plt.axvline(x=est.final_iteration, ls="--", c="k")
+            plt.legend(loc="best")
+            plt.savefig(self.plot_dir + f"/{title}.png", quality=100, dpi=600)
+            plt.close()
 
     def test_regressor(self):
         X, y = datasets.load_boston(return_X_y=True)
@@ -100,6 +125,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             # if cls.__name__ != "SGDRegressor":
             #     self.assertTrue(score == np.max(est.performance_history))
             print("max_iterations:", est.max_iterations)
+            print("final_iteration:", est.final_iteration)
             print("early_stopping_rounds:", est.early_stopping_rounds)
             print("early_stopping_tol:", est.early_stopping_tol)
             print("iter_inc:", est.iter_inc)
@@ -107,4 +133,18 @@ class TestIterAlforithm(LocalResourceTestCase):
             print("iter_ix:", est.iter_ix)
             print("min_performance:", np.min(est.performance_history))
             print("max_performance:", np.max(est.performance_history))
+            print("learning_curve:", est.learning_curve)
+            print("estimator:", est)
             print('\n' * 2)
+            learning_curve = est.learning_curve
+            plt.grid()
+            plt.plot(learning_curve[0], learning_curve[1], label="Train Set")
+            plt.plot(learning_curve[0], learning_curve[2], label="Valid Set")
+            plt.xlabel( est.iterations_name)
+            plt.ylabel("Accuracy")
+            title = cls.__name__
+            plt.title(title)
+            plt.axvline(x=est.final_iteration, ls="--", c="k")
+            plt.legend(loc="best")
+            plt.savefig(self.plot_dir + f"/{title}.png", quality=100, dpi=600)
+            plt.close()

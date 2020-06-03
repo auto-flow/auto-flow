@@ -32,7 +32,7 @@ class LogTestCase(LocalResourceTestCase):
         if os.path.exists(self.log_file):
             os.remove(self.log_file)
 
-    def iter_log_items(self)->Iterator[Tuple[str,str,str]]:
+    def iter_log_items(self) -> Iterator[Tuple[str, str, str]]:
         '''
         iterate log items
         Returns

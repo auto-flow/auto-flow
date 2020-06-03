@@ -153,9 +153,9 @@
     },
     "random_forest": {
       "n_estimators": 5000,
-      "early_stopping_rounds": 50,
+      "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
-      "iter_inc": 5,
+      "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
       "max_depth": null,  //todo:  restrict
@@ -170,7 +170,7 @@
     },
     "sgd": {
       "max_iter": 5000,
-      "early_stopping_rounds": 10,
+      "early_stopping_rounds": 5,
       "early_stopping_tol": 0.0,
       "iter_inc": 100,
       "loss":  {"_type": "choice", "_value": ["hinge", "log","modified_huber","squared_hinge","perceptron"],"_default": "log"},
@@ -383,7 +383,7 @@
     },
     "sgd": {
       "max_iter": 5000,
-      "early_stopping_rounds": 10,
+      "early_stopping_rounds": 5,
       "early_stopping_tol": 0.0,
       "iter_inc": 100,
       "loss":  {"_type": "choice", "_value": ["squared_loss", "huber","epsilon_insensitive","squared_hinge","squared_epsilon_insensitive"],"_default": "squared_loss"},

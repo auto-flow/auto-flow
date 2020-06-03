@@ -9,7 +9,6 @@ from autoflow.utils import typing_
 class EnsembleEstimator(BaseEstimator):
     mainTask = None
 
-
     def build_prediction_list(self):
         prediction_list = []
         for y_true_indexes, y_preds in zip(self.y_true_indexes_list, self.y_preds_list):

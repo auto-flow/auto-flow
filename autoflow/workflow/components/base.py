@@ -2,6 +2,7 @@ import inspect
 import math
 from copy import deepcopy
 from importlib import import_module
+from time import time
 from typing import Dict, Optional
 
 import numpy as np
@@ -10,9 +11,9 @@ from sklearn.base import BaseEstimator
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils._testing import ignore_warnings
 
-from autoflow.data_container.base import DataContainer
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
+from autoflow.data_container.base import DataContainer
 from autoflow.utils.logging_ import get_logger
 
 
@@ -241,18 +242,33 @@ class AutoFlowIterComponent(AutoFlowComponent):
 
     @ignore_warnings(category=ConvergenceWarning)
     def iterative_fit(self, X, y, X_valid, y_valid, iter_inc):
+        s = time()
         self.component.fit(X, y)
+        self.fit_times += time() - s
         early_stopping_tol = getattr(self, "early_stopping_tol", 0.001)
         N = len(self.performance_history)
         if X_valid is not None and y_valid is not None:
-            performance = self.component.score(X_valid, y_valid)
-            if np.any(performance - early_stopping_tol > self.performance_history):
+            s = time()
+            test_performance = self.component.score(X_valid, y_valid)
+            train_performance = self.component.score(X, y)
+            self.score_times += time() - s
+            self.learning_curve[0].append(self.iteration)
+            self.learning_curve[1].append(train_performance)
+            self.learning_curve[2].append(test_performance)
+            self.learning_curve[3].append(self.fit_times)
+            self.learning_curve[4].append(self.score_times)
+            if np.any(test_performance - early_stopping_tol > self.performance_history):
                 index = self.iter_ix % N
                 self.best_estimators[index] = deepcopy(self.component)
-                self.performance_history[index] = performance
+                self.performance_history[index] = test_performance
+                self.iteration_history[index] = self.iteration
             else:
                 self.fully_fitted_ = True
-                index = np.argmax(self.performance_history)
+                # todo: choose maximal performance, minimal iteration
+                index = int(np.lexsort((self.iteration_history, -self.performance_history))[0])
+                self.final_iteration = self.iteration_history[index]
+                setattr(self, self.iterations_name, self.final_iteration)
+                # index = np.argmax(self.performance_history)
                 best_estimator = self.best_estimators[index]
                 self.best_estimators = None
                 self.component = best_estimator
@@ -268,6 +284,17 @@ class AutoFlowIterComponent(AutoFlowComponent):
         iter_inc = getattr(self, "iter_inc", 10)
         early_stopping_rounds = getattr(self, "early_stopping_rounds", 20)
         self.performance_history = np.full(early_stopping_rounds, -np.inf)
+        self.iteration_history = np.full(early_stopping_rounds, -np.inf)
+        # https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.learning_curve.html#sklearn.model_selection.learning_curve
+        self.fit_times = 0
+        self.score_times = 0
+        self.learning_curve = [
+            [],  # train_sizes_abs [0]
+            [],  # train_scores    [1]
+            [],  # test_scores     [2]
+            [],  # fit_times       [3]
+            [],  # score_times     [4]
+        ]
         N = len(self.performance_history)
         self.best_estimators = np.zeros([N], dtype="object")
 
@@ -300,4 +327,5 @@ class AutoFlowIterComponent(AutoFlowComponent):
         else:
             self.max_iterations_ = 1000
         hyperparams[self.iterations_name] = iter_inc
+        self.iteration_ = iter_inc
         return hyperparams
