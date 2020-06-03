@@ -72,19 +72,19 @@ class ML_Workflow(Pipeline):
              transformer) in self._iter(with_final=(not self.is_estimator),
                                         filter_passthrough=False):
             # todo : 做中间结果的存储
-            store_intermediate = False
+            cache_intermediate = False
             hyperparams = {}
-            if getattr(transformer, "store_intermediate", False):
+            if getattr(transformer, "cache_intermediate", False):
                 if self.resource_manager is None:
                     self.logger.warning(
-                        f"In ML Workflow step '{step_name}', 'store_intermediate' is set to True, but resource_manager is None.")
+                        f"In ML Workflow step '{step_name}', 'cache_intermediate' is set to True, but resource_manager is None.")
                 else:
                     hyperparams = getattr(transformer, "hyperparams")
                     if not isinstance(hyperparams, dict):
                         self.logger.warning(f"In ML Workflow step '{step_name}', transformer haven't 'hyperparams'.")
                     else:
-                        store_intermediate = True
-            if store_intermediate:
+                        cache_intermediate = True
+            if cache_intermediate:
                 if hasattr(transformer, "prepare_X_to_fit"):
                     def stack_X(X_train, X_valid, X_test, **kwargs):
                         X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)

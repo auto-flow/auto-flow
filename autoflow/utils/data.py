@@ -72,6 +72,15 @@ def densify(X):
         return X
 
 
+def is_target_need_label_encode(target_col):
+    if is_cat(target_col, True):
+        unk = np.unique(target_col)
+        wanted = np.arange(len(unk), dtype='int32')
+        if not np.all(unk == wanted):
+            return True
+    return False
+
+
 def is_cat(s: Union[pd.Series, np.ndarray], consider_ordinal_as_cat):
     if not isinstance(s, pd.Series):
         s = pd.Series(s)

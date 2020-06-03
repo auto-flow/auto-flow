@@ -7,12 +7,14 @@ from typing import Union, Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from frozendict import frozendict
+from sklearn.preprocessing import LabelEncoder
 
 from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNIQUE_FEATURE_GROUPS
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
 from autoflow.data_container.base import get_container_data
-from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text
+from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text, \
+    is_target_need_label_encode
 from autoflow.utils.dataframe import get_unique_col_name
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
@@ -157,11 +159,17 @@ class DataManager(StrSignatureMixin):
             self.X_test.set_feature_groups(self.feature_groups)
         # --设置参数--
         y_train = to_array(y_train)
+        y_test = to_array(y_test)
+        # encode label
+        assert y_train is not None, f"{self.target_col_name} does not exist!"
+        if is_target_need_label_encode(y_train):
+            self.label_encoder = LabelEncoder()
+            y_train = self.label_encoder.fit_transform(y_train)
+            y_test = self.encode_label(y_test)
         if y_train is not None:
             y_train = NdArrayContainer("TrainSetLabel", dataset_instance=y_train,
                                        resource_manager=self.resource_manager)
             y_train.upload()
-        y_test = to_array(y_test)
         if y_test is not None:
             y_test = NdArrayContainer("TestSetLabel", dataset_instance=y_test,
                                       resource_manager=self.resource_manager)
@@ -176,6 +184,11 @@ class DataManager(StrSignatureMixin):
 
         # todo: 用户自定义验证集可以通过RandomShuffle 或者mlxtend指定
         # fixme: 不支持multilabel
+
+    def encode_label(self, y):
+        if self.label_encoder is not None:
+            return self.label_encoder.transform(y) if y is not None else None
+        return y
 
     def pop_auxiliary_feature_groups(self):
         y_train = pop_if_exists(self.X_train, self.target_col_name)

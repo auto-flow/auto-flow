@@ -141,7 +141,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             plt.plot(learning_curve[0], learning_curve[1], label="Train Set")
             plt.plot(learning_curve[0], learning_curve[2], label="Valid Set")
             plt.xlabel( est.iterations_name)
-            plt.ylabel("Accuracy")
+            plt.ylabel("R2")
             title = cls.__name__
             plt.title(title)
             plt.axvline(x=est.final_iteration, ls="--", c="k")

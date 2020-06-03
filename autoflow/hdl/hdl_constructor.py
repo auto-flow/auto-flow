@@ -551,7 +551,7 @@ class HDL_Constructor(StrSignatureMixin):
         estimator_dict = {}
         for estimator_value in estimator_values:
             packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
-            assert get_class_object_in_pipeline_components("preprocessing", packages) is not None, \
+            assert get_class_object_in_pipeline_components(data_manager.ml_task.mainTask, packages) is not None, \
                 f"In step '{target_key}', user defined packege : '{packages}' does not exist!"
             params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE2, mainTask)
             estimator_dict[packages] = params

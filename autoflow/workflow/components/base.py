@@ -24,7 +24,7 @@ class AutoFlowComponent(BaseEstimator):
     regression_only = False
     boost_model = False
     tree_model = False
-    store_intermediate = False
+    cache_intermediate = False
     suspend_other_processes = False
     is_fit = False
 

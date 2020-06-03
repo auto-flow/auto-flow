@@ -18,7 +18,7 @@ trained_pipeline = AutoFlowClassifier(
     included_classifiers=["lightgbm"], debug=True,
     num2purified_workflow={
         "num->compressed": {"_name": "compress.f1score", "threshold": 0.9, "n_jobs": 12,
-                            # "store_intermediate":False
+                            # "cache_intermediate":False
                             },
         "compressed->purified": ["scale.standardize", "operate.keep_going"],
     }
