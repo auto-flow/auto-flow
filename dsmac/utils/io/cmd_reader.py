@@ -436,7 +436,7 @@ class CMDReader(object):
         self.output_dir_arg = \
             smac_opts.add_argument("--output-dir", "--output_dir", dest='output_dir',
                                    type=str, action=ProcessOutputDirAction,
-                                   default="smac3-output_%s" % (
+                                   default="/tmp/smac3-output_%s" % (
                                        datetime.datetime.fromtimestamp(
                                            time.time()).strftime(
                                            '%Y-%m-%d_%H:%M:%S_%f')),

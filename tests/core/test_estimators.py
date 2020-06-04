@@ -8,8 +8,9 @@ from sklearn.datasets import load_iris, load_boston
 from sklearn.model_selection import train_test_split
 
 from autoflow import AutoFlowRegressor
+from autoflow.constants import STACK_X_MSG
 from autoflow.core.classifier import AutoFlowClassifier
-from autoflow.tests.base import LocalResourceTestCase
+from autoflow.tests.base import LocalResourceTestCase, LogTestCase
 
 
 class TestEstimators(LocalResourceTestCase):
@@ -44,7 +45,7 @@ class TestEstimators(LocalResourceTestCase):
             resource_manager=self.mock_resource_manager
 
         )
-        pipe.fit(X_train, y_train, fit_ensemble_params=False)
+        pipe.fit(X_train, y_train)
         # score = accuracy_score(y_test, y_pred)
         score = pipe.score(X_test, y_test)
         print(score)
@@ -88,8 +89,7 @@ class TestEstimators(LocalResourceTestCase):
             debug=True,
             resource_manager=self.mock_resource_manager
         )
-        pipe.fit(X_train, y_train, X_test, y_test,
-                 fit_ensemble_params=False)
+        pipe.fit(X_train, y_train, X_test, y_test)
         # score = accuracy_score(y_test, y_pred)
         score = pipe.score(X_test, y_test)
         print(score)
@@ -124,6 +124,36 @@ class TestEstimators(LocalResourceTestCase):
         # score = accuracy_score(y_test, y_pred)
         score = pipe.score(X_test, y_test)
         print(score)
-        self.assertGreater(score,0.9)
+        self.assertGreater(score, 0.9)
         self.assertTrue(
             np.all(pipe.data_manager.label_encoder.classes_ == array(['apple', 'banana', 'pear'], dtype=object)))
+
+
+class TestShouldStackX(LogTestCase):
+    visible_levels = ("DEBUG",)
+    log_name = "test_should_test_X.log"
+
+    def test_should_stack_X(self):
+        X, y = load_iris(return_X_y=True)
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        pipe = AutoFlowClassifier(
+            DAG_workflow={
+                "num->scale": "scale.standardize",
+                "scale->trans": "transform.power",
+                "trans->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+            },
+            initial_runs=1,
+            run_limit=1,
+            debug=True,
+            resource_manager=self.mock_resource_manager,
+            should_stack_X=False,
+            log_file=self.log_file
+        )
+        pipe.fit(X_train, y_train)
+        score = pipe.score(X_test, y_test)
+        print(score)
+        self.assertGreater(score, 0.5)
+        for (level, logger, msg) in self.iter_log_items():
+            if msg==STACK_X_MSG:
+                print((level, logger, msg))
+            assert msg != STACK_X_MSG

@@ -40,10 +40,12 @@ class TrainEvaluator(BaseEvaluator):
             should_calc_all_metric: bool,
             splitter,
             should_store_intermediate_result: bool,
+            should_stack_X: bool,
             resource_manager: ResourceManager,
             should_finally_fit: bool,
             model_registry: dict
     ):
+        self.should_stack_X = should_stack_X
         self.groups = groups
         self.model_registry = model_registry
         self.random_state = random_state
@@ -345,7 +347,8 @@ class TrainEvaluator(BaseEvaluator):
         component = self._create_component(key1, packages[-1], hyperparams)
         component.in_feature_groups = in_feature_groups
         component.out_feature_groups = out_feature_groups
-
+        if not self.should_stack_X:
+            setattr(component, "need_y", True)
         pipeline_list.append([
             step_name,
             component

@@ -50,6 +50,7 @@ class AutoFlowEstimator(BaseEstimator):
             should_store_intermediate_result=False,
             should_finally_fit=False,
             should_calc_all_metrics=True,
+            should_stack_X=True,
             **kwargs
     ):
         '''
@@ -105,6 +106,7 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        self.should_stack_X = should_stack_X
         self.n_jobs_in_algorithm = n_jobs_in_algorithm
         self.consider_ordinal_as_cat = consider_ordinal_as_cat
         if model_registry is None:
@@ -264,6 +266,7 @@ class AutoFlowEstimator(BaseEstimator):
             self.resource_manager.close_hdl_table()
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
             experiment_config = {
+                "should_stack_X": self.should_stack_X,
                 "should_finally_fit": self.should_finally_fit,
                 "should_calc_all_metric": self.should_calc_all_metrics,
                 "should_store_intermediate_result": self.should_store_intermediate_result,
@@ -392,6 +395,7 @@ class AutoFlowEstimator(BaseEstimator):
                 should_calc_all_metric=self.should_calc_all_metrics,
                 splitter=self.splitter,
                 should_store_intermediate_result=self.should_store_intermediate_result,
+                should_stack_X=self.should_stack_X,
                 resource_manager=resource_manager,
                 should_finally_fit=self.should_finally_fit,
                 model_registry=self.model_registry

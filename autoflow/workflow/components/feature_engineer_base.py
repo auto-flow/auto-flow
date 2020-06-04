@@ -1,5 +1,6 @@
 from sklearn.base import TransformerMixin
 
+from autoflow.constants import STACK_X_MSG
 from autoflow.data_container import DataFrameContainer
 from autoflow.workflow.components.base import AutoFlowComponent
 from autoflow.workflow.components.utils import stack_Xs
@@ -49,6 +50,7 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
         X_valid = self.before_fit_X(X_valid)
         X_test = self.before_fit_X(X_test)
         if not self.need_y:
+            self.logger.debug(STACK_X_MSG)
             return stack_Xs(X_train, X_valid, X_test)
         else:
             return X_train
