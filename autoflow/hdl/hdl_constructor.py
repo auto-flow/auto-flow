@@ -490,7 +490,7 @@ class HDL_Constructor(StrSignatureMixin):
         display(self.draw_workflow_space())
         display(self.get_hdl_dataframe())
 
-    def run(self, data_manager):
+    def run(self, data_manager, model_registry=None):
         '''
 
         Parameters
@@ -499,6 +499,8 @@ class HDL_Constructor(StrSignatureMixin):
         highR_cat_threshold: float
 
         '''
+        if model_registry is None:
+            model_registry={}
         self.data_manager = data_manager
         self.ml_task = data_manager.ml_task
         self.highR_cat_threshold = data_manager.highR_cat_threshold
@@ -540,7 +542,7 @@ class HDL_Constructor(StrSignatureMixin):
             sub_dict = {}
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
-                assert get_class_object_in_pipeline_components("preprocessing", packages) is not None,\
+                assert get_class_object_in_pipeline_components("preprocessing", packages, model_registry) is not None,\
                     f"In step '{step}', user defined packege : '{packages}' does not exist!"
                 # todo: 适配用户自定义模型
                 params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE1, mainTask)
@@ -551,7 +553,7 @@ class HDL_Constructor(StrSignatureMixin):
         estimator_dict = {}
         for estimator_value in estimator_values:
             packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
-            assert get_class_object_in_pipeline_components(data_manager.ml_task.mainTask, packages) is not None, \
+            assert get_class_object_in_pipeline_components(data_manager.ml_task.mainTask, packages, model_registry) is not None, \
                 f"In step '{target_key}', user defined packege : '{packages}' does not exist!"
             params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE2, mainTask)
             estimator_dict[packages] = params

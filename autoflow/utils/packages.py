@@ -19,7 +19,9 @@ def get_class_name_of_module(input_module):
         return inspect.getmembers(_module, inspect.isclass)[-1][0]
 
 
-def get_class_object_in_pipeline_components(key1, key2):
+def get_class_object_in_pipeline_components(key1, key2, model_registry):
+    if key2 in model_registry:
+        return model_registry[key2]
     try:
         module_path = f"autoflow.workflow.components.{key1}.{key2}"
         _class = get_class_name_of_module(module_path)

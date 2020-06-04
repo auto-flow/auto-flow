@@ -4,7 +4,7 @@
 # @Contact    : tqichun@gmail.com
 import numpy as np
 from sklearn.datasets import load_iris, load_boston
-from sklearn.model_selection import train_test_split, ShuffleSplit, KFold  # LeaveOneOut
+from sklearn.model_selection import train_test_split, ShuffleSplit, KFold  #, LeaveOneOut
 
 from autoflow import AutoFlowRegressor
 from autoflow.core.classifier import AutoFlowClassifier

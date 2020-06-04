@@ -47,6 +47,8 @@ class TrainEvaluator(BaseEvaluator):
     ):
         self.should_stack_X = should_stack_X
         self.groups = groups
+        if model_registry is None:
+            model_registry = {}
         self.model_registry = model_registry
         self.random_state = random_state
         if not hasattr(splitter, "random_state"):
@@ -311,10 +313,7 @@ class TrainEvaluator(BaseEvaluator):
                            self.should_store_intermediate_result, self.resource_manager)
 
     def _create_component(self, key1, key2, params):
-        if key2 in self.model_registry:
-            cls = self.model_registry[key2]
-        else:
-            cls = get_class_object_in_pipeline_components(key1, key2)
+        cls = get_class_object_in_pipeline_components(key1, key2, self.model_registry)
         component = cls(**params)
         # component.set_addition_info(self.addition_info)
         return component

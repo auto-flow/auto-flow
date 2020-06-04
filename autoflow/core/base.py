@@ -250,7 +250,7 @@ class AutoFlowEstimator(BaseEstimator):
         assert len(self.hdl_constructors) == len(self.tuners)
         n_step = len(self.hdl_constructors)
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
-            hdl_constructor.run(self.data_manager)
+            hdl_constructor.run(self.data_manager, self.model_registry)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
                 last_best_dhp = self.resource_manager.load_best_dhp()
