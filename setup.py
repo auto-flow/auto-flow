@@ -65,7 +65,7 @@ def get_package_data(name, suffixes):
     return ret
 
 
-needed_suffixes = ['.json', '.txt', '.yml', '.yaml']
+needed_suffixes = ['.json', '.txt', '.yml', '.yaml', '.bz2', '.csv']
 
 setup(
     name='auto-flow',
@@ -77,7 +77,7 @@ setup(
     long_description_content_type='text/x-rst',
     license='BSD',
     url='https://github.com/auto-flow/autoflow',
-    packages=find_packages("./", exclude=['test', 'examples']),
+    packages=find_packages("./", exclude=['test', 'examples', 'autoflow_server']),
     package_dir={
         'autoflow': './autoflow',
         'dsmac': './dsmac',
