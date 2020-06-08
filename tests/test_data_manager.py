@@ -9,6 +9,7 @@ from pandas import Index
 from autoflow import DataManager
 from autoflow import datasets
 from autoflow.tests.base import LocalResourceTestCase
+from autoflow.utils.dict_ import sort_dict
 
 
 class TestDataManager(LocalResourceTestCase):
@@ -20,11 +21,11 @@ class TestDataManager(LocalResourceTestCase):
                                          'num': ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare'],
                                          'cat': ['Sex', 'Cabin', 'Embarked'],
                                          'highR_cat': ['Ticket']}
-            assert data_manager.final_column_descriptions == final_column_descriptions
+            assert sort_dict(data_manager.final_column_descriptions) == sort_dict(final_column_descriptions)
             if not remote:
-                assert data_manager.column_descriptions == {'id': 'PassengerId', 'target': 'Survived', 'text': 'Name'}
+                assert sort_dict(data_manager.column_descriptions) == sort_dict({'id': 'PassengerId', 'target': 'Survived', 'text': 'Name'})
             else:
-                assert data_manager.column_descriptions == final_column_descriptions
+                assert sort_dict(data_manager.column_descriptions) == sort_dict(final_column_descriptions)
             if stacked:
                 assert np.all(pd.Series(data_manager.feature_groups) == pd.Series(['num', 'text', 'cat', 'nan',
                                                                                    'num', 'num', 'highR_cat', 'nan',
@@ -47,7 +48,8 @@ class TestDataManager(LocalResourceTestCase):
         data_manager1 = DataManager(
             X_train=train_df,
             X_test=test_df,
-            column_descriptions=column_descriptions
+            column_descriptions=column_descriptions,
+            resource_manager=self.mock_resource_manager
         )
         do_assert(data_manager1, remote=False, stacked=True)
         # -------------------------------------------------------------------------------
@@ -56,7 +58,8 @@ class TestDataManager(LocalResourceTestCase):
         data_manager2 = DataManager(
             X_train=train_df,
             # X_test=test_df,
-            column_descriptions=column_descriptions
+            column_descriptions=column_descriptions,
+            resource_manager=self.mock_resource_manager
         )
         do_assert(data_manager2, remote=False, stacked=False)
         # -------------------------------------------------------------------------------
@@ -64,7 +67,8 @@ class TestDataManager(LocalResourceTestCase):
         data_manager3 = DataManager(
             X_train=data_manager1.train_set_hash,
             # X_test=test_df,
-            column_descriptions=column_descriptions
+            column_descriptions=column_descriptions,
+            resource_manager=self.mock_resource_manager
         )
         do_assert(data_manager3, remote=True, stacked=False)
         # -------------------------------------------------------------------------------
@@ -72,6 +76,7 @@ class TestDataManager(LocalResourceTestCase):
         data_manager4 = DataManager(
             X_train=data_manager1.train_set_hash,
             X_test=data_manager1.test_set_hash,
-            column_descriptions=column_descriptions
+            column_descriptions=column_descriptions,
+            resource_manager=self.mock_resource_manager
         )
         do_assert(data_manager4, remote=True, stacked=True)
