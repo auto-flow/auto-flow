@@ -435,3 +435,8 @@ class DataManager(StrSignatureMixin):
         # self.resource_manager = rm
         # res.resource_manager = rm
         return res
+
+    def is_empty(self):
+        if self.X_train is None and self.X_test is None and self.y_train is None and self.y_test is None:
+            return True
+        return False

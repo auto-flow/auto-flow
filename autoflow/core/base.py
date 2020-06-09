@@ -14,6 +14,7 @@ from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold, StratifiedKFold
 
 from autoflow import constants
+from autoflow.constants import ExperimentType
 from autoflow.data_container import DataFrameContainer
 from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
@@ -41,7 +42,7 @@ class AutoFlowEstimator(BaseEstimator):
             resource_manager: Union[ResourceManager, str] = None,
             model_registry=None,
             random_state=42,
-            log_file: str = None,
+            log_path: str = "autoflow.log",
             log_config: Optional[dict] = None,
             highR_nan_threshold=0.5,
             highR_cat_threshold=0.5,
@@ -72,7 +73,7 @@ class AutoFlowEstimator(BaseEstimator):
         random_state: int
             random state
 
-        log_file: path
+        log_path: path
             which file to store log, if is None, ``autoflow.log`` will be used.
 
         log_config: dict
@@ -122,8 +123,8 @@ class AutoFlowEstimator(BaseEstimator):
         self.highR_nan_threshold = highR_nan_threshold
         self.highR_cat_threshold = highR_cat_threshold
         # ---logger------------------------------------
-        self.log_file = log_file
-        setup_logger(self.log_file, self.log_config)
+        self.log_path = os.path.expandvars(os.path.expanduser(log_path))
+        setup_logger(self.log_path, self.log_config)
         self.logger = get_logger(self)
         # ---random_state-----------------------------------
         self.random_state = random_state
@@ -250,6 +251,7 @@ class AutoFlowEstimator(BaseEstimator):
         assert len(self.hdl_constructors) == len(self.tuners)
         n_step = len(self.hdl_constructors)
         for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
+            setup_logger(self.log_path, self.log_config)
             hdl_constructor.run(self.data_manager, self.model_registry)
             raw_hdl = hdl_constructor.get_hdl()
             if step != 0:
@@ -275,10 +277,10 @@ class AutoFlowEstimator(BaseEstimator):
                 "highR_cat_threshold": self.highR_cat_threshold,
                 "consider_ordinal_as_cat": self.consider_ordinal_as_cat,
                 "random_state": self.random_state,
-                "log_file": self.log_file,
+                "log_path": self.log_path,
                 "log_config": self.log_config,
             }
-            self.resource_manager.insert_to_experiment_table(experiment_config, additional_info)
+            self.resource_manager.insert_to_experiment_table(ExperimentType.AUTO, experiment_config, additional_info)
             self.resource_manager.close_experiment_table()
             self.task_id = self.resource_manager.task_id
             self.hdl_id = self.resource_manager.hdl_id
@@ -291,6 +293,7 @@ class AutoFlowEstimator(BaseEstimator):
                 break
             if step == n_step - 1:
                 self.start_final_step(fit_ensemble_params)
+            self.resource_manager.finish_experiment(self.log_path, self)
 
         return self
 
@@ -384,7 +387,8 @@ class AutoFlowEstimator(BaseEstimator):
         # 替换搜索空间中的 random_state
 
         tuner.shps.seed(random_state)
-        self.instance_id = resource_manager.task_id + "-" + resource_manager.hdl_id
+        self.instance_id = resource_manager.task_id + "-" + resource_manager.hdl_id + "-" + \
+                           str(resource_manager.user_id)
         tuner.run(
             initial_configs=initial_configs,
             evaluator_params=dict(
@@ -398,7 +402,8 @@ class AutoFlowEstimator(BaseEstimator):
                 should_stack_X=self.should_stack_X,
                 resource_manager=resource_manager,
                 should_finally_fit=self.should_finally_fit,
-                model_registry=self.model_registry
+                model_registry=self.model_registry,
+                instance_id=self.instance_id
             ),
             instance_id=self.instance_id,
             rh_db_type=resource_manager.db_type,
@@ -461,7 +466,9 @@ class AutoFlowEstimator(BaseEstimator):
     def copy(self):
         tmp_dm = self.data_manager
         self.data_manager = self.data_manager.copy(keep_data=False)
+        self.resource_manager.start_safe_close()
         res = deepcopy(self)
+        self.resource_manager.end_safe_close()
         self.data_manager = tmp_dm
         return res
 
@@ -470,6 +477,8 @@ class AutoFlowEstimator(BaseEstimator):
         from pickle import dumps
         tmp_dm = self.data_manager
         self.data_manager = self.data_manager.copy(keep_data=False)
+        self.resource_manager.start_safe_close()
         res = dumps(self)
+        self.resource_manager.end_safe_close()
         self.data_manager = tmp_dm
         return res

@@ -59,7 +59,8 @@ class RunHistoryDB():
         self.db.create_tables([Run_History])
         return Run_History
 
-    def get_run_id(self, instance_id, config_id):
+    @staticmethod
+    def get_run_id( instance_id, config_id):
         return instance_id + "-" + config_id
 
     def appointment_config(self, config, instance_id) -> Tuple[bool, Optional[pw.Model]]:

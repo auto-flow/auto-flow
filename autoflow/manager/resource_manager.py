@@ -11,12 +11,12 @@ import numpy as np
 import pandas as pd
 import peewee as pw
 from frozendict import frozendict
-from playhouse.fields import PickleField
+# from playhouse.fields import PickleField
 from playhouse.reflection import generate_models
 from redis import Redis
 
 from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POOL_CLOSE_MSG, START_SAFE_CLOSE_MSG, \
-    END_SAFE_CLOSE_MSG
+    END_SAFE_CLOSE_MSG, ExperimentType
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.manager.data_manager import DataManager
@@ -28,7 +28,7 @@ from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from generic_fs import FileSystem
-from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, PickleField, create_database
+from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, create_database
 from generic_fs.utils.fs import get_file_system
 
 
@@ -438,10 +438,10 @@ class ResourceManager(StrSignatureMixin):
             dataset_id = pw.FixedCharField(max_length=32)
             user_id = pw.IntegerField()
             dataset_metadata = self.JSONField(default={})
-            dataset_path = pw.CharField(max_length=512, default="")
-            upload_type = pw.CharField(max_length=32, default="")
-            dataset_type = pw.CharField(max_length=32, default="")
-            dataset_source = pw.CharField(max_length=32, default="")
+            dataset_path = pw.TextField(default="")
+            upload_type = pw.CharField(max_length=32)
+            dataset_type = pw.CharField(max_length=32)
+            dataset_source = pw.CharField(max_length=32)
             column_descriptions = self.JSONField(default={})
             columns_mapper = self.JSONField(default={})
             columns = self.JSONField(default={})
@@ -603,11 +603,14 @@ class ResourceManager(StrSignatureMixin):
             experiment_id = pw.AutoField(primary_key=True)
             user_id = pw.IntegerField()
             hdl_id = pw.FixedCharField(max_length=32, default="")
-            task_id = pw.FixedCharField(max_length=32, default="")
-            experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来 # fixme
+            task_id = pw.FixedCharField(max_length=32)
+            experiment_type = pw.CharField(max_length=128)  # auto_modeling, manual_modeling, ensemble_modeling
+            experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来
             additional_info = self.JSONField(default={})  # trials与experiments同时存储
-            create_time = pw.DateTimeField(default=datetime.datetime.now)
-            modify_time = pw.DateTimeField(default=datetime.datetime.now)
+            final_model_path = pw.TextField(null=True)
+            log_path = pw.TextField(null=True)
+            start_time = pw.DateTimeField(default=datetime.datetime.now)
+            end_time = pw.DateTimeField(null=True)
 
             class Meta:
                 database = self.record_db
@@ -617,19 +620,43 @@ class ResourceManager(StrSignatureMixin):
 
     def insert_to_experiment_table(
             self,
+            experiment_type: ExperimentType,
             experiment_config,
             additional_info,
     ):
         self.init_experiment_table()
         self.additional_info = additional_info
+        assert isinstance(experiment_type, ExperimentType)
         experiment_record = self.ExperimentModel.create(
             user_id=self.user_id,
             hdl_id=self.hdl_id,
             task_id=self.task_id,
+            experiment_type=experiment_type.value,
             experiment_config=experiment_config,
             additional_info=additional_info,
         )
         self.experiment_id = experiment_record.experiment_id
+
+    def finish_experiment(self, log_path, final_model):
+        self.experiment_path = self.file_system.join(self.parent_experiments_dir, str(self.experiment_id))
+        self.file_system.mkdir(self.experiment_path)
+        experiment_log_path = self.file_system.join(self.experiment_path, "log_file.log")
+        experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
+        final_model = final_model.copy()
+        assert final_model.data_manager.is_empty()
+        self.file_system.dump_pickle(final_model, experiment_model_path)
+        self.file_system.upload(experiment_log_path, log_path)
+        if os.path.exists(log_path):
+            os.remove(log_path)
+        self.finish_experiment_update_info(experiment_model_path, experiment_log_path, datetime.datetime.now())
+
+    def finish_experiment_update_info(self, final_model_path, log_path, end_time):
+        self.init_experiment_table()
+        experiment = self.ExperimentModel.select().where(self.ExperimentModel.experiment_id == self.experiment_id)[0]
+        experiment.final_model_path = final_model_path
+        experiment.log_path = log_path
+        experiment.end_time = end_time
+        experiment.save()
 
     def init_experiment_table(self):
         if self.is_init_experiment:
@@ -647,13 +674,13 @@ class ResourceManager(StrSignatureMixin):
         class Task(pw.Model):
             task_id = pw.FixedCharField(max_length=32)
             user_id = pw.IntegerField()
-            metric = pw.CharField(max_length=256, default="")
-            splitter = pw.TextField(default="")
-            ml_task = pw.CharField(max_length=256, default="")
+            metric = pw.CharField(max_length=256)
+            splitter = pw.TextField()
+            ml_task = pw.CharField(max_length=256)
             specific_task_token = pw.CharField(max_length=256, default="")
-            train_set_id = pw.FixedCharField(max_length=32, default="")
+            train_set_id = pw.FixedCharField(max_length=32)
             test_set_id = pw.FixedCharField(max_length=32, default="")
-            train_label_id = pw.FixedCharField(max_length=32, default="")
+            train_label_id = pw.FixedCharField(max_length=32)
             test_label_id = pw.FixedCharField(max_length=32, default="")
             sub_sample_indexes = self.JSONField(default=[])
             sub_feature_indexes = self.JSONField(default=[])
@@ -750,8 +777,8 @@ class ResourceManager(StrSignatureMixin):
     # ----------hdl_model------------------------------------------------------------------
     def get_hdl_model(self) -> pw.Model:
         class Hdl(pw.Model):
-            task_id = pw.FixedCharField(max_length=32, default="")
-            hdl_id = pw.FixedCharField(max_length=32, default="")
+            task_id = pw.FixedCharField(max_length=32)
+            hdl_id = pw.FixedCharField(max_length=32)
             user_id = pw.IntegerField()
             hdl = self.JSONField(default={})
             hdl_metadata = self.JSONField(default={})
@@ -805,11 +832,12 @@ class ResourceManager(StrSignatureMixin):
         class Trial(pw.Model):
             trial_id = pw.AutoField(primary_key=True)
             user_id = pw.IntegerField()
-            config_id = pw.FixedCharField(max_length=32, default="")
-            experiment_id = pw.IntegerField(default=0)
-            task_id = pw.FixedCharField(max_length=32, default="",
-                                        index=True)  # 加索引
-            hdl_id = pw.FixedCharField(max_length=32, default="")
+            config_id = pw.FixedCharField(max_length=32)
+            run_id = pw.FixedCharField(max_length=256)
+            instance_id = pw.FixedCharField(max_length=128)
+            experiment_id = pw.IntegerField()
+            task_id = pw.FixedCharField(max_length=32, index=True)  # 加索引
+            hdl_id = pw.FixedCharField(max_length=32)
             estimator = pw.CharField(max_length=256, default="")
             loss = pw.FloatField(default=65535)
             losses = self.JSONField(default=[])
@@ -817,23 +845,19 @@ class ResourceManager(StrSignatureMixin):
             all_score = self.JSONField(default={})
             all_scores = self.JSONField(default=[])
             test_all_score = self.JSONField(default={})  # 测试集
-            models_path = pw.CharField(max_length=512, default="")
-            final_model_path = pw.CharField(max_length=512, default="")
-            y_info_path = pw.CharField(max_length=512, default="")
-            # ------------被附加的额外信息---------------
+            models_path = pw.TextField(default="")
+            final_model_path = pw.TextField(default="")
+            y_info_path = pw.TextField(default="")
             additional_info = self.JSONField(default={})
-            # -------------------------------------
-            smac_hyper_param = PickleField(default=0)
+            # smac_hyper_param = PickleField(default=0)
             dict_hyper_param = self.JSONField(default={})
             cost_time = pw.FloatField(default=65535)
             status = pw.CharField(max_length=32, default="SUCCESS")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
-            # todo: 改用数据集存储？变成Json字段，item是dataset ID
-            # intermediate_result_path = pw.TextField(default="")
             intermediate_results = self.JSONField(default=[])
-            create_time = pw.DateTimeField(default=datetime.datetime.now)
-            modify_time = pw.DateTimeField(default=datetime.datetime.now)
+            start_time = pw.DateTimeField()
+            end_time = pw.DateTimeField()
 
             class Meta:
                 database = self.record_db
@@ -861,6 +885,8 @@ class ResourceManager(StrSignatureMixin):
         self.TrialsModel.create(
             user_id=self.user_id,
             config_id=config_id,
+            run_id=info.get("run_id"),
+            instance_id=info.get("instance_id"),
             task_id=self.task_id,
             hdl_id=self.hdl_id,
             experiment_id=self.experiment_id,
@@ -875,13 +901,15 @@ class ResourceManager(StrSignatureMixin):
             final_model_path=finally_fit_model_path,
             y_info_path=y_info_path,
             additional_info=additional_info,
-            smac_hyper_param=info.get("program_hyper_param"),
+            # smac_hyper_param=info.get("program_hyper_param"),
             dict_hyper_param=info.get("dict_hyper_param", {}),
             cost_time=info.get("cost_time", 65535),
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),
             warning_info=info.get("warning_info", ""),
             intermediate_results=info.get("intermediate_results", []),
+            start_time=info.get("start_time"),
+            end_time=info.get("end_time"),
         )
 
     def insert_to_trial_table(self, info: Dict):

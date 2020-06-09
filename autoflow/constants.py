@@ -1,6 +1,15 @@
+import enum
 import re
 
 from autoflow.utils.ml_task import MLTask
+
+
+class ExperimentType(enum.Enum):
+    AUTO = "auto_modeling"
+    MANUAL = "manual_modeling"
+    ENSEMBLE = "ensemble_modeling"
+
+
 
 binary_classification_task = MLTask("classification", "binary", "classifier")
 multiclass_classification_task = MLTask("classification", "multiclass", "classifier")
@@ -20,7 +29,7 @@ RESOURCE_MANAGER_CLOSE_ALL_LOGGER = "ResourceManager.close_all"
 CONNECTION_POOL_CLOSE_MSG = "Connection pool in ResourceManger all closed."
 START_SAFE_CLOSE_MSG = "Start to safely close connection pool..."
 END_SAFE_CLOSE_MSG = "The connection pool has been safely closed."
-STACK_X_MSG="Stack Xs when prepare X to ."
+STACK_X_MSG = "Stack Xs when prepare X to ."
 LOGGING_LEVELS = {
     "CRITICAL": 50,
     "ERROR": 40,

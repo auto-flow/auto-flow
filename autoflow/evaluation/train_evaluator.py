@@ -1,3 +1,4 @@
+import datetime
 import sys
 from collections import defaultdict
 from contextlib import redirect_stderr
@@ -23,6 +24,7 @@ from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline
 from autoflow.utils.sys_ import get_trance_back_msg
 from autoflow.workflow.ml_workflow import ML_Workflow
+from dsmac.runhistory.runhistory_db import RunHistoryDB
 from dsmac.runhistory.utils import get_id_of_config
 
 
@@ -43,8 +45,10 @@ class TrainEvaluator(BaseEvaluator):
             should_stack_X: bool,
             resource_manager: ResourceManager,
             should_finally_fit: bool,
-            model_registry: dict
+            model_registry: dict,
+            instance_id: str
     ):
+        self.instance_id = instance_id
         self.should_stack_X = should_stack_X
         self.groups = groups
         if model_registry is None:
@@ -125,7 +129,7 @@ class TrainEvaluator(BaseEvaluator):
             status = "SUCCESS"
             failed_info = ""
             intermediate_results = []
-
+            start_time = datetime.datetime.now()
             for train_index, valid_index in self.splitter.split(X.data, y.data, self.groups):
                 cloned_model = model.copy()
                 X: DataFrameContainer
@@ -155,6 +159,7 @@ class TrainEvaluator(BaseEvaluator):
                 loss, all_score = self.loss(y_valid.data, y_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 losses.append(float(loss))
                 all_scores.append(all_score)
+            end_time = datetime.datetime.now()
             # finally fit
             if status == "SUCCESS" and self.should_finally_fit:
                 # make sure have resource_manager to do things like connect redis
@@ -197,7 +202,9 @@ class TrainEvaluator(BaseEvaluator):
                 "y_preds": y_preds,
                 "intermediate_results": intermediate_results,
                 "status": status,
-                "failed_info": failed_info
+                "failed_info": failed_info,
+                "start_time": start_time,
+                "end_time": end_time,
             }
             # todo
             if y_test is not None:
@@ -231,6 +238,8 @@ class TrainEvaluator(BaseEvaluator):
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id
+        info["instance_id"] = self.instance_id
+        info["run_id"] = RunHistoryDB.get_run_id(self.instance_id, config_id)
         info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
@@ -252,7 +261,6 @@ class TrainEvaluator(BaseEvaluator):
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
-        self.logger.debug(str(pipeline))
         return dhp, pipeline
 
     def parse_key(self, key: str):
