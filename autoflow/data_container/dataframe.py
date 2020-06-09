@@ -47,9 +47,9 @@ class DataFrameContainer(DataContainer):
                     # in this loop target is eliminate duplicated column `dup_col`
                     while np.sum(columns == dup_col) >= 1:
                         # 1. find first position `dup_col` appear
-                        first_ix=columns.tolist().index(dup_col)  # todo: 更好的办法
+                        first_ix = columns.tolist().index(dup_col)  # todo: 更好的办法
                         # 2. replace
-                        columns[first_ix]=get_unique_col_name(columns,dup_col)
+                        columns[first_ix] = get_unique_col_name(columns, dup_col)
             # set unique columns to dataset_instance
             dataset_instance.columns = columns
             # 2. rename dirty columns
@@ -85,9 +85,10 @@ class DataFrameContainer(DataContainer):
         self.dataset_hash = self.get_hash()
         if self.dataset_hash == self.uploaded_hash:
             return
-        L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
+        respond = self.resource_manager.insert_to_dataset_table(
             self.dataset_hash, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
             self.columns_mapper, list(self.columns))
+        L, dataset_id, dataset_path = respond["length"], respond["dataset_id"], respond["dataset_path"]
         if L != 0:
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:

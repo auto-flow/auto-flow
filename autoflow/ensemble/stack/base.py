@@ -33,7 +33,7 @@ class StackEstimator(EnsembleEstimator):
 
     def fit_trained_data(
             self,
-            estimators_list: List[List[typing_.GenericEstimator]],  # fixme : typing是否存在局限性？
+            estimators_list: List[List[typing_.GenericEstimator]],
             y_preds_list: List[List[np.ndarray]],
             y_true_indexes_list: List[List[np.ndarray]],
             y_true: np.ndarray

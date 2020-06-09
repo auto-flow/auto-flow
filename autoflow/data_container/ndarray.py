@@ -32,9 +32,10 @@ class NdArrayContainer(DataContainer):
         self.dataset_hash = self.get_hash()
         if self.dataset_hash == self.uploaded_hash:
             return
-        L, dataset_id, dataset_path = self.resource_manager.insert_to_dataset_table(
+        respond = self.resource_manager.insert_to_dataset_table(
             self.dataset_hash, self.dataset_metadata, "fs", self.dataset_source, {},
             {}, [])
+        L, dataset_id, dataset_path = respond["length"], respond["dataset_id"], respond["dataset_path"]
         if L != 0:
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:
