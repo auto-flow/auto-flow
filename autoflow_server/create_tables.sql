@@ -1,3 +1,5 @@
+create database autoflow;
+\c autoflow;
 create table dataset
 (
     dataset_id          char(32)    not null,
