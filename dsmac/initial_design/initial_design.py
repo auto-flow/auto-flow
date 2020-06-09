@@ -170,12 +170,12 @@ class InitialDesign:
             appoint_success, record = self.runhistory.db.appointment_config(initial_incumbent, rand_inst)
             if not appoint_success:
                 if record is not None:
-                    cost = record.cost
-                    config = record.config_bin
+                    cost = record["cost"]
+                    config = record["config_bin"]
                     if isinstance(config, bytes):
                         config = pickle.loads(config)
-                    self.runhistory.add(config, cost, record.time, record.status,
-                                        record.instance_id)
+                    self.runhistory.add(config, cost, record["time"], record["status"],
+                                    record["instance_id"])
                     return initial_incumbent
             status, cost, runtime, _ = self.tae_runner.start(
                 initial_incumbent,

@@ -11,7 +11,7 @@ from dsmac.runhistory.structure import DataOrigin
 from dsmac.runhistory.utils import get_id_of_config
 from dsmac.tae.execute_ta_run import StatusType
 from dsmac.utils.logging import PickableLoggerAdapter
-from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, PickleField
+from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField
 
 
 class RunHistoryDB():
@@ -24,8 +24,8 @@ class RunHistoryDB():
         self.runhistory = runhistory
         self.db_type = db_type
         self.db_params = db_params
-        self.Datebase = get_db_class_by_db_type(self.db_type)
-        self.db: pw.Database = self.Datebase(**self.db_params)
+        self.Datebase = self.get_db_cls()
+        self.db: pw.Database = self.get_db()
         self.logger = PickableLoggerAdapter(__name__)
         # --JSONField-----------------------------------------
         self.JSONField = get_JSONField(self.db_type)
@@ -33,12 +33,18 @@ class RunHistoryDB():
         self.Model: pw.Model = self.get_model()
         self.config_space: ConfigurationSpace = config_space
 
+    def get_db_cls(self):
+        return get_db_class_by_db_type(self.db_type)
+
+    def get_db(self):
+        return self.Datebase(**self.db_params)
+
     def get_model(self) -> pw.Model:
         class Run_History(pw.Model):
             run_id = pw.FixedCharField(max_length=256, primary_key=True)
             config_id = pw.FixedCharField(max_length=128, default="")
             config = self.JSONField(default={})
-            config_bin = PickleField(default=b"")
+            config_bin = pw.BlobField(default=b"")  # PickleField(default=b"")
             config_origin = pw.CharField(max_length=64, default="")
             cost = pw.FloatField(default=65535)
             time = pw.FloatField(default=0.0)
@@ -60,16 +66,19 @@ class RunHistoryDB():
         return Run_History
 
     @staticmethod
-    def get_run_id( instance_id, config_id):
+    def get_run_id(instance_id, config_id):
         return instance_id + "-" + config_id
 
     def appointment_config(self, config, instance_id) -> Tuple[bool, Optional[pw.Model]]:
         config_id = get_id_of_config(config)
         run_id = self.get_run_id(instance_id, config_id)
-        query = self.Model.select().where(self.Model.run_id == run_id)
+        return self._appointment_config(run_id, instance_id)
+
+    def _appointment_config(self, run_id, instance_id) -> Tuple[bool, Optional[pw.Model]]:
+        query = self.Model.select().where(self.Model.run_id == run_id).dicts()
         if len(query) > 0:
             query_ = query[0]
-            if query_.origin >= 0:
+            if query_["origin"] >= 0:
                 record = query_
             else:
                 record = None
@@ -93,50 +102,48 @@ class RunHistoryDB():
         run_id = self.get_run_id(instance_id, config_id)
         if instance_id is None:
             instance_id = ""
+        self._insert_runhistory(run_id, config_id, pickle.dumps(config), config.get_dictionary(), config.origin, cost,
+                                time, status.value, instance_id, seed, additional_info, origin.value)
+
+    def _insert_runhistory(self, run_id, config_id, config_bin, config, config_origin, cost: float, time: float,
+                           status: StatusType, instance_id: str = "",
+                           seed: int = 0,
+                           additional_info: dict = frozendict(),
+                           origin: DataOrigin = DataOrigin.INTERNAL):
         try:
             self.Model(
                 run_id=run_id,
                 config_id=config_id,
-                config=config.get_dictionary(),
-                config_origin=config.origin,
-                config_bin=pickle.dumps(config),
+                config=config,
+                config_origin=config_origin,
+                config_bin=config_bin,
                 cost=cost,
                 time=time,
                 instance_id=instance_id,
                 seed=seed,
-                status=status.value,
+                status=status,
                 additional_info=dict(additional_info),
-                origin=origin.value,
+                origin=origin,
                 modify_time=datetime.datetime.now()
             ).save()
         except Exception as e:
             pass
-        self.timestamp = datetime.datetime.now()
 
     def fetch_new_runhistory(self, instance_id, is_init=False):
-        if is_init:
-            # n_del = self.Model.delete().where(self.Model.origin < 0).execute()
-            # if n_del > 0:
-            #     self.logger.info(f"Delete {n_del} invalid records in run_history database.")
-            query = self.Model.select(). \
-                where((self.Model.origin >= 0) & (self.Model.instance_id == instance_id))
-        else:
-            query = self.Model.select(). \
-                where(
-                (self.Model.origin >= 0) & (self.Model.instance_id == instance_id) & (self.Model.pid != os.getpid()))
+        query = self._fetch_new_runhistory(instance_id, is_init)
         for model in query:
-            run_id = model.run_id
-            config_id = model.config_id
-            config = model.config
-            config_bin = model.config_bin
-            config_origin = model.config_origin
-            cost = model.cost
-            time = model.time
-            instance_id = model.instance_id
-            seed = model.seed
-            status = model.status
-            additional_info = model.additional_info
-            origin = model.origin
+            run_id = model["run_id"]
+            config_id = model["config_id"]
+            config = model["config"]
+            config_bin = model["config_bin"]
+            config_origin = model["config_origin"]
+            cost = model["cost"]
+            time = model["time"]
+            instance_id = model["instance_id"]
+            seed = model["seed"]
+            status = model["status"]
+            additional_info = model["additional_info"]
+            origin = model["origin"]
             try:
                 config = pickle.loads(config_bin)
             except Exception as e:
@@ -145,3 +152,18 @@ class RunHistoryDB():
             self.runhistory.add(config, cost, time, StatusType(status), instance_id, seed, additional_info,
                                 DataOrigin(origin))
         self.timestamp = datetime.datetime.now()
+
+    def _fetch_new_runhistory(self, instance_id, is_init=False):
+        if is_init:
+            # n_del = self.Model.delete().where(self.Model.origin < 0).execute()
+            # if n_del > 0:
+            #     self.logger.info(f"Delete {n_del} invalid records in run_history database.")
+            query = self.Model.select().where(
+                (self.Model.origin >= 0) & (self.Model.instance_id == instance_id)
+            ).dicts()
+        else:
+            query = self.Model.select().where(
+                (self.Model.origin >= 0) & (self.Model.instance_id == instance_id) &
+                (self.Model.pid != os.getpid())
+            ).dicts()
+        return query
