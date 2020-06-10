@@ -25,7 +25,7 @@ class DataContainer():
         self.dataset_metadata = dict(dataset_metadata)
         self.dataset_metadata.update(dataset_source=dataset_source)
         self.uploaded_hash = None
-        from autoflow.manager.resource_manager import ResourceManager
+        from autoflow.resource_manager.base import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
             self.logger.warning(

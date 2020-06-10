@@ -34,21 +34,21 @@ class StrSignatureMixin():
         return self.__str__()
 
 
-def get_valid_params_in_kwargs(klass, kwargs: Dict[str, Any]):
+def get_valid_params_in_kwargs(func, kwargs: Dict[str, Any]):
     validated = {}
     for key, value in kwargs.items():
-        if key in inspect.signature(klass.__init__).parameters.keys():
+        if key in inspect.signature(func).parameters.keys():
             validated[key] = value
     return validated
 
 
 def gather_kwargs_from_signature_and_attributes(klass, instance):
-    return get_valid_params_in_kwargs(klass, instance.__dict__)
+    return get_valid_params_in_kwargs(klass.__init__, instance.__dict__)
 
 
 def instancing(variable, klass, kwargs):
     if variable is None:
-        variable = klass(**get_valid_params_in_kwargs(klass, kwargs))
+        variable = klass(**get_valid_params_in_kwargs(klass.__init__, kwargs))
     elif isinstance(variable, dict):
         variable = klass(**variable)
     elif isinstance(variable, klass):

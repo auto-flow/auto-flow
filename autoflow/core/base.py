@@ -20,8 +20,8 @@ from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.manager.data_manager import DataManager
-from autoflow.manager.resource_manager import ResourceManager
+from autoflow.data_manager import DataManager
+from autoflow.resource_manager.base import ResourceManager
 from autoflow.metrics import r2, accuracy
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
@@ -242,7 +242,7 @@ class AutoFlowEstimator(BaseEstimator):
                 raise NotImplementedError()
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_to_tasks_table(
+        self.resource_manager.insert_to_task_table(
             data_manager=self.data_manager, metric=metric, splitter=splitter,
             specific_task_token=specific_task_token, dataset_metadata=dataset_metadata, task_metadata=task_metadata,
             sub_sample_indexes=sub_sample_indexes, sub_feature_indexes=sub_feature_indexes)

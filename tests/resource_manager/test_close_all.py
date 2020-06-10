@@ -40,6 +40,7 @@ class TestCloseAll(LogTestCase):
         print(score)
         # ----analyzing-----
         stack_cnt = 0
+        self.update_log_path(pipe)
         for (level, logger, msg) in self.iter_log_items():
             if logger==RESOURCE_MANAGER_CLOSE_ALL_LOGGER:
                 print("MESSAGE :",msg)

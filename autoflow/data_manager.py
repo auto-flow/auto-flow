@@ -84,7 +84,7 @@ class DataManager(StrSignatureMixin):
             high ratio NaN threshold, you can find examples and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
         '''
         self.upload_type = upload_type
-        from autoflow.manager.resource_manager import ResourceManager
+        from autoflow.resource_manager.base import ResourceManager
         self.logger = get_logger(self)
         if resource_manager is None:
             self.logger.warning(

@@ -32,6 +32,12 @@ class LogTestCase(LocalResourceTestCase):
         if os.path.exists(self.log_file):
             os.remove(self.log_file)
 
+    def update_log_path(self, pipe):
+        pipe.resource_manager.init_experiment_table()
+        experiment = pipe.resource_manager.ExperimentModel
+        log_path = experiment.select().where(experiment.experiment_id == pipe.experiment_id)[0].log_path
+        self.log_file = log_path
+
     def iter_log_items(self) -> Iterator[Tuple[str, str, str]]:
         '''
         iterate log items

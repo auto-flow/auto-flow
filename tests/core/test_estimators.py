@@ -69,6 +69,7 @@ class TestEstimators(LocalResourceTestCase):
         score = pipe.score(X_test, y_test)
         print(score)
         self.assertGreater(score, 0.9)
+        pipe.resource_manager.init_trial_table()
         trial = pipe.resource_manager.TrialsModel
         records = trial.select().where(trial.experiment_id == pipe.experiment_id)
         for record in records:
@@ -76,6 +77,7 @@ class TestEstimators(LocalResourceTestCase):
             self.assertTrue(
                 isinstance(record.test_all_score, dict) and bool(record.test_all_score) and
                 record.test_all_score["accuracy"] > 0.9)
+        pipe.resource_manager.close_trial_table()
 
     def test_single_regressor_with_X_test(self):
         X, y = load_boston(return_X_y=True)
@@ -94,6 +96,7 @@ class TestEstimators(LocalResourceTestCase):
         score = pipe.score(X_test, y_test)
         print(score)
         self.assertGreater(score, 0)
+        pipe.resource_manager.init_trial_table()
         trial = pipe.resource_manager.TrialsModel
         records = trial.select().where(trial.experiment_id == pipe.experiment_id)
         for record in records:
@@ -104,6 +107,7 @@ class TestEstimators(LocalResourceTestCase):
                 # and record.test_all_score["r2"] > 0
             )
             # print(record.test_all_score["r2"])
+        pipe.resource_manager.close_trial_table()
 
     def test_dirty_label(self):
         X, y = load_iris(return_X_y=True)
@@ -153,6 +157,7 @@ class TestShouldStackX(LogTestCase):
         score = pipe.score(X_test, y_test)
         print(score)
         self.assertGreater(score, 0.5)
+        self.update_log_path(pipe)
         for (level, logger, msg) in self.iter_log_items():
             if msg==STACK_X_MSG:
                 print((level, logger, msg))

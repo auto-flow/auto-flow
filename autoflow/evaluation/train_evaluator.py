@@ -14,8 +14,8 @@ from autoflow.data_container import DataFrameContainer
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
 from autoflow.hdl.shp2dhp import SHP2DHP
-from autoflow.manager.data_manager import DataManager
-from autoflow.manager.resource_manager import ResourceManager
+from autoflow.data_manager import DataManager
+from autoflow.resource_manager.base import ResourceManager
 from autoflow.metrics import Scorer, calculate_score
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger

@@ -378,7 +378,7 @@
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
         <span class="c1"># get task_id, and insert record into &quot;tasks.tasks&quot; database</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_tasks_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">insert_to_task_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_manager</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
                                                     <span class="n">specific_task_token</span><span class="p">,</span> <span class="n">dataset_metadata</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">close_task_table</span><span class="p">()</span>
         <span class="c1"># store other params</span>

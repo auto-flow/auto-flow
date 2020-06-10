@@ -1,4 +1,4 @@
-from autoflow.manager.resource_manager import ResourceManager
+from autoflow.resource_manager.base import ResourceManager
 from autoflow.utils.klass import StrSignatureMixin
 
 

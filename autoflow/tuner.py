@@ -13,8 +13,8 @@ from frozendict import frozendict
 from autoflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
-from autoflow.manager.data_manager import DataManager
-from autoflow.manager.resource_manager import ResourceManager
+from autoflow.data_manager import DataManager
+from autoflow.resource_manager.base import ResourceManager
 from autoflow.utils.concurrence import parse_n_jobs
 from autoflow.utils.config_space import get_random_initial_configs, get_grid_initial_configs, replace_phps
 from autoflow.utils.klass import StrSignatureMixin
