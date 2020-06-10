@@ -254,26 +254,26 @@ class ResourceManager(StrSignatureMixin):
         from autoflow import NdArrayContainer
 
         self.task_id = task_id
-        self.init_task_table()
         # 操作task而不是trial
-        task_record = self.TaskModel.select().where(
-            (self.TaskModel.task_id == self.task_id) & (self.TaskModel.user_id == self.user_id)
-        )[0]
-        ml_task_str = task_record.ml_task
+        self.init_task_table()
+        task_records = self._get_task_records(task_id, self.user_id)
+        assert len(task_records) > 0
+        task_record = task_records[0]
+        ml_task_str = task_record["ml_task"]
         ml_task = eval(ml_task_str)
-        train_set_id = task_record.train_set_id
-        test_set_id = task_record.test_set_id
-        train_label_id = task_record.train_label_id
-        test_label_id = task_record.test_label_id
+        train_set_id = task_record["train_set_id"]
+        test_set_id = task_record["test_set_id"]
+        train_label_id = task_record["train_label_id"]
+        test_label_id = task_record["test_label_id"]
         y_train = NdArrayContainer(dataset_id=train_label_id, resource_manager=self)
         return ml_task, y_train
 
     def load_best_estimator(self, ml_task: MLTask):
         self.init_trial_table()
-        record = self.TrialsModel.select().where(
-            (self.TrialsModel.task_id == self.task_id) & (self.TrialsModel.user_id == self.user_id)
-        ).order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(1)[0]
-        models = self.file_system.load_pickle(record.models_path)
+        records = self._get_sorted_trial_records(self.task_id, self.user_id, 1)
+        assert len(records) > 0
+        record = records[0]
+        models = self.file_system.load_pickle(record["models_path"])
         if ml_task.mainTask == "classification":
             estimator = VoteClassifier(models)
         else:
@@ -282,34 +282,25 @@ class ResourceManager(StrSignatureMixin):
 
     def load_best_dhp(self):
         # fixme: 限制hdl_id
-        trial_id = self.get_best_k_trials(1)[0]
-        record = self.TrialsModel.select().where(self.TrialsModel.trial_id == trial_id)[0]
-        return record.dict_hyper_param
-
-    def get_best_k_trials(self, k):
         self.init_trial_table()
-        trial_ids = []
-        records = self.TrialsModel.select().where(
-            (self.TrialsModel.task_id == self.task_id) & (self.TrialsModel.user_id == self.user_id)
-        ).order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
-        for record in records:
-            trial_ids.append(record.trial_id)
-        return trial_ids
+        trial_id = self._get_best_k_trial_ids(self.task_id, self.user_id, 1)[0]
+        record = self._get_trial_records_by_id(trial_id)[0]
+        return record["dict_hyper_param"]
 
     def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
         self.init_trial_table()
-        records = self.TrialsModel.select().where(self.TrialsModel.trial_id << trials)
+        records = self._get_trial_records_by_ids(trials)
         estimator_list = []
         y_true_indexes_list = []
         y_preds_list = []
         for record in records:
             exists = True
-            if not self.file_system.exists(record.models_path):
+            if not self.file_system.exists(record["models_path"]):
                 exists = False
             else:
-                estimator_list.append(self.file_system.load_pickle(record.models_path))
+                estimator_list.append(self.file_system.load_pickle(record["models_path"]))
             if exists:
-                y_info = self.file_system.load_pickle(record.y_info_path)
+                y_info = self.file_system.load_pickle(record["y_info_path"])
                 y_true_indexes_list.append(y_info["y_true_indexes"])
                 y_preds_list.append(y_info["y_preds"])
         return estimator_list, y_true_indexes_list, y_preds_list
@@ -571,10 +562,14 @@ class ResourceManager(StrSignatureMixin):
             hf.create_dataset("dataset", data=arr)
         self.file_system.upload(dataset_path, tmp_path)
 
-    def query_dataset_record(self, dataset_hash) -> List[Dict[str, Any]]:
+    def get_dataset_records(self, dataset_hash) -> List[Dict[str, Any]]:
+        self.init_dataset_table()
+        return self._get_dataset_records(dataset_hash, self.user_id)
+
+    def _get_dataset_records(self, dataset_id, user_id) -> List[Dict[str, Any]]:
         self.init_dataset_table()
         records = self.DatasetModel.select().where(
-            (self.DatasetModel.dataset_id == dataset_hash) & (self.DatasetModel.user_id == self.user_id)
+            (self.DatasetModel.dataset_id == dataset_id) & (self.DatasetModel.user_id == user_id)
         ).dicts()
         return list(records)
 
@@ -691,7 +686,7 @@ class ResourceManager(StrSignatureMixin):
         self._finish_experiment_update_info(self.experiment_id, final_model_path, log_path, end_time)
 
     def _finish_experiment_update_info(self, experiment_id: int, final_model_path: str, log_path: str,
-                                       end_time: datetime.datetime):
+                                       end_time: Union[datetime.datetime, str]):
         experiment = self.ExperimentModel.select().where(self.ExperimentModel.experiment_id == experiment_id)[0]
         experiment.final_model_path = final_model_path
         experiment.log_path = log_path
@@ -812,6 +807,13 @@ class ResourceManager(StrSignatureMixin):
             record.task_metadata = new_meta_data
             record.save()
         return task_id
+
+    def _get_task_records(self, task_id: str, user_id: int):
+        task_records = self.TaskModel.select().where(
+            (self.TaskModel.task_id == task_id) & (self.TaskModel.user_id == user_id)
+        ).dicts()
+        task_records = list(task_records)
+        return task_records
 
     def init_task_table(self):
         if self.is_init_task:
@@ -939,6 +941,31 @@ class ResourceManager(StrSignatureMixin):
             y_info_path=y_info_path,
         )
         self._insert_to_trial_table(self.user_id, self.task_id, self.hdl_id, self.experiment_id, info)
+
+    def _get_sorted_trial_records(self, task_id, user_id, limit):
+        records = self.TrialsModel.select().where(
+            (self.TrialsModel.task_id == task_id) & (self.TrialsModel.user_id == user_id)
+        ).order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(limit).dicts()
+        return list(records)
+
+    def _get_trial_records_by_id(self, trial_id):
+        records = self.TrialsModel.select().where(self.TrialsModel.trial_id == trial_id).dicts()
+        return list(records)
+
+    def _get_trial_records_by_ids(self, trial_ids):
+        records = self.TrialsModel.select().where(self.TrialsModel.trial_id << trial_ids).dicts()
+        records = list(records)
+        return records
+
+    def _get_best_k_trial_ids(self, task_id, user_id, k):
+        # self.init_trial_table()
+        trial_ids = []
+        records = self.TrialsModel.select(self.TrialsModel.trial_id).where(
+            (self.TrialsModel.task_id == task_id) & (self.TrialsModel.user_id == user_id)
+        ).order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(k)
+        for record in records:
+            trial_ids.append(record.trial_id)
+        return trial_ids
 
     def _insert_to_trial_table(self, user_id: int, task_id: str, hdl_id: str, experiment_id: int, info: dict):
         success = False

@@ -165,20 +165,24 @@ class SMBO(object):
     def start_(self, warm_start=True, only_timing=False):
         if only_timing:
             self.stats.start_timing()
-        self.instance_id=self.intensifier.instance
+        self.instance_id = self.intensifier.instance
         if warm_start:
-            self.runhistory.db.fetch_new_runhistory(self.instance_id,True)
+            self.runhistory.db.fetch_new_runhistory(self.instance_id, True)
         self.incumbent = self.runhistory.get_incumbent(self.instance_id)
         return self.start(self.incumbent)
 
     def run_(self):
         self.instance_id = self.intensifier.instance
         start_time = time.time()
-        self.runhistory.db.fetch_new_runhistory(self.instance_id, False)
+        final_cost, final_config = self.runhistory.db.fetch_new_runhistory(self.instance_id, False)
+        incumbent_cost = self.runhistory.get_cost(self.incumbent)
+        if self.incumbent is None:
+            self.incumbent = self.scenario.cs.get_default_configuration()
+        if final_config is not None and final_cost < incumbent_cost:
+            self.incumbent = final_config
         # todo: 做一个信息提示？如果从其他进程的搜索数据中找到了更好的结果
         self.incumbent = self.runhistory.get_incumbent(self.instance_id)
         X, Y = self.rh2EPM.transform(self.runhistory)
-
         self.logger.debug("Search for next configuration")
         # get all found configurations sorted according to acq
         challengers = self.choose_next(X, Y)
@@ -215,7 +219,7 @@ class SMBO(object):
             The best found configuration
         """
         self.runhistory.db.fetch_new_runhistory(self.instance_id, True)
-        self.instance_id=self.intensifier.instance
+        self.instance_id = self.intensifier.instance
         self.incumbent = self.runhistory.get_incumbent(self.instance_id)
         self.start(self.incumbent)
 
@@ -318,7 +322,7 @@ class SMBO(object):
         challengers = self.acq_optimizer.maximize(
             runhistory=self.runhistory,
             stats=self.stats,
-            num_points=self.scenario.acq_opt_challengers, # 10000
+            num_points=self.scenario.acq_opt_challengers,  # 10000
             random_configuration_chooser=self.random_configuration_chooser,
             instance_id=self.instance_id
             # dsmac.optimizer.random_configuration_chooser.ChooserProb

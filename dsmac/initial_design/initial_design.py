@@ -1,5 +1,4 @@
 import logging
-import pickle
 import typing
 
 import numpy as np
@@ -171,11 +170,10 @@ class InitialDesign:
             if not appoint_success:
                 if record is not None:
                     cost = record["cost"]
-                    config = record["config_bin"]
-                    if isinstance(config, bytes):
-                        config = pickle.loads(config)
+                    config = Configuration(scenario.cs, values=record["config"], origin=record["config_origin"])
+                    # config = Configuration(self.config_space, values=config, origin=config_origin)
                     self.runhistory.add(config, cost, record["time"], record["status"],
-                                    record["instance_id"])
+                                        record["instance_id"])
                     return initial_incumbent
             status, cost, runtime, _ = self.tae_runner.start(
                 initial_incumbent,

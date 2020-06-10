@@ -43,7 +43,7 @@ class NdArrayContainer(DataContainer):
         super(NdArrayContainer, self).upload(upload_type)
 
     def download(self, dataset_id):
-        records = self.resource_manager.query_dataset_record(dataset_id)
+        records = self.resource_manager.get_dataset_records(dataset_id)
         if len(records) == 0:
             raise ValueError(f"dataset_id: {dataset_id} didn't exists.")
         record = records[0]

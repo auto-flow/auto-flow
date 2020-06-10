@@ -6,3 +6,4 @@ autoflow*
 *.xls
 *.xlsx
 run*.py
+!run_estimator_http.py

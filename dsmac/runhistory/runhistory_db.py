@@ -1,8 +1,8 @@
 import datetime
 import os
-import pickle
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
+import numpy as np
 import peewee as pw
 from ConfigSpace import ConfigurationSpace, Configuration
 from frozendict import frozendict
@@ -32,6 +32,7 @@ class RunHistoryDB():
         # -----------------------------------------------------
         self.Model: pw.Model = self.get_model()
         self.config_space: ConfigurationSpace = config_space
+        self.timestamp = datetime.datetime.now()
 
     def get_db_cls(self):
         return get_db_class_by_db_type(self.db_type)
@@ -44,7 +45,7 @@ class RunHistoryDB():
             run_id = pw.FixedCharField(max_length=256, primary_key=True)
             config_id = pw.FixedCharField(max_length=128, default="")
             config = self.JSONField(default={})
-            config_bin = pw.BlobField(default=b"")  # PickleField(default=b"")
+            # config_bin = pw.BlobField(default=b"")  # PickleField(default=b"")
             config_origin = pw.CharField(max_length=64, default="")
             cost = pw.FloatField(default=65535)
             time = pw.FloatField(default=0.0)
@@ -74,8 +75,8 @@ class RunHistoryDB():
         run_id = self.get_run_id(instance_id, config_id)
         return self._appointment_config(run_id, instance_id)
 
-    def _appointment_config(self, run_id, instance_id) -> Tuple[bool, Optional[pw.Model]]:
-        query = self.Model.select().where(self.Model.run_id == run_id).dicts()
+    def _appointment_config(self, run_id, instance_id) -> Tuple[bool, Optional[List[dict]]]:
+        query = list(self.Model.select().where(self.Model.run_id == run_id).dicts())
         if len(query) > 0:
             query_ = query[0]
             if query_["origin"] >= 0:
@@ -102,21 +103,25 @@ class RunHistoryDB():
         run_id = self.get_run_id(instance_id, config_id)
         if instance_id is None:
             instance_id = ""
-        self._insert_runhistory(run_id, config_id, pickle.dumps(config), config.get_dictionary(), config.origin, cost,
-                                time, status.value, instance_id, seed, additional_info, origin.value)
+        # pickle.dumps(config)
+        self._insert_runhistory(run_id, config_id, config.get_dictionary(), config.origin, cost,
+                                time, status.value, instance_id, seed, additional_info, origin.value, os.getpid())
 
-    def _insert_runhistory(self, run_id, config_id, config_bin, config, config_origin, cost: float, time: float,
-                           status: StatusType, instance_id: str = "",
-                           seed: int = 0,
-                           additional_info: dict = frozendict(),
-                           origin: DataOrigin = DataOrigin.INTERNAL):
+    def _insert_runhistory(
+            self, run_id, config_id, config, config_origin, cost: float, time: float,
+            status: int, instance_id: str,
+            seed: int,
+            additional_info: dict,
+            origin: int,
+            pid: int
+    ):
         try:
             self.Model(
                 run_id=run_id,
                 config_id=config_id,
                 config=config,
                 config_origin=config_origin,
-                config_bin=config_bin,
+                # config_bin=config_bin,
                 cost=cost,
                 time=time,
                 instance_id=instance_id,
@@ -124,18 +129,21 @@ class RunHistoryDB():
                 status=status,
                 additional_info=dict(additional_info),
                 origin=origin,
-                modify_time=datetime.datetime.now()
+                modify_time=datetime.datetime.now(),
+                pid=pid
             ).save()
         except Exception as e:
             pass
 
-    def fetch_new_runhistory(self, instance_id, is_init=False):
-        query = self._fetch_new_runhistory(instance_id, is_init)
+    def fetch_new_runhistory(self, instance_id, is_init=False) -> Tuple[float, Configuration]:
+        query = self._fetch_new_runhistory(instance_id, os.getpid(), self.timestamp, is_init)
+        final_cost = np.inf
+        final_config = None
         for model in query:
             run_id = model["run_id"]
             config_id = model["config_id"]
             config = model["config"]
-            config_bin = model["config_bin"]
+            # config_bin = model["config_bin"]
             config_origin = model["config_origin"]
             cost = model["cost"]
             time = model["time"]
@@ -144,26 +152,28 @@ class RunHistoryDB():
             status = model["status"]
             additional_info = model["additional_info"]
             origin = model["origin"]
-            try:
-                config = pickle.loads(config_bin)
-            except Exception as e:
-                self.logger.error(f"{e}\nUsing config json instead to build Configuration.")
-                config = Configuration(self.config_space, values=config, origin=config_origin)
+            # try:
+            #     config = pickle.loads(config_bin)
+            # except Exception as e:
+            # self.logger.error(f"{e}\nUsing config json instead to build Configuration.")
+            config = Configuration(self.config_space, values=config, origin=config_origin)
             self.runhistory.add(config, cost, time, StatusType(status), instance_id, seed, additional_info,
                                 DataOrigin(origin))
-        self.timestamp = datetime.datetime.now()
+            if cost < final_cost:
+                final_config = config
+        return final_cost, final_config
 
-    def _fetch_new_runhistory(self, instance_id, is_init=False):
+    def _fetch_new_runhistory(self, instance_id, pid, timestamp, is_init):
         if is_init:
             # n_del = self.Model.delete().where(self.Model.origin < 0).execute()
             # if n_del > 0:
             #     self.logger.info(f"Delete {n_del} invalid records in run_history database.")
             query = self.Model.select().where(
-                (self.Model.origin >= 0) & (self.Model.instance_id == instance_id)
+                (self.Model.instance_id == instance_id) & (self.Model.origin >= 0)
             ).dicts()
         else:
             query = self.Model.select().where(
-                (self.Model.origin >= 0) & (self.Model.instance_id == instance_id) &
-                (self.Model.pid != os.getpid())
+                (self.Model.instance_id == instance_id) & (self.Model.origin >= 0) &
+                (self.Model.create_time > timestamp) & (self.Model.pid != pid)
             ).dicts()
-        return query
+        return list(query)

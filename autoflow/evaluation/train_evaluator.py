@@ -240,7 +240,7 @@ class TrainEvaluator(BaseEvaluator):
         info["config_id"] = config_id
         info["instance_id"] = self.instance_id
         info["run_id"] = RunHistoryDB.get_run_id(self.instance_id, config_id)
-        info["program_hyper_param"] = shp
+        # info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["component"] = estimator

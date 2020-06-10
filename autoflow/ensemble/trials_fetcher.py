@@ -31,6 +31,9 @@ class GetBestK(TrialsFetcher):
     def fetch(self):
         self.resource_manager.task_id = self.task_id
         self.resource_manager.hdl_id = self.hdl_id
-        fetched = self.resource_manager.get_best_k_trials(self.k)
+        self.resource_manager.init_trial_table()
+        fetched = self.resource_manager._get_best_k_trial_ids(
+            self.task_id, self.resource_manager.user_id, self.k
+        )
         # self.resource_manager.close_trials_db()
         return fetched
