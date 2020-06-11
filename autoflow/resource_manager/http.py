@@ -144,7 +144,7 @@ class HttpResourceManager(ResourceManager):
         response = self.post_requests(target, local)
         return response.json()
 
-    def _get_trial_records_by_id(self, trial_id):
+    def _get_trial_records_by_id(self, trial_id, k=0):
         local = get_valid_params_in_kwargs(self._get_trial_records_by_id, locals())
         target = "get_trial_records_by_id"
         response = self.post_requests(target, local)

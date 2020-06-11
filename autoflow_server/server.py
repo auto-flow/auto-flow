@@ -12,14 +12,22 @@ from typing import Dict, Any, List
 
 from fastapi import FastAPI, Body
 from autoflow.resource_manager.base import ResourceManager
+from autoflow.utils.dict_ import remove_None_value
 from dsmac.runhistory.runhistory_db import RunHistoryDB
 
 # from pydantic import BaseModel
 
 app = FastAPI()
-db_type = "sqlite"
-db_params = {}
-resource_manager = ResourceManager(db_type=db_type, db_params=db_params)
+db_type = os.getenv("DB_TYPE", "sqlite")
+db_params = {
+    "user": os.getenv("DB_USER"),
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT"),
+    "password": os.getenv("DB_PASSWORD"),
+}
+db_params = remove_None_value(db_params)
+resource_manager = ResourceManager(db_type=db_type, db_params=db_params,
+                                   store_path=os.getenv("STORE_PATH", "~/autoflow"))
 runhistory_db = RunHistoryDB(None, None, db_type, resource_manager.runhistory_db_params,
                              resource_manager.runhistory_table_name, "")
 resource_manager.init_dataset_table()
@@ -148,12 +156,14 @@ async def get_sorted_trial_records(task_id: str = Body(...), user_id: int = Body
 
 
 @app.post("/get_trial_records_by_id")
-async def get_trial_records_by_id(trial_id: int = Body(...)):
+async def get_trial_records_by_id(trial_id: int = Body(...), k=Body(...)):
+    # fixme: k为冗余参数，但是不加这个参数请求，server就会报422
     return resource_manager._get_trial_records_by_id(trial_id)
 
 
 @app.post("/get_trial_records_by_ids")
 async def get_trial_records_by_ids(trial_ids=Body(...), k=Body(...)):
+    # fixme: k为冗余参数，但是不加这个参数请求，server就会报422
     return resource_manager._get_trial_records_by_ids(trial_ids)
 
 

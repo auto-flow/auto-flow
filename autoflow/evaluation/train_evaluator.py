@@ -234,7 +234,7 @@ class TrainEvaluator(BaseEvaluator):
         # 2. 获取数据
         X_train, y_train, X_test, y_test = self.get_Xy()
         # 3. 进行评价
-        info = self.evaluate(model, X_train, y_train, X_test, y_test)  # todo : 考虑失败的情况
+        info = self.evaluate(model, X_train, y_train, X_test, y_test)
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id

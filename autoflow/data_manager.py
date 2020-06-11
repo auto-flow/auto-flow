@@ -406,10 +406,14 @@ class DataManager(StrSignatureMixin):
         self.resource_manager = None
         res = deepcopy(self)
         if keep_data:
-            self.X_train = X_train
-            self.X_test = X_test
-            self.y_train = y_train
-            self.y_test = y_test
+            res.X_train = X_train
+            res.X_test = X_test
+            res.y_train = y_train
+            res.y_test = y_test
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
         self.resource_manager = rm
         res.resource_manager = rm
         return res

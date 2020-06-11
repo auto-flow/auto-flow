@@ -46,7 +46,6 @@ class AutoFlowEstimator(BaseEstimator):
             log_config: Optional[dict] = None,
             highR_nan_threshold=0.5,
             highR_cat_threshold=0.5,
-            n_jobs_in_algorithm=1,
             consider_ordinal_as_cat=False,
             should_store_intermediate_result=False,
             should_finally_fit=False,
@@ -108,7 +107,6 @@ class AutoFlowEstimator(BaseEstimator):
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
         self.should_stack_X = should_stack_X
-        self.n_jobs_in_algorithm = n_jobs_in_algorithm
         self.consider_ordinal_as_cat = consider_ordinal_as_cat
         if model_registry is None:
             model_registry = {}
