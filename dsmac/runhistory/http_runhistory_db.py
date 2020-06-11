@@ -63,7 +63,7 @@ class HttpRunHistoryDB(RunHistoryDB):
         json_response = response.json()
         return json_response["ok"], json_response["record"]
 
-    def _insert_runhistory(
+    def _insert_runhistory_record(
             self, run_id, config_id, config, config_origin, cost: float, time: float,
             status: int, instance_id: str,
             seed: int,
@@ -73,8 +73,8 @@ class HttpRunHistoryDB(RunHistoryDB):
     ):
         additional_info = dict(additional_info)
         modify_time = datetime.datetime.now()
-        local = get_valid_params_in_kwargs(self._insert_runhistory, locals())
-        target = "runhistory"
+        local = get_valid_params_in_kwargs(self._insert_runhistory_record, locals())
+        target = "insert_runhistory_record"
         response = self.post_requests(target, local)
 
     def _fetch_new_runhistory(self, instance_id, pid, timestamp, is_init):

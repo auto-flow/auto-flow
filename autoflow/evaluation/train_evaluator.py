@@ -248,7 +248,7 @@ class TrainEvaluator(BaseEvaluator):
         info["additional_info"] = {
             "config_origin": getattr(shp, "origin", "unk")
         }
-        self.resource_manager.insert_to_trial_table(info)
+        self.resource_manager.insert_trial_record(info)
         return {
             "loss": info["loss"],
             "status": info["status"],

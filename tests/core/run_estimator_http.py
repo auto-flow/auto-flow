@@ -22,13 +22,16 @@ pipe = AutoFlowClassifier(
     DAG_workflow={
         "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
     },
-    initial_runs=6,
-    run_limit=27,
+    initial_runs=3,
+    run_limit=9,
     n_jobs=3,
     debug=True,
     resource_manager=http_resource_manager
 )
-pipe.fit(X_train, y_train)
+pipe.fit(
+    X_train, y_train,
+    fit_ensemble_params=False
+)
 # score = accuracy_score(y_test, y_pred)
 score = pipe.score(X_test, y_test)
 print(score)

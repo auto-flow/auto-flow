@@ -85,7 +85,7 @@ class DataFrameContainer(DataContainer):
         self.dataset_id = self.get_hash()
         if self.dataset_id == self.uploaded_hash:
             return
-        respond = self.resource_manager.insert_to_dataset_table(
+        respond = self.resource_manager.insert_dataset_record(
             self.dataset_id, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
             self.columns_mapper, list(self.columns))
         L, dataset_id, dataset_path = respond["length"], respond["dataset_id"], respond["dataset_path"]

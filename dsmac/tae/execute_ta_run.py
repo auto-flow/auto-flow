@@ -216,7 +216,7 @@ class ExecuteTARun(object):
                                 cost=cost, time=runtime, status=status,
                                 instance_id=instance, seed=seed,
                                 additional_info=additional_info)
-            self.runhistory.db.insert_runhistory(config=config,
+            self.runhistory.db.insert_runhistory_record(config=config,
                                 cost=cost, time=runtime, status=status,
                                 instance_id=instance, seed=seed,
                                 additional_info=additional_info)

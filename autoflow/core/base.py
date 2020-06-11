@@ -242,7 +242,7 @@ class AutoFlowEstimator(BaseEstimator):
                 raise NotImplementedError()
         self.metric = metric
         # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_to_task_table(
+        self.resource_manager.insert_task_record(
             data_manager=self.data_manager, metric=metric, splitter=splitter,
             specific_task_token=specific_task_token, dataset_metadata=dataset_metadata, task_metadata=task_metadata,
             sub_sample_indexes=sub_sample_indexes, sub_feature_indexes=sub_feature_indexes)
@@ -264,7 +264,7 @@ class AutoFlowEstimator(BaseEstimator):
             if is_not_realy_run:
                 break
             # get hdl_id, and insert record into "{task_id}.hdls" database
-            self.resource_manager.insert_to_hdl_table(hdl, hdl_constructor.hdl_metadata)
+            self.resource_manager.insert_hdl_record(hdl, hdl_constructor.hdl_metadata)
             self.resource_manager.close_hdl_table()
             # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
             experiment_config = {
@@ -280,7 +280,7 @@ class AutoFlowEstimator(BaseEstimator):
                 "log_path": self.log_path,
                 "log_config": self.log_config,
             }
-            self.resource_manager.insert_to_experiment_table(ExperimentType.AUTO, experiment_config, additional_info)
+            self.resource_manager.insert_experiment_record(ExperimentType.AUTO, experiment_config, additional_info)
             self.resource_manager.close_experiment_table()
             self.task_id = self.resource_manager.task_id
             self.hdl_id = self.resource_manager.hdl_id

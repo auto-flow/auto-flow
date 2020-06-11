@@ -55,7 +55,7 @@ class HttpResourceManager(ResourceManager):
     ############################  dataset ############################
     ##################################################################
 
-    def _insert_to_dataset_table(
+    def _insert_dataset_record(
             self,
             user_id: int,
             dataset_id: str,
@@ -67,8 +67,8 @@ class HttpResourceManager(ResourceManager):
             columns_mapper: Dict[str, str],
             columns: List[str]
     ):
-        local = get_valid_params_in_kwargs(self._insert_to_dataset_table, locals())
-        target = "dataset"
+        local = get_valid_params_in_kwargs(self._insert_dataset_record, locals())
+        target = "insert_dataset_record"
         response = self.post_requests(target, local)
         return response.json()
 
@@ -82,33 +82,33 @@ class HttpResourceManager(ResourceManager):
     ###########################  experiment ##########################
     ##################################################################
 
-    def _insert_to_experiment_table(
+    def _insert_experiment_record(
             self, user_id: int, hdl_id: str, task_id: str,
             experiment_type: str,
             experiment_config: Dict[str, Any], additional_info: Dict[str, Any]
     ):
-        local = get_valid_params_in_kwargs(self._insert_to_experiment_table, locals())
-        target = "experiment"
+        local = get_valid_params_in_kwargs(self._insert_experiment_record, locals())
+        target = "insert_experiment_record"
         response = self.post_requests(target, local)
         return response.json()["experiment_id"]
 
     def _finish_experiment_update_info(self, experiment_id: int, final_model_path: str, log_path: str,
                                        end_time: datetime.datetime):
         local = get_valid_params_in_kwargs(self._finish_experiment_update_info, locals())
-        target = "experiment_finish"
+        target = "finish_experiment_update_info"
         response = self.post_requests(target, local)
 
     ##################################################################
     ############################   task    ###########################
     ##################################################################
 
-    def _insert_to_task_table(self, task_id: str, user_id: int,
+    def _insert_task_record(self, task_id: str, user_id: int,
                               metric_str: str, splitter_str: str, ml_task_str: str,
                               train_set_id: str, test_set_id: str, train_label_id: str, test_label_id: str,
                               specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
                               sub_feature_indexes: List[str]):
-        local = get_valid_params_in_kwargs(self._insert_to_task_table, locals())
-        target = "task"
+        local = get_valid_params_in_kwargs(self._insert_task_record, locals())
+        target = "insert_task_record"
         response = self.post_requests(target, local)
         return response.json()["task_id"]
 
@@ -122,9 +122,9 @@ class HttpResourceManager(ResourceManager):
     ############################   hdl     ###########################
     ##################################################################
 
-    def _insert_to_hdl_table(self, task_id: str, hdl_id: str, user_id: int, hdl: dict, hdl_metadata: Dict[str, Any]):
-        local = get_valid_params_in_kwargs(self._insert_to_hdl_table, locals())
-        target = "hdl"
+    def _insert_hdl_record(self, task_id: str, hdl_id: str, user_id: int, hdl: dict, hdl_metadata: Dict[str, Any]):
+        local = get_valid_params_in_kwargs(self._insert_hdl_record, locals())
+        target = "insert_hdl_record"
         response = self.post_requests(target, local)
         return response.json()["hdl_id"]
 
@@ -132,9 +132,9 @@ class HttpResourceManager(ResourceManager):
     ############################   trial   ###########################
     ##################################################################
 
-    def _insert_to_trial_table(self, user_id: int, task_id: str, hdl_id: str, experiment_id: int, info: Dict[str, Any]):
-        local = get_valid_params_in_kwargs(self._insert_to_trial_table, locals())
-        target = "trial"
+    def _insert_trial_record(self, user_id: int, task_id: str, hdl_id: str, experiment_id: int, info: Dict[str, Any]):
+        local = get_valid_params_in_kwargs(self._insert_trial_record, locals())
+        target = "insert_trial_record"
         response = self.post_requests(target, local)
         return response.json()["trial_id"]
 

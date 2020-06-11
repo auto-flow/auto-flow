@@ -446,7 +446,7 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Dataset])
         return Dataset
 
-    def insert_to_dataset_table(
+    def insert_dataset_record(
             self,
             dataset_id,
             dataset_metadata,
@@ -460,7 +460,7 @@ class ResourceManager(StrSignatureMixin):
         dataset_path=""
         if upload_type == "fs":
             dataset_path = self.file_system.join(self.datasets_dir, f"{self.user_id}-{dataset_id}.h5")
-        return self._insert_to_dataset_table(
+        return self._insert_dataset_record(
             self.user_id,
             dataset_id,
             dataset_metadata,
@@ -472,7 +472,7 @@ class ResourceManager(StrSignatureMixin):
             columns
         )
 
-    def _insert_to_dataset_table(
+    def _insert_dataset_record(
             self,
             user_id: int,
             dataset_id: str,
@@ -640,7 +640,7 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Experiment])
         return Experiment
 
-    def insert_to_experiment_table(
+    def insert_experiment_record(
             self,
             experiment_type: ExperimentType,
             experiment_config,
@@ -648,11 +648,11 @@ class ResourceManager(StrSignatureMixin):
     ):
         self.init_experiment_table()
         assert isinstance(experiment_type, ExperimentType)
-        self.experiment_id = self._insert_to_experiment_table(self.user_id, self.hdl_id, self.task_id,
+        self.experiment_id = self._insert_experiment_record(self.user_id, self.hdl_id, self.task_id,
                                                               experiment_type.value,
                                                               experiment_config, additional_info)
 
-    def _insert_to_experiment_table(
+    def _insert_experiment_record(
             self, user_id: int, hdl_id: str, task_id: str,
             experiment_type: str,
             experiment_config: Dict[str, Any], additional_info: Dict[str, Any]
@@ -732,7 +732,7 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Task])
         return Task
 
-    def insert_to_task_table(self, data_manager: DataManager,
+    def insert_task_record(self, data_manager: DataManager,
                              metric: Scorer, splitter,
                              specific_task_token, dataset_metadata,
                              task_metadata, sub_sample_indexes, sub_feature_indexes):
@@ -771,13 +771,13 @@ class ResourceManager(StrSignatureMixin):
         task_metadata = dict(
             dataset_metadata=dataset_metadata, **task_metadata
         )
-        self.task_id = self._insert_to_task_table(
+        self.task_id = self._insert_task_record(
             task_id, self.user_id, metric_str, splitter_str, ml_task_str, train_set_id,
             test_set_id, train_label_id, test_label_id, specific_task_token, task_metadata,
             sub_sample_indexes, sub_feature_indexes
         )
 
-    def _insert_to_task_table(self, task_id: str, user_id: int,
+    def _insert_task_record(self, task_id: str, user_id: int,
                               metric_str: str, splitter_str: str, ml_task_str: str,
                               train_set_id: str, test_set_id: str, train_label_id: str, test_label_id: str,
                               specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
@@ -846,13 +846,13 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Hdl])
         return Hdl
 
-    def insert_to_hdl_table(self, hdl, hdl_metadata):
+    def insert_hdl_record(self, hdl, hdl_metadata):
         self.init_hdl_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
-        self.hdl_id = self._insert_to_hdl_table(self.task_id, hdl_id, self.user_id, hdl, hdl_metadata)
+        self.hdl_id = self._insert_hdl_record(self.task_id, hdl_id, self.user_id, hdl, hdl_metadata)
 
-    def _insert_to_hdl_table(self, task_id: str, hdl_id: str, user_id: int, hdl: dict, hdl_metadata: Dict[str, Any]):
+    def _insert_hdl_record(self, task_id: str, hdl_id: str, user_id: int, hdl: dict, hdl_metadata: Dict[str, Any]):
         records = self.HdlModel.select().where(
             (self.HdlModel.task_id == task_id) & (self.HdlModel.hdl_id == hdl_id))
         if len(records) == 0:
@@ -932,7 +932,7 @@ class ResourceManager(StrSignatureMixin):
         self.is_init_trial = False
         self.TrialsModel = None
 
-    def insert_to_trial_table(self, info: Dict):
+    def insert_trial_record(self, info: Dict):
         self.init_trial_table()
         config_id = info.get("config_id")
         models_path, finally_fit_model_path, y_info_path = \
@@ -942,7 +942,7 @@ class ResourceManager(StrSignatureMixin):
             finally_fit_model_path=finally_fit_model_path,
             y_info_path=y_info_path,
         )
-        self._insert_to_trial_table(self.user_id, self.task_id, self.hdl_id, self.experiment_id, info)
+        self._insert_trial_record(self.user_id, self.task_id, self.hdl_id, self.experiment_id, info)
 
     def _get_sorted_trial_records(self, task_id, user_id, limit):
         records = self.TrialsModel.select().where(
@@ -969,13 +969,13 @@ class ResourceManager(StrSignatureMixin):
             trial_ids.append(record.trial_id)
         return trial_ids
 
-    def _insert_to_trial_table(self, user_id: int, task_id: str, hdl_id: str, experiment_id: int, info: dict):
+    def _insert_trial_record(self, user_id: int, task_id: str, hdl_id: str, experiment_id: int, info: dict):
         success = False
         max_try_times = 3
         trial_id = -1
         for i in range(max_try_times):
             try:
-                trial_id = self.do_insert_to_trial_table(user_id, task_id, hdl_id, experiment_id, info)
+                trial_id = self.do_insert_trial_record(user_id, task_id, hdl_id, experiment_id, info)
                 success = True
             except Exception as e:
                 self.logger.error(e)
@@ -991,7 +991,7 @@ class ResourceManager(StrSignatureMixin):
             self.logger.error(f"After {max_try_times} times try, trial info cannot insert into trial table.")
         return trial_id
 
-    def do_insert_to_trial_table(self, user_id, task_id, hdl_id, experiment_id, info: dict):
+    def do_insert_trial_record(self, user_id, task_id, hdl_id, experiment_id, info: dict):
         trial_record = self.TrialsModel.create(
             user_id=user_id,
             config_id=info.get("config_id"),
