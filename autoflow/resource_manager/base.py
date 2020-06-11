@@ -232,7 +232,7 @@ class ResourceManager(StrSignatureMixin):
             "y_test_pred": info.pop("y_test_pred", None)
         }
         # ----dir---------------------
-        self.trial_dir = self.file_system.join(self.parent_trials_dir, self.task_id, self.hdl_id)
+        self.trial_dir = self.file_system.join(self.parent_trials_dir, str(self.user_id), self.task_id, self.hdl_id)
         self.file_system.mkdir(self.trial_dir)
         # ----get specific URL---------
         models_path = self.file_system.join(self.trial_dir, f"{model_id}_models.{self.compress_suffix}")
@@ -457,9 +457,11 @@ class ResourceManager(StrSignatureMixin):
             columns
     ):
         self.init_dataset_table()
-        dataset_path=""
+        dataset_path = ""
         if upload_type == "fs":
-            dataset_path = self.file_system.join(self.datasets_dir, f"{self.user_id}-{dataset_id}.h5")
+            dataset_dir = self.file_system.join(self.datasets_dir, str(self.user_id))
+            self.file_system.mkdir(dataset_dir)
+            dataset_path = self.file_system.join(dataset_dir, f"{dataset_id}.h5")
         return self._insert_dataset_record(
             self.user_id,
             dataset_id,
@@ -477,7 +479,7 @@ class ResourceManager(StrSignatureMixin):
             user_id: int,
             dataset_id: str,
             dataset_metadata: Dict[str, Any],
-            dataset_path:str,
+            dataset_path: str,
             upload_type: str,
             dataset_source: str,
             column_descriptions: Dict[str, Any],
@@ -649,8 +651,8 @@ class ResourceManager(StrSignatureMixin):
         self.init_experiment_table()
         assert isinstance(experiment_type, ExperimentType)
         self.experiment_id = self._insert_experiment_record(self.user_id, self.hdl_id, self.task_id,
-                                                              experiment_type.value,
-                                                              experiment_config, additional_info)
+                                                            experiment_type.value,
+                                                            experiment_config, additional_info)
 
     def _insert_experiment_record(
             self, user_id: int, hdl_id: str, task_id: str,
@@ -669,7 +671,8 @@ class ResourceManager(StrSignatureMixin):
         return experiment_record.experiment_id
 
     def finish_experiment(self, log_path, final_model):
-        self.experiment_path = self.file_system.join(self.parent_experiments_dir, str(self.experiment_id))
+        self.experiment_path = self.file_system.join(self.parent_experiments_dir, str(self.user_id),
+                                                     str(self.experiment_id))
         self.file_system.mkdir(self.experiment_path)
         experiment_log_path = self.file_system.join(self.experiment_path, "log_file.log")
         experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
@@ -733,9 +736,9 @@ class ResourceManager(StrSignatureMixin):
         return Task
 
     def insert_task_record(self, data_manager: DataManager,
-                             metric: Scorer, splitter,
-                             specific_task_token, dataset_metadata,
-                             task_metadata, sub_sample_indexes, sub_feature_indexes):
+                           metric: Scorer, splitter,
+                           specific_task_token, dataset_metadata,
+                           task_metadata, sub_sample_indexes, sub_feature_indexes):
         self.init_task_table()
         train_set_id = data_manager.train_set_id
         test_set_id = data_manager.test_set_id
@@ -778,10 +781,10 @@ class ResourceManager(StrSignatureMixin):
         )
 
     def _insert_task_record(self, task_id: str, user_id: int,
-                              metric_str: str, splitter_str: str, ml_task_str: str,
-                              train_set_id: str, test_set_id: str, train_label_id: str, test_label_id: str,
-                              specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
-                              sub_feature_indexes: List[str]):
+                            metric_str: str, splitter_str: str, ml_task_str: str,
+                            train_set_id: str, test_set_id: str, train_label_id: str, test_label_id: str,
+                            specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
+                            sub_feature_indexes: List[str]):
         records = self.TaskModel.select().where(
             (self.TaskModel.task_id == task_id) & (self.TaskModel.user_id == user_id)
         )

@@ -52,7 +52,6 @@ create table run_history
             primary key,
     config_id       char(128)   not null,
     config          json        not null,
-    config_bin      bytea       not null,
     config_origin   varchar(64) not null,
     cost            real        not null,
     time            real        not null,
@@ -61,13 +60,13 @@ create table run_history
     status          integer     not null,
     additional_info json        not null,
     origin          integer     not null,
-    weight          real        not null,
     pid             integer     not null,
     create_time     timestamp   not null,
     modify_time     timestamp   not null
 );
 create index run_history_instance_id
     on run_history (instance_id);
+
 create table task
 (
     task_id             char(32)     not null,
