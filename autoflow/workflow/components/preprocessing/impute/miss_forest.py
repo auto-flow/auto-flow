@@ -5,4 +5,4 @@ __all__ = ["MissForest"]
 
 class MissForest(AutoFlowFeatureEngineerAlgorithm):
     class__ = "MissForest"
-    module__ = "skimpute"
+    module__ = "autoflow.feature_engineer.impute"

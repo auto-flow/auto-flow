@@ -1,10 +1,13 @@
 import copy
 from abc import ABCMeta, abstractmethod
 from functools import partial
+from typing import List
 
 import numpy as np
 import pandas as pd
+import scipy.stats
 import sklearn.metrics
+from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import type_of_target
 
 from autoflow.metrics import classification_metrics
@@ -19,7 +22,7 @@ class Scorer(object, metaclass=ABCMeta):
         self._score_func = score_func
         self._optimum = optimum
         self._sign = sign
-        self.score=None
+        self.score = None
 
     @abstractmethod
     def __call__(self, y_true, y_pred, sample_weight=None):
@@ -193,6 +196,19 @@ def make_scorer(name, score_func, optimum=1, greater_is_better=True,
 # Standard regression scores
 r2 = make_scorer('r2',
                  sklearn.metrics.r2_score)
+
+pearsonr = make_scorer(
+    'pearsonr',
+    lambda x, y: scipy.stats.pearsonr(x, y)[0]
+)
+spearmanr = make_scorer(
+    'spearmanr',
+    lambda x, y: scipy.stats.spearmanr(x, y)[0]
+)
+kendalltau = make_scorer(
+    'kendalltau',
+    lambda x, y: scipy.stats.kendalltau(x, y)[0]
+)
 mean_squared_error = make_scorer('mean_squared_error',
                                  sklearn.metrics.mean_squared_error,
                                  optimum=0,
@@ -210,6 +226,8 @@ median_absolute_error = make_scorer('median_absolute_error',
 accuracy = make_scorer('accuracy',
                        sklearn.metrics.accuracy_score)
 mcc = make_scorer('mcc', sklearn.metrics.matthews_corrcoef)
+sensitivity = make_scorer("sensitivity", classification_metrics.sensitivity)
+specificity = make_scorer("specificity", classification_metrics.specificity)
 balanced_accuracy = make_scorer('balanced_accuracy',
                                 classification_metrics.balanced_accuracy)
 f1 = make_scorer('f1',
@@ -239,15 +257,18 @@ pac_score = make_scorer('pac_score',
 
 
 REGRESSION_METRICS = dict()
-for scorer in [r2, mean_squared_error, mean_absolute_error,
-               median_absolute_error]:
+for scorer in [
+    r2, mean_squared_error, mean_absolute_error,
+    median_absolute_error, pearsonr, spearmanr, kendalltau
+]:
     REGRESSION_METRICS[scorer.name] = scorer
 
 CLASSIFICATION_METRICS = dict()
 
-for scorer in [accuracy, average_precision, log_loss,
-               balanced_accuracy, pac_score, mcc
-               ]:
+for scorer in [
+    accuracy, average_precision, log_loss,
+    balanced_accuracy, pac_score, mcc, sensitivity, specificity
+]:
     CLASSIFICATION_METRICS[scorer.name] = scorer
 
 for multi_class in ["ovo", "ovr"]:
@@ -286,16 +307,16 @@ def calculate_score(solution, prediction, ml_task: MLTask, metric,
         solution = solution.values
     if should_calc_all_metric:
         score = dict()
-        true_score={}
+        true_score = {}
         if ml_task.mainTask == "regression":
             # TODO put this into the regression metric itself
             cprediction = sanitize_array(prediction)
             metric_dict = copy.copy(REGRESSION_METRICS)
             metric_dict[metric.name] = metric
             for metric_ in REGRESSION_METRICS:
-                func:Scorer = REGRESSION_METRICS[metric_]
+                func: Scorer = REGRESSION_METRICS[metric_]
                 score[func.name] = func(solution, cprediction)
-                true_score[func.name]=func.score
+                true_score[func.name] = func.score
 
         else:
             metric_dict = copy.copy(CLASSIFICATION_METRICS)
@@ -331,3 +352,10 @@ def calculate_score(solution, prediction, ml_task: MLTask, metric,
             score = metric(solution, prediction)
 
     return score, true_score
+
+
+def calculate_confusion_matrix(y_true, y_pred) -> List[List[int]]:
+    # return 2d list
+    if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
+        y_pred = np.argmax(y_pred, axis=1)
+    return confusion_matrix(y_true, y_pred).tolist()

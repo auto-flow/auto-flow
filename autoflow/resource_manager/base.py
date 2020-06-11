@@ -1013,7 +1013,7 @@ class ResourceManager(StrSignatureMixin):
             models_path=info.get("models_path", ""),
             final_model_path=info.get("finally_fit_model_path", ""),
             y_info_path=info.get("y_info_path", ""),
-            additional_info=info.get("additional_info", ""),
+            additional_info=info.get("additional_info", {}),
             # smac_hyper_param=info.get("program_hyper_param"),
             dict_hyper_param=info.get("dict_hyper_param", {}),
             cost_time=info.get("cost_time", 65535),
@@ -1058,16 +1058,3 @@ class ResourceManager(StrSignatureMixin):
         return True
 
 
-if __name__ == '__main__':
-    rm = ResourceManager("/home/tqc/PycharmProjects/autoflow/test/test_db")
-    rm.init_dataset_path("default_dataset_name")
-    rm.init_trial_table()
-    estimators = []
-    for record in rm.TrialsModel.select().group_by(rm.TrialsModel.estimator):
-        estimators.append(record.estimator)
-    for estimator in estimators:
-        should_delete = rm.TrialsModel.select(rm.TrialsModel.trial_id).where(
-            rm.TrialsModel.estimator == estimator).order_by(
-            rm.TrialsModel.loss, rm.TrialsModel.cost_time).offset(50)
-        if should_delete:
-            rm.TrialsModel.delete().where(rm.TrialsModel.trial_id.in_(should_delete)).execute()

@@ -12,7 +12,7 @@ from autoflow import datasets
 
 train_df, test_df = datasets.load("titanic", return_train_test=True)
 trained_pipeline = AutoFlowClassifier(
-    initial_runs=1, run_limit=3, n_jobs=1,
+    initial_runs=1, run_limit=1, n_jobs=1,
     included_classifiers=["catboost"],
     debug=True,
     n_jobs_in_algorithm=5

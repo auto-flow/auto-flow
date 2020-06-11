@@ -95,17 +95,18 @@ class RunHistoryDB():
         return True, None
 
     def insert_runhistory_record(self, config: Configuration, cost: float, time: float,
-                          status: StatusType, instance_id: str = "",
-                          seed: int = 0,
-                          additional_info: dict = frozendict(),
-                          origin: DataOrigin = DataOrigin.INTERNAL):
+                                 status: StatusType, instance_id: str = "",
+                                 seed: int = 0,
+                                 additional_info: dict = frozendict(),
+                                 origin: DataOrigin = DataOrigin.INTERNAL):
         config_id = get_id_of_config(config)
         run_id = self.get_run_id(instance_id, config_id)
         if instance_id is None:
             instance_id = ""
         # pickle.dumps(config)
         self._insert_runhistory_record(run_id, config_id, config.get_dictionary(), config.origin, cost,
-                                time, status.value, instance_id, seed, additional_info, origin.value, os.getpid())
+                                       time, status.value, instance_id, seed, additional_info, origin.value,
+                                       os.getpid())
 
     def _insert_runhistory_record(
             self, run_id, config_id, config, config_origin, cost: float, time: float,
@@ -137,6 +138,7 @@ class RunHistoryDB():
 
     def fetch_new_runhistory(self, instance_id, is_init=False) -> Tuple[float, Configuration]:
         query = self._fetch_new_runhistory(instance_id, os.getpid(), self.timestamp, is_init)
+        self.timestamp = datetime.datetime.now()
         final_cost = np.inf
         final_config = None
         for model in query:

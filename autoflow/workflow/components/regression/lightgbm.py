@@ -11,6 +11,7 @@ class LGBMRegressor(AutoFlowClassificationAlgorithm):
 
     boost_model = True
     tree_model = True
+    support_early_stopping = True
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None):

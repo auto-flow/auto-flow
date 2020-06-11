@@ -11,12 +11,12 @@ from ConfigSpace import Configuration
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.data_container import DataFrameContainer
+from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.base import BaseEvaluator
 from autoflow.hdl.shp2dhp import SHP2DHP
-from autoflow.data_manager import DataManager
+from autoflow.metrics import Scorer, calculate_score, calculate_confusion_matrix
 from autoflow.resource_manager.base import ResourceManager
-from autoflow.metrics import Scorer, calculate_score
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
@@ -118,6 +118,8 @@ class TrainEvaluator(BaseEvaluator):
     def evaluate(self, model: ML_Workflow, X, y, X_test, y_test):
         assert self.resource_manager is not None
         warning_info = StringIO()
+        additional_info = {}
+        support_early_stopping = getattr(model.steps[-1][1], "support_early_stopping", False)
         with redirect_stderr(warning_info):
             # splitter 必须存在
             losses = []
@@ -130,6 +132,8 @@ class TrainEvaluator(BaseEvaluator):
             failed_info = ""
             intermediate_results = []
             start_time = datetime.datetime.now()
+            confusion_matrices = []
+            best_iterations = []
             for train_index, valid_index in self.splitter.split(X.data, y.data, self.groups):
                 cloned_model = model.copy()
                 X: DataFrameContainer
@@ -152,6 +156,12 @@ class TrainEvaluator(BaseEvaluator):
                 y_true_indexes.append(valid_index)
                 y_pred = procedure_result["pred_valid"]
                 y_test_pred = procedure_result["pred_test"]
+                if self.ml_task.mainTask == "classification":
+                    confusion_matrices.append(calculate_confusion_matrix(y_valid.data, y_pred))
+                if support_early_stopping:
+                    estimator = cloned_model.steps[-1][1]
+                    best_iterations.append(getattr(
+                        estimator, "best_iteration_", getattr(estimator.component, "best_iteration_", -1)))
                 # todo: 取出处理后的y_pred
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
@@ -159,6 +169,10 @@ class TrainEvaluator(BaseEvaluator):
                 loss, all_score = self.loss(y_valid.data, y_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 losses.append(float(loss))
                 all_scores.append(all_score)
+            if self.ml_task.mainTask == "classification":
+                additional_info["confusion_matrices"] = confusion_matrices
+            if support_early_stopping:
+                additional_info["best_iterations"] = best_iterations
             end_time = datetime.datetime.now()
             # finally fit
             if status == "SUCCESS" and self.should_finally_fit:
@@ -205,6 +219,7 @@ class TrainEvaluator(BaseEvaluator):
                 "failed_info": failed_info,
                 "start_time": start_time,
                 "end_time": end_time,
+                "additional_info": additional_info
             }
             # todo
             if y_test is not None:
@@ -216,7 +231,8 @@ class TrainEvaluator(BaseEvaluator):
                         y_test_pred = vote_predicts(y_test_preds)
                     else:
                         y_test_pred = mean_predicts(y_test_preds)
-                test_loss, test_all_score = self.loss(y_test.data, y_test_pred)  # todo: 非1d-array情况下的用户自定义评估器
+                test_loss, test_all_score = self.loss(y_test.data, y_test_pred)
+                # todo: 非1d-array情况下的用户自定义评估器
                 info.update({
                     "test_loss": test_loss,
                     "test_all_score": test_all_score,
@@ -245,9 +261,9 @@ class TrainEvaluator(BaseEvaluator):
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["component"] = estimator
         info["cost_time"] = cost_time
-        info["additional_info"] = {
+        info["additional_info"].update({
             "config_origin": getattr(shp, "origin", "unk")
-        }
+        })
         self.resource_manager.insert_trial_record(info)
         return {
             "loss": info["loss"],

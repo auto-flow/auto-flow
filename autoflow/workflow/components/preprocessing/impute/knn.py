@@ -5,4 +5,4 @@ __all__ = ["KNNImputer"]
 
 class KNNImputer(AutoFlowFeatureEngineerAlgorithm):
     class__ = "KNNImputer"
-    module__ = "skimpute"
+    module__ = "autoflow.feature_engineer.impute"

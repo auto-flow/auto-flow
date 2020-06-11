@@ -25,7 +25,7 @@ class AutoFlowComponent(BaseEstimator):
     boost_model = False
     tree_model = False
     cache_intermediate = False
-    suspend_other_processes = False
+    support_early_stopping = False
     is_fit = False
 
     def __init__(self, **kwargs):
@@ -239,6 +239,7 @@ class AutoFlowComponent(BaseEstimator):
 class AutoFlowIterComponent(AutoFlowComponent):
     warm_start_name = "warm_start"
     iterations_name = "n_estimators"
+    support_early_stopping = True
 
     @ignore_warnings(category=ConvergenceWarning)
     def iterative_fit(self, X, y, X_valid, y_valid, iter_inc):
@@ -266,8 +267,8 @@ class AutoFlowIterComponent(AutoFlowComponent):
                 self.fully_fitted_ = True
                 # todo: choose maximal performance, minimal iteration
                 index = int(np.lexsort((self.iteration_history, -self.performance_history))[0])
-                self.final_iteration = self.iteration_history[index]
-                setattr(self, self.iterations_name, self.final_iteration)
+                self.best_iteration_ = self.iteration_history[index]
+                setattr(self, self.iterations_name, self.best_iteration_)
                 # index = np.argmax(self.performance_history)
                 best_estimator = self.best_estimators[index]
                 self.best_estimators = None

@@ -9,4 +9,4 @@ __all__ = ["AdaptiveSimpleImputer"]
 
 class AdaptiveSimpleImputer(AutoFlowFeatureEngineerAlgorithm):
     class__ = "AdaptiveSimpleImputer"
-    module__ = "skimpute"
+    module__ = "autoflow.feature_engineer.impute"

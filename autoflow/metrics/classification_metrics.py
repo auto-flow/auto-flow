@@ -2,10 +2,12 @@ import numpy as np
 import scipy as sp
 
 # from sklearn.metrics.classification import _check_targets, type_of_target
+from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import type_of_target
 
+
 def balanced_accuracy(solution, prediction):
-    y_type=type_of_target(solution)
+    y_type = type_of_target(solution)
 
     if y_type not in ["binary", "multiclass", 'multilabel-indicator']:
         raise ValueError("{0} is not supported".format(y_type))
@@ -57,6 +59,22 @@ def balanced_accuracy(solution, prediction):
         raise ValueError(y_type)
 
     return np.mean(bac)  # average over all classes
+
+
+def sensitivity(solution, prediction):
+    if type_of_target(solution) != "binary":
+        assert ValueError("multiclass format is not supported")
+    tn, fp, fn, tp = confusion_matrix(y_true=solution, y_pred=prediction).ravel()
+    se = tp / float(tp + fn)
+    return se
+
+
+def specificity(solution, prediction):
+    if type_of_target(solution) != "binary":
+        assert ValueError("multiclass format is not supported")
+    tn, fp, fn, tp = confusion_matrix(y_true=solution, y_pred=prediction).ravel()
+    sp = tn / float(tn + fp)
+    return sp
 
 
 def pac_score(solution, prediction):

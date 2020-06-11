@@ -68,7 +68,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             print("time:", end - start)
             self.assertTrue(score == np.max(est.performance_history))
             print("max_iterations:", est.max_iterations)
-            print("final_iteration:", est.final_iteration)
+            print("best_iteration_:", est.best_iteration_)
             print("early_stopping_rounds:", est.early_stopping_rounds)
             print("early_stopping_tol:", est.early_stopping_tol)
             print("iter_inc:", est.iter_inc)
@@ -87,7 +87,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             plt.ylabel("Accuracy")
             title = cls.__name__
             plt.title(title)
-            plt.axvline(x=est.final_iteration, ls="--", c="k")
+            plt.axvline(x=est.best_iteration_, ls="--", c="k")
             plt.legend(loc="best")
             plt.savefig(self.plot_dir + f"/{title}.png", quality=100, dpi=600)
             plt.close()
@@ -125,7 +125,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             # if cls.__name__ != "SGDRegressor":
             #     self.assertTrue(score == np.max(est.performance_history))
             print("max_iterations:", est.max_iterations)
-            print("final_iteration:", est.final_iteration)
+            print("best_iteration_:", est.best_iteration_)
             print("early_stopping_rounds:", est.early_stopping_rounds)
             print("early_stopping_tol:", est.early_stopping_tol)
             print("iter_inc:", est.iter_inc)
@@ -144,7 +144,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             plt.ylabel("R2")
             title = cls.__name__
             plt.title(title)
-            plt.axvline(x=est.final_iteration, ls="--", c="k")
+            plt.axvline(x=est.best_iteration_, ls="--", c="k")
             plt.legend(loc="best")
             plt.savefig(self.plot_dir + f"/{title}.png", quality=100, dpi=600)
             plt.close()
