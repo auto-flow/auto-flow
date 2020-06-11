@@ -20,5 +20,5 @@ class TestDataFrameContainer(LocalResourceTestCase):
         in_data = [1, 2, 3, 4, 5]
         dc = NdArrayContainer(dataset_instance=in_data, resource_manager=self.mock_resource_manager)
         dc.upload()
-        d_dc = NdArrayContainer(dataset_id=dc.dataset_hash, resource_manager=self.mock_resource_manager)
+        d_dc = NdArrayContainer(dataset_id=dc.dataset_id, resource_manager=self.mock_resource_manager)
         self.assertTrue(np.all(d_dc.data == np.array(in_data)))

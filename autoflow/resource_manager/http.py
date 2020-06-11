@@ -58,7 +58,7 @@ class HttpResourceManager(ResourceManager):
     def _insert_to_dataset_table(
             self,
             user_id: int,
-            dataset_hash: str,
+            dataset_id: str,
             dataset_metadata: Dict[str, Any],
             dataset_path:str,
             upload_type: str,

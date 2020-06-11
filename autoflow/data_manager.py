@@ -134,18 +134,18 @@ class DataManager(StrSignatureMixin):
         if self.X_train is not None:
             self.X_train.set_column_descriptions(self.final_column_descriptions)
             self.X_train.upload(self.upload_type)
-            self.logger.info(f"TrainSet's DataSet ID = {self.X_train.dataset_hash}")
+            self.logger.info(f"TrainSet's DataSet ID = {self.X_train.dataset_id}")
         if self.X_test is not None:
             self.X_test.set_column_descriptions(self.final_column_descriptions)
             self.X_test.upload(self.upload_type)
-            self.logger.info(f"TestSet's DataSet ID = {self.X_test.dataset_hash}")
+            self.logger.info(f"TestSet's DataSet ID = {self.X_test.dataset_id}")
         # ---origin hash-----------------------------------------------------
-        self.train_set_hash = self.X_train.get_hash() if self.X_train is not None else ""
-        self.test_set_hash = self.X_test.get_hash() if self.X_test is not None else ""
+        self.train_set_id = self.X_train.get_hash() if self.X_train is not None else ""
+        self.test_set_id = self.X_test.get_hash() if self.X_test is not None else ""
         if self.input_train_hash:
-            assert self.input_train_hash == self.train_set_hash
+            assert self.input_train_hash == self.train_set_id
         if self.input_test_hash:
-            assert self.input_test_hash == self.test_set_hash
+            assert self.input_test_hash == self.test_set_id
         # ---pop auxiliary columns-----------------------------------------------------
         y_train, y_test = self.pop_auxiliary_feature_groups()
         # --验证X与X_test的列应该相同
@@ -178,8 +178,8 @@ class DataManager(StrSignatureMixin):
         self.ml_task: MLTask = get_ml_task_from_y(y_train.data)
         self.y_train = y_train
         self.y_test = y_test
-        self.train_label_hash = self.y_train.get_hash() if self.y_train is not None else ""
-        self.test_label_hash = self.y_test.get_hash() if self.y_test is not None else ""
+        self.train_label_id = self.y_train.get_hash() if self.y_train is not None else ""
+        self.test_label_id = self.y_test.get_hash() if self.y_test is not None else ""
         if self.X_train is not None:
             self.columns = self.X_train.columns
         else:
@@ -230,10 +230,10 @@ class DataManager(StrSignatureMixin):
     def parse_data_container(self, dataset_source, X, y) -> Tuple[Optional[DataFrameContainer], str]:
         if X is None:
             return X, ""
-        # input_dataset_hash only work if X is dataset_id
-        # keep input_dataset_hash to do sample test
+        # input_dataset_id only work if X is dataset_id
+        # keep input_dataset_id to do sample test
         # make sure dataset is invariant in upload and download process
-        input_dataset_hash = ""
+        input_dataset_id = ""
         self.final_column_descriptions = None
         # filepath or dataset_id
         if isinstance(X, str):
@@ -245,7 +245,7 @@ class DataManager(StrSignatureMixin):
             # dataset_id
             else:
                 self.logger.info(f"'{X}' will be treated as dataset ID, and download from database.")
-                input_dataset_hash = X
+                input_dataset_id = X
                 X = DataFrameContainer(dataset_source, dataset_id=X, resource_manager=self.resource_manager,
                                        dataset_metadata=self.dataset_metadata)
                 self.final_column_descriptions = deepcopy(X.column_descriptions)
@@ -260,7 +260,7 @@ class DataManager(StrSignatureMixin):
             X = self.concat_y(X, y)
             X = DataFrameContainer(dataset_source, dataset_instance=X, resource_manager=self.resource_manager,
                                    dataset_metadata=self.dataset_metadata)
-        return X, input_dataset_hash
+        return X, input_dataset_id
 
     def parse_feature_group(self, series: pd.Series, consider_nan=True) -> str:
         # --- start parsing feature-group -----

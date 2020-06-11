@@ -29,11 +29,11 @@ class NdArrayContainer(DataContainer):
         return get_hash_of_array(self.data, m)
 
     def upload(self, upload_type="fs"):
-        self.dataset_hash = self.get_hash()
-        if self.dataset_hash == self.uploaded_hash:
+        self.dataset_id = self.get_hash()
+        if self.dataset_id == self.uploaded_hash:
             return
         respond = self.resource_manager.insert_to_dataset_table(
-            self.dataset_hash, self.dataset_metadata, "fs", self.dataset_source, {},
+            self.dataset_id, self.dataset_metadata, "fs", self.dataset_source, {},
             {}, [])
         L, dataset_id, dataset_path = respond["length"], respond["dataset_id"], respond["dataset_path"]
         if L != 0:

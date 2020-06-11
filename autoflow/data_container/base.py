@@ -20,7 +20,7 @@ class DataContainer():
                  resource_manager=None,
                  dataset_metadata=frozendict(), upload_type="fs"):
         self.upload_type = upload_type
-        self.dataset_hash = None
+        self.dataset_id = None
         self.dataset_source = dataset_source
         self.dataset_metadata = dict(dataset_metadata)
         self.dataset_metadata.update(dataset_source=dataset_source)

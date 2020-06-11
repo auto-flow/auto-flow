@@ -39,7 +39,7 @@ async def insert_to_dataset_table(
         columns_mapper: Dict[str, str],
         columns: List[str],
         user_id: int = Body(...),
-        dataset_hash: str = Body(...),
+        dataset_id: str = Body(...),
         dataset_metadata: Dict[str, Any] = Body(...),
         dataset_path: str = Body(...),
         upload_type: str = Body(...),
@@ -48,7 +48,7 @@ async def insert_to_dataset_table(
 ):
     return resource_manager._insert_to_dataset_table(
         user_id,
-        dataset_hash,
+        dataset_id,
         dataset_metadata,
         dataset_path,
         upload_type,

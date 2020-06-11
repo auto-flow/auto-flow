@@ -47,8 +47,8 @@ class ML_Workflow(Pipeline):
             data_copied.dataset_metadata.update(
                 {"task_id": task_id, "experiment_id": experiment_id, "step_name": step_name})
             data_copied.upload("fs")
-            dataset_hash = data_copied.dataset_hash
-            dict_[name] = dataset_hash
+            dataset_id = data_copied.dataset_id
+            dict_[name] = dataset_id
 
     def assemble_result(self, name, X, X_transformed_stack: DataFrameContainer, result):
         # fixme: 不支持重采样的preprocess
@@ -99,12 +99,12 @@ class ML_Workflow(Pipeline):
                             f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
                         return X_train
                 X_stack = stack_X(X_train, X_valid, X_test)
-                dataset_hash = X_stack.get_hash()
+                dataset_id = X_stack.get_hash()
                 component_name = transformer.__class__.__name__
                 m = hashlib.md5()
                 get_hash_of_str(component_name, m)
                 component_hash = get_hash_of_dict(hyperparams, m)
-                redis_key = f"{component_hash}-{dataset_hash}"
+                redis_key = f"{component_hash}-{dataset_id}"
                 redis_result = self.resource_manager.redis_hgetall(redis_key)
                 if isinstance(redis_result, dict) and b"component" in redis_result and b"result" in redis_result:
                     X_transformed_stack = pickle.loads(redis_result[b"result"])

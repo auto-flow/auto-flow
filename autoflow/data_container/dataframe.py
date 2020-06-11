@@ -82,18 +82,18 @@ class DataFrameContainer(DataContainer):
 
     def upload(self, upload_type="fs"):
         assert upload_type in ("table", "fs")
-        self.dataset_hash = self.get_hash()
-        if self.dataset_hash == self.uploaded_hash:
+        self.dataset_id = self.get_hash()
+        if self.dataset_id == self.uploaded_hash:
             return
         respond = self.resource_manager.insert_to_dataset_table(
-            self.dataset_hash, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
+            self.dataset_id, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
             self.columns_mapper, list(self.columns))
         L, dataset_id, dataset_path = respond["length"], respond["dataset_id"], respond["dataset_path"]
         if L != 0:
             self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
         else:
             if upload_type == "table":
-                self.resource_manager.upload_df_to_table(self.data, self.dataset_hash, self.columns_mapper)
+                self.resource_manager.upload_df_to_table(self.data, self.dataset_id, self.columns_mapper)
             else:
                 self.resource_manager.upload_df_to_fs(self.data, dataset_path)
         super(DataFrameContainer, self).upload(upload_type)

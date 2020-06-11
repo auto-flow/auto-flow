@@ -65,7 +65,7 @@ class TestDataManager(LocalResourceTestCase):
         # -------------------------------------------------------------------------------
 
         data_manager3 = DataManager(
-            X_train=data_manager1.train_set_hash,
+            X_train=data_manager1.train_set_id,
             # X_test=test_df,
             column_descriptions=column_descriptions,
             resource_manager=self.mock_resource_manager
@@ -74,8 +74,8 @@ class TestDataManager(LocalResourceTestCase):
         # -------------------------------------------------------------------------------
 
         data_manager4 = DataManager(
-            X_train=data_manager1.train_set_hash,
-            X_test=data_manager1.test_set_hash,
+            X_train=data_manager1.train_set_id,
+            X_test=data_manager1.test_set_id,
             column_descriptions=column_descriptions,
             resource_manager=self.mock_resource_manager
         )

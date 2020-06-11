@@ -22,7 +22,7 @@ class TestDataFrameContainer(LocalResourceTestCase):
         dc.set_feature_groups(feat_grp)
         column_descriptions = dc.column_descriptions
         dc.upload()
-        dataset_id = dc.dataset_hash
+        dataset_id = dc.dataset_id
         download_dc = DataFrameContainer("Unittest", dataset_id=dataset_id, resource_manager=self.mock_resource_manager)
         self.assertTrue(np.all(download_dc.data.fillna(0) == dc.data.fillna(0)))
         self.assertTrue(np.all(download_dc.feature_groups == dc.feature_groups))

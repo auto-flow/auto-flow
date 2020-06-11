@@ -448,7 +448,7 @@ class ResourceManager(StrSignatureMixin):
 
     def insert_to_dataset_table(
             self,
-            dataset_hash,
+            dataset_id,
             dataset_metadata,
             upload_type,
             dataset_source,
@@ -459,10 +459,10 @@ class ResourceManager(StrSignatureMixin):
         self.init_dataset_table()
         dataset_path=""
         if upload_type == "fs":
-            dataset_path = self.file_system.join(self.datasets_dir, f"{self.user_id}-{dataset_hash}.h5")
+            dataset_path = self.file_system.join(self.datasets_dir, f"{self.user_id}-{dataset_id}.h5")
         return self._insert_to_dataset_table(
             self.user_id,
-            dataset_hash,
+            dataset_id,
             dataset_metadata,
             dataset_path,
             upload_type,
@@ -475,7 +475,7 @@ class ResourceManager(StrSignatureMixin):
     def _insert_to_dataset_table(
             self,
             user_id: int,
-            dataset_hash: str,
+            dataset_id: str,
             dataset_metadata: Dict[str, Any],
             dataset_path:str,
             upload_type: str,
@@ -485,7 +485,7 @@ class ResourceManager(StrSignatureMixin):
             columns: List[str]
     ):
         records = self.DatasetModel.select().where(
-            (self.DatasetModel.dataset_id == dataset_hash) & (self.DatasetModel.user_id == user_id)
+            (self.DatasetModel.dataset_id == dataset_id) & (self.DatasetModel.user_id == user_id)
         )
         L = len(records)
         if L != 0:
@@ -495,7 +495,7 @@ class ResourceManager(StrSignatureMixin):
             record.save()
         else:
             record = self.DatasetModel().create(
-                dataset_id=dataset_hash,
+                dataset_id=dataset_id,
                 user_id=self.user_id,
                 dataset_metadata=dataset_metadata,
                 dataset_path=dataset_path,
@@ -524,12 +524,12 @@ class ResourceManager(StrSignatureMixin):
         self.is_init_dataset = False
         self.DatasetModel = None
 
-    def upload_df_to_table(self, df, dataset_hash, column_mapper):
+    def upload_df_to_table(self, df, dataset_id, column_mapper):
         dataset_db = self.init_dataset_db()
 
         class Meta:
             database = dataset_db
-            table_name = f"dataset_{dataset_hash}"
+            table_name = f"dataset_{dataset_id}"
 
         origin_columns = deepcopy(df.columns)
         df.columns = pd.Series(df.columns).map(column_mapper)
@@ -564,9 +564,9 @@ class ResourceManager(StrSignatureMixin):
             hf.create_dataset("dataset", data=arr)
         self.file_system.upload(dataset_path, tmp_path)
 
-    def get_dataset_records(self, dataset_hash) -> List[Dict[str, Any]]:
+    def get_dataset_records(self, dataset_id) -> List[Dict[str, Any]]:
         self.init_dataset_table()
-        return self._get_dataset_records(dataset_hash, self.user_id)
+        return self._get_dataset_records(dataset_id, self.user_id)
 
     def _get_dataset_records(self, dataset_id, user_id) -> List[Dict[str, Any]]:
         self.init_dataset_table()
@@ -575,11 +575,11 @@ class ResourceManager(StrSignatureMixin):
         ).dicts()
         return list(records)
 
-    def download_df_from_table(self, dataset_hash, columns, columns_mapper):
+    def download_df_from_table(self, dataset_id, columns, columns_mapper):
         inv_columns_mapper = inverse_dict(columns_mapper)
         dataset_db = self.init_dataset_db()
         models = generate_models(dataset_db)
-        table_name = f"dataset_{dataset_hash}"
+        table_name = f"dataset_{dataset_id}"
         if table_name not in models:
             raise ValueError(f"Table {table_name} didn't exists.")
         model = models[table_name]
@@ -737,10 +737,10 @@ class ResourceManager(StrSignatureMixin):
                              specific_task_token, dataset_metadata,
                              task_metadata, sub_sample_indexes, sub_feature_indexes):
         self.init_task_table()
-        train_set_id = data_manager.train_set_hash
-        test_set_id = data_manager.test_set_hash
-        train_label_id = data_manager.train_label_hash
-        test_label_id = data_manager.test_label_hash
+        train_set_id = data_manager.train_set_id
+        test_set_id = data_manager.test_set_id
+        train_label_id = data_manager.train_label_id
+        test_label_id = data_manager.test_label_id
         metric_str = metric.name
         splitter_str = str(splitter)
         ml_task_str = str(data_manager.ml_task)
