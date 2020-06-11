@@ -41,6 +41,7 @@ async def insert_to_dataset_table(
         user_id: int = Body(...),
         dataset_hash: str = Body(...),
         dataset_metadata: Dict[str, Any] = Body(...),
+        dataset_path: str = Body(...),
         upload_type: str = Body(...),
         dataset_source: str = Body(...),
 
@@ -49,6 +50,7 @@ async def insert_to_dataset_table(
         user_id,
         dataset_hash,
         dataset_metadata,
+        dataset_path,
         upload_type,
         dataset_source,
         column_descriptions,

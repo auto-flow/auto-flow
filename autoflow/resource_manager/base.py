@@ -457,10 +457,14 @@ class ResourceManager(StrSignatureMixin):
             columns
     ):
         self.init_dataset_table()
+        dataset_path=""
+        if upload_type == "fs":
+            dataset_path = self.file_system.join(self.datasets_dir, f"{self.user_id}-{dataset_hash}.h5")
         return self._insert_to_dataset_table(
             self.user_id,
             dataset_hash,
             dataset_metadata,
+            dataset_path,
             upload_type,
             dataset_source,
             column_descriptions,
@@ -473,6 +477,7 @@ class ResourceManager(StrSignatureMixin):
             user_id: int,
             dataset_hash: str,
             dataset_metadata: Dict[str, Any],
+            dataset_path:str,
             upload_type: str,
             dataset_source: str,
             column_descriptions: Dict[str, Any],
@@ -483,15 +488,12 @@ class ResourceManager(StrSignatureMixin):
             (self.DatasetModel.dataset_id == dataset_hash) & (self.DatasetModel.user_id == user_id)
         )
         L = len(records)
-        dataset_path = ""
         if L != 0:
             record = records[0]
             record.modify_time = datetime.datetime.now()
             record.dataset_metadata = dataset_metadata
             record.save()
         else:
-            if upload_type == "fs":
-                dataset_path = self.file_system.join(self.datasets_dir, f"{user_id}-{dataset_hash}.h5")
             record = self.DatasetModel().create(
                 dataset_id=dataset_hash,
                 user_id=self.user_id,

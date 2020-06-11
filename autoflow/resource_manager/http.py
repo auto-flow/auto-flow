@@ -60,6 +60,7 @@ class HttpResourceManager(ResourceManager):
             user_id: int,
             dataset_hash: str,
             dataset_metadata: Dict[str, Any],
+            dataset_path:str,
             upload_type: str,
             dataset_source: str,
             column_descriptions: Dict[str, Any],

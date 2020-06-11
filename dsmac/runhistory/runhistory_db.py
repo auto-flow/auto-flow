@@ -54,7 +54,7 @@ class RunHistoryDB():
             status = pw.IntegerField(default=0)
             additional_info = self.JSONField(default={})
             origin = pw.IntegerField(default=0)
-            weight = pw.FloatField(default=0.0)
+            # weight = pw.FloatField(default=0.0)
             pid = pw.IntegerField(default=os.getpid)  # todo: 改为 worker id
             create_time = pw.DateTimeField(default=datetime.datetime.now)
             modify_time = pw.DateTimeField(default=datetime.datetime.now)
