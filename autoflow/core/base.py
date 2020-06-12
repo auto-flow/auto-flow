@@ -16,13 +16,13 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from autoflow import constants
 from autoflow.constants import ExperimentType
 from autoflow.data_container import DataFrameContainer
+from autoflow.data_manager import DataManager
 from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.data_manager import DataManager
-from autoflow.resource_manager.base import ResourceManager
 from autoflow.metrics import r2, accuracy
+from autoflow.resource_manager.base import ResourceManager
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import estimate_config_space_numbers
@@ -278,7 +278,12 @@ class AutoFlowEstimator(BaseEstimator):
                 "log_path": self.log_path,
                 "log_config": self.log_config,
             }
-            self.resource_manager.insert_experiment_record(ExperimentType.AUTO, experiment_config, additional_info)
+            is_manual = self.start_tuner(tuner, hdl)
+            if is_manual:
+                experiment_type = ExperimentType.MANUAL
+            else:
+                experiment_type = ExperimentType.AUTO
+            self.resource_manager.insert_experiment_record(experiment_type, experiment_config, additional_info)
             self.resource_manager.close_experiment_table()
             self.task_id = self.resource_manager.task_id
             self.hdl_id = self.resource_manager.hdl_id
@@ -286,13 +291,17 @@ class AutoFlowEstimator(BaseEstimator):
             self.logger.info(f"task_id:\t{self.task_id}")
             self.logger.info(f"hdl_id:\t{self.hdl_id}")
             self.logger.info(f"experiment_id:\t{self.experiment_id}")
-            result = self.start_tuner(tuner, hdl)
-            if result["is_manual"] == True:
+            if is_manual:
+                tuner.evaluator.init_data(**self.get_evaluator_params())
+                # dhp, self.estimator = tuner.evaluator.shp2model(tuner.shps.sample_configuration())
+                tuner.evaluator(tuner.shps.sample_configuration())
+                self.start_final_step(False)
+                self.resource_manager.finish_experiment(self.log_path, self)
                 break
+            self.run_tuner(tuner)
             if step == n_step - 1:
                 self.start_final_step(fit_ensemble_params)
             self.resource_manager.finish_experiment(self.log_path, self)
-
         return self
 
     def get_sync_dict(self, n_jobs, tuner):
@@ -309,11 +318,13 @@ class AutoFlowEstimator(BaseEstimator):
         tuner.set_data_manager(self.data_manager)
         tuner.set_random_state(self.random_state)
         tuner.set_hdl(hdl)  # just for get shps of tuner
+        is_manual = False
         if estimate_config_space_numbers(tuner.shps) == 1:
             self.logger.info("HDL(Hyperparams Descriptions Language) is a constant space, using manual modeling.")
-            dhp, self.estimator = tuner.evaluator.shp2model(tuner.shps.sample_configuration())
-            self.estimator.fit(self.data_manager.X_train, self.data_manager.y_train)
-            return {"is_manual": True}
+            is_manual = True
+        return is_manual
+
+    def run_tuner(self, tuner: Tuner):
         n_jobs = tuner.n_jobs
         run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
         is_master_list = [False] * n_jobs
@@ -344,7 +355,6 @@ class AutoFlowEstimator(BaseEstimator):
                 p.start()
         for p in processes:
             p.join()
-        return {"is_manual": False}
 
     def start_final_step(self, fit_ensemble_params):
         if isinstance(fit_ensemble_params, str):
@@ -372,6 +382,29 @@ class AutoFlowEstimator(BaseEstimator):
         else:
             raise NotImplementedError
 
+    def get_evaluator_params(self, random_state=None, resource_manager=None):
+        if resource_manager is None:
+            resource_manager = self.resource_manager
+        if random_state is None:
+            random_state = self.random_state
+        if not hasattr(self, "instance_id"):
+            self.instance_id = ""
+            self.logger.warning(f"{self.__class__.__name__} haven't 'instance_id'!")
+        return dict(
+            random_state=random_state,
+            data_manager=self.data_manager,
+            metric=self.metric,
+            groups=self.groups,
+            should_calc_all_metric=self.should_calc_all_metrics,
+            splitter=self.splitter,
+            should_store_intermediate_result=self.should_store_intermediate_result,
+            should_stack_X=self.should_stack_X,
+            resource_manager=resource_manager,
+            should_finally_fit=self.should_finally_fit,
+            model_registry=self.model_registry,
+            instance_id=self.instance_id
+        )
+
     def run(self, tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict=None):
         if sync_dict:
             sync_dict[os.getpid()] = 0
@@ -389,19 +422,9 @@ class AutoFlowEstimator(BaseEstimator):
                            str(resource_manager.user_id)
         tuner.run(
             initial_configs=initial_configs,
-            evaluator_params=dict(
+            evaluator_params=self.get_evaluator_params(
                 random_state=random_state,
-                data_manager=self.data_manager,
-                metric=self.metric,
-                groups=self.groups,
-                should_calc_all_metric=self.should_calc_all_metrics,
-                splitter=self.splitter,
-                should_store_intermediate_result=self.should_store_intermediate_result,
-                should_stack_X=self.should_stack_X,
-                resource_manager=resource_manager,
-                should_finally_fit=self.should_finally_fit,
-                model_registry=self.model_registry,
-                instance_id=self.instance_id
+                resource_manager=resource_manager
             ),
             instance_id=self.instance_id,
             rh_db_type=resource_manager.db_type,

@@ -2,10 +2,22 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, Any, List, Callable
 
+from autoflow.utils.klass import get_valid_params_in_kwargs
 from autoflow.utils.list_ import remove_suffix_in_list
 from autoflow.utils.logging_ import get_logger
 
 logger = get_logger(__name__)
+
+
+def object_kwargs2dict(obj, func="__init__", keys=None, contain_class_name=False):
+    if keys is None:
+        dicts = obj.__dict__
+    else:
+        dicts = {key: getattr(obj, key) for key in keys}
+    result = get_valid_params_in_kwargs(getattr(obj, func), dicts)
+    if contain_class_name:
+        result["class_name"] = str(obj.__class__.__name__)
+    return result
 
 
 def add_prefix_in_dict_keys(dict_: Dict[str, Any], prefix: str) -> Dict[str, Any]:

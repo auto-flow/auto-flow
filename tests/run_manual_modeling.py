@@ -1,38 +1,36 @@
-import pandas as pd
-from sklearn.model_selection import ShuffleSplit
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : qichun tang
+# @Contact    : tqichun@gmail.com
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
 
-from autoflow.core.base import AutoFlowEstimator
-from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.tuner import Tuner
+from autoflow.core.classifier import AutoFlowClassifier
 
-df = pd.read_csv("../examples/classification/train_classification.csv")
-ss = ShuffleSplit(n_splits=1, random_state=0, test_size=0.25)
-train_ix, test_ix = next(ss.split(df))
-df_train = df.iloc[train_ix, :]
-df_test = df.iloc[test_ix, :]
-
-hdl_constructor = HDL_Constructor(
+X, y = load_iris(return_X_y=True)
+# X = X[y != 2]
+# y = y[y != 2]
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+pipe = AutoFlowClassifier(
     DAG_workflow={
-        "nan->{highR=highR_nan,lowR=lowR_nan}": "operate.split.nan",
-        "lowR_nan->nan": "impute.fill_abnormal",
-        "highR_nan->nan": "operate.drop",
-        "all->{cat_name=cat,num_name=num}": "operate.split.cat_num",
-        "cat->num": "encode.cat_boost",
-        "num->target": {"_name": "lightgbm", "_vanilla": True}
-    }
+        "num->scaled": {
+            "_name": "scale.standardize",
+            "_vanilla":True
+        },
+        "scaled->target": {
+            "_name": "liblinear_svc",
+            "random_state":42,
+            "_vanilla": True
+        }
+    },
+    initial_runs=3,
+    run_limit=9,
+    n_jobs=3,
+    debug=True,
+    search_method="smac",
+    random_state=0
 )
-tuner = Tuner(
-    run_limit=-1,
-    search_method="grid"
-)
-autoflow_pipeline = AutoFlowEstimator(tuner, hdl_constructor)
-column_descriptions = {
-    "id": "PassengerId",
-    "target": "Survived",
-    "ignore": "Name"
-}
-
-autoflow_pipeline.fit(
-    X_train=df_train, X_test=df_test, column_descriptions=column_descriptions
-)
-
+pipe.fit(X_train, y_train, fit_ensemble_params=False)
+# score = accuracy_score(y_test, y_pred)
+score = pipe.score(X_test, y_test)
+print(score)

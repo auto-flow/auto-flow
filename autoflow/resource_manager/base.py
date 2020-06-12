@@ -22,7 +22,7 @@ from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict
-from autoflow.utils.dict_ import update_data_structure
+from autoflow.utils.dict_ import update_data_structure, object_kwargs2dict
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_dict
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
@@ -30,6 +30,7 @@ from autoflow.utils.ml_task import MLTask
 from generic_fs import FileSystem
 from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, create_database
 from generic_fs.utils.fs import get_file_system
+from autoflow.utils.ml_task import MLTask
 
 
 def get_field_of_type(type_, df, column):
@@ -259,8 +260,8 @@ class ResourceManager(StrSignatureMixin):
         task_records = self._get_task_records(task_id, self.user_id)
         assert len(task_records) > 0
         task_record = task_records[0]
-        ml_task_str = task_record["ml_task"]
-        ml_task = eval(ml_task_str)
+        ml_task_dict = task_record["ml_task"]
+        ml_task = MLTask(**ml_task_dict)
         train_set_id = task_record["train_set_id"]
         test_set_id = task_record["test_set_id"]
         train_label_id = task_record["train_label_id"]
@@ -715,8 +716,8 @@ class ResourceManager(StrSignatureMixin):
             task_id = pw.FixedCharField(max_length=32)
             user_id = pw.IntegerField()
             metric = pw.CharField(max_length=256)
-            splitter = pw.TextField()
-            ml_task = pw.CharField(max_length=256)
+            splitter = self.JSONField()  # pw.TextField()
+            ml_task = self.JSONField()  # pw.CharField(max_length=256)
             specific_task_token = pw.CharField(max_length=256, default="")
             train_set_id = pw.FixedCharField(max_length=32)
             test_set_id = pw.FixedCharField(max_length=32, default="")
@@ -746,7 +747,10 @@ class ResourceManager(StrSignatureMixin):
         test_label_id = data_manager.test_label_id
         metric_str = metric.name
         splitter_str = str(splitter)
-        ml_task_str = str(data_manager.ml_task)
+        splitter_dict = object_kwargs2dict(splitter, contain_class_name=True)
+        ml_task = data_manager.ml_task
+        ml_task_str = str(ml_task)
+        ml_task_dict = object_kwargs2dict(ml_task, func="__new__", keys=ml_task._fields)
         if sub_sample_indexes is None:
             sub_sample_indexes = []
         if sub_feature_indexes is None:
@@ -775,27 +779,26 @@ class ResourceManager(StrSignatureMixin):
             dataset_metadata=dataset_metadata, **task_metadata
         )
         self.task_id = self._insert_task_record(
-            task_id, self.user_id, metric_str, splitter_str, ml_task_str, train_set_id,
+            task_id, self.user_id, metric_str, splitter_dict, ml_task_dict, train_set_id,
             test_set_id, train_label_id, test_label_id, specific_task_token, task_metadata,
             sub_sample_indexes, sub_feature_indexes
         )
 
     def _insert_task_record(self, task_id: str, user_id: int,
-                            metric_str: str, splitter_str: str, ml_task_str: str,
+                            metric_str: str, splitter_dict: Dict[str, str], ml_task_dict: Dict[str, str],
                             train_set_id: str, test_set_id: str, train_label_id: str, test_label_id: str,
                             specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
                             sub_feature_indexes: List[str]):
         records = self.TaskModel.select().where(
             (self.TaskModel.task_id == task_id) & (self.TaskModel.user_id == user_id)
         )
-
         if len(records) == 0:
             self.TaskModel.create(
                 task_id=task_id,
                 user_id=user_id,
                 metric=metric_str,
-                splitter=splitter_str,
-                ml_task=ml_task_str,
+                splitter=splitter_dict,
+                ml_task=ml_task_dict,
                 specific_task_token=specific_task_token,
                 train_set_id=train_set_id,
                 test_set_id=test_set_id,
@@ -1056,5 +1059,3 @@ class ResourceManager(StrSignatureMixin):
                 self.TrialsModel.delete().where(
                     self.TrialsModel.trial_id.in_(should_delete.select(self.TrialsModel.trial_id))).execute()
         return True
-
-
