@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+import shutil
 import traceback
 from copy import deepcopy
 from math import ceil
@@ -30,7 +31,6 @@ from autoflow.utils.ml_task import MLTask
 from generic_fs import FileSystem
 from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, create_database
 from generic_fs.utils.fs import get_file_system
-from autoflow.utils.ml_task import MLTask
 
 
 def get_field_of_type(type_, df, column):
@@ -78,6 +78,7 @@ class ResourceManager(StrSignatureMixin):
             user_id=0,
             search_record_db_name="autoflow",
             dataset_table_db_name="autoflow_dataset",
+            del_local_log_path=True
     ):
         '''
 
@@ -118,6 +119,7 @@ class ResourceManager(StrSignatureMixin):
         compress_suffix: str
             compress file's suffix, default is bz2
         '''
+        self.del_local_log_path = del_local_log_path
         self.dataset_table_db_name = dataset_table_db_name
         self.search_record_db_name = search_record_db_name
         self.user_id = user_id
@@ -285,12 +287,12 @@ class ResourceManager(StrSignatureMixin):
         # fixme: 限制hdl_id
         self.init_trial_table()
         trial_id = self._get_best_k_trial_ids(self.task_id, self.user_id, 1)[0]
-        record = self._get_trial_records_by_id(trial_id)[0]
+        record = self._get_trial_records_by_id(trial_id, self.task_id, self.user_id)[0]
         return record["dict_hyper_param"]
 
     def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
         self.init_trial_table()
-        records = self._get_trial_records_by_ids(trials)
+        records = self._get_trial_records_by_ids(trials, self.task_id, self.user_id)
         estimator_list = []
         y_true_indexes_list = []
         y_preds_list = []
@@ -627,7 +629,7 @@ class ResourceManager(StrSignatureMixin):
         class Experiment(pw.Model):
             experiment_id = pw.AutoField(primary_key=True)
             user_id = pw.IntegerField()
-            hdl_id = pw.FixedCharField(max_length=32, default="")
+            hdl_id = pw.FixedCharField(max_length=32, null=True)
             task_id = pw.FixedCharField(max_length=32)
             experiment_type = pw.CharField(max_length=128)  # auto_modeling, manual_modeling, ensemble_modeling
             experiment_config = self.JSONField(default={})  # 实验配置，将一些不可优化的部分存储起来
@@ -651,7 +653,7 @@ class ResourceManager(StrSignatureMixin):
     ):
         self.init_experiment_table()
         assert isinstance(experiment_type, ExperimentType)
-        self.experiment_id = self._insert_experiment_record(self.user_id, self.hdl_id, self.task_id,
+        self.experiment_id = self._insert_experiment_record(self.user_id, getattr(self, "hdl_id",None), self.task_id,
                                                             experiment_type.value,
                                                             experiment_config, additional_info)
 
@@ -671,20 +673,36 @@ class ResourceManager(StrSignatureMixin):
         )
         return experiment_record.experiment_id
 
-    def finish_experiment(self, log_path, final_model):
+    def finish_experiment(self, local_log_path, final_model, del_local_log_path=None):
+        if del_local_log_path is None:
+            del_local_log_path = self.del_local_log_path
+        # 路径确定
         self.experiment_path = self.file_system.join(self.parent_experiments_dir, str(self.user_id),
                                                      str(self.experiment_id))
         self.file_system.mkdir(self.experiment_path)
         experiment_log_path = self.file_system.join(self.experiment_path, "log_file.log")
         experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
+        # 实验结果模型序列化
         final_model = final_model.copy()
         assert final_model.data_manager.is_empty()
         self.start_safe_close()
         self.file_system.dump_pickle(final_model, experiment_model_path)
         self.end_safe_close()
-        self.file_system.upload(experiment_log_path, log_path)
-        if os.path.exists(log_path):
-            os.remove(log_path)
+        # 日志上传
+        if os.path.exists(local_log_path):
+            tmp_log_path = f"/tmp/log"
+            if os.path.exists(tmp_log_path):
+                os.remove(tmp_log_path)
+            shutil.copy(local_log_path, tmp_log_path)
+            if del_local_log_path:
+                os.remove(local_log_path)
+            self.file_system.upload(experiment_log_path, tmp_log_path)
+            if os.path.exists(local_log_path):
+                os.remove(local_log_path)
+        else:
+            experiment_log_path = ""
+            self.logger.warning(f"Local log path : '{local_log_path}' didn't exist!")
+        # 信息上传数据库
         self.finish_experiment_update_info(experiment_model_path, experiment_log_path, datetime.datetime.now())
 
     def finish_experiment_update_info(self, final_model_path, log_path, end_time):
@@ -956,12 +974,18 @@ class ResourceManager(StrSignatureMixin):
         ).order_by(self.TrialsModel.loss, self.TrialsModel.cost_time).limit(limit).dicts()
         return list(records)
 
-    def _get_trial_records_by_id(self, trial_id):
-        records = self.TrialsModel.select().where(self.TrialsModel.trial_id == trial_id).dicts()
+    def _get_trial_records_by_id(self, trial_id, task_id, user_id):
+        records = self.TrialsModel.select().where(
+            (self.TrialsModel.trial_id == trial_id) & (self.TrialsModel.task_id == task_id) &
+            (self.TrialsModel.user_id == user_id)
+        ).dicts()
         return list(records)
 
-    def _get_trial_records_by_ids(self, trial_ids):
-        records = self.TrialsModel.select().where(self.TrialsModel.trial_id << trial_ids).dicts()
+    def _get_trial_records_by_ids(self, trial_ids, task_id, user_id):
+        records = self.TrialsModel.select().where(
+            (self.TrialsModel.trial_id << trial_ids) & (self.TrialsModel.task_id == task_id) &
+            (self.TrialsModel.user_id == user_id)
+        ).dicts()
         records = list(records)
         return records
 

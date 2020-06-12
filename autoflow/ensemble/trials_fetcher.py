@@ -37,3 +37,21 @@ class GetBestK(TrialsFetcher):
         )
         # self.resource_manager.close_trials_db()
         return fetched
+
+
+class GetSpecificTrials(TrialsFetcher):
+    def __init__(
+            self,
+            resource_manager: ResourceManager,
+            task_id: str,
+            hdl_id: str,
+            trial_ids: int
+    ):
+        super(GetSpecificTrials, self).__init__(resource_manager, task_id, hdl_id)
+        self.trial_ids = trial_ids
+
+    def fetch(self):
+        # todo: 校验？
+        self.resource_manager.task_id = self.task_id
+        self.resource_manager.hdl_id = self.hdl_id
+        return self.trial_ids

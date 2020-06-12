@@ -379,7 +379,10 @@ class DataManager(StrSignatureMixin):
         if isinstance(X_origin, np.ndarray):
             X.columns = self.columns
         elif isinstance(X_origin, pd.DataFrame):
-            assert np.all(X.columns == X_origin.columns)
+            assert set(X.columns) == set(self.columns)
+            if not np.all(X.columns == self.columns):
+                self.logger.warning(f"{X.dataset_source}'s columns do not match the TrainSet's columns by position!")
+                X.data = X.data[self.columns]
         else:
             raise NotImplementedError
         X.set_feature_groups(self.feature_groups)

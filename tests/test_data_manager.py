@@ -80,3 +80,33 @@ class TestDataManager(LocalResourceTestCase):
             resource_manager=self.mock_resource_manager
         )
         do_assert(data_manager4, remote=True, stacked=True)
+
+    def test_reindex_columns(self):
+        from sklearn.datasets import load_iris
+        from sklearn.model_selection import train_test_split
+
+        from autoflow.core.classifier import AutoFlowClassifier
+
+        X, y = load_iris(return_X_y=True)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+        pipe = AutoFlowClassifier(
+            DAG_workflow={
+                "num->target": [
+                    "logistic_regression",
+                ]
+            },
+            initial_runs=1,
+            run_limit=1,
+            n_jobs=1,
+            debug=True,
+            search_method="smac",
+            random_state=0,
+            resource_manager=self.mock_resource_manager
+        )
+        pipe.fit(X_train, y_train, X_test, y_test)
+        X_test = pipe.data_manager.X_test.data
+        X_test = X_test[[f'column_{i}' for i in range(3, -1, -1)]]
+        # score = accuracy_score(y_test, y_pred)
+        score = pipe.score(X_test, y_test)
+        print(score)
+        assert score > 0.8

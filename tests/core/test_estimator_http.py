@@ -77,7 +77,7 @@ class TestEnsemble(LocalResourceTestCase):
         )
         assert isinstance(pipe.estimator, StackClassifier)
         score = pipe.score(X_test, y_test)
-        assert score > 0.9
+        assert score > 0.8
 
     def test_2(self):
         X, y = load_iris(return_X_y=True)
@@ -116,7 +116,7 @@ class TestEnsemble(LocalResourceTestCase):
         assert isinstance(pipe.estimator, VoteClassifier)
         # score = accuracy_score(y_test, y_pred)
         score = pipe.score(X_test, y_test)
-        assert score > 0.9
+        assert score > 0.8
 
     def test_3(self):
         titanic_df = load("titanic")

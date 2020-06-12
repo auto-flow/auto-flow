@@ -56,4 +56,4 @@ pipe.fit(
 assert isinstance(pipe.estimator, VoteClassifier)
 # score = accuracy_score(y_test, y_pred)
 score = pipe.score(X_test, y_test)
-assert score > 0.9
+assert score > 0.8

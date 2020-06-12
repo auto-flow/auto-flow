@@ -27,7 +27,7 @@ from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import estimate_config_space_numbers
 from autoflow.utils.dict_ import update_mask_from_other_dict
-from autoflow.utils.klass import instancing, sequencing
+from autoflow.utils.klass import instancing, sequencing, get_valid_params_in_kwargs
 from autoflow.utils.logging_ import get_logger, setup_logger
 from autoflow.utils.packages import get_class_name_of_module
 
@@ -204,7 +204,7 @@ class AutoFlowEstimator(BaseEstimator):
         task_metadata = dict(task_metadata)
         column_descriptions = dict(column_descriptions)
         # build data_manager
-        self.data_manager = DataManager(
+        self.data_manager: DataManager = DataManager(
             self.resource_manager,
             X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
             self.highR_cat_threshold, self.consider_ordinal_as_cat, upload_type
@@ -360,13 +360,13 @@ class AutoFlowEstimator(BaseEstimator):
         if isinstance(fit_ensemble_params, str):
             if fit_ensemble_params == "auto":
                 self.logger.info(f"'fit_ensemble_params' is 'auto', use default params to fit_ensemble_params.")
-                self.estimator = self.fit_ensemble()
+                self.estimator = self.fit_ensemble(fit_ensemble_alone=False)
             else:
                 raise NotImplementedError
         elif isinstance(fit_ensemble_params, bool):
             if fit_ensemble_params:
                 self.logger.info(f"'fit_ensemble_params' is True, use default params to fit_ensemble_params.")
-                self.estimator = self.fit_ensemble()
+                self.estimator = self.fit_ensemble(fit_ensemble_alone=False)
             else:
                 self.logger.info(
                     f"'fit_ensemble_params' is False, don't fit_ensemble but use best trial as result.")
@@ -374,7 +374,7 @@ class AutoFlowEstimator(BaseEstimator):
         elif isinstance(fit_ensemble_params, dict):
             self.logger.info(
                 f"'fit_ensemble_params' is specific: {fit_ensemble_params}.")
-            self.estimator = self.fit_ensemble(**fit_ensemble_params)
+            self.estimator = self.fit_ensemble(fit_ensemble_alone=False, **fit_ensemble_params)
         elif fit_ensemble_params is None:
             self.logger.info(
                 f"'fit_ensemble_params' is None, don't fit_ensemble but use best trial as result.")
@@ -442,20 +442,37 @@ class AutoFlowEstimator(BaseEstimator):
             trials_fetcher_params=frozendict(k=10),
             ensemble_type="stack",
             ensemble_params=frozendict(),
+            fit_ensemble_alone=True
     ):
+        # fixme: ensemble_params可能会面临一个问题，就是传入无法序列化的内容
+        trials_fetcher_params = dict(trials_fetcher_params)
+        ensemble_params = dict(ensemble_params)
+        kwargs = get_valid_params_in_kwargs(self.fit_ensemble, locals())
         if task_id is None:
             assert hasattr(self.resource_manager, "task_id") and self.resource_manager.task_id is not None
             task_id = self.resource_manager.task_id
-        # if hdl_id is None:
-        #     assert hasattr(self.resource_manager, "hdl_id") and self.resource_manager.hdl_id is not None
-        #     hdl_id = self.resource_manager.hdl_id
+        self.task_id = task_id
+        self.hdl_id = hdl_id
+        self.resource_manager.task_id = task_id
+        self.resource_manager.hdl_id = hdl_id
+        if fit_ensemble_alone:
+            setup_logger(self.log_path, self.log_config)
+            if fit_ensemble_alone:
+                experiment_config = {
+                    "fit_ensemble_params": kwargs
+                }
+                self.resource_manager.insert_experiment_record(ExperimentType.ENSEMBLE, experiment_config, {})
+                self.experiment_id = self.resource_manager.experiment_id
         trials_fetcher_name = trials_fetcher
         from autoflow.ensemble import trials_fetcher
         assert hasattr(trials_fetcher, trials_fetcher_name)
         trials_fetcher_cls = getattr(trials_fetcher, trials_fetcher_name)
-        trials_fetcher: TrialsFetcher = trials_fetcher_cls(resource_manager=self.resource_manager, task_id=task_id,
-                                                           hdl_id=hdl_id,
-                                                           **trials_fetcher_params)
+        trials_fetcher: TrialsFetcher = trials_fetcher_cls(
+            resource_manager=self.resource_manager,
+            task_id=task_id,
+            hdl_id=hdl_id,
+            **trials_fetcher_params
+        )
         trial_ids = trials_fetcher.fetch()
         estimator_list, y_true_indexes_list, y_preds_list = TrainedDataFetcher(
             task_id, hdl_id, trial_ids, self.resource_manager).fetch()
@@ -466,12 +483,10 @@ class AutoFlowEstimator(BaseEstimator):
         ensemble_estimator_class_name = get_class_name_of_module(ensemble_estimator_package_name)
         ensemble_estimator_class = getattr(ensemble_estimator_package, ensemble_estimator_class_name)
         ensemble_estimator: EnsembleEstimator = ensemble_estimator_class(**ensemble_params)
-        # todo: 集成学习部分，存在无法处理K折验证以外问题的情况（不完整的y_pred）
         ensemble_estimator.fit_trained_data(estimator_list, y_true_indexes_list, y_preds_list, y_true)
         self.ensemble_estimator = ensemble_estimator
-        # if return_Xy_test:
-        #     return self.ensemble_estimator, Xy_test
-        # else:
+        if fit_ensemble_alone:
+            self.resource_manager.finish_experiment(self.log_path, self)
         return self.ensemble_estimator
 
     def auto_fit_ensemble(self):
@@ -486,20 +501,20 @@ class AutoFlowEstimator(BaseEstimator):
 
     def copy(self):
         tmp_dm = self.data_manager
-        self.data_manager = self.data_manager.copy(keep_data=False)
+        self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
         self.resource_manager.start_safe_close()
         res = deepcopy(self)
         self.resource_manager.end_safe_close()
-        self.data_manager = tmp_dm
+        self.data_manager: DataManager = tmp_dm
         return res
 
     def pickle(self):
         # todo: 怎么做保证不触发self.resource_manager的__reduce__
         from pickle import dumps
         tmp_dm = self.data_manager
-        self.data_manager = self.data_manager.copy(keep_data=False)
+        self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
         self.resource_manager.start_safe_close()
         res = dumps(self)
         self.resource_manager.end_safe_close()
-        self.data_manager = tmp_dm
+        self.data_manager: DataManager = tmp_dm
         return res

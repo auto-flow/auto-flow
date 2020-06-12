@@ -9,7 +9,7 @@ from typing import Dict, Any, List
 import requests
 
 from autoflow import ResourceManager
-from autoflow.utils.json_ import CustomJsonEncoder
+from generic_fs.utils.utils import CustomJsonEncoder
 from autoflow.utils.klass import get_valid_params_in_kwargs
 
 
@@ -144,13 +144,13 @@ class HttpResourceManager(ResourceManager):
         response = self.post_requests(target, local)
         return response.json()
 
-    def _get_trial_records_by_id(self, trial_id, k=0):
+    def _get_trial_records_by_id(self, trial_id, task_id, user_id):
         local = get_valid_params_in_kwargs(self._get_trial_records_by_id, locals())
         target = "get_trial_records_by_id"
         response = self.post_requests(target, local)
         return response.json()
 
-    def _get_trial_records_by_ids(self, trial_ids, k=0):
+    def _get_trial_records_by_ids(self, trial_ids, task_id, user_id):
         local = get_valid_params_in_kwargs(self._get_trial_records_by_ids, locals())
         target = "get_trial_records_by_ids"
         response = self.post_requests(target, local)

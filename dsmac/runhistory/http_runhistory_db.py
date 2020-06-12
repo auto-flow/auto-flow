@@ -7,6 +7,7 @@ import peewee as pw
 import requests
 
 from dsmac.runhistory.runhistory_db import RunHistoryDB
+from generic_fs.utils.utils import CustomJsonEncoder
 
 
 def get_valid_params_in_kwargs(func, kwargs: Dict[str, Any]):
@@ -15,17 +16,6 @@ def get_valid_params_in_kwargs(func, kwargs: Dict[str, Any]):
         if key in inspect.signature(func).parameters.keys():
             validated[key] = value
     return validated
-
-
-class CustomJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, (datetime.datetime, datetime.date)):
-            return str(obj)
-        elif isinstance(obj, bytes):
-            # todo: base64
-            return obj.decode(encoding="utf-8")
-        else:
-            return json.JSONEncoder.default(self, obj)
 
 
 class HttpRunHistoryDB(RunHistoryDB):
