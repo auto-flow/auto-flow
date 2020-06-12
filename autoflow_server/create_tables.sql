@@ -23,7 +23,7 @@ create table experiment
         constraint experiment_pkey
             primary key,
     user_id           integer      not null,
-    hdl_id            char(32)     not null,
+    hdl_id            char(32),
     task_id           char(32)     not null,
     experiment_type   varchar(128) not null,
     experiment_config json         not null,

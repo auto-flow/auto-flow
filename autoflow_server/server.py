@@ -157,15 +157,14 @@ async def get_sorted_trial_records(task_id: str = Body(...), user_id: int = Body
 
 
 @app.post("/get_trial_records_by_id")
-async def get_trial_records_by_id(trial_id: int = Body(...), k=Body(...)):
-    # fixme: k为冗余参数，但是不加这个参数请求，server就会报422
-    return resource_manager._get_trial_records_by_id(trial_id)
+async def get_trial_records_by_id(trial_id: int = Body(...), task_id: str = Body(...), user_id: int = Body(...)):
+    return resource_manager._get_trial_records_by_id(trial_id, task_id, user_id)
 
 
 @app.post("/get_trial_records_by_ids")
-async def get_trial_records_by_ids(trial_ids=Body(...), k=Body(...)):
-    # fixme: k为冗余参数，但是不加这个参数请求，server就会报422
-    return resource_manager._get_trial_records_by_ids(trial_ids)
+async def get_trial_records_by_ids(trial_ids: List[int] = Body(...), task_id: str = Body(...),
+                                   user_id: int = Body(...)):
+    return resource_manager._get_trial_records_by_ids(trial_ids, task_id, user_id)
 
 
 @app.post("/get_best_k_trial_ids")
