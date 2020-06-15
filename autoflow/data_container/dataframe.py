@@ -183,6 +183,7 @@ class DataFrameContainer(DataContainer):
         if isinstance(feature_group, str):
             feature_group = [feature_group]
         result = self.copy()
+        assert feature_group is not None
         loc = result.feature_groups.isin(feature_group)  # 实际操作的部分
         if not isin:
             loc = (~loc)
@@ -246,7 +247,7 @@ class DataFrameContainer(DataContainer):
                                     resource_manager=self.resource_manager,
                                     dataset_metadata=self.dataset_metadata)
         new_df.set_feature_groups(new_feature_group)
-        new_df.index = deleted_df.index
+        new_df.index = deleted_df.index # 非常重要的一步
         return deleted_df.concat_to(new_df)
 
     def sub_sample(self, index):
@@ -278,8 +279,14 @@ class DataFrameContainer(DataContainer):
     def dtypes(self, dtypes_):
         self.data.dtypes = dtypes_
 
+    @property
+    def feature_groups_str(self):
+        if len(self.feature_groups) < 20:
+            return str(list(self.feature_groups))
+        return str(self.feature_groups)
+
     def __str__(self):
-        return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {list(self.feature_groups)}"
+        return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {self.feature_groups_str}"
 
     def __repr__(self):
-        return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {list(self.feature_groups)}"
+        return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {self.feature_groups_str}"

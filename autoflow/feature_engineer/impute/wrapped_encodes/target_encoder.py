@@ -7,7 +7,7 @@ from copy import deepcopy
 import numpy as np
 from category_encoders import TargetEncoder as OriginTargetEncoder
 
-from skimpute.utils import process_dataframe
+from autoflow.feature_engineer.impute.utils import process_dataframe
 
 
 class TargetEncoder(OriginTargetEncoder):

@@ -7,18 +7,17 @@ import pandas as pd
 import sklearn.feature_selection
 
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
-from autoflow.utils.dataframe import DataFrameValuesWrapper
 
 
 class SklearnSelectMixin():
     max_feature_name = "_max_features__sp1_percent"
 
-    def _transform_proc(self, X):
+    def _transform_procedure(self, X):
         if X is None:
             return None
         else:
-            trans = self.estimator.transform(X)
-            mask = self.estimator.get_support()
+            trans = self.component.transform(X)
+            mask = self.component.get_support()
             columns = X.columns[mask]
             return pd.DataFrame(trans, columns=columns)
 
@@ -102,19 +101,17 @@ class SelectPercentileBase(SklearnSelectMixin, AutoFlowFeatureEngineerAlgorithm)
         return hyperparams
 
     def before_fit_X(self, X):
-        wrapper = DataFrameValuesWrapper(X.data)
-        X_ = wrapper.array
         if X is None:
             return None
-        X_ = deepcopy(X_)
+        X_ = deepcopy(super(SelectPercentileBase, self).before_fit_X(X))
         if self.score_func == sklearn.feature_selection.chi2:
             X_[X_ < 0] = 0.0
-        X.data = wrapper.wrap_to_dataframe(X_)
+        return X_
 
-    def before_trans_X(self, X):
-        wrapper = DataFrameValuesWrapper(X.data)
-        X_ = wrapper.array
-        X_ = deepcopy(X_)
-        if self.score_func == sklearn.feature_selection.chi2:
-            X_[X_ < 0] = 0.0
-        X.data = wrapper.wrap_to_dataframe(X_)
+    # def before_trans_X(self, X):
+    #     if X is None:
+    #         return None
+    #     X_ = deepcopy(super(SelectPercentileBase, self).before_fit_X(X))
+    #     if self.score_func == sklearn.feature_selection.chi2:
+    #         X_[X_ < 0] = 0.0
+    #     return X_

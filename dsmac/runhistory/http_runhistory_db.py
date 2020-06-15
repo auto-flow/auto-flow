@@ -59,6 +59,7 @@ class HttpRunHistoryDB(RunHistoryDB):
             seed: int,
             additional_info: dict,
             origin: int,
+            modify_time:str,
             pid: int,
     ):
         additional_info = dict(additional_info)

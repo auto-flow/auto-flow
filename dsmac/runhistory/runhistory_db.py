@@ -43,7 +43,7 @@ class RunHistoryDB():
     def get_model(self) -> pw.Model:
         class Run_History(pw.Model):
             run_id = pw.FixedCharField(max_length=256, primary_key=True)
-            config_id = pw.FixedCharField(max_length=128, default="")
+            config_id = pw.FixedCharField(max_length=32, default="")
             config = self.JSONField(default={})
             # config_bin = pw.BlobField(default=b"")  # PickleField(default=b"")
             config_origin = pw.CharField(max_length=64, default="")
@@ -106,7 +106,7 @@ class RunHistoryDB():
         # pickle.dumps(config)
         self._insert_runhistory_record(run_id, config_id, config.get_dictionary(), config.origin, cost,
                                        time, status.value, instance_id, seed, additional_info, origin.value,
-                                       os.getpid())
+                                       str(datetime.datetime.now()), os.getpid())
 
     def _insert_runhistory_record(
             self, run_id, config_id, config, config_origin, cost: float, time: float,
@@ -114,6 +114,7 @@ class RunHistoryDB():
             seed: int,
             additional_info: dict,
             origin: int,
+            modify_time: str,
             pid: int
     ):
         try:
@@ -130,11 +131,12 @@ class RunHistoryDB():
                 status=status,
                 additional_info=dict(additional_info),
                 origin=origin,
-                modify_time=datetime.datetime.now(),
+                modify_time=modify_time,
                 pid=pid
             ).save()
+            return {"msg": "ok"}
         except Exception as e:
-            pass
+            return {"msg": str(e)}
 
     def fetch_new_runhistory(self, instance_id, is_init=False) -> Tuple[float, Configuration]:
         query = self._fetch_new_runhistory(instance_id, os.getpid(), self.timestamp, is_init)
@@ -176,6 +178,6 @@ class RunHistoryDB():
         else:
             query = self.Model.select().where(
                 (self.Model.instance_id == instance_id) & (self.Model.origin >= 0) &
-                (self.Model.create_time > timestamp) & (self.Model.pid != pid)
+                (self.Model.modify_time > timestamp) & (self.Model.pid != pid)
             ).dicts()
         return list(query)

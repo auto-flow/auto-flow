@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.impute import SimpleImputer
 
-from skimpute.utils import process_dataframe, parse_cat_col
+from autoflow.feature_engineer.impute.utils import process_dataframe, parse_cat_col
 
 
 class AdaptiveSimpleImputer(BaseEstimator, TransformerMixin):

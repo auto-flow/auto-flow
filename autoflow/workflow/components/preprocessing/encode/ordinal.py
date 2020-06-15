@@ -1,8 +1,8 @@
 from autoflow.workflow.components.preprocessing.encode.base import BaseEncoder
 
-__all__ = ["LabelEncoder"]
+__all__ = ["OrdinalEncoder"]
 
 
-class LabelEncoder(BaseEncoder):
+class OrdinalEncoder(BaseEncoder):
     class__ = "OrdinalEncoder"
     module__ = "category_encoders"

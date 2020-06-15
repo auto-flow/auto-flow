@@ -21,9 +21,9 @@ from autoflow.datasets import load
 from autoflow.data_container.dataframe import DataFrameContainer
 import numpy as np
 
-class TestEnsemble(LocalResourceTestCase):
+class TestEstimatorsHttp(LocalResourceTestCase):
     def setUp(self) -> None:
-        super(TestEnsemble, self).setUp()
+        super(TestEstimatorsHttp, self).setUp()
         # todo: 考虑8000端口已经占用的情况
         self.p = subprocess.Popen(
             args=[self.get_uvicorn_path(), "server:app"],
@@ -48,7 +48,7 @@ class TestEnsemble(LocalResourceTestCase):
         )
 
     def tearDown(self) -> None:
-        super(TestEnsemble, self).tearDown()
+        super(TestEstimatorsHttp, self).tearDown()
         self.p.kill()
 
     def get_server_dir(self):

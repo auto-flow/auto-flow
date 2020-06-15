@@ -430,7 +430,7 @@
       "hash": {
         "_n_components__card_ratio": {"_type": "quniform", "_value": [0.1,1,0.1],"_default": 0.8}
       },
-      "label": {},
+      "ordinal": {},
       "leave_one_out": {},
       "one_hot": {},
       "target": {},
@@ -501,7 +501,7 @@
         }
       },
       "pca": {
-        "n_components": {"_type": "quniform", "_value": [0.5, 1],"_default": 0.9},    //keep_variance
+        "_n_components__sp1_ratio": {"_type": "quniform", "_value": [0.5, 1],"_default": 0.8},    //keep_variance
         "whiten": {"_type": "choice", "_value": [true,false],"_default": true},
         "copy": true
       },
@@ -541,7 +541,11 @@
     },
     "select": {
       "from_model_clf": {
-        "estimator":{"_type": "choice", "_value": ["sklearn.ensemble.ExtraTreesClassifier", "sklearn.svm.LinearSVC"],
+        "estimator":{"_type": "choice", "_value": [
+          "sklearn.ensemble.ExtraTreesClassifier",
+          "sklearn.svm.LinearSVC",
+          "sklearn.linear_model.LogisticRegression",
+        ],
           "_default": "sklearn.ensemble.ExtraTreesClassifier"},
         "penalty": "l1",
         "dual": false,
@@ -553,16 +557,22 @@
         "min_samples_leaf": 10,
         "random_state": 42,
         "n_jobs": 1,
-        "__activate":{
-          "estimator":{
-            "sklearn.svm.LinearSVC":["penalty", "dual", "C", "multi_class"],
-            "sklearn.ensemble.ExtraTreesClassifier":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
-          }
-        },
+        "solver":"saga",
+//        "__activate":{
+//          "estimator":{
+//            "sklearn.svm.LinearSVC":["penalty", "dual", "C", "multi_class"],
+//            "sklearn.ensemble.ExtraTreesClassifier":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
+//          }
+//        },
         "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       },
       "from_model_reg": {
-        "estimator":{"_type": "choice", "_value": ["sklearn.ensemble.ExtraTreesRegressor", "sklearn.svm.LinearSVR"],
+        "estimator":{"_type": "choice", "_value": [
+          "sklearn.ensemble.ExtraTreesRegressor",
+          "sklearn.svm.LinearSVR",
+          "sklearn.linear_model.Ridge",
+          "sklearn.linear_model.Lasso",
+        ],
           "_default": "sklearn.ensemble.ExtraTreesRegressor"},
         "loss": "epsilon_insensitive",
         "dual": true,
@@ -573,44 +583,63 @@
         "min_samples_leaf": 10,
         "random_state": 42,
         "n_jobs": 1,
-        "__activate":{
-          "estimator":{
-            "sklearn.svm.LinearSVR":["loss", "dual", "C"],
-            "sklearn.ensemble.ExtraTreesRegressor":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
-          }
-        },
+//        "__activate":{
+//          "estimator":{
+//            "sklearn.svm.LinearSVR":["loss", "dual", "C"],
+//            "sklearn.ensemble.ExtraTreesRegressor":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
+//          }
+//        },
         "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90}
       },
       "rfe_clf": {
-        "estimator":{"_type": "choice", "_value": ["sklearn.ensemble.ExtraTreesClassifier", "sklearn.linear_model.LogisticRegression"],"_default": "sklearn.ensemble.ExtraTreesClassifier"},
+        "estimator":{"_type": "choice", "_value": [
+          "sklearn.ensemble.ExtraTreesClassifier",
+          "sklearn.svm.LinearSVC",
+          "sklearn.linear_model.LogisticRegression"
+        ],
+          "_default": "sklearn.ensemble.ExtraTreesClassifier"},
+        "penalty": "l1",
+        "dual": false,
+        "multi_class": "ovr",
+        "C": 1,
         "n_estimators": 10,
         "max_depth": 7,
         "min_samples_split": 10,
         "min_samples_leaf": 10,
         "random_state": 42,
-        "__activate":{
-          "estimator":{
-            "sklearn.ensemble.ExtraTreesClassifier":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
-          }
-        },
+        "n_jobs": 1,
+        "solver":"saga",
+//        "__activate":{
+//          "estimator":{
+//            "sklearn.ensemble.ExtraTreesClassifier":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
+//          }
+//        },
         "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
         "_step__sp1_dev": 20
       },
       "rfe_reg": {
         "estimator":{"_type": "choice",
-          "_value": ["sklearn.ensemble.ExtraTreesRegressor",
-                     "sklearn.linear_model.Ridge"],
+          "_value": [
+          "sklearn.ensemble.ExtraTreesRegressor",
+          "sklearn.svm.LinearSVR",
+          "sklearn.linear_model.Ridge",
+          "sklearn.linear_model.Lasso"
+          ],
           "_default": "sklearn.ensemble.ExtraTreesRegressor"},
+        "loss": "epsilon_insensitive",
+        "dual": true,
+        "C": 1,
         "n_estimators": 10,
         "max_depth": 7,
         "min_samples_split": 10,
         "min_samples_leaf": 10,
         "random_state": 42,
-        "__activate":{
-          "estimator":{
-            "sklearn.ensemble.ExtraTreesRegressor":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
-          }
-        },
+        "n_jobs": 1,
+//        "__activate":{
+//          "estimator":{
+//            "sklearn.ensemble.ExtraTreesRegressor":["n_estimators","max_depth","min_samples_split","min_samples_leaf"],
+//          }
+//        },
         "_select_percent": {"_type": "quniform", "_value": [1,100,0.5],"_default": 90},
         "_step__sp1_dev": 20
       },
@@ -653,7 +682,10 @@
       }
     },
     "transform": {
-       "power": {}
+      //todo: power设置超参
+      //todo: quantile重复了
+       "power": {},
+       "quantile": {},
     }
   }
 }

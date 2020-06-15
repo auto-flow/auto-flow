@@ -171,14 +171,14 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span> <span class="k">as</span> <span class="n">SklearnLabelEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OrdinalEncoder</span> <span class="k">as</span> <span class="n">SklearnLabelEncoder</span>
 
 <span class="kn">from</span> <span class="nn">autoflow.utils.data</span> <span class="kn">import</span> <span class="n">to_array</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;LabelEncoder&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;OrdinalEncoder&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="LabelEncoder"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.encode.html#autoflow.feature_engineer.encode.label_encode.LabelEncoder">[docs]</a><span class="k">class</span> <span class="nc">LabelEncoder</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelEncoder"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.encode.html#autoflow.feature_engineer.encode.label_encode.LabelEncoder">[docs]</a><span class="k">class</span> <span class="nc">OrdinalEncoder</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
 <div class="viewcode-block" id="LabelEncoder.fit"><a class="viewcode-back" href="../../../../_module/autoflow.feature_engineer.encode.html#autoflow.feature_engineer.encode.label_encode.LabelEncoder.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">to_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="n">encoders</span> <span class="o">=</span> <span class="p">[]</span>

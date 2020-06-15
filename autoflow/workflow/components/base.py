@@ -186,10 +186,7 @@ class AutoFlowComponent(BaseEstimator):
         elif indicator == "sp1_ratio":
             factor = "shape"
             if hasattr(self, factor):
-                n_components = max(
-                    int(self.shape[1] * value),
-                    1
-                )
+                n_components = max(1, min(self.shape[0], round(self.shape[1] * value)))
             else:
                 self.logger.warning(f"{str(self)} haven't attribute {factor}")
                 n_components = 100

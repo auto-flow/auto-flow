@@ -805,7 +805,7 @@ class ResourceManager(StrSignatureMixin):
     def _insert_task_record(self, task_id: str, user_id: int,
                             metric_str: str, splitter_dict: Dict[str, str], ml_task_dict: Dict[str, str],
                             train_set_id: str, test_set_id: str, train_label_id: str, test_label_id: str,
-                            specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
+                            specific_task_token: str, task_metadata: Dict[str, Any], sub_sample_indexes: List[int],
                             sub_feature_indexes: List[str]):
         records = self.TaskModel.select().where(
             (self.TaskModel.task_id == task_id) & (self.TaskModel.user_id == user_id)

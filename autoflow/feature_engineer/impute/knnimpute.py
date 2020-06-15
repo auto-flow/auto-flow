@@ -13,8 +13,8 @@ from sklearn.neighbors._base import _get_weights
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils.validation import check_is_fitted
 
-from skimpute.utils import process_dataframe, parse_cat_col, build_encoder, encode_data, decode_data
-from skimpute.wrapped_encodes.target_encoder import TargetEncoder
+from autoflow.feature_engineer.impute.utils import process_dataframe, parse_cat_col, build_encoder, encode_data, decode_data
+from autoflow.feature_engineer.impute.wrapped_encodes.target_encoder import TargetEncoder
 from .pairwise_external import _get_mask
 from .pairwise_external import pairwise_distances
 
@@ -104,7 +104,7 @@ class KNNImputer(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> from skimpute import KNNImputer
+    >>> from autoflow.feature_engineer.impute import KNNImputer
     >>> nan = float("NaN")
     >>> X = [[1, 2, nan], [3, 4, 3], [nan, 6, 5], [8, 8, 7]]
     >>> imputer = KNNImputer(n_neighbors=2, weights="uniform")
@@ -244,7 +244,7 @@ class KNNImputer(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ["fitted_X_", "statistics_", "do_simple_imputing", "idx2encoder", "dtypes"])
         if self.do_simple_imputing:
             logger.debug("KNNImputer is doing adaptive simple imputation.")
-            from skimpute import AdaptiveSimpleImputer
+            from autoflow.feature_engineer.impute import AdaptiveSimpleImputer
             return AdaptiveSimpleImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat).fit_transform(X)
         X_ = process_dataframe(X)
         columns = X.columns

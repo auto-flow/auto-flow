@@ -105,7 +105,7 @@ async def finish_experiment_update_info(
 
 @app.post("/insert_task_record")
 async def insert_task_record(
-        task_metadata: Dict[str, Any], sub_sample_indexes: List[str],
+        task_metadata: Dict[str, Any], sub_sample_indexes: List[int],
         sub_feature_indexes: List[str],
         task_id: str = Body(...), user_id: int = Body(...),
         metric_str: str = Body(...), splitter_dict: Dict[str, str] = Body(...),
@@ -193,15 +193,15 @@ async def insert_runhistory_record(
         seed: int = Body(...),
         additional_info: Dict[str, Any] = Body(...),
         origin: int = Body(...),
+        modify_time: str = Body(...),
         pid: int = Body(...),
 ):
-    runhistory_db._insert_runhistory_record(
+    return runhistory_db._insert_runhistory_record(
         run_id, config_id, config, config_origin, cost, time,
         status, instance_id, seed,
         additional_info,
-        origin, pid
+        origin, modify_time, pid
     )
-    return {"msg": "ok"}
 
 
 @app.post("/fetch_new_runhistory")

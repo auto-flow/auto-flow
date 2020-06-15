@@ -50,8 +50,8 @@ pipe = AutoFlowClassifier(
 )
 pipe.fit(
     X_train, y_train,
+    # fit_ensemble_params="auto",
     fit_ensemble_params=False,
-    # fit_ensemble_params=False,
 )
 assert isinstance(pipe.estimator, VoteClassifier)
 # score = accuracy_score(y_test, y_pred)

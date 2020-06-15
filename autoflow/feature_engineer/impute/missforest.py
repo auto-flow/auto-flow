@@ -13,7 +13,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.utils.validation import check_is_fitted
 
-from skimpute.utils import process_dataframe, parse_cat_col, build_encoder, decode_data
+from autoflow.feature_engineer.impute.utils import process_dataframe, parse_cat_col, build_encoder, decode_data
 from .pairwise_external import _get_mask
 
 logger = logging.getLogger(__name__)
@@ -224,7 +224,7 @@ class MissForest(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> from skimpute import MissForest
+    >>> from autoflow.feature_engineer.impute.missforest import MissForest
     >>> nan = float("NaN")
     >>> X = [[1, 2, nan], [3, 4, 3], [nan, 6, 5], [8, 8, 7]]
     >>> imputer = MissForest(random_state=1337)
@@ -479,7 +479,7 @@ class MissForest(BaseEstimator, TransformerMixin):
         mask = _get_mask(X_, self.missing_values)
         if np.any(mask.sum(axis=0) >= (X_.shape[0])):
             logger.warning("One or more columns have all rows missing. Using AdaptiveSimpleImputer to do imputing.")
-            from skimpute.adaptive import AdaptiveSimpleImputer
+            from autoflow.feature_engineer.impute import AdaptiveSimpleImputer
             return AdaptiveSimpleImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat). \
                 fit_transform(X)
 

@@ -38,12 +38,12 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
         if X is None:
             return None
         X_ = X.filter_feature_groups(self.in_feature_groups, True)
-        X_ = self.before_trans_X(X_)
-        X_data = self._transform_procedure(X_.data)
-        return X.replace_feature_groups(self.in_feature_groups, X_data, self.out_feature_groups)
+        X_data = self.before_trans_X(X_)
+        X_trans = self._transform_procedure(X_data)
+        return X.replace_feature_groups(self.in_feature_groups, X_trans, self.out_feature_groups)
 
     def before_trans_X(self, X):
-        return X
+        return X.data
 
     def prepare_X_to_fit(self, X_train, X_valid=None, X_test=None, **kwargs):
         X_train = self.before_fit_X(X_train)

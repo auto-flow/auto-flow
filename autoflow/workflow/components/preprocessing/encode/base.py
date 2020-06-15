@@ -16,4 +16,4 @@ class BaseEncoder(AutoFlowFeatureEngineerAlgorithm):
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None, columns_metadata=None):
         X_ = X.astype(str)
-        return estimator.fit(X_, y)
+        return estimator.fit(X_,y)

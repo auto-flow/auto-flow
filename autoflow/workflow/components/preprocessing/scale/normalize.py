@@ -1,7 +1,7 @@
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
-__all__=["NormalizerComponent"]
+__all__=["Normalizer"]
 
-class NormalizerComponent(AutoFlowFeatureEngineerAlgorithm):
+class Normalizer(AutoFlowFeatureEngineerAlgorithm):
     class__ = "Normalizer"
     module__ = "sklearn.preprocessing"
