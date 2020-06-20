@@ -8,16 +8,16 @@ from typing import Dict, Optional, List
 
 import numpy as np
 
-from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
+from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
+    SUBSAMPLES_BUDGET_MODE
 from autoflow.data_container import DataFrameContainer
-from autoflow.data_container import NdArrayContainer
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
+from autoflow.evaluation.budget import implement_subsample_budget
 from autoflow.hdl.shp2dhp import SHP2DHP
 from autoflow.hpbandster.core.worker import Worker
 from autoflow.metrics import Scorer, calculate_score, calculate_confusion_matrix
 from autoflow.resource_manager.base import ResourceManager
-from autoflow.utils.array_ import get_stratified_sampling_index
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.hash import get_hash_of_config
 from autoflow.utils.klass import StrSignatureMixin
@@ -43,6 +43,9 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             should_stack_X: bool,
             should_finally_fit: bool,
             model_registry: dict,
+            budget2kfold: Optional[Dict[float, int]] = None,
+            algo2budget_mode: Optional[Dict[str, str]] = None,
+            algo2iter: Optional[Dict[str, int]] = None,
             nameserver=None,
             nameserver_port=None,
             host=None,
@@ -52,6 +55,9 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         super(TrainEvaluator, self).__init__(
             run_id, nameserver, nameserver_port, host, worker_id, timeout
         )
+        self.algo2iter = algo2iter
+        self.algo2budget_mode = algo2budget_mode
+        self.budget2kfold = budget2kfold
         self.timeout = timeout
         self.id = worker_id
         self.host = host
@@ -116,21 +122,11 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def implement_subsample_budget(self, X_train: DataFrameContainer, y_train: NdArrayContainer, budget):
-        samples = int(X_train.shape[0] * budget)
-        features = X_train.shape[1]
-        sub_sample_index = get_stratified_sampling_index(y_train.data, budget, self.random_state)
-        X_train = X_train.sub_sample(sub_sample_index)
-        y_train = y_train.sub_sample(sub_sample_index)
-        if features > samples:
-            sub_feature_index = self.rng.permutation(X_train.shape[1])[:samples]
-            X_train = X_train.sub_feature(sub_feature_index)
-        return X_train, y_train
-
     def evaluate(self, model: ML_Workflow, X, y, X_test, y_test, budget):
         warning_info = StringIO()
         additional_info = {}
         support_early_stopping = getattr(model.steps[-1][1], "support_early_stopping", False)
+        budget_mode = self.algo2budget_mode[model.steps[-1][1].__class__.__name__]
         with redirect_stderr(warning_info):
             # splitter 必须存在
             losses = []
@@ -153,8 +149,13 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 X_valid = X.sub_sample(valid_index)
                 y_train = y.sub_sample(train_index)
                 y_valid = y.sub_sample(valid_index)
-                if fold_ix == 0 and budget < 1:
-                    X_train, y_train = self.implement_subsample_budget(X_train, y_train, budget)
+                if fold_ix == 0 and budget_mode == SUBSAMPLES_BUDGET_MODE and budget < 1:
+                    X_train, y_train, (X_valid, X_test) = implement_subsample_budget(
+                        X_train, y_train, [X_valid, X_test],
+                        budget, self.random_state
+                    )
+                # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
+                # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
                 try:
                     procedure_result = cloned_model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid,
                                                               X_test, y_test)
@@ -184,6 +185,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 losses.append(float(loss))
                 all_scores.append(all_score)
                 if fold_ix == 0 and budget < 1:
+                    break
+                if budget > 1 and fold_ix == self.budget2kfold[budget]:
                     break
             if self.ml_task.mainTask == "classification":
                 additional_info["confusion_matrices"] = confusion_matrices
@@ -258,7 +261,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         info["warning_info"] = warning_info.getvalue()
         return info
 
-    def compute(self, config: dict, budget: float, **kwargs):
+    def compute(self, config: dict, config_info: dict, budget: float, **kwargs):
         # 1. 将php变成model
         config_id = get_hash_of_config(config)
         start = time()
@@ -271,6 +274,9 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id
+        info["config"] = config
+        info["config_info"] = config_info
+        info["budget"] = budget
         info["instance_id"] = self.run_id  # fixme: 删除
         info["run_id"] = self.run_id
         # info["program_hyper_param"] = shp
@@ -283,10 +289,13 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         #     "config_origin": getattr(shp, "origin", "unk")
         # })
         # fixme: 改到result_logger
-        # self.resource_manager.insert_trial_record(info)
+        trial_id = self.resource_manager.insert_trial_record(info)
         return {
             "loss": info["loss"],
-            "info": {},
+            "info": {
+                "config_id": config_id,
+                "trial_id": trial_id
+            },
         }
 
     def shp2model(self, shp):

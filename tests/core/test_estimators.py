@@ -70,7 +70,7 @@ class TestEstimators(LocalResourceTestCase):
         print(score)
         self.assertGreater(score, 0.8)
         pipe.resource_manager.init_trial_table()
-        trial = pipe.resource_manager.TrialsModel
+        trial = pipe.resource_manager.TrialModel
         records = trial.select().where(trial.experiment_id == pipe.experiment_id)
         for record in records:
             self.assertTrue(record is not None)
@@ -97,7 +97,7 @@ class TestEstimators(LocalResourceTestCase):
         print(score)
         self.assertGreater(score, 0)
         pipe.resource_manager.init_trial_table()
-        trial = pipe.resource_manager.TrialsModel
+        trial = pipe.resource_manager.TrialModel
         records = trial.select().where(trial.experiment_id == pipe.experiment_id)
         for record in records:
             self.assertTrue(record is not None)

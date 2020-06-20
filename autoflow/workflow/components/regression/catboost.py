@@ -4,12 +4,12 @@ from typing import Dict
 import numpy as np
 
 from autoflow.data_container import DataFrameContainer
-from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
+from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
 __all__ = ["CatBoostRegressor"]
 
 
-class CatBoostRegressor(AutoFlowClassificationAlgorithm):
+class CatBoostRegressor(AutoFlowRegressionAlgorithm):
     class__ = "CatBoostRegressor"
     module__ = "catboost"
 
@@ -19,7 +19,7 @@ class CatBoostRegressor(AutoFlowClassificationAlgorithm):
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None):
-        categorical_features_indices = None #get_categorical_features_indices(X)
+        categorical_features_indices = None  # get_categorical_features_indices(X)
         if (X_valid is not None) and (y_valid is not None):
             eval_set = (X_valid, y_valid)
         else:

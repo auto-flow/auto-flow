@@ -10,7 +10,6 @@ class ExperimentType(enum.Enum):
     ENSEMBLE = "ensemble_modeling"
 
 
-
 binary_classification_task = MLTask("classification", "binary", "classifier")
 multiclass_classification_task = MLTask("classification", "multiclass", "classifier")
 multilabel_classification_task = MLTask("classification", "multilabel", "classifier")
@@ -25,6 +24,8 @@ UNIQUE_FEATURE_GROUPS = ("id", "target")
 NAN_FEATURE_GROUPS = ("nan", "highR_nan")
 VARIABLE_PATTERN = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")
 JOBLIB_CACHE = "/tmp/joblib_cache"
+ITERATIONS_BUDGET_MODE = "iterations"
+SUBSAMPLES_BUDGET_MODE = "subsamples"
 RESOURCE_MANAGER_CLOSE_ALL_LOGGER = "ResourceManager.close_all"
 CONNECTION_POOL_CLOSE_MSG = "Connection pool in ResourceManger all closed."
 START_SAFE_CLOSE_MSG = "Start to safely close connection pool..."

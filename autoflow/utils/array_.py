@@ -5,6 +5,8 @@
 from collections import Counter
 
 import numpy as np
+from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.utils.multiclass import type_of_target
 
 
 def sanitize_array(array):
@@ -45,6 +47,14 @@ def multilabel_to_multiclass(array):
 
 
 def get_stratified_sampling_index(array: np.ndarray, proportion: float, random_state: int):
+    array = array.astype("float32")
+    if type_of_target(array) == "continuous":
+        if len(array) < 10:
+            n_bins = 2
+        else:
+            n_bins = 5
+        kbins = KBinsDiscretizer(n_bins=n_bins, encode="ordinal", strategy="kmeans")
+        array = kbins.fit_transform(array.reshape(-1, 1)).squeeze()
     assert len(array.shape) == 1
     rng = np.random.RandomState(random_state)
     labels = Counter(array)

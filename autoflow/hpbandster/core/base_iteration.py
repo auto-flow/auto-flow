@@ -6,11 +6,11 @@ from autoflow.hpbandster.core.dispatcher import Job
 
 
 class Datum(object):
-    def __init__(self, config, config_info, results=None, time_stamps=None, exceptions=None, status='QUEUED', budget=0):
+    def __init__(self, config, config_info, results=None, timestamps=None, exceptions=None, status='QUEUED', budget=0):
         self.config = config
         self.config_info = config_info
         self.results = results if not results is None else {}
-        self.time_stamps = time_stamps if not time_stamps is None else {}
+        self.timestamps = timestamps if not timestamps is None else {}
         self.exceptions = exceptions if not exceptions is None else {}
         self.status = status
         self.budget = budget
@@ -18,10 +18,10 @@ class Datum(object):
     def __repr__(self):
         return ( \
                     "\nconfig:{}\n".format(self.config) + \
-                    "config_info:\n{}\n" % self.config_info + \
+                    "config_info:\n{}\n" .format(self.config_info) + \
                     "losses:\n"
                     '\t'.join(["{}: {}\t".format(k, v['loss']) for k, v in self.results.items()]) + \
-                    "time stamps: {}".format(self.time_stamps)
+                    "time stamps: {}".format(self.timestamps)
         )
 
 
@@ -50,7 +50,7 @@ class BaseIteration(object):
             that perform best after this particular budget is exhausted
             to build a better autoML system.
         logger: a logger
-        result_logger: hpbandster.api.results.util.json_result_logger object
+        result_logger: hpbandster.api.results.util.JsonResultLogger object
             a result logger that writes live results to disk
         """
 
@@ -132,7 +132,7 @@ class BaseIteration(object):
             assert d.status == 'RUNNING', "Configuration wasn't scheduled for a run."
             assert d.budget == budget, 'Budgets differ (%f != %f)!' % (self.data[config_id]['budget'], budget)
 
-        d.time_stamps[budget] = timestamps
+        d.timestamps[budget] = timestamps
         d.results[budget] = result
 
         if (not job.result is None) and np.isfinite(result['loss']):
@@ -166,7 +166,7 @@ class BaseIteration(object):
                 assert v.budget == self.budgets[self.stage], 'Configuration budget does not align with current stage!'
                 v.status = 'RUNNING'
                 self.num_running += 1
-                return (k, v.config, v.budget)
+                return (k, v.config,v.config_info, v.budget)
 
         # check if there are still slots to fill in the current stage and return that
         if (self.actual_num_configs[self.stage] < self.num_configs[self.stage]):
@@ -266,7 +266,7 @@ class WarmStartIteration(BaseIteration):
         self.stage = 0
 
         id2conf = Result.get_id2config_mapping()
-        delta_t = - max(map(lambda r: r.time_stamps['finished'], Result.get_all_runs()))
+        delta_t = - max(map(lambda r: r.timestamps['finished'], Result.get_all_runs()))
 
         super().__init__(-1, [len(id2conf)], [None], None)
 
@@ -280,7 +280,7 @@ class WarmStartIteration(BaseIteration):
                 j.result = {'loss': r.loss, 'info': r.info}
                 j.error_logs = r.error_logs
 
-                for k, v in r.time_stamps.items():
+                for k, v in r.timestamps.items():
                     j.timestamps[k] = v + delta_t
 
                 self.register_result(j, skip_sanity_checks=True)
@@ -296,6 +296,6 @@ class WarmStartIteration(BaseIteration):
         """
 
         for k, v in self.data.items():
-            for kk, vv in v.time_stamps.items():
+            for kk, vv in v.timestamps.items():
                 for kkk, vvv in vv.items():
-                    self.data[k].time_stamps[kk][kkk] += time_ref
+                    self.data[k].timestamps[kk][kkk] += time_ref

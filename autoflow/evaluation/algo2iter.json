@@ -1,0 +1,16 @@
+{
+  "CatBoostClassifier": 2000,
+  "CatBoostRegressor": 2000,
+  "ElasticNet": 2000,
+  "ExtraTreesClassifier": 1000,
+  "ExtraTreesRegressor": 1000,
+  "GradientBoostingClassifier": 2000,
+  "GradientBoostingRegressor": 2000,
+  "LGBMClassifier": 2000,
+  "LGBMRegressor": 2000,
+  "LogisticRegression": 2000,
+  "RandomForestClassifier": 1000,
+  "RandomForestRegressor": 1000,
+  "SGDClassifier": 2000,
+  "SGDRegressor": 2000
+}

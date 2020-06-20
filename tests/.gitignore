@@ -7,3 +7,4 @@ autoflow*
 *.xlsx
 run*.py
 !run_estimator_http.py
+!run_optimizer.py

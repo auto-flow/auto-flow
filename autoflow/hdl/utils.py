@@ -31,7 +31,7 @@ def get_hdl_bank(path: str, logger=None) -> Dict:
 
 
 def _get_default_hdl_bank() -> Dict:
-    return json.loads((Path(hdl.__file__).parent / f"hdl_bank.json").read_text())
+    return json.loads((Path(hdl.__file__).parent / "hdl_bank.json").read_text())
 
 
 memory = Memory(JOBLIB_CACHE, verbose=1)

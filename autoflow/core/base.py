@@ -15,12 +15,13 @@ from sklearn.model_selection import KFold, StratifiedKFold, ShuffleSplit
 
 import autoflow.hpbandster.core.nameserver as hpns
 from autoflow import constants
-from autoflow.constants import ExperimentType
+from autoflow.constants import ExperimentType, SUBSAMPLES_BUDGET_MODE
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
+from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2budget_mode
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
@@ -28,6 +29,7 @@ from autoflow.hpbandster.utils import get_max_SH_iter
 from autoflow.metrics import r2, accuracy
 from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
+from autoflow.hpbandster.core.result import DatabaseResultLogger
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import estimate_config_space_numbers, replace_phps
@@ -49,7 +51,10 @@ class AutoFlowEstimator(BaseEstimator):
             max_budget: Optional[float] = None,
             eta: Optional[float] = None,
             SH_only: bool = False,
-            budget_kfold_mapper: Optional[Dict[float, int]] = None,
+            budget2kfold: Optional[Dict[float, int]] = None,
+            algo2budget_mode: Optional[Dict[str, str]] = None,
+            algo2iter: Optional[Dict[str, int]] = None,
+            only_use_subsamples_budget_mode: bool = False,
             n_folds: int = 5,
             holdout_test_size: float = 1 / 3,
             n_keep_samples: int = 30000,
@@ -132,12 +137,22 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
-        self.budget_kfold_mapper = budget_kfold_mapper
+        self.only_use_subsamples_budget_mode = only_use_subsamples_budget_mode
+        if algo2iter is None:
+            algo2iter = get_default_algo2iter()
+        if algo2budget_mode is None:
+            algo2budget_mode = get_default_algo2budget_mode()
+        if only_use_subsamples_budget_mode:
+            algo2budget_mode = {key: SUBSAMPLES_BUDGET_MODE for key in algo2budget_mode}
+        self.algo2iter = algo2iter
+        self.algo2budget_mode = algo2budget_mode
+        self.budget2kfold = budget2kfold
         self.max_n_samples_for_CV = max_n_samples_for_CV
         self.min_n_samples_for_SH = min_n_samples_for_SH
         self.n_keep_samples = n_keep_samples
         self.config_generator_params = dict(config_generator_params)
         assert isinstance(n_folds, int) and n_folds >= 1
+        # fixme: support int
         assert isinstance(holdout_test_size, float) and 0 < holdout_test_size < 1
         self.holdout_test_size = holdout_test_size
         self.n_folds = n_folds
@@ -263,7 +278,7 @@ class AutoFlowEstimator(BaseEstimator):
             self.logger.info(
                 f"TrainSet has {self.n_samples} samples,"
                 f" greater than n_keep_samples({self.n_keep_samples}). ")
-        # set min_budget max_budget eta
+        # set min_budget, max_budget, eta, budget2kfold
         if self.n_samples < self.min_n_samples_for_SH:
             self.min_budget = self.max_budget = self.eta = 1
         else:
@@ -277,22 +292,22 @@ class AutoFlowEstimator(BaseEstimator):
                     self.max_budget = 1
             if self.eta is None:
                 self.eta = 4
-            if self.budget_kfold_mapper is None:
+            if self.budget2kfold is None:
                 if self.max_budget <= 1:
-                    self.budget_kfold_mapper = {}
+                    self.budget2kfold = {}
                 else:
-                    self.budget_kfold_mapper = {self.max_budget: self.n_splits}
+                    self.budget2kfold = {self.max_budget: self.n_splits}
         # set n_iterations
         # fixme: 有拍脑袋的嫌疑
         if self.n_iterations is None:
             if self.min_budget != self.max_budget:
                 max_SH_iter = get_max_SH_iter(self.min_budget, self.max_budget, self.eta)
                 if self.max_budget > 1:
-                    self.n_iterations = max_SH_iter * 2
+                    self.n_iterations = max_SH_iter * 1
                 else:
-                    self.n_iterations = max_SH_iter * 4
+                    self.n_iterations = max_SH_iter * 1
             else:
-                self.n_iterations=100
+                self.n_iterations = 50
         # parse metric
         if metric is None:
             if self.ml_task.mainTask == "regression":
@@ -318,9 +333,18 @@ class AutoFlowEstimator(BaseEstimator):
         # get hdl_id, and insert record into "{task_id}.hdls" database
         self.resource_manager.insert_hdl_record(self.hdl, self.hdl_constructor.hdl_metadata)
         self.resource_manager.close_hdl_table()
+        self.resource_manager.insert_budget_record({
+            "algo2budget_mode": self.algo2budget_mode,
+            "budget2kfold": self.budget2kfold,
+            "algo2iter": self.algo2iter,
+            "min_budget": self.min_budget,
+            "max_budget": self.max_budget,
+            "eta": self.eta,
+        })
         self.task_id = self.resource_manager.task_id
         self.hdl_id = self.resource_manager.hdl_id
         self.user_id = self.resource_manager.user_id
+        self.budget_id = self.resource_manager.budget_id
         self.logger.info(f"task_id:\t{self.task_id}")
         self.logger.info(f"hdl_id:\t{self.hdl_id}")
         self.run_id = f"{self.task_id}-{self.hdl_id}-{self.user_id}"
@@ -383,6 +407,9 @@ class AutoFlowEstimator(BaseEstimator):
             should_stack_X=self.should_stack_X,
             should_finally_fit=self.should_finally_fit,
             model_registry=self.model_registry,
+            budget2kfold=self.budget2kfold,
+            algo2budget_mode=self.algo2budget_mode,
+            algo2iter=self.algo2iter,
             nameserver=self.ns_host,
             nameserver_port=self.ns_port,
             host=worker_host,
@@ -424,7 +451,7 @@ class AutoFlowEstimator(BaseEstimator):
 
     def run_optimizer(
             self, master_host=None, min_budget=None, max_budget=None, eta=None,
-            config_generator=None, config_generator_param=None,n_iterations=None,
+            config_generator=None, config_generator_param=None, n_iterations=None,
             min_n_workers=None
     ):
         set_if_not_None(self, "master_host", master_host)
@@ -444,20 +471,21 @@ class AutoFlowEstimator(BaseEstimator):
         else:
             raise NotImplementedError
         config_generator = cls(self.config_space, **self.config_generator_params)
+        self.database_result_logger = DatabaseResultLogger(self.resource_manager)
         self.optimizer = Optimizer(
             self.run_id,
             config_generator,
             nameserver=self.ns_host,
             nameserver_port=self.ns_port,
             host=self.master_host,
-            result_logger=None,  # todo
+            result_logger=self.database_result_logger,
             previous_result=None,  # todo
             min_budget=self.min_budget,
             max_budget=self.max_budget,
             eta=self.eta,
-            SH_only=self.SH_only
+            SH_only=self.SH_only,
         )
-        self.optimizer.run(self.n_iterations, self.min_n_workers)
+        self.hpbandstr_result = self.optimizer.run(self.n_iterations, self.min_n_workers)
 
     run_master = run_optimizer  # Semantic compatibility with hpbandster
 
@@ -734,10 +762,19 @@ class AutoFlowEstimator(BaseEstimator):
 
     def copy(self):
         tmp_dm = self.data_manager
+        tmp_NS=self.NS
+        tmp_evaluators=self.evaluators
+        tmp_optimizer=self.optimizer
+        self.NS=None
+        self.evaluators=None
+        self.optimizer=None
         self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
         self.resource_manager.start_safe_close()
         res = deepcopy(self)
         self.resource_manager.end_safe_close()
+        self.NS = tmp_NS
+        self.evaluators = tmp_evaluators
+        self.optimizer = tmp_optimizer
         self.data_manager: DataManager = tmp_dm
         return res
 
@@ -745,9 +782,18 @@ class AutoFlowEstimator(BaseEstimator):
         # todo: 怎么做保证不触发self.resource_manager的__reduce__
         from pickle import dumps
         tmp_dm = self.data_manager
+        tmp_NS = self.NS
+        tmp_evaluators = self.evaluators
+        tmp_optimizer = self.optimizer
+        self.NS = None
+        self.evaluators = None
+        self.optimizer = None
         self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
         self.resource_manager.start_safe_close()
         res = dumps(self)
         self.resource_manager.end_safe_close()
+        self.NS = tmp_NS
+        self.evaluators = tmp_evaluators
+        self.optimizer = tmp_optimizer
         self.data_manager: DataManager = tmp_dm
         return res

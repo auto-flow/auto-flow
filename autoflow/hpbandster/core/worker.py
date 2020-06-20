@@ -173,7 +173,7 @@ class Worker(object):
         with Pyro4.locateNS(self.nameserver, port=self.nameserver_port) as ns:
             ns.remove(self.worker_id)
 
-    def compute(self, config_id, config, budget, working_directory):
+    def compute(self, config_id, config, config_info, budget, working_directory):
         """ The function you have to overload implementing your computation.
 
         Parameters

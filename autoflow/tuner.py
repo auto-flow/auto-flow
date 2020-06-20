@@ -10,7 +10,6 @@ import numpy as np
 from ConfigSpace import ConfigurationSpace, Configuration
 from frozendict import frozendict
 
-from autoflow.evaluation.ensemble_evaluator import EnsembleEvaluator
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.data_manager import DataManager

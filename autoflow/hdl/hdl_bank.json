@@ -82,7 +82,7 @@
       "_n_components__sp1_ratio": {"_type": "quniform", "_value": [0.1,0.9],"_default": 0.5}
     },
     "liblinear_svc": {
-      "max_iter": 3000,
+      "max_iter": {"_type": "int_quniform","_value": [1000, 3000, 100], "_default": 2000},
       "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
       "dual": {"_type": "choice", "_value": [true,false],"_default": false},
       "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},

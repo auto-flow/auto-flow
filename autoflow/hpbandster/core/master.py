@@ -66,7 +66,7 @@ class Master(object):
             If true (default), the job_queue_sizes are relative to the current number of workers.
         logger: logging.logger like object
             the logger to output some (more or less meaningful) information
-        result_logger: hpbandster.api.results.util.json_result_logger object
+        result_logger: hpbandster.api.results.util.JsonResultLogger object
             a result logger that writes live results to disk
         previous_result: hpbandster.core.result.Result object
             previous run to warmstart the run
@@ -266,7 +266,7 @@ class Master(object):
                 self.num_running_jobs, str(self.job_queue_sizes)))
                 self.thread_cond.wait()
 
-    def _submit_job(self, config_id, config, budget):
+    def _submit_job(self, config_id, config,config_info, budget):
         """
         hidden function to submit a new job to the dispatcher
 
@@ -276,7 +276,7 @@ class Master(object):
         self.logger.debug('HBMASTER: trying submitting job %s to dispatcher' % str(config_id))
         with self.thread_cond:
             self.logger.debug('HBMASTER: submitting job %s to dispatcher' % str(config_id))
-            self.dispatcher.submit_job(config_id, config=config, budget=budget,
+            self.dispatcher.submit_job(config_id, config=config,config_info=config_info, budget=budget,
                                        working_directory=self.working_directory)
             self.num_running_jobs += 1
 

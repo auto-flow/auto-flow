@@ -3,7 +3,7 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 import inspect
-from typing import Dict, Any, Sequence
+from typing import Dict, Any, Sequence, Type
 
 NONE_TOKEN = "NaN"
 
@@ -45,9 +45,14 @@ def get_valid_params_in_kwargs(func, kwargs: Dict[str, Any]):
 def gather_kwargs_from_signature_and_attributes(klass, instance):
     return get_valid_params_in_kwargs(klass.__init__, instance.__dict__)
 
+
 def set_if_not_None(obj, variable_name, value):
     if value is not None:
         setattr(obj, variable_name, value)
+
+
+def get_class_full_name(klass: Type) -> str:
+    return f"{klass.__module__}.{klass.__name__}"
 
 
 def instancing(variable, klass, kwargs):
