@@ -1,4 +1,7 @@
-from typing import List
+from copy import deepcopy
+from typing import List, Union, Dict, Any
+
+from ConfigSpace import Configuration
 
 from autoflow.hdl.smac import _decode
 from autoflow.utils.klass import StrSignatureMixin
@@ -36,8 +39,13 @@ class SHP2DHP(StrSignatureMixin):
         result.append(cursor)
         return result
 
-    def __call__(self, shp):
-        dict_ = shp.get_dictionary()
+    def __call__(self, shp: Union[Configuration, Dict[str, Any]]):
+        if isinstance(shp, Configuration):
+            dict_ = shp.get_dictionary()
+        elif isinstance(shp, dict):
+            dict_ = deepcopy(shp)
+        else:
+            raise NotImplementedError
         result = {}
         for k, v in dict_.items():
             if isinstance(v, str):

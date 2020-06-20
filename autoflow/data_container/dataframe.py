@@ -123,6 +123,7 @@ class DataFrameContainer(DataContainer):
     def set_feature_groups(self, feature_groups):
         if not isinstance(feature_groups, pd.Series):
             feature_groups = pd.Series(feature_groups)
+        feature_groups.index = range(len(feature_groups))
         assert len(feature_groups) == self.shape[1], "feature_groups' length should equal to features' length."
         self.feature_groups = feature_groups
         self.column_descriptions = self.feature_groups2column_descriptions(feature_groups)
@@ -247,12 +248,23 @@ class DataFrameContainer(DataContainer):
                                     resource_manager=self.resource_manager,
                                     dataset_metadata=self.dataset_metadata)
         new_df.set_feature_groups(new_feature_group)
-        new_df.index = deleted_df.index # 非常重要的一步
+        new_df.index = deleted_df.index  # 非常重要的一步
         return deleted_df.concat_to(new_df)
 
     def sub_sample(self, index):
         new_df = self.copy()
+        # fixme
         new_df.data = deepcopy(new_df.data.iloc[index, :])
+        return new_df
+
+    def sub_feature(self, index):
+        new_df = self.copy()
+        if isinstance(index, np.ndarray) and index.dtype == int:
+            new_df.data = deepcopy(new_df.data.iloc[:, index])
+            new_df.set_feature_groups(new_df.feature_groups[index])
+        else:
+            # todo: 如果index是列名序列
+            raise NotImplementedError
         return new_df
 
     @property

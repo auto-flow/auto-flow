@@ -7,76 +7,80 @@ from time import time
 from typing import Dict, Optional, List
 
 import numpy as np
-from ConfigSpace import Configuration
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
 from autoflow.data_container import DataFrameContainer
+from autoflow.data_container import NdArrayContainer
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
-from autoflow.evaluation.base import BaseEvaluator
 from autoflow.hdl.shp2dhp import SHP2DHP
+from autoflow.hpbandster.core.worker import Worker
 from autoflow.metrics import Scorer, calculate_score, calculate_confusion_matrix
 from autoflow.resource_manager.base import ResourceManager
+from autoflow.utils.array_ import get_stratified_sampling_index
 from autoflow.utils.dict_ import group_dict_items_before_first_token
-from autoflow.utils.logging_ import get_logger
+from autoflow.utils.hash import get_hash_of_config
+from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline
 from autoflow.utils.sys_ import get_trance_back_msg
 from autoflow.workflow.ml_workflow import ML_Workflow
-from dsmac.runhistory.runhistory_db import RunHistoryDB
-from dsmac.runhistory.utils import get_id_of_config
 
 
-class TrainEvaluator(BaseEvaluator):
-    def __init__(self):
-        # ---member variable----
-        self.debug = False
-
-    def init_data(
+class TrainEvaluator(Worker, StrSignatureMixin):
+    def __init__(
             self,
-            random_state,
+            run_id,
             data_manager: DataManager,
+            resource_manager: ResourceManager,
+            random_state: int,
             metric: Scorer,
             groups: List[int],
             should_calc_all_metric: bool,
             splitter,
             should_store_intermediate_result: bool,
             should_stack_X: bool,
-            resource_manager: ResourceManager,
             should_finally_fit: bool,
             model_registry: dict,
-            instance_id: str
+            nameserver=None,
+            nameserver_port=None,
+            host=None,
+            worker_id=None,
+            timeout=None,
     ):
-        self.instance_id = instance_id
-        self.should_stack_X = should_stack_X
-        self.groups = groups
-        if model_registry is None:
-            model_registry = {}
+        super(TrainEvaluator, self).__init__(
+            run_id, nameserver, nameserver_port, host, worker_id, timeout
+        )
+        self.timeout = timeout
+        self.id = worker_id
+        self.host = host
+        self.nameserver_port = nameserver_port
+        self.nameserver = nameserver
         self.model_registry = model_registry
-        self.random_state = random_state
-        if not hasattr(splitter, "random_state"):
-            setattr(splitter, "random_state", 42)  # random state is required, and is certain
-        self.splitter = splitter
-        self.data_manager = data_manager
-        self.X_train = self.data_manager.X_train
-        self.y_train = self.data_manager.y_train
-        self.X_test = self.data_manager.X_test
-        self.y_test = self.data_manager.y_test
+        self.should_finally_fit = should_finally_fit
+        self.resource_manager = resource_manager
+        self.should_stack_X = should_stack_X
         self.should_store_intermediate_result = should_store_intermediate_result
-        self.metric = metric
-        self.ml_task: MLTask = self.data_manager.ml_task
-
+        self.splitter = splitter
         self.should_calc_all_metric = should_calc_all_metric
-
+        self.groups = groups
+        self.metric = metric
+        self.data_manager = data_manager
+        self.random_state = random_state
+        self.run_id = run_id
+        # ---member variable----
+        self.debug = False
+        self.ml_task: MLTask = self.data_manager.ml_task
         if self.ml_task.mainTask == "regression":
             self.predict_function = self._predict_regression
         else:
             self.predict_function = self._predict_proba
-
-        self.logger = get_logger(self)
-        self.resource_manager = resource_manager
-        self.should_finally_fit = should_finally_fit
+        self.X_train = self.data_manager.X_train
+        self.y_train = self.data_manager.y_train
+        self.X_test = self.data_manager.X_test
+        self.y_test = self.data_manager.y_test
+        self.rng = np.random.RandomState(self.random_state)
 
     def loss(self, y_true, y_hat):
         score, true_score = calculate_score(
@@ -93,9 +97,6 @@ class TrainEvaluator(BaseEvaluator):
             raise TypeError
 
         return err, all_score
-
-    def set_resource_manager(self, resource_manager: ResourceManager):
-        self.resource_manager = resource_manager
 
     def _predict_proba(self, X, model):
         y_pred = model.predict_proba(X)
@@ -115,8 +116,18 @@ class TrainEvaluator(BaseEvaluator):
         return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def evaluate(self, model: ML_Workflow, X, y, X_test, y_test):
-        assert self.resource_manager is not None
+    def implement_subsample_budget(self, X_train: DataFrameContainer, y_train: NdArrayContainer, budget):
+        samples = int(X_train.shape[0] * budget)
+        features = X_train.shape[1]
+        sub_sample_index = get_stratified_sampling_index(y_train.data, budget, self.random_state)
+        X_train = X_train.sub_sample(sub_sample_index)
+        y_train = y_train.sub_sample(sub_sample_index)
+        if features > samples:
+            sub_feature_index = self.rng.permutation(X_train.shape[1])[:samples]
+            X_train = X_train.sub_feature(sub_feature_index)
+        return X_train, y_train
+
+    def evaluate(self, model: ML_Workflow, X, y, X_test, y_test, budget):
         warning_info = StringIO()
         additional_info = {}
         support_early_stopping = getattr(model.steps[-1][1], "support_early_stopping", False)
@@ -134,17 +145,21 @@ class TrainEvaluator(BaseEvaluator):
             start_time = datetime.datetime.now()
             confusion_matrices = []
             best_iterations = []
-            for train_index, valid_index in self.splitter.split(X.data, y.data, self.groups):
+            # todo： 实现budget
+            for fold_ix, (train_index, valid_index) in enumerate(self.splitter.split(X.data, y.data, self.groups)):
                 cloned_model = model.copy()
                 X: DataFrameContainer
                 X_train = X.sub_sample(train_index)
                 X_valid = X.sub_sample(valid_index)
                 y_train = y.sub_sample(train_index)
                 y_valid = y.sub_sample(valid_index)
+                if fold_ix == 0 and budget < 1:
+                    X_train, y_train = self.implement_subsample_budget(X_train, y_train, budget)
                 try:
-                    procedure_result = cloned_model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid, X_test,
-                                                              y_test)
+                    procedure_result = cloned_model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid,
+                                                              X_test, y_test)
                 except Exception as e:
+                    self.logger.error(str(e))
                     failed_info = get_trance_back_msg()
                     status = "FAILED"
                     if self.debug:
@@ -162,13 +177,14 @@ class TrainEvaluator(BaseEvaluator):
                     estimator = cloned_model.steps[-1][1]
                     best_iterations.append(getattr(
                         estimator, "best_iteration_", getattr(estimator.component, "best_iteration_", -1)))
-                # todo: 取出处理后的y_pred
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
                     y_test_preds.append(y_test_pred)
                 loss, all_score = self.loss(y_valid.data, y_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 losses.append(float(loss))
                 all_scores.append(all_score)
+                if fold_ix == 0 and budget < 1:
+                    break
             if self.ml_task.mainTask == "classification":
                 additional_info["confusion_matrices"] = confusion_matrices
             if support_early_stopping:
@@ -242,32 +258,35 @@ class TrainEvaluator(BaseEvaluator):
         info["warning_info"] = warning_info.getvalue()
         return info
 
-    def __call__(self, shp: Configuration):
+    def compute(self, config: dict, budget: float, **kwargs):
         # 1. 将php变成model
-        config_id = get_id_of_config(shp)
+        config_id = get_hash_of_config(config)
         start = time()
-        dhp, model = self.shp2model(shp)
+        dhp, model = self.shp2model(config)
         # 2. 获取数据
         X_train, y_train, X_test, y_test = self.get_Xy()
+        # todo: iter budget类型的支持
         # 3. 进行评价
-        info = self.evaluate(model, X_train, y_train, X_test, y_test)
+        info = self.evaluate(model, X_train, y_train, X_test, y_test, budget)
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id
-        info["instance_id"] = self.instance_id
-        info["run_id"] = RunHistoryDB.get_run_id(self.instance_id, config_id)
+        info["instance_id"] = self.run_id  # fixme: 删除
+        info["run_id"] = self.run_id
         # info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["component"] = estimator
         info["cost_time"] = cost_time
-        info["additional_info"].update({
-            "config_origin": getattr(shp, "origin", "unk")
-        })
-        self.resource_manager.insert_trial_record(info)
+        # fixme
+        # info["additional_info"].update({
+        #     "config_origin": getattr(shp, "origin", "unk")
+        # })
+        # fixme: 改到result_logger
+        # self.resource_manager.insert_trial_record(info)
         return {
             "loss": info["loss"],
-            "status": info["status"],
+            "info": {},
         }
 
     def shp2model(self, shp):
@@ -290,17 +309,6 @@ class TrainEvaluator(BaseEvaluator):
                 break
         cnt = int(cnt)
         key = key[ix:]
-        # pattern = re.compile(r"(\{.*\})")
-        # match = pattern.search(key)
-        # additional_info = {}
-        # if match:
-        #     braces_content = match.group(1)
-        #     _to = braces_content[1:-1]
-        #     param_kvs = _to.split(",")
-        #     for param_kv in param_kvs:
-        #         k, v = param_kv.split("=")
-        #         additional_info[k] = v
-        #     key = pattern.sub("", key)
         # todo: 支持多结点的输入输出，与dataframe.py耦合
         if "->" in key:
             _from, _to = key.split("->")

@@ -45,6 +45,10 @@ def get_valid_params_in_kwargs(func, kwargs: Dict[str, Any]):
 def gather_kwargs_from_signature_and_attributes(klass, instance):
     return get_valid_params_in_kwargs(klass.__init__, instance.__dict__)
 
+def set_if_not_None(obj, variable_name, value):
+    if value is not None:
+        setattr(obj, variable_name, value)
+
 
 def instancing(variable, klass, kwargs):
     if variable is None:
@@ -53,9 +57,6 @@ def instancing(variable, klass, kwargs):
         variable = klass(**variable)
     elif isinstance(variable, klass):
         pass
-    elif isinstance(variable, Sequence):
-        for elem in variable:
-            assert isinstance(elem, klass)
     else:
         raise NotImplementedError
     return variable

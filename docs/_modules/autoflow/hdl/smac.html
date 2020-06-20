@@ -198,7 +198,7 @@
 <div class="viewcode-block" id="choice"><a class="viewcode-back" href="../../../_module/autoflow.hdl.smac.html#autoflow.hdl.smac.choice">[docs]</a><span class="k">def</span> <span class="nf">choice</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Constant</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">_encode</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>  <span class="c1"># fixme: if declare probability in here?</span>
-    <span class="c1"># fixme: copy from autoflow/hdl2shps/hdl2shps.py:354</span>
+    <span class="c1"># fixme: copy from autoflow/hdl2configSpce/hdl2configSpce.py:354</span>
     <span class="n">choice2proba</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">not_specific_proba_choices</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">sum_proba</span> <span class="o">=</span> <span class="mi">0</span>

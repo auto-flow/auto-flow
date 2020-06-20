@@ -1,1 +1,2 @@
-from hpbandster.optimizers.config_generators.random_sampling import RandomSampling
+from autoflow.hpbandster.optimizers.config_generators.random_sampling import RandomSampling
+from autoflow.hpbandster.optimizers.config_generators.bohb import BOHB

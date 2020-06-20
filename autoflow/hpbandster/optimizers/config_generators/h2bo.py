@@ -9,10 +9,10 @@ import ConfigSpace.util
 import numpy as np
 import scipy.stats as sps
 
-from autoflow.hpbandster.core.base_config_generator import base_config_generator
+from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
 from autoflow.hpbandster.optimizers.kde.mvkde import MultivariateKDE
 
-class H2BO(base_config_generator):
+class H2BO(BaseConfigGenerator):
 	def __init__(self, configspace, min_points_in_model = None,
 				 top_n_percent=15, num_samples = 64, random_fraction=1/3,
 				 min_bandwidth=1e-3, bw_estimator='scott', fully_dimensional=True,

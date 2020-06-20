@@ -1,9 +1,9 @@
-from autoflow.hpbandster.core.base_config_generator import base_config_generator
+from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
 
 
 
 
-class RandomSampling(base_config_generator):
+class RandomSampling(BaseConfigGenerator):
     """
         class to implement random sampling from a ConfigSpace
     """
@@ -18,7 +18,7 @@ class RandomSampling(base_config_generator):
             The configuration space to sample from. It contains the full
             specification of the Hyperparameters with their priors
         **kwargs:
-            see  hyperband.config_generators.base.base_config_generator for additional arguments
+            see  hyperband.config_generators.base.BaseConfigGenerator for additional arguments
         """
 
         super().__init__(**kwargs)

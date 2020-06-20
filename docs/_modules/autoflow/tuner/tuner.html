@@ -180,7 +180,7 @@
 <span class="kn">from</span> <span class="nn">dsmac.scenario.scenario</span> <span class="kn">import</span> <span class="n">Scenario</span>
 <span class="kn">from</span> <span class="nn">autoflow.evaluation.ensemble_evaluator</span> <span class="kn">import</span> <span class="n">EnsembleEvaluator</span>
 <span class="kn">from</span> <span class="nn">autoflow.evaluation.train_evaluator</span> <span class="kn">import</span> <span class="n">TrainEvaluator</span>
-<span class="kn">from</span> <span class="nn">autoflow.hdl2shps.hdl2shps</span> <span class="kn">import</span> <span class="n">HDL2SHPS</span>
+<span class="kn">from</span> <span class="nn">autoflow.hdl2configSpce.hdl2configSpce</span> <span class="kn">import</span> <span class="n">HDL2SHPS</span>
 <span class="kn">from</span> <span class="nn">autoflow.manager.data_manager</span> <span class="kn">import</span> <span class="n">DataManager</span>
 <span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.concurrence</span> <span class="kn">import</span> <span class="n">parse_n_jobs</span>
@@ -323,15 +323,15 @@
     <span class="c1"># def set_addition_info(self, addition_info):</span>
     <span class="c1">#     self.addition_info = addition_info</span>
 
-<div class="viewcode-block" id="Tuner.hdl2shps"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.Tuner.hdl2shps">[docs]</a>    <span class="k">def</span> <span class="nf">hdl2shps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
-        <span class="n">hdl2shps</span> <span class="o">=</span> <span class="n">HDL2SHPS</span><span class="p">()</span>
-        <span class="n">hdl2shps</span><span class="o">.</span><span class="n">set_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">hdl2shps</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Tuner.hdl2shps"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.Tuner.hdl2shps">[docs]</a>    <span class="k">def</span> <span class="nf">hdl2configSpce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="n">hdl2configSpce</span> <span class="o">=</span> <span class="n">HDL2SHPS</span><span class="p">()</span>
+        <span class="n">hdl2configSpce</span><span class="o">.</span><span class="n">set_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_task</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hdl2configSpce</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Tuner.set_hdl"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.Tuner.set_hdl">[docs]</a>    <span class="k">def</span> <span class="nf">set_hdl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdl</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdl</span> <span class="o">=</span> <span class="n">hdl</span>
         <span class="c1"># todo: 泛化ML管线后，可能存在多个preprocessing</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl2shps</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="p">:</span> <span class="n">ConfigurationSpace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl2configSpce</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shps</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Tuner.set_resource_manager"><a class="viewcode-back" href="../../../_module/autoflow.tuner.html#autoflow.tuner.Tuner.set_resource_manager">[docs]</a>    <span class="k">def</span> <span class="nf">set_resource_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span><span class="p">):</span>

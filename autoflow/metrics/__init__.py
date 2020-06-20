@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import type_of_target
 
 from autoflow.metrics import classification_metrics
-from autoflow.utils.array import sanitize_array
+from autoflow.utils.array_ import sanitize_array
 from autoflow.utils.ml_task import MLTask
 
 

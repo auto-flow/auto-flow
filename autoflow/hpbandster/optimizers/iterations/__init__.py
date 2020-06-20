@@ -1,1 +1,1 @@
-from hpbandster.optimizers.iterations.successivehalving import SuccessiveHalving
+from autoflow.hpbandster.optimizers.iterations.successivehalving import SuccessiveHalving

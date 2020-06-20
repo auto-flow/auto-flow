@@ -5,6 +5,8 @@ import time
 
 import Pyro4
 
+from autoflow.utils.logging_ import get_logger
+
 
 class Job(object):
 	def __init__(self, id, **kwargs):
@@ -29,14 +31,7 @@ class Job(object):
 			"result: " + str(self.result)+ "\n" +\
 			"exception: "+ str(self.exception) + "\n"
 		)
-	def recreate_from_run(self, run):
-		
-		run.config_id
-		run.budget
-		run.error_logs  
-		run.loss        
-		run.info        
-		run.time_stamps 
+
 
 
 
@@ -74,7 +69,7 @@ class Dispatcher(object):
 	def __init__(self, new_result_callback, run_id='0',
 					ping_interval=10, nameserver='localhost',
 					nameserver_port=None, 
-					host=None, logger=None, queue_callback=None):
+					host=None, queue_callback=None):
 		"""
 		Parameters
 		----------
@@ -91,8 +86,6 @@ class Dispatcher(object):
 		    port of Pyro4 nameserver
 		host: str
 		    ip (or name that resolves to that) of the network interface to use
-		logger: logging.Logger
-		    logger-instance for info and debug
 		queue_callback: function
 		    gets called with the number of workers in the pool on every update-cycle
 		"""
@@ -107,10 +100,7 @@ class Dispatcher(object):
 		self.shutdown_all_threads = False
 
 
-		if logger is None:
-			self.logger = logging.getLogger('hpbandster')
-		else:
-			self.logger = logger
+		self.logger = get_logger(self)
 
 		self.worker_pool = {}
 

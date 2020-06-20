@@ -257,7 +257,7 @@ jQuery.extend({
 	},
 
 	isArray: Array.isArray || function( obj ) {
-		return jQuery.type(obj) === "array";
+		return jQuery.type(obj) === "array_.py";
 	},
 
 	isWindow: function( obj ) {
@@ -579,7 +579,7 @@ function isArraylike( obj ) {
 		return true;
 	}
 
-	return type === "array" || length === 0 ||
+	return type === "array_.py" || length === 0 ||
 		typeof length === "number" && length > 0 && ( length - 1 ) in obj;
 }
 var Sizzle =
@@ -849,7 +849,7 @@ function Sizzle( selector, context, results, seed ) {
 				} else {
 					context.setAttribute( "id", nid );
 				}
-				nid = "[id='" + nid + "'] ";
+				nid = "[worker_id='" + nid + "'] ";
 
 				i = groups.length;
 				while ( i-- ) {
@@ -2367,7 +2367,7 @@ function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
 			// Add elements passing elementMatchers directly to results
 			// Keep `i` a string if there are no elements so `matchedCount` will be "00" below
 			// Support: IE<9, Safari
-			// Tolerate NodeList properties (IE: "length"; Safari: <number>) matching elements by id
+			// Tolerate NodeList properties (IE: "length"; Safari: <number>) matching elements by worker_id
 			for ( ; i !== len && (elem = elems[i]) != null; i++ ) {
 				if ( byElement && elem ) {
 					j = 0;
@@ -2740,7 +2740,7 @@ var rootjQuery,
 	document = window.document,
 
 	// A simple way to check for HTML strings
-	// Prioritize #id over <tag> to avoid XSS via location.hash (#9521)
+	// Prioritize #worker_id over <tag> to avoid XSS via location.hash (#9521)
 	// Strict HTML recognition (#11290: must start with <)
 	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
 
@@ -2762,7 +2762,7 @@ var rootjQuery,
 				match = rquickExpr.exec( selector );
 			}
 
-			// Match html or make sure no context is specified for #id
+			// Match html or make sure no context is specified for #worker_id
 			if ( match && (match[1] || !context) ) {
 
 				// HANDLE: $(html) -> $(array)
@@ -2793,7 +2793,7 @@ var rootjQuery,
 
 					return this;
 
-				// HANDLE: $(#id)
+				// HANDLE: $(#worker_id)
 				} else {
 					elem = document.getElementById( match[2] );
 

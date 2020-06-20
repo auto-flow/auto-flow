@@ -1,13 +1,13 @@
-autoflow.hdl2shps package
+autoflow.hdl2configSpce package
 =========================
 
 Submodules
 ----------
 
-autoflow.hdl2shps.hdl2shps module
+autoflow.hdl2configSpce.hdl2configSpce module
 ---------------------------------
 
-.. automodule:: autoflow.hdl2shps.hdl2shps
+.. automodule:: autoflow.hdl2configSpce.hdl2configSpce
    :members:
    :undoc-members:
    :show-inheritance:
@@ -16,7 +16,7 @@ autoflow.hdl2shps.hdl2shps module
 Module contents
 ---------------
 
-.. automodule:: autoflow.hdl2shps
+.. automodule:: autoflow.hdl2configSpce
    :members:
    :undoc-members:
    :show-inheritance:

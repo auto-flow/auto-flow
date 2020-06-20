@@ -3,10 +3,10 @@ import numpy as np
 import scipy.stats as sps
 import statsmodels.api as sm
 
-from autoflow.hpbandster.core import base_config_generator
+from autoflow.hpbandster.core import config_generator
 
 
-class KernelDensityEstimator(base_config_generator):
+class KernelDensityEstimator(config_generator.BaseConfigGenerator):
 	
 	def __init__(self, configspace, top_n_percent=10, update_after_n_points=50,
 				 min_points_in_model = None,

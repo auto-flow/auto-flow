@@ -13,7 +13,7 @@ Subpackages
    autoflow.evaluation
    autoflow.feature_engineer
    autoflow.hdl
-   autoflow.hdl2shps
+   autoflow.hdl2configSpce
    autoflow.manager
    autoflow.metrics
    autoflow.pipeline

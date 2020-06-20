@@ -4,15 +4,16 @@ import multiprocessing
 import os
 from copy import deepcopy
 from importlib import import_module
-from multiprocessing import Manager
-from typing import Union, Optional, Dict, List, Any
+from typing import Union, Optional, Dict, Any, List, Type
 
 import numpy as np
 import pandas as pd
+from ConfigSpace import ConfigurationSpace
 from frozendict import frozendict
 from sklearn.base import BaseEstimator
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import KFold, StratifiedKFold, ShuffleSplit
 
+import autoflow.hpbandster.core.nameserver as hpns
 from autoflow import constants
 from autoflow.constants import ExperimentType
 from autoflow.data_container import DataFrameContainer
@@ -20,15 +21,20 @@ from autoflow.data_manager import DataManager
 from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
+from autoflow.evaluation.train_evaluator import TrainEvaluator
+from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.hpbandster.utils import get_max_SH_iter
 from autoflow.metrics import r2, accuracy
+from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
-from autoflow.utils.config_space import estimate_config_space_numbers
-from autoflow.utils.dict_ import update_mask_from_other_dict
-from autoflow.utils.klass import instancing, sequencing, get_valid_params_in_kwargs
+from autoflow.utils.config_space import estimate_config_space_numbers, replace_phps
+from autoflow.utils.klass import instancing, get_valid_params_in_kwargs, set_if_not_None
+from autoflow.utils.list_ import multiply_to_list
 from autoflow.utils.logging_ import get_logger, setup_logger
+from autoflow.utils.net import get_a_free_port
 from autoflow.utils.packages import get_class_name_of_module
 
 
@@ -37,20 +43,40 @@ class AutoFlowEstimator(BaseEstimator):
 
     def __init__(
             self,
-            tuner: Union[Tuner, List[Tuner], None, dict] = None,
-            hdl_constructor: Union[HDL_Constructor, List[HDL_Constructor], None, dict] = None,
             resource_manager: Union[ResourceManager, str] = None,
-            model_registry=None,
-            random_state=42,
+            hdl_constructor: Union[HDL_Constructor, None, dict] = None,
+            min_budget: Optional[float] = None,
+            max_budget: Optional[float] = None,
+            eta: Optional[float] = None,
+            SH_only: bool = False,
+            budget_kfold_mapper: Optional[Dict[float, int]] = None,
+            n_folds: int = 5,
+            holdout_test_size: float = 1 / 3,
+            n_keep_samples: int = 30000,
+            min_n_samples_for_SH: int = 1000,
+            max_n_samples_for_CV: int = 5000,
+            config_generator: Union[str, Type] = "BOHB",
+            config_generator_params: dict = frozendict(),
+            ns_host: str = "127.0.0.1",
+            ns_port: int = 9090,
+            worker_host: str = "127.0.0.1",
+            master_host: str = "127.0.0.1",
+            n_workers: int = 1,
+            n_iterations: Optional[int] = None,
+            min_n_workers: int = 1,
+            concurrent_type: str = "process",
+            model_registry: Dict[str, Type] = None,
+            n_jobs_in_algorithm: Optional[int] = None,
+            random_state: int = 42,
             log_path: str = "autoflow.log",
             log_config: Optional[dict] = None,
-            highR_nan_threshold=0.5,
-            highR_cat_threshold=0.5,
-            consider_ordinal_as_cat=False,
-            should_store_intermediate_result=False,
-            should_finally_fit=False,
-            should_calc_all_metrics=True,
-            should_stack_X=True,
+            highR_nan_threshold: float = 0.5,
+            highR_cat_threshold: float = 0.3,
+            consider_ordinal_as_cat: bool = False,
+            should_store_intermediate_result: bool = False,
+            should_finally_fit: bool = False,
+            should_calc_all_metrics: bool = True,
+            should_stack_X: bool = True,
             **kwargs
     ):
         '''
@@ -106,6 +132,29 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        self.budget_kfold_mapper = budget_kfold_mapper
+        self.max_n_samples_for_CV = max_n_samples_for_CV
+        self.min_n_samples_for_SH = min_n_samples_for_SH
+        self.n_keep_samples = n_keep_samples
+        self.config_generator_params = dict(config_generator_params)
+        assert isinstance(n_folds, int) and n_folds >= 1
+        assert isinstance(holdout_test_size, float) and 0 < holdout_test_size < 1
+        self.holdout_test_size = holdout_test_size
+        self.n_folds = n_folds
+        self.min_n_workers = min_n_workers
+        self.master_host = master_host
+        self.n_jobs_in_algorithm = n_jobs_in_algorithm
+        self.n_iterations = n_iterations
+        self.concurrent_type = concurrent_type
+        self.n_workers = n_workers
+        self.worker_host = worker_host
+        self.ns_port = ns_port
+        self.ns_host = ns_host
+        self.config_generator = config_generator
+        self.SH_only = SH_only
+        self.eta = eta
+        self.max_budget = max_budget
+        self.min_budget = min_budget
         self.should_stack_X = should_stack_X
         self.consider_ordinal_as_cat = consider_ordinal_as_cat
         if model_registry is None:
@@ -126,21 +175,291 @@ class AutoFlowEstimator(BaseEstimator):
         self.logger = get_logger(self)
         # ---random_state-----------------------------------
         self.random_state = random_state
-        # ---tuner-----------------------------------
-        tuner = instancing(tuner, Tuner, kwargs)
-        # ---tuners-----------------------------------
-        self.tuners = sequencing(tuner, Tuner)
-        self.tuner = self.tuners[0]
         # ---hdl_constructor--------------------------
-        hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
-        # ---hdl_constructors-------------------------
-        self.hdl_constructors = sequencing(hdl_constructor, HDL_Constructor)
-        self.hdl_constructor = self.hdl_constructors[0]
+        self.hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
         # ---resource_manager-----------------------------------
         self.resource_manager: ResourceManager = instancing(resource_manager, ResourceManager, kwargs)
         # ---member_variable------------------------------------
         self.estimator = None
         self.ensemble_estimator = None
+        self.evaluators = []
+
+    def hdl2configSpce(self, hdl: Dict):
+        hdl2shps = HDL2SHPS()
+        hdl2shps.set_task(self.ml_task)
+        return hdl2shps(hdl)
+
+    def input_experiment_data(
+            self,
+            X_train: Union[np.ndarray, pd.DataFrame, DataFrameContainer, str],
+            y_train=None,
+            X_test: Union[np.ndarray, pd.DataFrame, DataFrameContainer, str] = None,
+            y_test=None,
+            groups=None,
+            upload_type="fs",
+            sub_sample_indexes=None,
+            sub_feature_indexes=None,
+            column_descriptions: Optional[Dict] = frozendict(),
+            metric=None,
+            splitter=None,
+            specific_task_token="",
+            dataset_metadata: dict = frozenset(),
+            task_metadata: dict = frozendict(),
+
+    ):
+        self.upload_type = upload_type
+        self.sub_sample_indexes = sub_sample_indexes
+        self.sub_feature_indexes = sub_feature_indexes
+        dataset_metadata = dict(dataset_metadata)
+        task_metadata = dict(task_metadata)
+        column_descriptions = dict(column_descriptions)
+        # build data_manager
+        self.data_manager: DataManager = DataManager(
+            self.resource_manager,
+            X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
+            self.highR_cat_threshold, self.consider_ordinal_as_cat, upload_type
+        )
+        # parse ml_task
+        self.ml_task = self.data_manager.ml_task
+        if self.checked_mainTask is not None:
+            if self.checked_mainTask != self.ml_task.mainTask:
+                if self.checked_mainTask == "regression":
+                    self.ml_task = constants.regression_task
+                    self.data_manager.ml_task = self.ml_task
+                else:
+                    self.logger.error(
+                        f"This task is supposed to be {self.checked_mainTask} task ,but the target data is {self.ml_task}.")
+                    raise ValueError
+        # parse splitter
+        self.groups = groups
+        self.n_samples = self.data_manager.X_train.shape[0]
+        if splitter is None:
+            if self.n_samples > self.max_n_samples_for_CV:
+                self.logger.info(
+                    f"TrainSet has {self.n_samples} samples,"
+                    f" greater than max n_samples for Cross-Validation "
+                    f"(max_n_samples_for_CV = {self.max_n_samples_for_CV}).")
+                splitter = ShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=self.random_state)
+            else:
+                if self.n_folds == 1:
+                    splitter = ShuffleSplit(n_splits=1, test_size=self.holdout_test_size,
+                                            random_state=self.random_state)
+                else:
+                    if self.ml_task.mainTask == "classification":
+                        splitter = StratifiedKFold(n_splits=self.n_folds, shuffle=True, random_state=self.random_state)
+                    else:
+                        splitter = KFold(n_splits=self.n_folds, shuffle=True, random_state=self.random_state)
+        assert hasattr(splitter, "split") and hasattr(splitter, "n_splits"), \
+            "Parameter 'splitter' should be a train-valid splitter, " \
+            "which contain 'split(X, y, groups)' method, 'n_splits' attribute."
+        if getattr(splitter, "random_state") is None:
+            self.logger.warning(
+                f"splitter '{splitter}' haven't specific random_state, it's random_state is set default '{self.random_state}'")
+            splitter.random_state = self.random_state
+        self.n_splits = splitter.n_splits
+        self.splitter = splitter
+        # do subsample if n_samples >  n_keep_samples
+        if self.n_samples > self.n_keep_samples:
+            self.logger.info(
+                f"TrainSet has {self.n_samples} samples,"
+                f" greater than n_keep_samples({self.n_keep_samples}). ")
+        # set min_budget max_budget eta
+        if self.n_samples < self.min_n_samples_for_SH:
+            self.min_budget = self.max_budget = self.eta = 1
+        else:
+            # todo: 可以改进得更灵活
+            if self.min_budget is None:
+                self.min_budget = 1 / 16
+            if self.max_budget is None:
+                if self.n_splits > 1:
+                    self.max_budget = 4
+                else:
+                    self.max_budget = 1
+            if self.eta is None:
+                self.eta = 4
+            if self.budget_kfold_mapper is None:
+                if self.max_budget <= 1:
+                    self.budget_kfold_mapper = {}
+                else:
+                    self.budget_kfold_mapper = {self.max_budget: self.n_splits}
+        # set n_iterations
+        # fixme: 有拍脑袋的嫌疑
+        if self.n_iterations is None:
+            if self.min_budget != self.max_budget:
+                max_SH_iter = get_max_SH_iter(self.min_budget, self.max_budget, self.eta)
+                if self.max_budget > 1:
+                    self.n_iterations = max_SH_iter * 2
+                else:
+                    self.n_iterations = max_SH_iter * 4
+            else:
+                self.n_iterations=100
+        # parse metric
+        if metric is None:
+            if self.ml_task.mainTask == "regression":
+                metric = r2
+            elif self.ml_task.mainTask == "classification":
+                metric = accuracy
+            else:
+                raise NotImplementedError()
+        self.metric = metric
+        # get task_id, and insert record into "tasks.tasks" database
+        self.resource_manager.insert_task_record(
+            data_manager=self.data_manager, metric=metric, splitter=splitter,
+            specific_task_token=specific_task_token, dataset_metadata=dataset_metadata, task_metadata=task_metadata,
+            sub_sample_indexes=sub_sample_indexes, sub_feature_indexes=sub_feature_indexes)
+        self.resource_manager.close_task_table()
+        # store other params
+        self.hdl_constructor.run(self.data_manager, self.model_registry)
+        self.hdl = self.hdl_constructor.get_hdl()
+        self.config_space: ConfigurationSpace = self.hdl2configSpce(self.hdl)
+        self.config_space.seed(self.random_state)
+        if self.n_jobs_in_algorithm is not None:
+            replace_phps(self.config_space, "n_jobs", int(self.n_jobs_in_algorithm))
+        # get hdl_id, and insert record into "{task_id}.hdls" database
+        self.resource_manager.insert_hdl_record(self.hdl, self.hdl_constructor.hdl_metadata)
+        self.resource_manager.close_hdl_table()
+        self.task_id = self.resource_manager.task_id
+        self.hdl_id = self.resource_manager.hdl_id
+        self.user_id = self.resource_manager.user_id
+        self.logger.info(f"task_id:\t{self.task_id}")
+        self.logger.info(f"hdl_id:\t{self.hdl_id}")
+        self.run_id = f"{self.task_id}-{self.hdl_id}-{self.user_id}"
+        self.worker_cnt = 0
+
+    def insert_experiment_record(
+            self,
+            additional_info: dict = frozendict(),
+            fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
+
+    ):
+        additional_info = dict(additional_info)
+        # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
+        experiment_config = {
+            "should_stack_X": self.should_stack_X,
+            "should_finally_fit": self.should_finally_fit,
+            "should_calc_all_metric": self.should_calc_all_metrics,
+            "should_store_intermediate_result": self.should_store_intermediate_result,
+            "fit_ensemble_params": str(fit_ensemble_params),
+            "highR_nan_threshold": self.highR_nan_threshold,
+            "highR_cat_threshold": self.highR_cat_threshold,
+            "consider_ordinal_as_cat": self.consider_ordinal_as_cat,
+            "random_state": self.random_state,
+            "log_path": self.log_path,
+            "log_config": self.log_config,
+        }
+        # fixme
+        is_manual = False  # self.start_tuner(tuner, hdl)
+        if is_manual:
+            experiment_type = ExperimentType.MANUAL
+        else:
+            experiment_type = ExperimentType.AUTO
+        self.resource_manager.insert_experiment_record(experiment_type, experiment_config, additional_info)
+        self.resource_manager.close_experiment_table()
+        self.experiment_id = self.resource_manager.experiment_id
+        self.logger.info(f"experiment_id:\t{self.experiment_id}")
+
+    def run_nameserver(self, ns_host=None, ns_port=None):
+        set_if_not_None(self, "ns_host", ns_host)
+        set_if_not_None(self, "ns_port", ns_port)
+        self.ns_port = get_a_free_port(self.ns_port, self.ns_host)
+        self.NS = hpns.NameServer(run_id=self.run_id, host=self.ns_host, port=self.ns_port)
+        self.NS.start()
+        self.ns_host = self.NS.host
+        self.ns_port = self.NS.port
+
+    def run_evaluator(self, worker_host, background, concurrent_type, worker_id=None):
+        if worker_id is None:
+            worker_id = self.worker_cnt
+        evaluator = TrainEvaluator(
+            run_id=self.run_id,
+            data_manager=self.data_manager,
+            resource_manager=self.resource_manager,
+            random_state=self.random_state,
+            metric=self.metric,
+            groups=self.groups,
+            should_calc_all_metric=self.should_calc_all_metrics,
+            splitter=self.splitter,
+            should_store_intermediate_result=self.should_store_intermediate_result,
+            should_stack_X=self.should_stack_X,
+            should_finally_fit=self.should_finally_fit,
+            model_registry=self.model_registry,
+            nameserver=self.ns_host,
+            nameserver_port=self.ns_port,
+            host=worker_host,
+            worker_id=worker_id,
+            timeout=None
+        )
+        self.worker_cnt += 1
+        self.evaluators.append(evaluator)
+        evaluator.run(background, concurrent_type)
+
+    def run_evaluators(
+            self,
+            worker_host: Union[str, None, List[str]] = None,
+            background: Union[str, None, List[str]] = None,
+            concurrent_type: Union[str, None, List[str]] = None,
+            worker_id: Union[None, List[Union[str, int]]] = None,
+            n_workers: Optional[int] = None
+    ):
+        if worker_host is None:
+            worker_host = self.worker_host
+        if background is None:
+            background = True
+        if concurrent_type is None:
+            concurrent_type = self.concurrent_type
+        if isinstance(worker_id, (int, str)):
+            worker_id = None
+        if n_workers is None:
+            n_workers = self.n_workers
+        worker_host = multiply_to_list(worker_host, n_workers)
+        background = multiply_to_list(background, n_workers)
+        concurrent_type = multiply_to_list(concurrent_type, n_workers)
+        worker_id = multiply_to_list(worker_id, n_workers)
+        for worker_host_, background_, concurrent_type_, worker_id_ in zip(
+                worker_host, background, concurrent_type, worker_id
+        ):
+            self.run_evaluator(worker_host_, background_, concurrent_type_, worker_id_)
+
+    run_workers = run_evaluators  # Semantic compatibility with hpbandster
+
+    def run_optimizer(
+            self, master_host=None, min_budget=None, max_budget=None, eta=None,
+            config_generator=None, config_generator_param=None,n_iterations=None,
+            min_n_workers=None
+    ):
+        set_if_not_None(self, "master_host", master_host)
+        set_if_not_None(self, "min_budget", min_budget)
+        set_if_not_None(self, "max_budget", max_budget)
+        set_if_not_None(self, "eta", eta)
+        set_if_not_None(self, "config_generator", config_generator)
+        set_if_not_None(self, "config_generator_param", config_generator_param)
+        set_if_not_None(self, "n_iterations", n_iterations)
+        set_if_not_None(self, "min_n_workers", min_n_workers)
+        if inspect.isclass(self.config_generator):
+            self.logger.info(f"'{self.config_generator}' is a class from '{self.config_generator.__module__}' module.")
+            cls = self.config_generator
+        elif isinstance(self.config_generator, str):
+            module = import_module("autoflow.hpbandster.optimizers.config_generators")
+            cls = getattr(module, self.config_generator)
+        else:
+            raise NotImplementedError
+        config_generator = cls(self.config_space, **self.config_generator_params)
+        self.optimizer = Optimizer(
+            self.run_id,
+            config_generator,
+            nameserver=self.ns_host,
+            nameserver_port=self.ns_port,
+            host=self.master_host,
+            result_logger=None,  # todo
+            previous_result=None,  # todo
+            min_budget=self.min_budget,
+            max_budget=self.max_budget,
+            eta=self.eta,
+            SH_only=self.SH_only
+        )
+        self.optimizer.run(self.n_iterations, self.min_n_workers)
+
+    run_master = run_optimizer  # Semantic compatibility with hpbandster
 
     def fit(
             self,
@@ -156,9 +475,9 @@ class AutoFlowEstimator(BaseEstimator):
             metric=None,
             splitter=None,
             specific_task_token="",
-            additional_info: dict = frozendict(),
             dataset_metadata: dict = frozenset(),
             task_metadata: dict = frozendict(),
+            additional_info: dict = frozendict(),
             fit_ensemble_params: Union[str, Dict[str, Any], None, bool] = "auto",
             is_not_realy_run=False,
     ):
@@ -196,121 +515,35 @@ class AutoFlowEstimator(BaseEstimator):
         -------
         self
         '''
-        self.upload_type = upload_type
-        self.sub_sample_indexes = sub_sample_indexes
-        self.sub_feature_indexes = sub_feature_indexes
-        dataset_metadata = dict(dataset_metadata)
-        additional_info = dict(additional_info)
-        task_metadata = dict(task_metadata)
-        column_descriptions = dict(column_descriptions)
-        # build data_manager
-        self.data_manager: DataManager = DataManager(
-            self.resource_manager,
-            X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
-            self.highR_cat_threshold, self.consider_ordinal_as_cat, upload_type
+        setup_logger(self.log_path, self.log_config)
+        self.input_experiment_data(
+            X_train, y_train, X_test, y_test, groups, upload_type, sub_sample_indexes,
+            sub_feature_indexes, column_descriptions, metric, splitter, specific_task_token,
+            dataset_metadata, task_metadata
         )
-        # parse ml_task
-        self.ml_task = self.data_manager.ml_task
-        if self.checked_mainTask is not None:
-            if self.checked_mainTask != self.ml_task.mainTask:
-                if self.checked_mainTask == "regression":
-                    self.ml_task = constants.regression_task
-                    self.data_manager.ml_task = self.ml_task
-                else:
-                    self.logger.error(
-                        f"This task is supposed to be {self.checked_mainTask} task ,but the target data is {self.ml_task}.")
-                    raise ValueError
-        # parse splitter
-        self.groups = groups
-        if splitter is None:
-            if self.ml_task.mainTask == "classification":
-                splitter = StratifiedKFold(n_splits=5, shuffle=True, random_state=self.random_state)
-            else:
-                splitter = KFold(n_splits=5, shuffle=True, random_state=self.random_state)
-        assert hasattr(splitter, "split"), "Parameter 'splitter' should be a train-valid splitter, " \
-                                           "which contain 'split(X, y, groups)' method."
-        self.splitter = splitter
-        # parse metric
-        if metric is None:
-            if self.ml_task.mainTask == "regression":
-                metric = r2
-            elif self.ml_task.mainTask == "classification":
-                metric = accuracy
-            else:
-                raise NotImplementedError()
-        self.metric = metric
-        # get task_id, and insert record into "tasks.tasks" database
-        self.resource_manager.insert_task_record(
-            data_manager=self.data_manager, metric=metric, splitter=splitter,
-            specific_task_token=specific_task_token, dataset_metadata=dataset_metadata, task_metadata=task_metadata,
-            sub_sample_indexes=sub_sample_indexes, sub_feature_indexes=sub_feature_indexes)
-        self.resource_manager.close_task_table()
-        # store other params
-        assert len(self.hdl_constructors) == len(self.tuners)
-        n_step = len(self.hdl_constructors)
-        for step, (hdl_constructor, tuner) in enumerate(zip(self.hdl_constructors, self.tuners)):
-            setup_logger(self.log_path, self.log_config)
-            hdl_constructor.run(self.data_manager, self.model_registry)
-            raw_hdl = hdl_constructor.get_hdl()
-            if step != 0:
-                last_best_dhp = self.resource_manager.load_best_dhp()
-                hdl = update_mask_from_other_dict(raw_hdl, last_best_dhp)
-                self.logger.debug(f"Updated HDL(Hyperparams Descriptions Language) in step {step}:\n{hdl}")
-            else:
-                hdl = raw_hdl
-            self.hdl = hdl
-            if is_not_realy_run:
-                break
-            # get hdl_id, and insert record into "{task_id}.hdls" database
-            self.resource_manager.insert_hdl_record(hdl, hdl_constructor.hdl_metadata)
-            self.resource_manager.close_hdl_table()
-            # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
-            experiment_config = {
-                "should_stack_X": self.should_stack_X,
-                "should_finally_fit": self.should_finally_fit,
-                "should_calc_all_metric": self.should_calc_all_metrics,
-                "should_store_intermediate_result": self.should_store_intermediate_result,
-                "fit_ensemble_params": str(fit_ensemble_params),
-                "highR_nan_threshold": self.highR_nan_threshold,
-                "highR_cat_threshold": self.highR_cat_threshold,
-                "consider_ordinal_as_cat": self.consider_ordinal_as_cat,
-                "random_state": self.random_state,
-                "log_path": self.log_path,
-                "log_config": self.log_config,
-            }
-            is_manual = self.start_tuner(tuner, hdl)
-            if is_manual:
-                experiment_type = ExperimentType.MANUAL
-            else:
-                experiment_type = ExperimentType.AUTO
-            self.resource_manager.insert_experiment_record(experiment_type, experiment_config, additional_info)
-            self.resource_manager.close_experiment_table()
-            self.task_id = self.resource_manager.task_id
-            self.hdl_id = self.resource_manager.hdl_id
-            self.experiment_id = self.resource_manager.experiment_id
-            self.logger.info(f"task_id:\t{self.task_id}")
-            self.logger.info(f"hdl_id:\t{self.hdl_id}")
-            self.logger.info(f"experiment_id:\t{self.experiment_id}")
-            if is_manual:
-                tuner.evaluator.init_data(**self.get_evaluator_params())
-                # dhp, self.estimator = tuner.evaluator.shp2model(tuner.shps.sample_configuration())
-                tuner.evaluator(tuner.shps.sample_configuration())
-                self.start_final_step(False)
-                self.resource_manager.finish_experiment(self.log_path, self)
-                break
-            self.run_tuner(tuner)
-            if step == n_step - 1:
-                self.start_final_step(fit_ensemble_params)
-            self.resource_manager.finish_experiment(self.log_path, self)
+        if is_not_realy_run:
+            return self
+        self.insert_experiment_record(
+            additional_info, fit_ensemble_params
+        )
+        self.run_nameserver()
+        self.run_evaluators()
+        self.run_optimizer()
+        self.optimizer.shutdown(shutdown_workers=True)
+        self.NS.shutdown()
+        self.start_final_step(fit_ensemble_params)
+        self.resource_manager.finish_experiment(self.log_path, self)
         return self
-
-    def get_sync_dict(self, n_jobs, tuner):
-        if n_jobs > 1 and tuner.search_method != "grid":
-            sync_dict = Manager().dict()
-            sync_dict["exit_processes"] = tuner.exit_processes
-        else:
-            sync_dict = None
-        return sync_dict
+        # todo: 重新实现手动建模
+        # if is_manual:
+        #     tuner.evaluator.init_data(**self.get_evaluator_params())
+        #     # dhp, self.estimator = tuner.evaluator.shp2model(tuner.shps.sample_configuration())
+        #     tuner.evaluator(tuner.shps.sample_configuration())
+        #     self.start_final_step(False)
+        #     self.resource_manager.finish_experiment(self.log_path, self)
+        #     break
+        # self.run_tuner(tuner)
+        # if step == n_step - 1:
 
     def start_tuner(self, tuner: Tuner, hdl: dict):
         self.logger.debug(f"Start fine tune task, \nwhich HDL(Hyperparams Descriptions Language) is:\n{hdl}")

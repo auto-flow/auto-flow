@@ -160,13 +160,13 @@ var Documentation = {
    * add context elements like header anchor links
    */
   addContextElements : function() {
-    $('div[id] > :header:first').each(function() {
+    $('div[worker_id] > :header:first').each(function() {
       $('<a class="headerlink">\u00B6</a>').
       attr('href', '#' + this.id).
       attr('title', _('Permalink to this headline')).
       appendTo(this);
     });
-    $('dt[id]').each(function() {
+    $('dt[worker_id]').each(function() {
       $('<a class="headerlink">\u00B6</a>').
       attr('href', '#' + this.id).
       attr('title', _('Permalink to this definition')).

@@ -4,7 +4,7 @@ import threading
 
 from robo.models.lcnet import LCNet, get_lc_net
 
-from autoflow.hpbandster.core.base_config_generator import base_config_generator
+from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
 
 
 def smoothing(lc):
@@ -17,7 +17,7 @@ def smoothing(lc):
     return new_lc
 
 
-class LCNetWrapper(base_config_generator):
+class LCNetWrapper(BaseConfigGenerator):
     def __init__(self,
                  configspace,
                  max_budget,

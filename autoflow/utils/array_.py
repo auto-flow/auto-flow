@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+from collections import Counter
+
 import numpy as np
 
 
@@ -40,3 +42,20 @@ def binarization(array):
 def multilabel_to_multiclass(array):
     array = binarization(array)
     return np.array([np.nonzero(array[i, :])[0][0] for i in range(len(array))])
+
+
+def get_stratified_sampling_index(array: np.ndarray, proportion: float, random_state: int):
+    assert len(array.shape) == 1
+    rng = np.random.RandomState(random_state)
+    labels = Counter(array)
+    origin_index = np.arange(len(array), dtype='int32')
+    results = []
+    for label in labels:
+        mask = (array == label)
+        masked_index = origin_index[mask]
+        L = max(1, round(len(masked_index) * proportion))
+        samples = rng.choice(masked_index, L, replace=False)
+        results.append(samples)
+    result = np.hstack(results)
+    rng.shuffle(result)
+    return result

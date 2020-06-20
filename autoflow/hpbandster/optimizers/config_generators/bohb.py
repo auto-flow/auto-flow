@@ -11,10 +11,10 @@ import scipy.stats as sps
 import scipy.optimize as spo
 import statsmodels.api as sm
 
-from autoflow.hpbandster.core.base_config_generator import base_config_generator
+from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
 
 
-class BOHB(base_config_generator):
+class BOHB(BaseConfigGenerator):
 	def __init__(self, configspace, min_points_in_model = None,
 				 top_n_percent=15, num_samples = 64, random_fraction=1/3,
 				 bandwidth_factor=3, min_bandwidth=1e-3,
