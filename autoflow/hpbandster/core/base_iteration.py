@@ -18,7 +18,7 @@ class Datum(object):
     def __repr__(self):
         return ( \
                     "\nconfig:{}\n".format(self.config) + \
-                    "config_info:\n{}\n" .format(self.config_info) + \
+                    "config_info:\n{}\n".format(self.config_info) + \
                     "losses:\n"
                     '\t'.join(["{}: {}\t".format(k, v['loss']) for k, v in self.results.items()]) + \
                     "time stamps: {}".format(self.timestamps)
@@ -166,7 +166,7 @@ class BaseIteration(object):
                 assert v.budget == self.budgets[self.stage], 'Configuration budget does not align with current stage!'
                 v.status = 'RUNNING'
                 self.num_running += 1
-                return (k, v.config,v.config_info, v.budget)
+                return (k, v.config, v.config_info, v.budget)
 
         # check if there are still slots to fill in the current stage and return that
         if (self.actual_num_configs[self.stage] < self.num_configs[self.stage]):
@@ -260,20 +260,20 @@ class WarmStartIteration(BaseIteration):
     iteration that imports a privious Result for warm starting
     """
 
-    def __init__(self, Result, config_generator):
+    def __init__(self, result, config_generator):
 
         self.is_finished = False
         self.stage = 0
 
-        id2conf = Result.get_id2config_mapping()
-        delta_t = - max(map(lambda r: r.timestamps['finished'], Result.get_all_runs()))
+        id2conf = result.get_id2config_mapping()
+        delta_t = - max(map(lambda r: r.timestamps['finished'], result.get_all_runs()))
 
         super().__init__(-1, [len(id2conf)], [None], None)
 
         for i, id in enumerate(id2conf):
             new_id = self.add_configuration(config=id2conf[id]['config'], config_info=id2conf[id]['config_info'])
 
-            for r in Result.get_runs_by_id(id):
+            for r in result.get_runs_by_id(id):
 
                 j = Job(new_id, config=id2conf[id]['config'], budget=r.budget)
 
@@ -299,3 +299,5 @@ class WarmStartIteration(BaseIteration):
             for kk, vv in v.timestamps.items():
                 for kkk, vvv in vv.items():
                     self.data[k].timestamps[kk][kkk] += time_ref
+
+

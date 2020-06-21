@@ -2,9 +2,7 @@ import copy
 import json
 import os
 
-from autoflow.resource_manager.base import ResourceManager
 from autoflow.hpbandster.core.base_iteration import Datum
-from autoflow.hpbandster.core.dispatcher import Job
 
 
 class Run(object):
@@ -65,83 +63,6 @@ def extract_HBS_learning_curves(runs):
     sr = sorted(runs, key=lambda r: r.budget)
     lc = list(filter(lambda t: not t[1] is None, [(r.budget, r.loss) for r in sr]))
     return ([lc, ])
-
-
-class JsonResultLogger(object):
-    def __init__(self, directory, overwrite=False):
-        """
-        convenience logger for 'semi-live-results'
-
-        Logger that writes job results into two files (configs.json and results.json).
-        Both files contain propper json objects in each line.
-
-        This version opens and closes the files for each result.
-        This might be very slow if individual runs are fast and the
-        filesystem is rather slow (e.g. a NFS).
-
-        Parameters
-        ----------
-
-        directory: string
-            the directory where the two files 'configs.json' and
-            'results.json' are stored
-        overwrite: bool
-            In case the files already exist, this flag controls the
-            behavior:
-            
-                * True:   The existing files will be overwritten. Potential risk of deleting previous results
-                * False:  A FileExistsError is raised and the files are not modified.
-        """
-
-        os.makedirs(directory, exist_ok=True)
-
-        self.config_fn = os.path.join(directory, 'configs.json')
-        self.results_fn = os.path.join(directory, 'results.json')
-
-        try:
-            with open(self.config_fn, 'x') as fh:
-                pass
-        except FileExistsError:
-            if overwrite:
-                with open(self.config_fn, 'w') as fh:
-                    pass
-            else:
-                raise FileExistsError('The file %s already exists.' % self.config_fn)
-        except:
-            raise
-
-        try:
-            with open(self.results_fn, 'x') as fh:
-                pass
-        except FileExistsError:
-            if overwrite:
-                with open(self.results_fn, 'w') as fh:
-                    pass
-            else:
-                raise FileExistsError('The file %s already exists.' % self.config_fn)
-
-        except:
-            raise
-
-        self.config_ids = set()
-
-    def new_config(self, config_id, config, config_info):
-        if not config_id in self.config_ids:
-            self.config_ids.add(config_id)
-            with open(self.config_fn, 'a') as fh:
-                fh.write(json.dumps([config_id, config, config_info]))
-                fh.write('\n')
-
-    def __call__(self, job):
-        if not job.id in self.config_ids:
-            # should never happen! TODO: log warning here!
-            self.config_ids.add(job.id)
-            with open(self.config_fn, 'a') as fh:
-                fh.write(json.dumps([job.id, job.kwargs['config'], {}]))
-                fh.write('\n')
-        with open(self.results_fn, 'a') as fh:
-            fh.write(json.dumps([job.id, job.kwargs['budget'], job.timestamps, job.result, job.exception]))
-            fh.write("\n")
 
 
 def logged_results_to_HBS_result(directory):
@@ -272,7 +193,7 @@ class Result(object):
         all_runs = self.get_all_runs(only_largest_budget=not all_budgets)
 
         if not all_budgets:
-            all_runs = list(filter(lambda r: r.budget == res.HB_config['max_budget'], all_runs))
+            all_runs = list(filter(lambda r: r.budget == self.HB_config['max_budget'], all_runs))
 
         all_runs.sort(key=lambda r: r.timestamps['finished'])
 
@@ -335,7 +256,8 @@ class Result(object):
                 if d.results[b] is None:
                     r = Run(config_id, b, None, None, d.timestamps[b], err_logs)
                 else:
-                    r = Run(config_id, b, d.results[b]['loss'], d.results[b]['info'], d.timestamps[b], err_logs)
+                    r = Run(config_id, b, d.results[b]['loss'], d.results[b]['info'],
+                            d.timestamps[b], err_logs)
                 runs.append(r)
             except:
                 raise
@@ -411,6 +333,15 @@ class Result(object):
             except:
                 pass
         return (new_dict)
+
+    @staticmethod
+    def from_dict(data,HB_config):
+        data = copy.deepcopy(data)
+        result = Result([], HB_config)
+        for k, v in data.items():
+            data[k] = Datum(**v)
+        result.data = data
+        return result
 
     def _merge_results(self):
         """
@@ -516,14 +447,3 @@ class Result(object):
         df_y = pd.DataFrame(all_losses)
 
         return (df_X, df_y)
-
-
-class DatabaseResultLogger():
-    def __init__(self, resource_manager: ResourceManager):
-        self.resource_manager = resource_manager
-
-    def __call__(self, job: Job):
-        self.resource_manager._finish_trial_update_info(job.result["info"]["trial_id"], job.timestamps)
-
-    def new_config(self, config_id, config, config_info):
-        pass

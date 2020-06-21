@@ -21,6 +21,8 @@ from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POO
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
+from autoflow.hpbandster.core.result import Result
+from autoflow.hpbandster.utils import modify_timestamps
 from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict
 from autoflow.utils.dict_ import update_data_structure, object_kwargs2dict
@@ -976,13 +978,13 @@ class ResourceManager(StrSignatureMixin):
             config_id = pw.FixedCharField(max_length=32)
             config = self.JSONField(default={})  # new
             config_info = self.JSONField(default={})  # new
-            run_id = pw.FixedCharField(max_length=256)
-            instance_id = pw.FixedCharField(max_length=128)
+            # run_id = pw.FixedCharField(max_length=256)
+            # instance_id = pw.FixedCharField(max_length=128)
             experiment_id = pw.IntegerField()
             task_id = pw.FixedCharField(max_length=32, index=True)  # 加索引
             hdl_id = pw.FixedCharField(max_length=32)
             budget_id = pw.FixedCharField(max_length=32)  # new
-            budget = pw.FloatField()                      # new
+            budget = pw.FloatField()  # new
             estimator = pw.CharField(max_length=256, default="")
             loss = pw.FloatField(default=65535)
             losses = self.JSONField(default=[])
@@ -1095,8 +1097,8 @@ class ResourceManager(StrSignatureMixin):
             config_id=info.get("config_id"),
             config=info.get("config"),
             config_info=info.get("config_info"),
-            run_id=info.get("run_id"),
-            instance_id=info.get("instance_id"),
+            # run_id=info.get("run_id"),
+            # instance_id=info.get("instance_id"),
             task_id=task_id,
             hdl_id=hdl_id,
             budget_id=budget_id,  # new
@@ -1130,6 +1132,71 @@ class ResourceManager(StrSignatureMixin):
         trial.timestamps = timestamps
         trial.save()
 
+    def get_result_from_trial_table(self, task_id: str, hdl_id: str, user_id: int,
+                                    budget_id: str):
+        # todo: 支持从experiment表中组装结果
+        # todo: 对异常的处理
+        self.init_trial_table()
+        Trial = self.TrialModel
+        budget_set = set()
+        records = Trial.select(
+            Trial.trial_id, Trial.experiment_id, Trial.timestamps, Trial.config_id, Trial.config,
+            Trial.config_info, Trial.loss, Trial.budget
+        ).where(
+            (Trial.task_id == task_id) & (Trial.user_id == user_id)
+            & (Trial.hdl_id == hdl_id) & (Trial.budget_id == budget_id)
+        ).order_by(Trial.experiment_id, Trial.config_id, Trial.budget).dicts()
+        records = list(records)
+        if len(records):
+            self.logger.info(f"Fetch {len(records)} records from previous task, which will be used for warm start.")
+        else:
+            return  None
+        current_experiment_id = None
+        current_started_time = None
+        current_config_id = None
+        results_dict = {}
+        for record in records:
+            trial_id = record["trial_id"]
+            experiment_id = record["experiment_id"]
+            timestamps = record["timestamps"]
+            config_id = record["config_id"]
+            config = record["config"]
+            config_info = record["config_info"]
+            loss = record["loss"]
+            budget = record["budget"]
+            budget_set.add(budget)
+            if experiment_id != current_experiment_id:
+                current_experiment_id = experiment_id  # update
+                current_started_time = timestamps["started"]
+            timestamps = modify_timestamps(timestamps, -current_started_time)
+            if config_id != current_config_id:
+                current_config_id = config_id  # update
+                results_dict[config_id] = {
+                    "config": config,
+                    "config_info": config_info,
+                    "results": {},
+                    "timestamps": {},
+                    "status": "COMPLETED",
+                    "budget": budget,
+                    "exceptions": {}
+                }
+            results_dict[config_id]["budget"] = max(results_dict[config_id]["budget"], budget)
+            results_dict[config_id]["results"][budget] = {
+                "loss": loss,
+                "info": {
+                    "trial_id": trial_id,
+                    "config_id": config_id
+                }
+            }
+            results_dict[config_id]["exceptions"][budget] = None
+            results_dict[config_id]["timestamps"][budget] = timestamps
+        budgets = list(sorted(list(budget_set)))
+        result = Result.from_dict(
+            results_dict,
+            {"max_budget": max(budgets), "min_budget": min(budgets), "budgets": budgets}
+        )
+        return result
+
     # todo: check 这个功能
     def delete_models(self):
         self.init_trial_table()
@@ -1150,5 +1217,3 @@ class ResourceManager(StrSignatureMixin):
                 self.TrialModel.delete().where(
                     self.TrialModel.trial_id.in_(should_delete.select(self.TrialModel.trial_id))).execute()
         return True
-
-

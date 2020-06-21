@@ -25,11 +25,11 @@ from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2b
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.hpbandster.core.result_logger import DatabaseResultLogger
 from autoflow.hpbandster.utils import get_max_SH_iter
 from autoflow.metrics import r2, accuracy
 from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
-from autoflow.hpbandster.core.result import DatabaseResultLogger
 from autoflow.tuner import Tuner
 from autoflow.utils.concurrence import get_chunks
 from autoflow.utils.config_space import estimate_config_space_numbers, replace_phps
@@ -347,6 +347,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.budget_id = self.resource_manager.budget_id
         self.logger.info(f"task_id:\t{self.task_id}")
         self.logger.info(f"hdl_id:\t{self.hdl_id}")
+        self.logger.info(f"budget_id:\t{self.budget_id}")
         self.run_id = f"{self.task_id}-{self.hdl_id}-{self.user_id}"
         self.worker_cnt = 0
 
@@ -472,6 +473,12 @@ class AutoFlowEstimator(BaseEstimator):
             raise NotImplementedError
         config_generator = cls(self.config_space, **self.config_generator_params)
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
+        previous_result = self.resource_manager.get_result_from_trial_table(
+            task_id=self.task_id,
+            hdl_id=self.hdl_id,
+            user_id=self.user_id,
+            budget_id=self.budget_id,
+        )
         self.optimizer = Optimizer(
             self.run_id,
             config_generator,
@@ -479,7 +486,7 @@ class AutoFlowEstimator(BaseEstimator):
             nameserver_port=self.ns_port,
             host=self.master_host,
             result_logger=self.database_result_logger,
-            previous_result=None,  # todo
+            previous_result=previous_result,
             min_budget=self.min_budget,
             max_budget=self.max_budget,
             eta=self.eta,
@@ -762,12 +769,12 @@ class AutoFlowEstimator(BaseEstimator):
 
     def copy(self):
         tmp_dm = self.data_manager
-        tmp_NS=self.NS
-        tmp_evaluators=self.evaluators
-        tmp_optimizer=self.optimizer
-        self.NS=None
-        self.evaluators=None
-        self.optimizer=None
+        tmp_NS = self.NS
+        tmp_evaluators = self.evaluators
+        tmp_optimizer = self.optimizer
+        self.NS = None
+        self.evaluators = None
+        self.optimizer = None
         self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
         self.resource_manager.start_safe_close()
         res = deepcopy(self)

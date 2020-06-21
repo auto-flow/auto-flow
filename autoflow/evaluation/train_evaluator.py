@@ -184,7 +184,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 loss, all_score = self.loss(y_valid.data, y_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 losses.append(float(loss))
                 all_scores.append(all_score)
-                if fold_ix == 0 and budget < 1:
+                if fold_ix == 0 and budget <= 1:
                     break
                 if budget > 1 and fold_ix == self.budget2kfold[budget]:
                     break
@@ -277,14 +277,13 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         info["config"] = config
         info["config_info"] = config_info
         info["budget"] = budget
-        info["instance_id"] = self.run_id  # fixme: 删除
-        info["run_id"] = self.run_id
+        # info["instance_id"] = self.run_id
+        # info["run_id"] = self.run_id
         # info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
         info["component"] = estimator
         info["cost_time"] = cost_time
-        # fixme
         # info["additional_info"].update({
         #     "config_origin": getattr(shp, "origin", "unk")
         # })
