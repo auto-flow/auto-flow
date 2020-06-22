@@ -4,6 +4,7 @@
 # @Contact    : tqichun@gmail.com
 import numpy as np
 from frozendict import frozendict
+from typing import Dict
 
 from autoflow.hpbandster.core.master import Master
 from autoflow.hpbandster.optimizers.iterations.successivehalving import SuccessiveHalving
@@ -25,6 +26,8 @@ class Optimizer(Master):
             dynamic_queue_size=True,
             result_logger=None,
             previous_result=None,
+            incumbents: Dict[float, dict] = None,
+            incumbent_performances: Dict[float, float] = None,
             min_budget=1 / 16,
             max_budget=1,
             eta=4,
@@ -48,7 +51,9 @@ class Optimizer(Master):
             job_queue_sizes,
             dynamic_queue_size,
             result_logger,
-            previous_result
+            previous_result,
+            incumbents,
+            incumbent_performances
         )
 
     def get_next_iteration(self, iteration, iteration_kwargs=frozendict()):

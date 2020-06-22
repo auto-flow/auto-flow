@@ -3,9 +3,10 @@ import hashlib
 import os
 import shutil
 import traceback
+from collections import defaultdict
 from copy import deepcopy
 from math import ceil
-from typing import Dict, Tuple, List, Union, Any
+from typing import Dict, Tuple, List, Union, Any, Optional
 
 import h5py
 import numpy as np
@@ -257,7 +258,7 @@ class ResourceManager(StrSignatureMixin):
         return models_path, finally_fit_model_path, y_info_path
 
     def get_ensemble_needed_info(self, task_id) -> Tuple[MLTask, Any]:
-        from autoflow import NdArrayContainer
+        from autoflow.data_container import NdArrayContainer
 
         self.task_id = task_id
         # 操作task而不是trial
@@ -686,7 +687,8 @@ class ResourceManager(StrSignatureMixin):
         experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
         # 实验结果模型序列化
         final_model = final_model.copy()
-        assert final_model.data_manager.is_empty()
+        if final_model.data_manager is not None:
+            assert final_model.data_manager.is_empty()
         self.start_safe_close()
         self.file_system.dump_pickle(final_model, experiment_model_path)
         self.end_safe_close()
@@ -1038,8 +1040,12 @@ class ResourceManager(StrSignatureMixin):
                                          info)
 
     def _get_sorted_trial_records(self, task_id, user_id, limit):
-        records = self.TrialModel.select().where(
+        max_budget=self.TrialModel.select(pw.fn.MAX(self.TrialModel.budget).alias("max_budget")).where(
             (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
+        )[0].max_budget
+        records = self.TrialModel.select(self.TrialModel.trial_id).where(
+            (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
+            & (self.TrialModel.budget == max_budget)
         ).order_by(self.TrialModel.loss, self.TrialModel.cost_time).limit(limit).dicts()
         return list(records)
 
@@ -1061,8 +1067,12 @@ class ResourceManager(StrSignatureMixin):
     def _get_best_k_trial_ids(self, task_id, user_id, k):
         # self.init_trial_table()
         trial_ids = []
+        max_budget=self.TrialModel.select(pw.fn.MAX(self.TrialModel.budget).alias("max_budget")).where(
+            (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
+        )[0].max_budget
         records = self.TrialModel.select(self.TrialModel.trial_id).where(
             (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
+            & (self.TrialModel.budget == max_budget)
         ).order_by(self.TrialModel.loss, self.TrialModel.cost_time).limit(k)
         for record in records:
             trial_ids.append(record.trial_id)
@@ -1132,8 +1142,10 @@ class ResourceManager(StrSignatureMixin):
         trial.timestamps = timestamps
         trial.save()
 
-    def get_result_from_trial_table(self, task_id: str, hdl_id: str, user_id: int,
-                                    budget_id: str):
+    def get_result_from_trial_table(
+            self, task_id: str, hdl_id: str,
+            user_id: int, budget_id: str
+    ) -> Tuple[Optional[Result], Optional[Dict[float, dict]], Optional[Dict[float, float]]]:
         # todo: 支持从experiment表中组装结果
         # todo: 对异常的处理
         self.init_trial_table()
@@ -1150,25 +1162,51 @@ class ResourceManager(StrSignatureMixin):
         if len(records):
             self.logger.info(f"Fetch {len(records)} records from previous task, which will be used for warm start.")
         else:
-            return  None
-        current_experiment_id = None
-        current_started_time = None
+            return None, None, None
         current_config_id = None
         results_dict = {}
+        incumbents = defaultdict(dict)
+        incumbent_performances = defaultdict(lambda: np.inf)
+        experiment2min_started = defaultdict(lambda: np.inf)
+        experiment2max_finished = defaultdict(lambda: -np.inf)
+        experiment2delta_time = {}
+        finished_time = 0
+        experiments = set()
+        for record in records:
+            experiment_id = record["experiment_id"]
+            experiment2min_started[experiment_id] = min(experiment2min_started[experiment_id],
+                                                        record["timestamps"]["started"])
+            experiment2max_finished[experiment_id] = max(experiment2max_finished[experiment_id],
+                                                         record["timestamps"]["finished"])
+            experiments.add(experiment_id)
+        min_experiment_id = min(experiments)
+        base_delta_time = -experiment2min_started[min_experiment_id]
+
+        for i, experiment_id in enumerate(sorted(experiments)):
+            experiment2delta_time[experiment_id] = -base_delta_time
+
+            if i != 0:
+                base_delta_time -= (experiment2min_started[experiment_id] - finished_time)
+            experiment2delta_time[experiment_id] = base_delta_time
+            finished_time = experiment2max_finished[experiment_id]
+
         for record in records:
             trial_id = record["trial_id"]
             experiment_id = record["experiment_id"]
             timestamps = record["timestamps"]
+            # result_logger 失败导致
+            if timestamps is None:
+                timestamps = {}
             config_id = record["config_id"]
             config = record["config"]
             config_info = record["config_info"]
             loss = record["loss"]
             budget = record["budget"]
             budget_set.add(budget)
-            if experiment_id != current_experiment_id:
-                current_experiment_id = experiment_id  # update
-                current_started_time = timestamps["started"]
-            timestamps = modify_timestamps(timestamps, -current_started_time)
+            # result_logger 失败导致
+            if timestamps.get("started") is None:
+                continue
+            timestamps = modify_timestamps(timestamps, experiment2delta_time[experiment_id])
             if config_id != current_config_id:
                 current_config_id = config_id  # update
                 results_dict[config_id] = {
@@ -1190,12 +1228,19 @@ class ResourceManager(StrSignatureMixin):
             }
             results_dict[config_id]["exceptions"][budget] = None
             results_dict[config_id]["timestamps"][budget] = timestamps
+            challenger = config
+            challenger_performance = loss
+            incumbent_performance = incumbent_performances[budget]
+            incumbent = incumbents[budget]
+            if challenger_performance < incumbent_performance:
+                incumbent_performances[budget] = challenger_performance
+                incumbents[budget] = challenger
         budgets = list(sorted(list(budget_set)))
         result = Result.from_dict(
             results_dict,
             {"max_budget": max(budgets), "min_budget": min(budgets), "budgets": budgets}
         )
-        return result
+        return result, incumbents, incumbent_performances
 
     # todo: check 这个功能
     def delete_models(self):

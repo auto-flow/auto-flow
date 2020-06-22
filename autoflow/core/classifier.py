@@ -23,5 +23,6 @@ class AutoFlowClassifier(AutoFlowEstimator, ClassifierMixin):
         return self.estimator.predict_proba(self.data_manager.X_test)
 
     def score(self, X, y, sample_weight=None):
-        y=self.data_manager.encode_label(y)
+        if self.data_manager is not None:
+            y=self.data_manager.encode_label(y)
         return super(AutoFlowClassifier, self).score(X, y)

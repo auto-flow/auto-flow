@@ -198,6 +198,9 @@ class AutoFlowEstimator(BaseEstimator):
         self.estimator = None
         self.ensemble_estimator = None
         self.evaluators = []
+        self.data_manager = None
+        self.NS = None
+        self.optimizer = None
 
     def hdl2configSpce(self, hdl: Dict):
         hdl2shps = HDL2SHPS()
@@ -473,7 +476,7 @@ class AutoFlowEstimator(BaseEstimator):
             raise NotImplementedError
         config_generator = cls(self.config_space, **self.config_generator_params)
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
-        previous_result = self.resource_manager.get_result_from_trial_table(
+        previous_result, incumbents, incumbent_performances = self.resource_manager.get_result_from_trial_table(
             task_id=self.task_id,
             hdl_id=self.hdl_id,
             user_id=self.user_id,
@@ -491,6 +494,8 @@ class AutoFlowEstimator(BaseEstimator):
             max_budget=self.max_budget,
             eta=self.eta,
             SH_only=self.SH_only,
+            incumbents=incumbents,
+            incumbent_performances=incumbent_performances
         )
         self.hpbandstr_result = self.optimizer.run(self.n_iterations, self.min_n_workers)
 
@@ -775,7 +780,8 @@ class AutoFlowEstimator(BaseEstimator):
         self.NS = None
         self.evaluators = None
         self.optimizer = None
-        self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
+        self.data_manager: DataManager = self.data_manager.copy(
+            keep_data=False) if self.data_manager is not None else None
         self.resource_manager.start_safe_close()
         res = deepcopy(self)
         self.resource_manager.end_safe_close()
@@ -795,7 +801,8 @@ class AutoFlowEstimator(BaseEstimator):
         self.NS = None
         self.evaluators = None
         self.optimizer = None
-        self.data_manager: DataManager = self.data_manager.copy(keep_data=False)
+        self.data_manager: DataManager = self.data_manager.copy(
+            keep_data=False) if self.data_manager is not None else None
         self.resource_manager.start_safe_close()
         res = dumps(self)
         self.resource_manager.end_safe_close()

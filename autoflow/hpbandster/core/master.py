@@ -2,10 +2,15 @@ import copy
 import os
 import threading
 import time
+from collections import defaultdict
+
+import numpy as np
+from typing import Dict
 
 from autoflow.hpbandster.core.base_iteration import WarmStartIteration
 from autoflow.hpbandster.core.dispatcher import Dispatcher
 from autoflow.hpbandster.core.result import Result
+from autoflow.hpbandster.utils import print_incumbent_trajectory
 from autoflow.utils.logging_ import get_logger
 
 
@@ -23,6 +28,8 @@ class Master(object):
                  dynamic_queue_size=True,
                  result_logger=None,
                  previous_result=None,
+                 incumbents:Dict[float,dict]=None,
+                 incumbent_performances:Dict[float,float]=None
                  ):
         """The Master class is responsible for the book keeping and to decide what to run next. Optimizers are
                 instantiations of Master, that handle the important steps of deciding what configurations to run on what
@@ -112,7 +119,12 @@ class Master(object):
             nameserver=nameserver, nameserver_port=nameserver_port,
             host=host
         )
-
+        self.incumbents = defaultdict(dict)
+        self.incumbent_performances = defaultdict(lambda: np.inf)
+        if incumbents is not None:
+            self.incumbents.update(incumbents)
+        if incumbent_performances is not None:
+            self.incumbent_performances.update(incumbent_performances)
         self.dispatcher_thread = threading.Thread(target=self.dispatcher.run)
         self.dispatcher_thread.start()
 
@@ -135,7 +147,7 @@ class Master(object):
         with self.thread_cond:
             while (self.dispatcher.number_of_workers() < min_n_workers):
                 self.logger.debug('HBMASTER: only %i worker(s) available, waiting for at least %i.' % (
-                self.dispatcher.number_of_workers(), min_n_workers))
+                    self.dispatcher.number_of_workers(), min_n_workers))
                 self.thread_cond.wait(1)
                 self.dispatcher.trigger_discover_worker()
 
@@ -243,7 +255,19 @@ class Master(object):
         with self.thread_cond:
             self.logger.debug('job_callback for %s got condition' % str(job.id))
             self.num_running_jobs -= 1
-
+            budget = job.kwargs["budget"]
+            challenger = job.kwargs["config"]
+            challenger_performance = job.result["loss"]
+            incumbent_performance = self.incumbent_performances[budget]
+            incumbent = self.incumbents[budget]
+            if challenger_performance < incumbent_performance:
+                if np.isfinite(self.incumbent_performances[budget]):
+                    print_incumbent_trajectory(
+                        challenger_performance, incumbent_performance,
+                        challenger, incumbent, budget
+                    )
+                self.incumbent_performances[budget] = challenger_performance
+                self.incumbents[budget] = challenger
             if not self.result_logger is None:
                 self.result_logger(job)
             self.iterations[job.id[0]].register_result(job)
@@ -263,10 +287,10 @@ class Master(object):
         if self.num_running_jobs >= self.job_queue_sizes[1]:
             while (self.num_running_jobs > self.job_queue_sizes[0]):
                 self.logger.debug('HBMASTER: running jobs: %i, queue sizes: %s -> wait' % (
-                self.num_running_jobs, str(self.job_queue_sizes)))
+                    self.num_running_jobs, str(self.job_queue_sizes)))
                 self.thread_cond.wait()
 
-    def _submit_job(self, config_id, config,config_info, budget):
+    def _submit_job(self, config_id, config, config_info, budget):
         """
         hidden function to submit a new job to the dispatcher
 
@@ -276,7 +300,7 @@ class Master(object):
         self.logger.debug('HBMASTER: trying submitting job %s to dispatcher' % str(config_id))
         with self.thread_cond:
             self.logger.debug('HBMASTER: submitting job %s to dispatcher' % str(config_id))
-            self.dispatcher.submit_job(config_id, config=config,config_info=config_info, budget=budget,
+            self.dispatcher.submit_job(config_id, config=config, config_info=config_info, budget=budget,
                                        working_directory=self.working_directory)
             self.num_running_jobs += 1
 

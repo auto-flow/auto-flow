@@ -23,7 +23,7 @@ pipe = AutoFlowClassifier(
     concurrent_type="thread",
     max_budget=1,
     n_jobs_in_algorithm=3,
-    n_workers=3,
+    n_workers=1,
     # min_budget=1 / 4
 )
 pipe.fit(X_train, y_train, fit_ensemble_params=False)
