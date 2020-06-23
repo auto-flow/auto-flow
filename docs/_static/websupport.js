@@ -348,7 +348,7 @@
         }
         // User mode: only mark the comment as deleted
         div
-          .find('span.user-worker_id:first')
+          .find('span.user-id:first')
           .text('[deleted]').end()
           .find('div.comment-text:first')
           .text('[deleted]').end()
@@ -541,7 +541,7 @@
    */
   function getChildren(ul, recursive) {
     var children = [];
-    ul.children().children("[worker_id^='cd']")
+    ul.children().children("[id^='cd']")
       .each(function() {
         var comment = $(this).data('comment');
         if (recursive)
@@ -586,8 +586,8 @@
   }
 
   /**
-   * A simple template renderer. Placeholders such as <%worker_id%> are replaced
-   * by context['worker_id'] with items being escaped. Placeholders such as <#worker_id#>
+   * A simple template renderer. Placeholders such as <%id%> are replaced
+   * by context['id'] with items being escaped. Placeholders such as <#id#>
    * are not escaped.
    */
   function renderTemplate(template, context) {
@@ -684,7 +684,7 @@
   }
 
   var popupTemplate = '\
-    <div class="sphinx-comments" worker_id="sc<%worker_id%>">\
+    <div class="sphinx-comments" id="sc<%id%>">\
       <p class="sort-options">\
         Sort by:\
         <a href="#" class="sort-option byrating">best rated</a>\
@@ -692,76 +692,76 @@
         <a href="#" class="sort-option byage">oldest</a>\
       </p>\
       <div class="comment-header">Comments</div>\
-      <div class="comment-loading" worker_id="cn<%worker_id%>">\
+      <div class="comment-loading" id="cn<%id%>">\
         loading comments... <img src="<%loadingImage%>" alt="" /></div>\
-      <ul worker_id="cl<%worker_id%>" class="comment-ul"></ul>\
-      <div worker_id="ca<%worker_id%>">\
+      <ul id="cl<%id%>" class="comment-ul"></ul>\
+      <div id="ca<%id%>">\
       <p class="add-a-comment">Add a comment\
-        (<a href="#" class="comment-markup" worker_id="ab<%worker_id%>">markup</a>):</p>\
-      <div class="comment-markup-box" worker_id="mb<%worker_id%>">\
+        (<a href="#" class="comment-markup" id="ab<%id%>">markup</a>):</p>\
+      <div class="comment-markup-box" id="mb<%id%>">\
         reStructured text markup: <i>*emph*</i>, <b>**strong**</b>, \
         <code>``code``</code>, \
         code blocks: <code>::</code> and an indented block after blank line</div>\
-      <form method="post" worker_id="cf<%worker_id%>" class="comment-form" action="">\
+      <form method="post" id="cf<%id%>" class="comment-form" action="">\
         <textarea name="comment" cols="80"></textarea>\
         <p class="propose-button">\
-          <a href="#" worker_id="pc<%worker_id%>" class="show-propose-change">\
+          <a href="#" id="pc<%id%>" class="show-propose-change">\
             Propose a change &#9657;\
           </a>\
-          <a href="#" worker_id="hc<%worker_id%>" class="hide-propose-change">\
+          <a href="#" id="hc<%id%>" class="hide-propose-change">\
             Propose a change &#9663;\
           </a>\
         </p>\
-        <textarea name="proposal" worker_id="pt<%worker_id%>" cols="80"\
+        <textarea name="proposal" id="pt<%id%>" cols="80"\
                   spellcheck="false"></textarea>\
         <input type="submit" value="Add comment" />\
-        <input type="hidden" name="node" value="<%worker_id%>" />\
+        <input type="hidden" name="node" value="<%id%>" />\
         <input type="hidden" name="parent" value="" />\
       </form>\
       </div>\
     </div>';
 
   var commentTemplate = '\
-    <div worker_id="cd<%worker_id%>" class="sphinx-comment<%css_class%>">\
+    <div id="cd<%id%>" class="sphinx-comment<%css_class%>">\
       <div class="vote">\
         <div class="arrow">\
-          <a href="#" worker_id="uv<%worker_id%>" class="vote" title="vote up">\
+          <a href="#" id="uv<%id%>" class="vote" title="vote up">\
             <img src="<%upArrow%>" />\
           </a>\
-          <a href="#" worker_id="uu<%worker_id%>" class="un vote" title="vote up">\
+          <a href="#" id="uu<%id%>" class="un vote" title="vote up">\
             <img src="<%upArrowPressed%>" />\
           </a>\
         </div>\
         <div class="arrow">\
-          <a href="#" worker_id="dv<%worker_id%>" class="vote" title="vote down">\
-            <img src="<%downArrow%>" worker_id="da<%worker_id%>" />\
+          <a href="#" id="dv<%id%>" class="vote" title="vote down">\
+            <img src="<%downArrow%>" id="da<%id%>" />\
           </a>\
-          <a href="#" worker_id="du<%worker_id%>" class="un vote" title="vote down">\
+          <a href="#" id="du<%id%>" class="un vote" title="vote down">\
             <img src="<%downArrowPressed%>" />\
           </a>\
         </div>\
       </div>\
       <div class="comment-content">\
         <p class="tagline comment">\
-          <span class="user-worker_id"><%username%></span>\
+          <span class="user-id"><%username%></span>\
           <span class="rating"><%pretty_rating%></span>\
           <span class="delta"><%time.delta%></span>\
         </p>\
         <div class="comment-text comment"><#text#></div>\
         <p class="comment-opts comment">\
-          <a href="#" class="reply hidden" worker_id="rl<%worker_id%>">reply &#9657;</a>\
-          <a href="#" class="close-reply" worker_id="cr<%worker_id%>">reply &#9663;</a>\
-          <a href="#" worker_id="sp<%worker_id%>" class="show-proposal">proposal &#9657;</a>\
-          <a href="#" worker_id="hp<%worker_id%>" class="hide-proposal">proposal &#9663;</a>\
-          <a href="#" worker_id="dc<%worker_id%>" class="delete-comment hidden">delete</a>\
-          <span worker_id="cm<%worker_id%>" class="moderation hidden">\
-            <a href="#" worker_id="ac<%worker_id%>" class="accept-comment">accept</a>\
+          <a href="#" class="reply hidden" id="rl<%id%>">reply &#9657;</a>\
+          <a href="#" class="close-reply" id="cr<%id%>">reply &#9663;</a>\
+          <a href="#" id="sp<%id%>" class="show-proposal">proposal &#9657;</a>\
+          <a href="#" id="hp<%id%>" class="hide-proposal">proposal &#9663;</a>\
+          <a href="#" id="dc<%id%>" class="delete-comment hidden">delete</a>\
+          <span id="cm<%id%>" class="moderation hidden">\
+            <a href="#" id="ac<%id%>" class="accept-comment">accept</a>\
           </span>\
         </p>\
-        <pre class="proposal" worker_id="pr<%worker_id%>">\
+        <pre class="proposal" id="pr<%id%>">\
 <#proposal_diff#>\
         </pre>\
-          <ul class="comment-children" worker_id="cl<%worker_id%>"></ul>\
+          <ul class="comment-children" id="cl<%id%>"></ul>\
         </div>\
         <div class="clearleft"></div>\
       </div>\
@@ -769,12 +769,12 @@
 
   var replyTemplate = '\
     <li>\
-      <div class="reply-div" worker_id="rd<%worker_id%>">\
-        <form worker_id="rf<%worker_id%>">\
+      <div class="reply-div" id="rd<%id%>">\
+        <form id="rf<%id%>">\
           <textarea name="comment" cols="80"></textarea>\
           <input type="submit" value="Add reply" />\
           <input type="button" value="Cancel" />\
-          <input type="hidden" name="parent" value="<%worker_id%>" />\
+          <input type="hidden" name="parent" value="<%id%>" />\
           <input type="hidden" name="node" value="" />\
         </form>\
       </div>\

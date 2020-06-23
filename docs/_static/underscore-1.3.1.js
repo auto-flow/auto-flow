@@ -876,7 +876,7 @@
     });
   };
 
-  // Generate a unique integer worker_id (unique within the entire client session).
+  // Generate a unique integer id (unique within the entire client session).
   // Useful for temporary DOM ids.
   var idCounter = 0;
   _.uniqueId = function(prefix) {
