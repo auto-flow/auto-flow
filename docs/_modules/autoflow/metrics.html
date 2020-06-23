@@ -171,15 +171,18 @@
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
 <span class="kn">import</span> <span class="nn">sklearn.metrics</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
 
-<span class="kn">from</span> <span class="nn">autoflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
 <span class="kn">from</span> <span class="nn">autoflow.metrics</span> <span class="kn">import</span> <span class="n">classification_metrics</span>
-<span class="kn">from</span> <span class="nn">autoflow.utils.array</span> <span class="kn">import</span> <span class="n">sanitize_array</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.array_</span> <span class="kn">import</span> <span class="n">sanitize_array</span>
+<span class="kn">from</span> <span class="nn">autoflow.utils.ml_task</span> <span class="kn">import</span> <span class="n">MLTask</span>
 
 
 <div class="viewcode-block" id="Scorer"><a class="viewcode-back" href="../../_module/autoflow.metrics.html#autoflow.metrics.Scorer">[docs]</a><span class="k">class</span> <span class="nc">Scorer</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
@@ -189,6 +192,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span> <span class="o">=</span> <span class="n">score_func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimum</span> <span class="o">=</span> <span class="n">optimum</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="n">sign</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -216,7 +220,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        score : float</span>
-<span class="sd">            Score function applied to prediction of estimator on X.</span>
+<span class="sd">            Score function applied to prediction of component on X.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">type_true</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> \
@@ -233,12 +237,13 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">type_true</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
-                                                 <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
-                                                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
+                                          <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
-                                                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span>
 
 
 <span class="k">class</span> <span class="nc">_ProbaScorer</span><span class="p">(</span><span class="n">Scorer</span><span class="p">):</span>
@@ -259,14 +264,16 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        score : float</span>
-<span class="sd">            Score function applied to prediction of estimator on X.</span>
+<span class="sd">            Score function applied to prediction of component on X.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
-                                                 <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
-                                                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
+                                          <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span>
 
 
 <span class="k">class</span> <span class="nc">_ThresholdScorer</span><span class="p">(</span><span class="n">Scorer</span><span class="p">):</span>
@@ -287,7 +294,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        score : float</span>
-<span class="sd">            Score function applied to prediction of estimator on X.</span>
+<span class="sd">            Score function applied to prediction of component on X.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y_type</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">y_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;multilabel-indicator&quot;</span><span class="p">):</span>
@@ -299,11 +306,13 @@
             <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">p</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">y_pred</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 
         <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
-                                                 <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
-                                                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
+                                          <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_func</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span>
 
 
 <div class="viewcode-block" id="make_scorer"><a class="viewcode-back" href="../../_module/autoflow.metrics.html#autoflow.metrics.make_scorer">[docs]</a><span class="k">def</span> <span class="nf">make_scorer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">score_func</span><span class="p">,</span> <span class="n">optimum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -357,6 +366,19 @@
 <span class="c1"># Standard regression scores</span>
 <span class="n">r2</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s1">&#39;r2&#39;</span><span class="p">,</span>
                  <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span><span class="p">)</span>
+
+<span class="n">pearsonr</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span>
+    <span class="s1">&#39;pearsonr&#39;</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">spearmanr</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span>
+    <span class="s1">&#39;spearmanr&#39;</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">kendalltau</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span>
+    <span class="s1">&#39;kendalltau&#39;</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kendalltau</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
 <span class="n">mean_squared_error</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s1">&#39;mean_squared_error&#39;</span><span class="p">,</span>
                                  <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">,</span>
                                  <span class="n">optimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -374,6 +396,8 @@
 <span class="n">accuracy</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span>
                        <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">accuracy_score</span><span class="p">)</span>
 <span class="n">mcc</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s1">&#39;mcc&#39;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">matthews_corrcoef</span><span class="p">)</span>
+<span class="n">sensitivity</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s2">&quot;sensitivity&quot;</span><span class="p">,</span> <span class="n">classification_metrics</span><span class="o">.</span><span class="n">sensitivity</span><span class="p">)</span>
+<span class="n">specificity</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s2">&quot;specificity&quot;</span><span class="p">,</span> <span class="n">classification_metrics</span><span class="o">.</span><span class="n">specificity</span><span class="p">)</span>
 <span class="n">balanced_accuracy</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s1">&#39;balanced_accuracy&#39;</span><span class="p">,</span>
                                 <span class="n">classification_metrics</span><span class="o">.</span><span class="n">balanced_accuracy</span><span class="p">)</span>
 <span class="n">f1</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="s1">&#39;f1&#39;</span><span class="p">,</span>
@@ -403,15 +427,18 @@
 
 
 <span class="n">REGRESSION_METRICS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">scorer</span> <span class="ow">in</span> <span class="p">[</span><span class="n">r2</span><span class="p">,</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">mean_absolute_error</span><span class="p">,</span>
-               <span class="n">median_absolute_error</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scorer</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="n">r2</span><span class="p">,</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">mean_absolute_error</span><span class="p">,</span>
+    <span class="n">median_absolute_error</span><span class="p">,</span> <span class="n">pearsonr</span><span class="p">,</span> <span class="n">spearmanr</span><span class="p">,</span> <span class="n">kendalltau</span>
+<span class="p">]:</span>
     <span class="n">REGRESSION_METRICS</span><span class="p">[</span><span class="n">scorer</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">scorer</span>
 
 <span class="n">CLASSIFICATION_METRICS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">scorer</span> <span class="ow">in</span> <span class="p">[</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">average_precision</span><span class="p">,</span> <span class="n">log_loss</span><span class="p">,</span>
-               <span class="n">balanced_accuracy</span><span class="p">,</span> <span class="n">pac_score</span><span class="p">,</span> <span class="n">mcc</span>
-               <span class="p">]:</span>
+<span class="k">for</span> <span class="n">scorer</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="n">accuracy</span><span class="p">,</span> <span class="n">average_precision</span><span class="p">,</span> <span class="n">log_loss</span><span class="p">,</span>
+    <span class="n">balanced_accuracy</span><span class="p">,</span> <span class="n">pac_score</span><span class="p">,</span> <span class="n">mcc</span><span class="p">,</span> <span class="n">sensitivity</span><span class="p">,</span> <span class="n">specificity</span>
+<span class="p">]:</span>
     <span class="n">CLASSIFICATION_METRICS</span><span class="p">[</span><span class="n">scorer</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">scorer</span>
 
 <span class="k">for</span> <span class="n">multi_class</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ovo&quot;</span><span class="p">,</span> <span class="s2">&quot;ovr&quot;</span><span class="p">]:</span>
@@ -450,14 +477,16 @@
         <span class="n">solution</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">values</span>
     <span class="k">if</span> <span class="n">should_calc_all_metric</span><span class="p">:</span>
         <span class="n">score</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">true_score</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">ml_task</span><span class="o">.</span><span class="n">mainTask</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
             <span class="c1"># TODO put this into the regression metric itself</span>
             <span class="n">cprediction</span> <span class="o">=</span> <span class="n">sanitize_array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
             <span class="n">metric_dict</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">REGRESSION_METRICS</span><span class="p">)</span>
             <span class="n">metric_dict</span><span class="p">[</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric</span>
             <span class="k">for</span> <span class="n">metric_</span> <span class="ow">in</span> <span class="n">REGRESSION_METRICS</span><span class="p">:</span>
-                <span class="n">func</span> <span class="o">=</span> <span class="n">REGRESSION_METRICS</span><span class="p">[</span><span class="n">metric_</span><span class="p">]</span>
+                <span class="n">func</span><span class="p">:</span> <span class="n">Scorer</span> <span class="o">=</span> <span class="n">REGRESSION_METRICS</span><span class="p">[</span><span class="n">metric_</span><span class="p">]</span>
                 <span class="n">score</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">cprediction</span><span class="p">)</span>
+                <span class="n">true_score</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">score</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">metric_dict</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">CLASSIFICATION_METRICS</span><span class="p">)</span>
@@ -470,6 +499,7 @@
 
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">score</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">))</span>
+                    <span class="n">true_score</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">score</span>
                 <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;multiclass format is not supported&#39;</span><span class="p">:</span>
                         <span class="k">continue</span>
@@ -491,7 +521,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">score</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">score</span></div>
+    <span class="k">return</span> <span class="n">score</span><span class="p">,</span> <span class="n">true_score</span></div>
+
+
+<div class="viewcode-block" id="calculate_confusion_matrix"><a class="viewcode-back" href="../../_module/autoflow.metrics.html#autoflow.metrics.calculate_confusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">calculate_confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+    <span class="c1"># return 2d list</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

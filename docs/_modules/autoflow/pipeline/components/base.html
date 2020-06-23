@@ -193,7 +193,7 @@
     <span class="n">regression_only</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">boost_model</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">tree_model</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">cache_intermediate</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">store_intermediate</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">suspend_other_processes</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">is_fit</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -256,9 +256,9 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="AutoFlowComponent.pred_or_trans"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.pred_or_trans">[docs]</a>    <span class="k">def</span> <span class="nf">pred_or_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">X_train_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-        <span class="n">X_valid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
-        <span class="n">X_test_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="n">X_train_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+        <span class="n">X_valid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+        <span class="n">X_test_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pred_or_trans</span><span class="p">(</span><span class="n">X_train_</span><span class="p">,</span> <span class="n">X_valid_</span><span class="p">,</span> <span class="n">X_test_</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span></div>
@@ -273,7 +273,7 @@
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="n">validated</span></div>
 
-<div class="viewcode-block" id="AutoFlowComponent.preprocess_data"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.preprocess_data">[docs]</a>    <span class="k">def</span> <span class="nf">filter_feature_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GenericDataFrame</span><span class="p">],</span> <span class="n">extract_info</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoFlowComponent.preprocess_data"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.base.AutoFlowComponent.preprocess_data">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GenericDataFrame</span><span class="p">],</span> <span class="n">extract_info</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># todo 考虑在这                                                                                                                                                                                    里多densify</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -312,9 +312,9 @@
         <span class="c1"># todo: sklearn 对于 DataFrame 是支持的， 是否需要修改？</span>
         <span class="c1"># 只选择当前需要的feature_groups</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">GenericDataFrame</span><span class="p">)</span>
-        <span class="n">X_train_</span><span class="p">,</span> <span class="n">feature_groups</span><span class="p">,</span> <span class="n">columns_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">X_valid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
-        <span class="n">X_test_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="n">X_train_</span><span class="p">,</span> <span class="n">feature_groups</span><span class="p">,</span> <span class="n">columns_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">X_valid_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+        <span class="n">X_test_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
         <span class="c1"># 通过以上步骤，保证所有的X都是np.ndarray 形式</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">X_train_</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_proxy_estimator</span><span class="p">()</span>
@@ -349,9 +349,9 @@
              <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># 保留其他数据集的参数，方便模型拓展</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_X_to_fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_intermediate</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_intermediate</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;warn: no resource_manager when cache_intermediate is True&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;warn: no resource_manager when store_intermediate is True&quot;</span><span class="p">)</span>
                 <span class="n">fitted_estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_fit</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
                                                  <span class="n">feature_groups</span><span class="p">,</span> <span class="n">columns_metadata</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>

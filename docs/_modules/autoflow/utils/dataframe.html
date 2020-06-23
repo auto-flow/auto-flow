@@ -168,19 +168,79 @@
            <div itemprop="articleBody">
             
   <h1>Source code for autoflow.utils.dataframe</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
-<div class="viewcode-block" id="pop_if_exists"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.pop_if_exists">[docs]</a><span class="k">def</span> <span class="nf">pop_if_exists</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<div class="viewcode-block" id="process_dataframe"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.process_dataframe">[docs]</a><span class="k">def</span> <span class="nf">process_dataframe</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="k">return</span> <span class="n">X_</span></div>
+
+
+<div class="viewcode-block" id="replace_nan_to_None"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.replace_nan_to_None">[docs]</a><span class="k">def</span> <span class="nf">replace_nan_to_None</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">column</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">object</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="replace_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.replace_dict">[docs]</a><span class="k">def</span> <span class="nf">replace_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">from_</span><span class="p">:</span>
+            <span class="n">dict_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_</span></div>
+
+
+<div class="viewcode-block" id="replace_dicts"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.replace_dicts">[docs]</a><span class="k">def</span> <span class="nf">replace_dicts</span><span class="p">(</span><span class="n">dicts</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">dict_</span> <span class="ow">in</span> <span class="n">dicts</span><span class="p">:</span>
+        <span class="n">replace_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_unique_col_name"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.get_unique_col_name">[docs]</a><span class="k">def</span> <span class="nf">get_unique_col_name</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span> <span class="n">wanted</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">columns</span> <span class="o">==</span> <span class="n">wanted</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">wanted</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ix</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">ix</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">wanted</span><span class="p">)</span>
+        <span class="n">wanted</span> <span class="o">=</span> <span class="n">wanted</span><span class="p">[:</span><span class="n">ix</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{cnt}</span><span class="s2">&quot;</span>
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">wanted</span></div>
+
+
+<div class="viewcode-block" id="process_duplicated_columns"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.process_duplicated_columns">[docs]</a><span class="k">def</span> <span class="nf">process_duplicated_columns</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="c1"># 查看是否有重复列，并去重</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">unq</span><span class="p">,</span> <span class="n">cnt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unq</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">columns</span><span class="p">,</span> <span class="p">{}</span>
+    <span class="n">duplicated_columns</span> <span class="o">=</span> <span class="n">unq</span><span class="p">[</span><span class="n">cnt</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">index2newName</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">duplicated_column</span> <span class="ow">in</span> <span class="n">duplicated_columns</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">columns</span> <span class="o">==</span> <span class="n">duplicated_column</span><span class="p">)[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">new_name</span> <span class="o">=</span> <span class="n">get_unique_col_name</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
+            <span class="n">columns</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+            <span class="n">index2newName</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">columns</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">columns</span><span class="p">,</span> <span class="n">index2newName</span></div>
+
+
+<div class="viewcode-block" id="inverse_dict"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.inverse_dict">[docs]</a><span class="k">def</span> <span class="nf">inverse_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">dict_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict_</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
 
 
 <div class="viewcode-block" id="rectify_dtypes"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.rectify_dtypes">[docs]</a><span class="k">def</span> <span class="nf">rectify_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
@@ -212,7 +272,11 @@
 <div class="viewcode-block" id="DataFrameValuesWrapper.wrap_to_dataframe"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.dataframe.DataFrameValuesWrapper.wrap_to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">wrap_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div></div>
 
-
+<span class="c1"># if __name__ == &#39;__main__&#39;:</span>
+<span class="c1">#     columns = pd.Index([str(x) for x in [1, 2, 3, 2, 3, 4, 5]])</span>
+<span class="c1">#     columns, index2newName = process_duplicated_columns(columns)</span>
+<span class="c1">#     print(columns)</span>
+<span class="c1">#     print(index2newName)</span>
 </pre></div>
 
            </div>

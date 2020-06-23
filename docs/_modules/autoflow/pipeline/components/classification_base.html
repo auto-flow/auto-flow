@@ -202,7 +202,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_or_trans</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AutoFlowClassificationAlgorithm.predict_proba"><a class="viewcode-back" href="../../../../_module/autoflow.pipeline.components.html#autoflow.pipeline.components.classification_base.AutoFlowClassificationAlgorithm.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_feature_groups</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_data</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">):</span>

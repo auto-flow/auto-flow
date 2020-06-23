@@ -324,7 +324,7 @@ I want to introduce a concept: <code class="docutils literal notranslate"><span 
 the remaining columns are called <code class="docutils literal notranslate"><span class="pre">features</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can find <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code>’s definition in <a class="reference internal" href="api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a></p>
+<p>You can find <code class="docutils literal notranslate"><span class="pre">column_descriptions</span></code>’s definition in <code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></p>
 </div>
 <p>If some <code class="docutils literal notranslate"><span class="pre">features</span></code> have similar properties, they are containing in a same <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>.</p>
 <div class="admonition note">
@@ -451,7 +451,7 @@ Some computer scientists said, <code class="docutils literal notranslate"><span 
 <h3>Instance In Titanic<a class="headerlink" href="#instance-in-titanic" title="Permalink to this headline">¶</a></h3>
 <p>You may be curious about the <code class="docutils literal notranslate"><span class="pre">workflow</span> <span class="pre">space</span></code> picture above, want to know how it work.
 Let me introduce the processing details step by step.</p>
-<p><strong>First step</strong>, data manager(<a class="reference internal" href="api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a>) split raw data into three
+<p><strong>First step</strong>, data manager(<code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code>) split raw data into three
 <code class="docutils literal notranslate"><span class="pre">feature</span> <span class="pre">group</span></code>: <a class="reference internal" href="#nan"><span class="std std-ref">nan</span></a>, <a class="reference internal" href="#highr-nan"><span class="std std-ref">highR_nan</span></a>, <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a> and <a class="reference internal" href="#num"><span class="std std-ref">num</span></a>. like this:</p>
 <table class="docutils align-default" id="id3">
 <caption><span class="caption-text">First Step : Split By Data Manager</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
@@ -687,7 +687,7 @@ Let me introduce the processing details step by step.</p>
 </tbody>
 </table>
 <p>This corresponds to this figure:</p>
-<div class="graphviz"><img src="_images/graphviz-8e791b0e6131ff343aab8d552fda60b247e7d6e5.png" alt="digraph estimating {
+<div class="graphviz"><img src="_images/graphviz-9b2d536036f665db9ecb040b6fad9a94da523eba.png" alt="digraph estimating {
    &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
@@ -802,7 +802,7 @@ feature groups: <a class="reference internal" href="#cat-nan"><span class="std s
 </tbody>
 </table>
 <p>This corresponds to this figure:</p>
-<div class="graphviz"><img src="_images/graphviz-c698afc8974bf690ad6b1c1d1ca4b10d41e2e5ee.png" alt="digraph estimating {
+<div class="graphviz"><img src="_images/graphviz-81564d7a8f2d07c73b6e76455a35b9801d683a1e.png" alt="digraph estimating {
    &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
@@ -918,7 +918,7 @@ feature groups: <a class="reference internal" href="#cat-nan"><span class="std s
 </tbody>
 </table>
 <p>This corresponds to this figure:</p>
-<div class="graphviz"><img src="_images/graphviz-b816e00685ffb762d4f067391946e64e2f368dde.png" alt="digraph estimating {
+<div class="graphviz"><img src="_images/graphviz-644ec15f2bacbdfa100df02b9fdcaff16d7756c2.png" alt="digraph estimating {
    &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
@@ -1037,7 +1037,7 @@ feature groups: <a class="reference internal" href="#highr-cat"><span class="std
 </tbody>
 </table>
 <p>This corresponds to this figure:</p>
-<div class="graphviz"><img src="_images/graphviz-9b58d1359ed08c4a0477e9abe3fd51bb94ce9339.png" alt="digraph estimating {
+<div class="graphviz"><img src="_images/graphviz-e2007c689d639cd88fa6735ec3276fd85f23527c.png" alt="digraph estimating {
    &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
@@ -1172,7 +1172,7 @@ we encode <a class="reference internal" href="#lowr-cat"><span class="std std-re
 </tbody>
 </table>
 <p>This corresponds to this figure:</p>
-<div class="graphviz"><img src="_images/graphviz-31ddc3e69ba151c2f024d1a2c3fecaaf6a41557f.png" alt="digraph estimating {
+<div class="graphviz"><img src="_images/graphviz-8444d418185affc16ff7b6ece6166063cb856492.png" alt="digraph estimating {
    &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];
@@ -1191,7 +1191,7 @@ we encode <a class="reference internal" href="#lowr-cat"><span class="std std-re
 <p><strong>Seventh step</strong>, finally, we finish all the data preprocessing phase,
 now we should do estimating. <code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> and <code class="docutils literal notranslate"><span class="pre">random_forest</span></code> are candidate algorithms.</p>
 <p>This corresponds to this figure:</p>
-<div class="graphviz"><img src="_images/graphviz-344210078541dbc212d985206995cf25f40145e9.png" alt="digraph estimating {
+<div class="graphviz"><img src="_images/graphviz-40bf45731881d3aac9ec2c670109013e49c9dc76.png" alt="digraph estimating {
    &quot;data&quot; -&gt; &quot;cat&quot; [ label=&quot;data_manager: cat&quot; ];
    &quot;data&quot; -&gt; &quot;num&quot; [ label=&quot;data_manager: num&quot; ];
    &quot;data&quot; -&gt; &quot;nan&quot; [ label=&quot;data_manager: nan&quot; ];

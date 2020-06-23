@@ -173,7 +173,9 @@
 <span class="c1"># @Author  : qichun tang</span>
 <span class="c1"># @Contact    : tqichun@gmail.com</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="n">NONE_TOKEN</span> <span class="o">=</span> <span class="s2">&quot;NaN&quot;</span>
 
 
 <div class="viewcode-block" id="StrSignatureMixin"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.StrSignatureMixin">[docs]</a><span class="k">class</span> <span class="nc">StrSignatureMixin</span><span class="p">():</span>
@@ -181,8 +183,10 @@
         <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{self.__class__.__name__}</span><span class="s2">(&quot;</span>
         <span class="n">valid_params</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;NaN&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;NaN&quot;</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">NONE_TOKEN</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="n">NONE_TOKEN</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">valid_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span>
         <span class="n">valid_params_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{key}</span><span class="s2">={repr(value)}&quot;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">valid_params</span><span class="p">]</span>
         <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_params_str_list</span><span class="p">)</span>
@@ -200,24 +204,34 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_valid_params_in_kwargs"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.get_valid_params_in_kwargs">[docs]</a><span class="k">def</span> <span class="nf">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<div class="viewcode-block" id="get_valid_params_in_kwargs"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.get_valid_params_in_kwargs">[docs]</a><span class="k">def</span> <span class="nf">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
     <span class="n">validated</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">klass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">validated</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">return</span> <span class="n">validated</span></div>
 
 
+<div class="viewcode-block" id="gather_kwargs_from_signature_and_attributes"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.gather_kwargs_from_signature_and_attributes">[docs]</a><span class="k">def</span> <span class="nf">gather_kwargs_from_signature_and_attributes</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_if_not_None"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.set_if_not_None">[docs]</a><span class="k">def</span> <span class="nf">set_if_not_None</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_class_full_name"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.get_class_full_name">[docs]</a><span class="k">def</span> <span class="nf">get_class_full_name</span><span class="p">(</span><span class="n">klass</span><span class="p">:</span> <span class="n">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{klass.__module__}</span><span class="s2">.</span><span class="si">{klass.__name__}</span><span class="s2">&quot;</span></div>
+
+
 <div class="viewcode-block" id="instancing"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.klass.instancing">[docs]</a><span class="k">def</span> <span class="nf">instancing</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">variable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">variable</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="o">**</span><span class="n">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">variable</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="o">**</span><span class="n">get_valid_params_in_kwargs</span><span class="p">(</span><span class="n">klass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="o">**</span><span class="n">variable</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">klass</span><span class="p">):</span>
         <span class="k">pass</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">variable</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">klass</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
     <span class="k">return</span> <span class="n">variable</span></div>

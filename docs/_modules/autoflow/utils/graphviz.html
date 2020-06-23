@@ -176,7 +176,8 @@
 
 
 <div class="viewcode-block" id="ColorSelector"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.graphviz.ColorSelector">[docs]</a><span class="k">class</span> <span class="nc">ColorSelector</span><span class="p">(</span><span class="n">StrSignatureMixin</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">colorful</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorful</span> <span class="o">=</span> <span class="n">colorful</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="mi">0</span>
@@ -184,6 +185,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">id2label</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorful</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">label</span><span class="o">==</span><span class="s2">&quot;target&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;#000000&quot;</span>
         <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span><span class="p">:</span>

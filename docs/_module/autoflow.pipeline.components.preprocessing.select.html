@@ -174,244 +174,29 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.base">
-<span id="autoflow-pipeline-components-preprocessing-select-base-module"></span><h2>autoflow.pipeline.components.preprocessing.select.base module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.base" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.REF_Base">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.base.</code><code class="sig-name descname">REF_Base</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#REF_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin</span></code></a>, <a class="reference internal" href="autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm" title="autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.REF_Base.after_process_hyperparams">
-<code class="sig-name descname">after_process_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#REF_Base.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.REF_Base.class__">
-<code class="sig-name descname">class__</code><em class="property"> = 'RFE'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base.class__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.REF_Base.max_feature_name">
-<code class="sig-name descname">max_feature_name</code><em class="property"> = '_n_features_to_select__sp1_percent'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base.max_feature_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.REF_Base.module__">
-<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.feature_selection'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base.module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.REF_Base.need_y">
-<code class="sig-name descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base.need_y" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.base.</code><code class="sig-name descname">SelectFromModelBase</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectFromModelBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin</span></code></a>, <a class="reference internal" href="autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm" title="autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.after_process_hyperparams">
-<code class="sig-name descname">after_process_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectFromModelBase.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.class__">
-<code class="sig-name descname">class__</code><em class="property"> = 'SelectFromModel'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.class__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.max_feature_name">
-<code class="sig-name descname">max_feature_name</code><em class="property"> = '_max_features__sp1_percent'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.max_feature_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.module__">
-<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.feature_selection'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.need_y">
-<code class="sig-name descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase.need_y" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.base.</code><code class="sig-name descname">SelectPercentileBase</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin</span></code></a>, <a class="reference internal" href="autoflow.pipeline.components.html#autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm" title="autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.feature_engineer_base.AutoFlowFeatureEngineerAlgorithm</span></code></a></p>
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.after_process_hyperparams">
-<code class="sig-name descname">after_process_hyperparams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.after_process_hyperparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.after_process_hyperparams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_fit_X">
-<code class="sig-name descname">before_fit_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.before_fit_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_fit_X" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_trans_X">
-<code class="sig-name descname">before_trans_X</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.before_trans_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.before_trans_X" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.class__">
-<code class="sig-name descname">class__</code><em class="property"> = 'GenericUnivariateSelect'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.class__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_default_name">
-<code class="sig-name descname">get_default_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.get_default_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_default_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_name2func">
-<code class="sig-name descname">get_name2func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SelectPercentileBase.get_name2func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.get_name2func" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.max_feature_name">
-<code class="sig-name descname">max_feature_name</code><em class="property"> = 'param'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.max_feature_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.module__">
-<code class="sig-name descname">module__</code><em class="property"> = 'sklearn.feature_selection'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.need_y">
-<code class="sig-name descname">need_y</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase.need_y" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.base.</code><code class="sig-name descname">SklearnSelectMixin</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SklearnSelectMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.before_parse_escape_hyperparameters">
-<code class="sig-name descname">before_parse_escape_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hyperparams</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/base.html#SklearnSelectMixin.before_parse_escape_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.before_parse_escape_hyperparameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.max_feature_name">
-<code class="sig-name descname">max_feature_name</code><em class="property"> = '_max_features__sp1_percent'</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.base.SklearnSelectMixin.max_feature_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-base-module">
+<h2>autoflow.pipeline.components.preprocessing.select.base module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-base-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.from_model_clf">
-<span id="autoflow-pipeline-components-preprocessing-select-from-model-clf-module"></span><h2>autoflow.pipeline.components.preprocessing.select.from_model_clf module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.from_model_clf" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.from_model_clf.</code><code class="sig-name descname">SelectFromModelClf</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/from_model_clf.html#SelectFromModelClf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase" title="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase</span></code></a></p>
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf.classification_only">
-<code class="sig-name descname">classification_only</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.from_model_clf.SelectFromModelClf.classification_only" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-from-model-clf-module">
+<h2>autoflow.pipeline.components.preprocessing.select.from_model_clf module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-from-model-clf-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.from_model_reg">
-<span id="autoflow-pipeline-components-preprocessing-select-from-model-reg-module"></span><h2>autoflow.pipeline.components.preprocessing.select.from_model_reg module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.from_model_reg" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.from_model_reg.</code><code class="sig-name descname">SelectFromModelReg</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/from_model_reg.html#SelectFromModelReg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase" title="autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SelectFromModelBase</span></code></a></p>
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg.regression_only">
-<code class="sig-name descname">regression_only</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.from_model_reg.SelectFromModelReg.regression_only" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-from-model-reg-module">
+<h2>autoflow.pipeline.components.preprocessing.select.from_model_reg module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-from-model-reg-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.rfe_clf">
-<span id="autoflow-pipeline-components-preprocessing-select-rfe-clf-module"></span><h2>autoflow.pipeline.components.preprocessing.select.rfe_clf module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.rfe_clf" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.rfe_clf.</code><code class="sig-name descname">RFE_Clf</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/rfe_clf.html#RFE_Clf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base" title="autoflow.pipeline.components.preprocessing.select.base.REF_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.REF_Base</span></code></a></p>
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf.classification_only">
-<code class="sig-name descname">classification_only</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.rfe_clf.RFE_Clf.classification_only" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-rfe-clf-module">
+<h2>autoflow.pipeline.components.preprocessing.select.rfe_clf module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-rfe-clf-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.rfe_reg">
-<span id="autoflow-pipeline-components-preprocessing-select-rfe-reg-module"></span><h2>autoflow.pipeline.components.preprocessing.select.rfe_reg module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.rfe_reg" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.rfe_reg.</code><code class="sig-name descname">RFE_Reg</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/rfe_reg.html#RFE_Reg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.REF_Base" title="autoflow.pipeline.components.preprocessing.select.base.REF_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.REF_Base</span></code></a></p>
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg.regression_only">
-<code class="sig-name descname">regression_only</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.rfe_reg.RFE_Reg.regression_only" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-rfe-reg-module">
+<h2>autoflow.pipeline.components.preprocessing.select.rfe_reg module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-rfe-reg-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.univar_clf">
-<span id="autoflow-pipeline-components-preprocessing-select-univar-clf-module"></span><h2>autoflow.pipeline.components.preprocessing.select.univar_clf module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.univar_clf" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.univar_clf.</code><code class="sig-name descname">SelectPercentileClassification</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/univar_clf.html#SelectPercentileClassification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase" title="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase</span></code></a></p>
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.classification_only">
-<code class="sig-name descname">classification_only</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.classification_only" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_default_name">
-<code class="sig-name descname">get_default_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/univar_clf.html#SelectPercentileClassification.get_default_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_default_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_name2func">
-<code class="sig-name descname">get_name2func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/univar_clf.html#SelectPercentileClassification.get_name2func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_clf.SelectPercentileClassification.get_name2func" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-univar-clf-module">
+<h2>autoflow.pipeline.components.preprocessing.select.univar_clf module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-univar-clf-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select.univar_reg">
-<span id="autoflow-pipeline-components-preprocessing-select-univar-reg-module"></span><h2>autoflow.pipeline.components.preprocessing.select.univar_reg module<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select.univar_reg" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.pipeline.components.preprocessing.select.univar_reg.</code><code class="sig-name descname">SelectPercentileRegression</code><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/univar_reg.html#SelectPercentileRegression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase" title="autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.pipeline.components.preprocessing.select.base.SelectPercentileBase</span></code></a></p>
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_default_name">
-<code class="sig-name descname">get_default_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/univar_reg.html#SelectPercentileRegression.get_default_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_default_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_name2func">
-<code class="sig-name descname">get_name2func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/pipeline/components/preprocessing/select/univar_reg.html#SelectPercentileRegression.get_name2func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.get_name2func" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.regression_only">
-<code class="sig-name descname">regression_only</code><em class="property"> = True</em><a class="headerlink" href="#autoflow.pipeline.components.preprocessing.select.univar_reg.SelectPercentileRegression.regression_only" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="autoflow-pipeline-components-preprocessing-select-univar-reg-module">
+<h2>autoflow.pipeline.components.preprocessing.select.univar_reg module<a class="headerlink" href="#autoflow-pipeline-components-preprocessing-select-univar-reg-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.pipeline.components.preprocessing.select">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-autoflow.pipeline.components.preprocessing.select" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

@@ -168,13 +168,16 @@
            <div itemprop="articleBody">
             
   <h1>Source code for autoflow.hdl.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterator</span>
 
 <span class="kn">import</span> <span class="nn">json5</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Memory</span>
 
 <span class="kn">from</span> <span class="nn">autoflow</span> <span class="kn">import</span> <span class="n">hdl</span>
-<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">,</span> <span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span>
+<span class="kn">from</span> <span class="nn">autoflow.constants</span> <span class="kn">import</span> <span class="n">SERIES_CONNECT_LEADER_TOKEN</span><span class="p">,</span> <span class="n">SERIES_CONNECT_SEPARATOR_TOKEN</span><span class="p">,</span> <span class="n">JOBLIB_CACHE</span>
 
 
 <div class="viewcode-block" id="is_hdl_bottom"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.is_hdl_bottom">[docs]</a><span class="k">def</span> <span class="nf">is_hdl_bottom</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -197,8 +200,12 @@
         <span class="k">return</span> <span class="n">get_default_hdl_bank</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_default_hdl_bank"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_default_hdl_bank">[docs]</a><span class="k">def</span> <span class="nf">get_default_hdl_bank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">Path</span><span class="p">(</span><span class="n">hdl</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;hdl_bank.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span></div>
+<span class="k">def</span> <span class="nf">_get_default_hdl_bank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">Path</span><span class="p">(</span><span class="n">hdl</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;hdl_bank.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+
+
+<span class="n">memory</span> <span class="o">=</span> <span class="n">Memory</span><span class="p">(</span><span class="n">JOBLIB_CACHE</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">get_default_hdl_bank</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="n">_get_default_hdl_bank</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_origin_models"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_origin_models">[docs]</a><span class="k">def</span> <span class="nf">get_origin_models</span><span class="p">(</span><span class="n">raw_models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
@@ -229,6 +236,24 @@
 <div class="viewcode-block" id="purify_keys"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.purify_keys">[docs]</a><span class="k">def</span> <span class="nf">purify_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">yield</span> <span class="n">purify_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_default_hp_of_cls"><a class="viewcode-back" href="../../../_module/autoflow.hdl.html#autoflow.hdl.utils.get_default_hp_of_cls">[docs]</a><span class="k">def</span> <span class="nf">get_default_hp_of_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;autoflow.workflow.components.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">hdl_bank</span> <span class="o">=</span> <span class="n">get_default_hdl_bank</span><span class="p">()</span>
+    <span class="n">hp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">hdl_bank</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+        <span class="n">hp</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">hp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;_default&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;_default&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;default hyperparams of </span><span class="si">{cls.__name__}</span><span class="s2"> :&quot;</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
 </pre></div>
 
            </div>

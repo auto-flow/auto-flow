@@ -170,7 +170,7 @@
   <h1>Source code for autoflow.ensemble.trained_data_fetcher</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ndarray</span>
-<span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span class="kn">from</span> <span class="nn">autoflow.resource_manager.base</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.typing_</span> <span class="kn">import</span> <span class="n">GenericEstimator</span>
 
@@ -195,7 +195,6 @@
     <span class="p">]:</span>
         <span class="n">estimator_list</span><span class="p">,</span> <span class="n">y_true_indexes_list</span><span class="p">,</span> <span class="n">y_preds_list</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">load_estimators_in_trials</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_ids</span><span class="p">)</span>
-        <span class="c1"># self.resource_manager.close_trials_db()</span>
         <span class="k">return</span> <span class="n">estimator_list</span><span class="p">,</span> <span class="n">y_true_indexes_list</span><span class="p">,</span> <span class="n">y_preds_list</span></div></div>
 </pre></div>
 

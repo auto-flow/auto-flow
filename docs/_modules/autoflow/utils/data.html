@@ -169,10 +169,13 @@
             
   <h1>Source code for autoflow.utils.data</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- encoding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">datefinder</span> <span class="kn">import</span> <span class="n">find_dates</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
 
 
 <div class="viewcode-block" id="convert_to_num"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.convert_to_num">[docs]</a><span class="k">def</span> <span class="nf">convert_to_num</span><span class="p">(</span><span class="n">Ybin</span><span class="p">):</span>
@@ -239,17 +242,56 @@
         <span class="k">return</span> <span class="n">X</span></div>
 
 
-<div class="viewcode-block" id="is_cat"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_cat">[docs]</a><span class="k">def</span> <span class="nf">is_cat</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-            <span class="k">continue</span>
-        <span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="is_target_need_label_encode"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_target_need_label_encode">[docs]</a><span class="k">def</span> <span class="nf">is_target_need_label_encode</span><span class="p">(</span><span class="n">target_col</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_cat</span><span class="p">(</span><span class="n">target_col</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="n">unk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">target_col</span><span class="p">)</span>
+        <span class="n">wanted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unk</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">unk</span> <span class="o">==</span> <span class="n">wanted</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
+<div class="viewcode-block" id="is_cat"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_cat">[docs]</a><span class="k">def</span> <span class="nf">is_cat</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">consider_ordinal_as_cat</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">consider_ordinal_as_cat</span><span class="p">:</span>
+        <span class="n">valid_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;multiclass&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">consider_ordinal_as_cat</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;binary&quot;</span><span class="p">):</span>
+            <span class="n">valid_types</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;binary&quot;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">tp</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tp</span> <span class="ow">in</span> <span class="n">valid_types</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="finite_array"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.finite_array">[docs]</a><span class="k">def</span> <span class="nf">finite_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Replace NaN and Inf (there should not be any!)</span>
+<span class="sd">    :param array:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="n">maxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">)])</span>
+    <span class="n">mini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">)])</span>
+    <span class="n">array</span><span class="p">[</span><span class="n">array</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">maxi</span>
+    <span class="n">array</span><span class="p">[</span><span class="n">array</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">mini</span>
+    <span class="k">return</span> <span class="n">array</span></div>
+
+
 <div class="viewcode-block" id="is_highR_nan"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_highR_nan">[docs]</a><span class="k">def</span> <span class="nf">is_highR_nan</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">threshold</span></div>
+
+
+<div class="viewcode-block" id="is_highR_cat"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_highR_cat">[docs]</a><span class="k">def</span> <span class="nf">is_highR_cat</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">threshold</span></div>
 
 
 <div class="viewcode-block" id="is_nan"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_nan">[docs]</a><span class="k">def</span> <span class="nf">is_nan</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
@@ -262,6 +304,65 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span>
     <span class="k">return</span> <span class="n">X</span></div>
+
+
+<div class="viewcode-block" id="is_text"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_text">[docs]</a><span class="k">def</span> <span class="nf">is_text</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cat_been_checked</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cat_been_checked</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_cat</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">consider_ordinal_as_cat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_highR_cat</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">s</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="is_date"><a class="viewcode-back" href="../../../_module/autoflow.utils.html#autoflow.utils.data.is_date">[docs]</a><span class="k">def</span> <span class="nf">is_date</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cat_been_checked</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cat_been_checked</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_cat</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">consider_ordinal_as_cat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">find_dates</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_text</span><span class="p">([</span>
+        <span class="s2">&quot;hello world&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;good morning&quot;</span>
+        <span class="s2">&quot;it is a good day&quot;</span>
+    <span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_text</span><span class="p">([</span>
+        <span class="s2">&quot;hello world&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;good morning&quot;</span><span class="p">,</span>
+        <span class="mi">0</span>
+    <span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_text</span><span class="p">([</span>
+        <span class="s2">&quot;hello world&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;good morning&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;omg&quot;</span>
+    <span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_text</span><span class="p">([</span>
+        <span class="s2">&quot;hello world&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hello world&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hello world&quot;</span><span class="p">,</span>
+    <span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_date</span><span class="p">([</span>
+        <span class="s1">&#39;2018&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;2016&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;658.2.3&#39;</span>
+    <span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_date</span><span class="p">([</span>
+        <span class="s1">&#39;456&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;456&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;256&#39;</span>
+    <span class="p">]))</span>
 </pre></div>
 
            </div>

@@ -189,7 +189,7 @@
 <span id="autoflow-hdl-hdl-constructor-module"></span><h2>autoflow.hdl.hdl_constructor module<a class="headerlink" href="#module-autoflow.hdl.hdl_constructor" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.hdl.hdl_constructor.</code><code class="sig-name descname">HDL_Constructor</code><span class="sig-paren">(</span><em class="sig-param">DAG_workflow: Union[str</em>, <em class="sig-param">Dict[str</em>, <em class="sig-param">Any]] = 'generic_recommend'</em>, <em class="sig-param">hdl_bank_path=None</em>, <em class="sig-param">hdl_bank=None</em>, <em class="sig-param">hdl_metadata=&lt;frozendict {}&gt;</em>, <em class="sig-param">included_classifiers=('adaboost'</em>, <em class="sig-param">'catboost'</em>, <em class="sig-param">'decision_tree'</em>, <em class="sig-param">'extra_trees'</em>, <em class="sig-param">'gaussian_nb'</em>, <em class="sig-param">'k_nearest_neighbors'</em>, <em class="sig-param">'liblinear_svc'</em>, <em class="sig-param">'libsvm_svc'</em>, <em class="sig-param">'lightgbm'</em>, <em class="sig-param">'logistic_regression'</em>, <em class="sig-param">'random_forest'</em>, <em class="sig-param">'sgd')</em>, <em class="sig-param">included_regressors=('adaboost'</em>, <em class="sig-param">'bayesian_ridge'</em>, <em class="sig-param">'catboost'</em>, <em class="sig-param">'decision_tree'</em>, <em class="sig-param">'elasticnet'</em>, <em class="sig-param">'extra_trees'</em>, <em class="sig-param">'gaussian_process'</em>, <em class="sig-param">'k_nearest_neighbors'</em>, <em class="sig-param">'kernel_ridge'</em>, <em class="sig-param">'liblinear_svr'</em>, <em class="sig-param">'lightgbm'</em>, <em class="sig-param">'random_forest'</em>, <em class="sig-param">'sgd')</em>, <em class="sig-param">included_highR_nan_imputers=('operate.drop'</em>, <em class="sig-param">{'_name': 'operate.keep_going'</em>, <em class="sig-param">'__rely_model': 'boost_model'})</em>, <em class="sig-param">included_cat_nan_imputers=('impute.fill_cat'</em>, <em class="sig-param">{'_name': 'impute.fill_abnormal'</em>, <em class="sig-param">'__rely_model': 'boost_model'})</em>, <em class="sig-param">included_num_nan_imputers=('impute.fill_num'</em>, <em class="sig-param">{'_name': 'impute.fill_abnormal'</em>, <em class="sig-param">'__rely_model': 'boost_model'})</em>, <em class="sig-param">included_highR_cat_encoders=('operate.drop'</em>, <em class="sig-param">'encode.label'</em>, <em class="sig-param">'encode.cat_boost')</em>, <em class="sig-param">included_lowR_cat_encoders=('encode.one_hot'</em>, <em class="sig-param">'encode.label'</em>, <em class="sig-param">'encode.cat_boost')</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.hdl.hdl_constructor.</code><code class="sig-name descname">HDL_Constructor</code><span class="sig-paren">(</span><em class="sig-param">DAG_workflow: Union[str, Dict[str, Any]] = 'generic_recommend', hdl_bank_path=None, hdl_bank=None, hdl_metadata=&lt;frozendict {}&gt;, included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'libsvm_svc', 'lightgbm', 'logistic_regression', 'random_forest', 'sgd'), included_regressors=('adaboost', 'bayesian_ridge', 'catboost', 'decision_tree', 'elasticnet', 'extra_trees', 'gaussian_process', 'k_nearest_neighbors', 'kernel_ridge', 'liblinear_svr', 'lightgbm', 'random_forest', 'sgd'), included_highR_nan_imputers=('operate.drop', 'operate.keep_going'), included_nan_imputers=('impute.adaptive_fill',), included_highR_cat_encoders=('operate.drop', 'encode.ordinal', 'encode.cat_boost'), included_cat_encoders=('encode.one_hot', 'encode.ordinal', 'encode.cat_boost'), num2purified_workflow=&lt;frozendict {'num-&gt;scaled': ['scale.standardize', 'operate.keep_going'], 'scaled-&gt;purified': ['operate.keep_going', 'transform.power']}&gt;, text2purified_workflow=&lt;frozendict {'text-&gt;tokenized': 'text.tokenize.simple', 'tokenized-&gt;purified': ['text.topic.tsvd', 'text.topic.lsi', 'text.topic.nmf']}&gt;, date2purified_workflow=&lt;frozendict {}&gt;, purified2final_workflow=&lt;frozendict {'purified-&gt;final': ['operate.keep_going']}&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="autoflow.utils.html#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 <p><code class="docutils literal notranslate"><span class="pre">HDL</span></code> is abbreviation of Hyper-parameter Descriptions Language.
 It describes an abstract hyperparametric space that independent with concrete implementation.</p>
@@ -286,7 +286,7 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <code class="sig-name descname">data_manager</code><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.data_manager" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -316,7 +316,7 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 </div>
 <dl class="py method">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space">
-<code class="sig-name descname">draw_workflow_space</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.draw_workflow_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">draw_workflow_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">colorful</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">candidates_colors</span><span class="o">=</span><span class="default_value">'#663366', '#663300', '#666633', '#333366', '#660033'</span></em>, <em class="sig-param"><span class="n">feature_groups_colors</span><span class="o">=</span><span class="default_value">'#0099CC', '#0066CC', '#339933', '#FFCC33', '#33CC99', '#FF0033', '#663399', '#FF6600'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.draw_workflow_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.draw_workflow_space" title="Permalink to this definition">¶</a></dt>
 <dd><p class="rubric">Notes</p>
 <p>You must install graphviz in your compute.</p>
 <p>if you are using Ubuntu or another debian Linux, you should run:</p>
@@ -365,8 +365,18 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="py method">
+<dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.get_hdl_dataframe">
+<code class="sig-name descname">get_hdl_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.get_hdl_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.get_hdl_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.get_params_in_dict">
 <code class="sig-name descname">get_params_in_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hdl_bank</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">packages</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">phase</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">mainTask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.get_params_in_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.get_params_in_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.interactive_display_workflow_space">
+<code class="sig-name descname">interactive_display_workflow_space</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.interactive_display_workflow_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.interactive_display_workflow_space" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -380,13 +390,17 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.purify_step_name">
+<code class="sig-name descname">purify_step_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.purify_step_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.purify_step_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="autoflow.hdl.hdl_constructor.HDL_Constructor.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span></em>, <em class="sig-param"><span class="n">random_state</span></em>, <em class="sig-param"><span class="n">highR_cat_threshold</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_manager</span></em>, <em class="sig-param"><span class="n">model_registry</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/hdl_constructor.html#HDL_Constructor.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.hdl_constructor.HDL_Constructor.run" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_manager</strong> (<a class="reference internal" href="../api.html#autoflow.manager.data_manager.DataManager" title="autoflow.manager.data_manager.DataManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code></a>) – </p></li>
-<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>data_manager</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.manager.data_manager.DataManager</span></code>) – </p></li>
 <li><p><strong>highR_cat_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
 </ul>
 </dd>
@@ -404,8 +418,8 @@ program will not load <code class="docutils literal notranslate"><span class="pr
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="autoflow.hdl.utils.get_default_hdl_bank">
-<code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">get_default_hdl_bank</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="../_modules/autoflow/hdl/utils.html#get_default_hdl_bank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.get_default_hdl_bank" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.hdl.utils.get_default_hp_of_cls">
+<code class="sig-prename descclassname">autoflow.hdl.utils.</code><code class="sig-name descname">get_default_hp_of_cls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/hdl/utils.html#get_default_hp_of_cls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.hdl.utils.get_default_hp_of_cls" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

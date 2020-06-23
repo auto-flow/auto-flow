@@ -174,26 +174,8 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-autoflow.utils.array">
-<span id="autoflow-utils-array-module"></span><h2>autoflow.utils.array module<a class="headerlink" href="#module-autoflow.utils.array" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="autoflow.utils.array.binarization">
-<code class="sig-prename descclassname">autoflow.utils.array.</code><code class="sig-name descname">binarization</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">array</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/array.html#binarization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.array.binarization" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.array.multilabel_to_multiclass">
-<code class="sig-prename descclassname">autoflow.utils.array.</code><code class="sig-name descname">multilabel_to_multiclass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">array</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/array.html#multilabel_to_multiclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.array.multilabel_to_multiclass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.array.sanitize_array">
-<code class="sig-prename descclassname">autoflow.utils.array.</code><code class="sig-name descname">sanitize_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">array</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/array.html#sanitize_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.array.sanitize_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Replace NaN and Inf (there should not be any!)
-:param array:
-:return:</p>
-</dd></dl>
-
+<div class="section" id="autoflow-utils-array-module">
+<h2>autoflow.utils.array module<a class="headerlink" href="#autoflow-utils-array-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-autoflow.utils.concurrence">
 <span id="autoflow-utils-concurrence-module"></span><h2>autoflow.utils.concurrence module<a class="headerlink" href="#module-autoflow.utils.concurrence" title="Permalink to this headline">¶</a></h2>
@@ -289,8 +271,26 @@ typically classification target values
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="autoflow.utils.data.finite_array">
+<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">finite_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">array</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#finite_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.finite_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace NaN and Inf (there should not be any!)
+:param array:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.utils.data.is_cat">
-<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_cat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_cat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_cat" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_cat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>pandas.core.series.Series<span class="p">, </span>numpy.ndarray<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">consider_ordinal_as_cat</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_cat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_cat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.data.is_date">
+<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">cat_been_checked</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.data.is_highR_cat">
+<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_highR_cat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em>, <em class="sig-param"><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_highR_cat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_highR_cat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -301,6 +301,16 @@ typically classification target values
 <dl class="py function">
 <dt id="autoflow.utils.data.is_nan">
 <code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_nan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_nan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_nan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.data.is_target_need_label_encode">
+<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_target_need_label_encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_col</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_target_need_label_encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_target_need_label_encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.data.is_text">
+<code class="sig-prename descclassname">autoflow.utils.data.</code><code class="sig-name descname">is_text</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">cat_been_checked</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/data.html#is_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.data.is_text" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -338,8 +348,23 @@ typically classification target values
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="autoflow.utils.dataframe.pop_if_exists">
-<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">pop_if_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">col</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">]</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#pop_if_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.pop_if_exists" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.utils.dataframe.get_unique_col_name">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">get_unique_col_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>pandas.core.indexes.base.Index<span class="p">, </span>pandas.core.series.Series<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">wanted</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#get_unique_col_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.get_unique_col_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.dataframe.inverse_dict">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">inverse_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#inverse_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.inverse_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.dataframe.process_dataframe">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">process_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">, </span>numpy.ndarray<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">copy</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#process_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.process_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.dataframe.process_duplicated_columns">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">process_duplicated_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">pandas.core.indexes.base.Index</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>pandas.core.indexes.base.Index<span class="p">, </span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#process_duplicated_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.process_duplicated_columns" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -347,96 +372,30 @@ typically classification target values
 <code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">rectify_dtypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#rectify_dtypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.rectify_dtypes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt id="autoflow.utils.dataframe.replace_dict">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">replace_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">from_</span></em>, <em class="sig-param"><span class="n">to_</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#replace_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.replace_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.dataframe.replace_dicts">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">replace_dicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicts</span></em>, <em class="sig-param"><span class="n">from_</span></em>, <em class="sig-param"><span class="n">to_</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#replace_dicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.replace_dicts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.dataframe.replace_nan_to_None">
+<code class="sig-prename descclassname">autoflow.utils.dataframe.</code><code class="sig-name descname">replace_nan_to_None</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/autoflow/utils/dataframe.html#replace_nan_to_None"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dataframe.replace_nan_to_None" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="module-autoflow.utils.dict">
-<span id="autoflow-utils-dict-module"></span><h2>autoflow.utils.dict module<a class="headerlink" href="#module-autoflow.utils.dict" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.utils.dict.GlobalList">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">GlobalList</code><a class="reference internal" href="../_modules/autoflow/utils/dict.html#GlobalList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.GlobalList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="py attribute">
-<dt id="autoflow.utils.dict.GlobalList.data">
-<code class="sig-name descname">data</code><em class="property"> = []</em><a class="headerlink" href="#autoflow.utils.dict.GlobalList.data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.add_prefix_in_dict_keys">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">add_prefix_in_dict_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">prefix</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#add_prefix_in_dict_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.add_prefix_in_dict_keys" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.filter_item_by_key_condition">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">filter_item_by_key_condition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a><a class="reference internal" href="../_modules/autoflow/utils/dict.html#filter_item_by_key_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.filter_item_by_key_condition" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.find_token_in_dict">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">find_token_in_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">token</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#find_token_in_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.find_token_in_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.group_dict_items_before_first_token">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">group_dict_items_before_first_token</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">token</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#group_dict_items_before_first_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.group_dict_items_before_first_token" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.read_dict_in_path_mode">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">read_dict_in_path_mode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#read_dict_in_path_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.read_dict_in_path_mode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.remove_None_value">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">remove_None_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a><a class="reference internal" href="../_modules/autoflow/utils/dict.html#remove_None_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.remove_None_value" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.replace_kv">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">replace_kv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">rk</span></em>, <em class="sig-param"><span class="n">rv</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#replace_kv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.replace_kv" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.sort_dict">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">sort_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#sort_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.sort_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.update_data_structure">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">update_data_structure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_dict</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">additional_dict</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a><a class="reference internal" href="../_modules/autoflow/utils/dict.html#update_data_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.update_data_structure" title="Permalink to this definition">¶</a></dt>
-<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update_data_structure</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">)}],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">}},</span>
-<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s2">&quot;key3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">}},</span> <span class="s2">&quot;key4&quot;</span><span class="p">:</span> <span class="s2">&quot;new_value&quot;</span><span class="p">}</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="go">{&quot;key1&quot;: &quot;b&quot;, &quot;key2&quot;: [1, True, {&quot;a&quot;, (2, )}, 1, False], &quot;key3&quot;: {&quot;a&quot;:{&quot;b&quot;:2, &quot;b&quot;:2}}, &quot;key4&quot;: &quot;new_value&quot;}</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>updated_dict</strong></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.update_mask_from_other_dict">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">update_mask_from_other_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">should_update</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">template</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">ignored_suffix</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span> <span class="o">=</span> <span class="default_value">'(choice)'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#update_mask_from_other_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.update_mask_from_other_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.dict.write_dict_in_path_mode">
-<code class="sig-prename descclassname">autoflow.utils.dict.</code><code class="sig-name descname">write_dict_in_path_mode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/dict.html#write_dict_in_path_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.dict.write_dict_in_path_mode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="autoflow-utils-dict-module">
+<h2>autoflow.utils.dict module<a class="headerlink" href="#autoflow-utils-dict-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-autoflow.utils.graphviz">
 <span id="autoflow-utils-graphviz-module"></span><h2>autoflow.utils.graphviz module<a class="headerlink" href="#module-autoflow.utils.graphviz" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="autoflow.utils.graphviz.ColorSelector">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.graphviz.</code><code class="sig-name descname">ColorSelector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">colors</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/graphviz.html#ColorSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.graphviz.ColorSelector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.graphviz.</code><code class="sig-name descname">ColorSelector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">colors</span></em>, <em class="sig-param"><span class="n">colorful</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/graphviz.html#ColorSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.graphviz.ColorSelector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#autoflow.utils.klass.StrSignatureMixin" title="autoflow.utils.klass.StrSignatureMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">autoflow.utils.klass.StrSignatureMixin</span></code></a></p>
 </dd></dl>
 
@@ -459,8 +418,23 @@ typically classification target values
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="autoflow.utils.hash.get_hash_of_config">
+<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>ConfigSpace.configuration_space.Configuration<span class="p">, </span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.utils.hash.get_hash_of_dataframe">
-<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">L</span><span class="o">=</span><span class="default_value">500</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.hash.get_hash_of_dataframe_csv">
+<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_dataframe_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">L</span><span class="o">=</span><span class="default_value">500</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_dataframe_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_dataframe_csv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.hash.get_hash_of_dataframe_deprecated">
+<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_dataframe_deprecated</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_dataframe_deprecated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_dataframe_deprecated" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -469,8 +443,13 @@ typically classification target values
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="autoflow.utils.hash.get_hash_of_file">
+<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.utils.hash.get_hash_of_str">
-<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_str" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">autoflow.utils.hash.</code><code class="sig-name descname">get_hash_of_str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/hash.html#get_hash_of_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.hash.get_hash_of_str" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -483,8 +462,18 @@ typically classification target values
 </dd></dl>
 
 <dl class="py function">
+<dt id="autoflow.utils.klass.gather_kwargs_from_signature_and_attributes">
+<code class="sig-prename descclassname">autoflow.utils.klass.</code><code class="sig-name descname">gather_kwargs_from_signature_and_attributes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span></em>, <em class="sig-param"><span class="n">instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/klass.html#gather_kwargs_from_signature_and_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.klass.gather_kwargs_from_signature_and_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.klass.get_class_full_name">
+<code class="sig-prename descclassname">autoflow.utils.klass.</code><code class="sig-name descname">get_class_full_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span><span class="p">:</span> <span class="n">Type</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><a class="reference internal" href="../_modules/autoflow/utils/klass.html#get_class_full_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.klass.get_class_full_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="autoflow.utils.klass.get_valid_params_in_kwargs">
-<code class="sig-prename descclassname">autoflow.utils.klass.</code><code class="sig-name descname">get_valid_params_in_kwargs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/klass.html#get_valid_params_in_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.klass.get_valid_params_in_kwargs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">autoflow.utils.klass.</code><code class="sig-name descname">get_valid_params_in_kwargs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/klass.html#get_valid_params_in_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.klass.get_valid_params_in_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -497,14 +486,14 @@ typically classification target values
 <code class="sig-prename descclassname">autoflow.utils.klass.</code><code class="sig-name descname">sequencing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">klass</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/klass.html#sequencing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.klass.sequencing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</div>
-<div class="section" id="module-autoflow.utils.list">
-<span id="autoflow-utils-list-module"></span><h2>autoflow.utils.list module<a class="headerlink" href="#module-autoflow.utils.list" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="autoflow.utils.list.remove_suffix_in_list">
-<code class="sig-prename descclassname">autoflow.utils.list.</code><code class="sig-name descname">remove_suffix_in_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">suffix</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/list.html#remove_suffix_in_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.list.remove_suffix_in_list" title="Permalink to this definition">¶</a></dt>
+<dt id="autoflow.utils.klass.set_if_not_None">
+<code class="sig-prename descclassname">autoflow.utils.klass.</code><code class="sig-name descname">set_if_not_None</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">variable_name</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/klass.html#set_if_not_None"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.klass.set_if_not_None" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</div>
+<div class="section" id="autoflow-utils-list-module">
+<h2>autoflow.utils.list module<a class="headerlink" href="#autoflow-utils-list-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-autoflow.utils.logging_">
 <span id="autoflow-utils-logging-module"></span><h2>autoflow.utils.logging_ module<a class="headerlink" href="#module-autoflow.utils.logging_" title="Permalink to this headline">¶</a></h2>
@@ -607,7 +596,12 @@ typically classification target values
 
 <dl class="py function">
 <dt id="autoflow.utils.packages.get_class_object_in_pipeline_components">
-<code class="sig-prename descclassname">autoflow.utils.packages.</code><code class="sig-name descname">get_class_object_in_pipeline_components</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key1</span></em>, <em class="sig-param"><span class="n">key2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/packages.html#get_class_object_in_pipeline_components"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.packages.get_class_object_in_pipeline_components" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">autoflow.utils.packages.</code><code class="sig-name descname">get_class_object_in_pipeline_components</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key1</span></em>, <em class="sig-param"><span class="n">key2</span></em>, <em class="sig-param"><span class="n">model_registry</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/packages.html#get_class_object_in_pipeline_components"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.packages.get_class_object_in_pipeline_components" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="autoflow.utils.packages.import_by_package_url">
+<code class="sig-prename descclassname">autoflow.utils.packages.</code><code class="sig-name descname">import_by_package_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">package_url</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/packages.html#import_by_package_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.packages.import_by_package_url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -615,7 +609,7 @@ typically classification target values
 <span id="autoflow-utils-pipeline-module"></span><h2>autoflow.utils.pipeline module<a class="headerlink" href="#module-autoflow.utils.pipeline" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="autoflow.utils.pipeline.concat_pipeline">
-<code class="sig-prename descclassname">autoflow.utils.pipeline.</code><code class="sig-name descname">concat_pipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference internal" href="autoflow.pipeline.html#autoflow.pipeline.pipeline.GenericPipeline" title="autoflow.pipeline.pipeline.ML_Workflow">autoflow.pipeline.pipeline.ML_Workflow</a><span class="p">]</span><a class="reference internal" href="../_modules/autoflow/utils/pipeline.html#concat_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.pipeline.concat_pipeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">autoflow.utils.pipeline.</code><code class="sig-name descname">concat_pipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>autoflow.workflow.ml_workflow.ML_Workflow<span class="p">]</span><a class="reference internal" href="../_modules/autoflow/utils/pipeline.html#concat_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.pipeline.concat_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -629,52 +623,8 @@ typically classification target values
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-autoflow.utils.sys">
-<span id="autoflow-utils-sys-module"></span><h2>autoflow.utils.sys module<a class="headerlink" href="#module-autoflow.utils.sys" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="autoflow.utils.sys.Global">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.sys.</code><code class="sig-name descname">Global</code><a class="reference internal" href="../_modules/autoflow/utils/sys.html#Global"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.Global" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>跨文件全局变量类</p>
-<dl class="py method">
-<dt id="autoflow.utils.sys.Global.get">
-<em class="property">classmethod </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/sys.html#Global.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.Global.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="autoflow.utils.sys.HandleException">
-<em class="property">class </em><code class="sig-prename descclassname">autoflow.utils.sys.</code><code class="sig-name descname">HandleException</code><a class="reference internal" href="../_modules/autoflow/utils/sys.html#HandleException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.HandleException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>异常处理记录类</p>
-<dl class="py method">
-<dt id="autoflow.utils.sys.HandleException.handle">
-<em class="property">classmethod </em><code class="sig-name descname">handle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.8)">Exception</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/sys.html#HandleException.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.HandleException.handle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.sys.get_info">
-<code class="sig-prename descclassname">autoflow.utils.sys.</code><code class="sig-name descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/sys.html#get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.get_info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.sys.get_log_dir">
-<code class="sig-prename descclassname">autoflow.utils.sys.</code><code class="sig-name descname">get_log_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/sys.html#get_log_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.get_log_dir" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.sys.get_trance_back_msg">
-<code class="sig-prename descclassname">autoflow.utils.sys.</code><code class="sig-name descname">get_trance_back_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/sys.html#get_trance_back_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.get_trance_back_msg" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="autoflow.utils.sys.print_run">
-<code class="sig-prename descclassname">autoflow.utils.sys.</code><code class="sig-name descname">print_run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmd</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoflow/utils/sys.html#print_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autoflow.utils.sys.print_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="autoflow-utils-sys-module">
+<h2>autoflow.utils.sys module<a class="headerlink" href="#autoflow-utils-sys-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-autoflow.utils.typing_">
 <span id="autoflow-utils-typing-module"></span><h2>autoflow.utils.typing_ module<a class="headerlink" href="#module-autoflow.utils.typing_" title="Permalink to this headline">¶</a></h2>

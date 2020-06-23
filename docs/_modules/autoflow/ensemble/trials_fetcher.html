@@ -168,7 +168,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for autoflow.ensemble.trials_fetcher</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">autoflow.manager.resource_manager</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
+<span></span><span class="kn">from</span> <span class="nn">autoflow.resource_manager.base</span> <span class="kn">import</span> <span class="n">ResourceManager</span>
 <span class="kn">from</span> <span class="nn">autoflow.utils.klass</span> <span class="kn">import</span> <span class="n">StrSignatureMixin</span>
 
 
@@ -201,9 +201,30 @@
 <div class="viewcode-block" id="GetBestK.fetch"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.trials_fetcher.GetBestK.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span>
-        <span class="n">fetched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">_get_best_k_trial_ids</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">init_trial_table</span><span class="p">()</span>
+        <span class="n">fetched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">_get_best_k_trial_ids</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
+        <span class="p">)</span>
         <span class="c1"># self.resource_manager.close_trials_db()</span>
         <span class="k">return</span> <span class="n">fetched</span></div></div>
+
+
+<div class="viewcode-block" id="GetSpecificTrials"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.trials_fetcher.GetSpecificTrials">[docs]</a><span class="k">class</span> <span class="nc">GetSpecificTrials</span><span class="p">(</span><span class="n">TrialsFetcher</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">resource_manager</span><span class="p">:</span> <span class="n">ResourceManager</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">hdl_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">trial_ids</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GetSpecificTrials</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">resource_manager</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">hdl_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trial_ids</span> <span class="o">=</span> <span class="n">trial_ids</span>
+
+<div class="viewcode-block" id="GetSpecificTrials.fetch"><a class="viewcode-back" href="../../../_module/autoflow.ensemble.html#autoflow.ensemble.trials_fetcher.GetSpecificTrials.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># todo: 校验？</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="o">.</span><span class="n">hdl_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdl_id</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_ids</span></div></div>
 </pre></div>
 
            </div>
