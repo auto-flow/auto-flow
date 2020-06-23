@@ -29,6 +29,7 @@ class ML_Workflow(Pipeline):
         self._validate_steps()
         self.intermediate_result = {}
         self.logger = get_logger(self)
+        self.fitted = False
 
     @property
     def is_estimator(self):
@@ -67,10 +68,9 @@ class ML_Workflow(Pipeline):
             "X_test": X_test,
             "X_valid": X_valid,
         }
-        for (step_idx,
-             step_name,
-             transformer) in self._iter(with_final=(not self.is_estimator),
-                                        filter_passthrough=False):
+        for (step_idx, step_name, transformer) in self._iter(
+                with_final=(not (fit_final_estimator and self.is_estimator)),
+                filter_passthrough=False):
             # todo : 做中间结果的存储
             cache_intermediate = False
             hyperparams = {}
@@ -138,18 +138,33 @@ class ML_Workflow(Pipeline):
 
             self.last_data = result
             self.steps[step_idx] = (step_name, fitted_transformer)
-        if fit_final_estimator and self.is_estimator:
+        if (fit_final_estimator and self.is_estimator):
             # self._final_estimator.resource_manager = self.resource_manager
             self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
             # self._final_estimator.resource_manager = None
+        self.fitted = True
         return self
 
     def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
         return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test). \
             transform(X_train, X_valid, X_test, y_train)
 
-    def procedure(self, ml_task: MLTask, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None):
-        self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+    def procedure(
+            self, ml_task: MLTask, X_train, y_train, X_valid=None, y_valid=None,
+            X_test=None, y_test=None, max_iter=-1
+    ):
+        if max_iter > 0:
+            # set final model' max_iter param
+            self[-1].set_max_iter(max_iter)
+        if max_iter > 0 and self.fitted:
+            self.last_data = self.transform(X_train, X_valid, X_test, y_train)
+            self[-1].fit(
+                self.last_data.get("X_train"), self.last_data.get("y_train"),
+                self.last_data.get("X_valid"),y_valid,
+                self.last_data.get("X_test"), y_test
+            )
+        else:
+            self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         X_train = self.last_data["X_train"]
         y_train = self.last_data["y_train"]
         X_valid = self.last_data.get("X_valid")

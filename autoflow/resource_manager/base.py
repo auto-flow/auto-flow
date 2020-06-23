@@ -34,6 +34,7 @@ from autoflow.utils.ml_task import MLTask
 from generic_fs import FileSystem
 from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, create_database
 from generic_fs.utils.fs import get_file_system
+from . import cache as cache_module
 
 
 def get_field_of_type(type_, df, column):
@@ -81,7 +82,9 @@ class ResourceManager(StrSignatureMixin):
             user_id=0,
             search_record_db_name="autoflow",
             dataset_table_db_name="autoflow_dataset",
-            del_local_log_path=True
+            del_local_log_path=True,
+            cache_system="FsCache",
+            cache_system_params=frozendict(),
     ):
         '''
 
@@ -122,6 +125,8 @@ class ResourceManager(StrSignatureMixin):
         compress_suffix: str
             compress file's suffix, default is bz2
         '''
+        self.cache_system_params = dict(cache_system_params)
+        self.cache_system = cache_system
         self.del_local_log_path = del_local_log_path
         self.dataset_table_db_name = dataset_table_db_name
         self.search_record_db_name = search_record_db_name
@@ -178,6 +183,8 @@ class ResourceManager(StrSignatureMixin):
         # None means didn't create database
         self._dataset_db_name = None
         self._record_db_name = None
+        # --cache system---------------------------------
+        self.cache: cache_module.BaseCache = getattr(cache_module, self.cache_system)(self, **self.cache_system_params)
 
     def close_all(self):
         self.close_redis()
@@ -1040,10 +1047,10 @@ class ResourceManager(StrSignatureMixin):
                                          info)
 
     def _get_sorted_trial_records(self, task_id, user_id, limit):
-        max_budget=self.TrialModel.select(pw.fn.MAX(self.TrialModel.budget).alias("max_budget")).where(
+        max_budget = self.TrialModel.select(pw.fn.MAX(self.TrialModel.budget).alias("max_budget")).where(
             (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
         )[0].max_budget
-        records = self.TrialModel.select(self.TrialModel.trial_id).where(
+        records = self.TrialModel.select().where(  # select *
             (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
             & (self.TrialModel.budget == max_budget)
         ).order_by(self.TrialModel.loss, self.TrialModel.cost_time).limit(limit).dicts()
@@ -1067,7 +1074,7 @@ class ResourceManager(StrSignatureMixin):
     def _get_best_k_trial_ids(self, task_id, user_id, k):
         # self.init_trial_table()
         trial_ids = []
-        max_budget=self.TrialModel.select(pw.fn.MAX(self.TrialModel.budget).alias("max_budget")).where(
+        max_budget = self.TrialModel.select(pw.fn.MAX(self.TrialModel.budget).alias("max_budget")).where(
             (self.TrialModel.task_id == task_id) & (self.TrialModel.user_id == user_id)
         )[0].max_budget
         records = self.TrialModel.select(self.TrialModel.trial_id).where(

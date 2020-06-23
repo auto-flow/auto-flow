@@ -17,6 +17,7 @@
       "n_estimators": 5000,
 //      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
+      "bootstrap_type": "MVS",
       "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
       "border_count": {"_type": "int_loguniform","_value": [1,1000], "_default": 1},
       "early_stopping_rounds": 250,
@@ -220,11 +221,10 @@
       "fit_intercept": true
     },
     "catboost": {
-//      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
       "n_estimators": 5000,
-//      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
+      "bootstrap_type": "MVS",
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
       "border_count": {"_type": "int_loguniform","_value": [1,1000], "_default": 1},

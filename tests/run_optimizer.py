@@ -14,8 +14,8 @@ pipe = AutoFlowClassifier(
         "num->target": [
             # "liblinear_svc", "libsvm_svc", "logistic_regression"
             # "random_forest",
-            "liblinear_svc",
-            # "logistic_regression"
+            # "catboost",
+            "logistic_regression"
         ]
     },
     random_state=0,

@@ -1,3 +1,4 @@
+from autoflow.workflow.components.base import BoostingModelMixin
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 from autoflow.workflow.components.utils import get_categorical_features_indices
 from autoflow.utils.data import to_array
@@ -5,7 +6,7 @@ from autoflow.utils.data import to_array
 __all__ = ["LGBMClassifier"]
 
 
-class LGBMClassifier(AutoFlowClassificationAlgorithm):
+class LGBMClassifier(AutoFlowClassificationAlgorithm, BoostingModelMixin):
     class__ = "LGBMClassifier"
     module__ = "lightgbm"
 

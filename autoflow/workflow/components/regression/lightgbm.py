@@ -1,9 +1,10 @@
+from autoflow.workflow.components.base import BoostingModelMixin
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
 __all__ = ["LGBMRegressor"]
 
 
-class LGBMRegressor(AutoFlowRegressionAlgorithm):
+class LGBMRegressor(AutoFlowRegressionAlgorithm, BoostingModelMixin):
     class__ = "LGBMRegressor"
     module__ = "lightgbm"
 

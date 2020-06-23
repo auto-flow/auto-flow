@@ -2,13 +2,14 @@ from copy import deepcopy
 from typing import Dict
 
 from autoflow.data_container import DataFrameContainer
+from autoflow.workflow.components.base import BoostingModelMixin
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 import numpy as np
 
 __all__ = ["CatBoostClassifier"]
 
 
-class CatBoostClassifier(AutoFlowClassificationAlgorithm):
+class CatBoostClassifier(AutoFlowClassificationAlgorithm, BoostingModelMixin):
     class__ = "CatBoostClassifier"
     module__ = "catboost"
 

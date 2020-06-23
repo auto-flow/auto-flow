@@ -25,11 +25,13 @@ def implement_subsample_budget(
         budget, random_state: int
 ) -> Tuple[DataFrameContainer, NdArrayContainer, List[Optional[DataFrameContainer]]]:
     rng = np.random.RandomState(random_state)
-    samples = int(X_train.shape[0] * budget)
+    samples = round(X_train.shape[0] * budget)
     features = X_train.shape[1]
     sub_sample_index = get_stratified_sampling_index(y_train.data, budget, random_state)
+    # sub sampling X_train, y_train
     X_train = X_train.sub_sample(sub_sample_index)
     y_train = y_train.sub_sample(sub_sample_index)
+    # if features > samples , do sub_feature avoid over-fitting
     if features > samples:
         sub_feature_index = rng.permutation(X_train.shape[1])[:samples]
         X_train = X_train.sub_feature(sub_feature_index)

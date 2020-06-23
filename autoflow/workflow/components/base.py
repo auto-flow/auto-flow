@@ -143,8 +143,9 @@ class AutoFlowComponent(BaseEstimator):
         X_valid_ = self.before_fit_X(X_valid)
         y_valid_ = self.before_fit_y(y_valid)
         # 对代理的estimator进行预处理
-        self.component = self.after_process_estimator(self.component, X_train_, y_train_, X_valid_,
-                                                      y_valid_, X_test_, y_test_)
+        if not self.is_fit:
+            self.component = self.after_process_estimator(self.component, X_train_, y_train_, X_valid_,
+                                                          y_valid_, X_test_, y_test_)
         # todo: 测试特征全部删除的情况
         if len(X_train.shape) > 1 and X_train.shape[1] > 0:
             self.component = self._fit(self.component, X_train_, y_train_, X_valid_,
@@ -238,8 +239,33 @@ class AutoFlowIterComponent(AutoFlowComponent):
     iterations_name = "n_estimators"
     support_early_stopping = True
 
+    def __init__(self, **kwargs):
+        super(AutoFlowIterComponent, self).__init__(**kwargs)
+        # 迭代式地训练，并引入早停机制
+        if not hasattr(self, "iter_inc"):
+            self.iter_inc = 10
+        if not hasattr(self, "early_stopping_rounds"):
+            self.early_stopping_rounds = 20
+        self.performance_history = np.full(self.early_stopping_rounds, -np.inf)
+        self.iteration_history = np.full(self.early_stopping_rounds, 0, dtype="int32")
+        # https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.learning_curve.html#sklearn.model_selection.learning_curve
+        self.fit_times = 0
+        self.score_times = 0
+        self.learning_curve = [
+            [],  # train_sizes_abs [0]
+            [],  # train_scores    [1]
+            [],  # test_scores     [2]
+            [],  # fit_times       [3]
+            [],  # score_times     [4]
+        ]
+        N = len(self.performance_history)
+        self.best_estimators = np.zeros([N], dtype="object")
+        self.iter_ix = 0
+        self.backup_component = None
+        self.should_early_stopping = False
+
     @ignore_warnings(category=ConvergenceWarning)
-    def iterative_fit(self, X, y, X_valid, y_valid, iter_inc):
+    def iterative_fit(self, X, y, X_valid, y_valid):
         s = time()
         self.component.fit(X, y)
         self.fit_times += time() - s
@@ -261,52 +287,46 @@ class AutoFlowIterComponent(AutoFlowComponent):
                 self.performance_history[index] = test_performance
                 self.iteration_history[index] = self.iteration
             else:
-                self.fully_fitted_ = True
-                # todo: choose maximal performance, minimal iteration
-                index = int(np.lexsort((self.iteration_history, -self.performance_history))[0])
-                self.best_iteration_ = self.iteration_history[index]
-                setattr(self, self.iterations_name, self.best_iteration_)
-                # index = np.argmax(self.performance_history)
-                best_estimator = self.best_estimators[index]
-                self.best_estimators = None
-                self.component = best_estimator
-        if not self.fully_fitted:
-            self.iteration_ = getattr(self.component, self.iterations_name)
-            self.iteration_ += iter_inc
-            self.iteration_ = min(self.iteration_, self.max_iterations)
-            setattr(self.component, self.iterations_name, self.iteration_)
+                self.should_early_stopping = True
+
+    @property
+    def is_fully_fitted(self):
+        if (self.iteration_ >= self.max_iterations):
+            self.logger.info(
+                f"{self.__class__.__name__}'s next iteration "
+                f"{self.iteration_ + self.iter_inc} is greater than max iterations {self.max_iterations}.")
+            return True
+        elif (self.should_early_stopping):
+            self.logger.info(
+                f"{self.__class__.__name__} is early stopping because "
+                f"validation-set performance no longer improves.")
+            return True
+        else:
+            return False
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None):
-        # 迭代式地训练，并引入早停机制
-        iter_inc = getattr(self, "iter_inc", 10)
-        early_stopping_rounds = getattr(self, "early_stopping_rounds", 20)
-        self.performance_history = np.full(early_stopping_rounds, -np.inf)
-        self.iteration_history = np.full(early_stopping_rounds, -np.inf)
-        # https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.learning_curve.html#sklearn.model_selection.learning_curve
-        self.fit_times = 0
-        self.score_times = 0
-        self.learning_curve = [
-            [],  # train_sizes_abs [0]
-            [],  # train_scores    [1]
-            [],  # test_scores     [2]
-            [],  # fit_times       [3]
-            [],  # score_times     [4]
-        ]
-        N = len(self.performance_history)
-        self.best_estimators = np.zeros([N], dtype="object")
-
-        self.iter_ix = 0
-        while not self.fully_fitted:
-            self.iterative_fit(X, y, X_valid, y_valid, iter_inc)
+        if self.backup_component is not None:
+            self.component = self.backup_component
+        while True:
+            self.iterative_fit(X, y, X_valid, y_valid)
+            if self.is_fully_fitted:
+                break
+            self.iteration_ = getattr(self.component, self.iterations_name)
+            self.iteration_ += self.iter_inc
+            # self.iteration_ = min(self.iteration_, self.max_iterations)
+            setattr(self.component, self.iterations_name, int(self.iteration_))
             self.iter_ix += 1
+        # todo: choose maximal performance, minimal iteration
+        index = int(np.lexsort((self.iteration_history, -self.performance_history))[0])
+        self.best_iteration_ = int(self.iteration_history[index])
+        setattr(self, self.iterations_name, self.best_iteration_)
+        best_estimator = self.best_estimators[index]
+        self.backup_component = self.component
+        self.component = best_estimator
+        # index = np.argmax(self.performance_history)
+        # self.best_estimators = None
         return self.component
-
-    @property
-    def fully_fitted(self) -> bool:
-        if self.iteration > self.max_iterations:
-            return True
-        return getattr(self, "fully_fitted_", False)
 
     @property
     def max_iterations(self):
@@ -327,3 +347,21 @@ class AutoFlowIterComponent(AutoFlowComponent):
         hyperparams[self.iterations_name] = iter_inc
         self.iteration_ = iter_inc
         return hyperparams
+
+    def set_max_iter(self, max_iter):
+        max_iter = int(max_iter)
+        self.hyperparams[self.iterations_name] = max_iter
+        self.set_addition_info({self.iterations_name: max_iter})
+        self.max_iterations_ = max_iter
+
+    def finish_fitting(self):
+        self.best_estimators = None
+
+
+class BoostingModelMixin():
+    def set_max_iter(self, max_iter):
+        max_iter = int(max_iter)
+        if self.component is None:
+            self.hyperparams["n_estimators"] = max_iter
+        else:
+            self.component.n_estimators = max_iter

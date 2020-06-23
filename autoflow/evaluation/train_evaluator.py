@@ -9,8 +9,8 @@ from typing import Dict, Optional, List
 import numpy as np
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
-    SUBSAMPLES_BUDGET_MODE
-from autoflow.data_container import DataFrameContainer
+    SUBSAMPLES_BUDGET_MODE, ITERATIONS_BUDGET_MODE
+from autoflow.data_container import DataFrameContainer, NdArrayContainer
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.budget import implement_subsample_budget
@@ -25,6 +25,7 @@ from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline
 from autoflow.utils.sys_ import get_trance_back_msg
+from autoflow.workflow.components.base import AutoFlowIterComponent
 from autoflow.workflow.ml_workflow import ML_Workflow
 
 
@@ -122,13 +123,23 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def evaluate(self, model: ML_Workflow, X, y, X_test, y_test, budget):
+    def evaluate(self, config_id, model: ML_Workflow, X, y, X_test, y_test, budget):
         warning_info = StringIO()
         additional_info = {}
-        support_early_stopping = getattr(model.steps[-1][1], "support_early_stopping", False)
-        budget_mode = self.algo2budget_mode[model.steps[-1][1].__class__.__name__]
+        final_model = model[-1]
+        final_model_name = final_model.__class__.__name__
+        support_early_stopping = getattr(final_model, "support_early_stopping", False)
+        budget_mode = self.algo2budget_mode[final_model_name]
+        is_iter_algo = self.algo2iter.get(final_model_name) is not None
+        max_iter = -1
+        # if final model is iterative algorithm, max_iter should be specified
+        if is_iter_algo:
+            if budget_mode == ITERATIONS_BUDGET_MODE:
+                fraction = min(1, budget)
+            else:
+                fraction = 1
+            max_iter = max(round(self.algo2iter[final_model_name] * fraction), 1)
         with redirect_stderr(warning_info):
-            # splitter 必须存在
             losses = []
             models = []
             y_true_indexes = []
@@ -141,7 +152,6 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             start_time = datetime.datetime.now()
             confusion_matrices = []
             best_iterations = []
-            # todo： 实现budget
             for fold_ix, (train_index, valid_index) in enumerate(self.splitter.split(X.data, y.data, self.groups)):
                 cloned_model = model.copy()
                 X: DataFrameContainer
@@ -149,24 +159,36 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 X_valid = X.sub_sample(valid_index)
                 y_train = y.sub_sample(train_index)
                 y_valid = y.sub_sample(valid_index)
+                # subsamples budget_mode.
                 if fold_ix == 0 and budget_mode == SUBSAMPLES_BUDGET_MODE and budget < 1:
                     X_train, y_train, (X_valid, X_test) = implement_subsample_budget(
                         X_train, y_train, [X_valid, X_test],
                         budget, self.random_state
                     )
+                cache_key = self.get_cache_key(config_id, X_train, y_train)
+                cached_model = self.resource_manager.cache.get(cache_key)
+                if cached_model is not None:
+                    cloned_model = cached_model
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
                 try:
-                    procedure_result = cloned_model.procedure(self.ml_task, X_train, y_train, X_valid, y_valid,
-                                                              X_test, y_test)
+                    procedure_result = cloned_model.procedure(
+                        self.ml_task, X_train, y_train, X_valid, y_valid,
+                        X_test, y_test, max_iter
+                    )
                 except Exception as e:
                     self.logger.error(str(e))
                     failed_info = get_trance_back_msg()
-                    status = "FAILED"
+                    status = "FAILED"  # todo: 实现 timeout， memory out
                     if self.debug:
                         self.logger.error("re-raise exception")
                         raise sys.exc_info()[1]
                     break
+                # save model as cache
+                if (budget_mode == ITERATIONS_BUDGET_MODE and budget <= 1 and
+                    isinstance(final_model, AutoFlowIterComponent)) or \
+                        (budget == 1):
+                    self.resource_manager.cache.set(cache_key, cloned_model)
                 intermediate_results.append(cloned_model.intermediate_result)
                 models.append(cloned_model)
                 y_true_indexes.append(valid_index)
@@ -176,6 +198,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     confusion_matrices.append(calculate_confusion_matrix(y_valid.data, y_pred))
                 if support_early_stopping:
                     estimator = cloned_model.steps[-1][1]
+                    # todo: 重构 LGBM等
                     best_iterations.append(getattr(
                         estimator, "best_iteration_", getattr(estimator.component, "best_iteration_", -1)))
                 y_preds.append(y_pred)
@@ -184,9 +207,13 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 loss, all_score = self.loss(y_valid.data, y_pred)  # todo: 非1d-array情况下的用户自定义评估器
                 losses.append(float(loss))
                 all_scores.append(all_score)
+                # when  budget  <= 1 , hold out validation
                 if fold_ix == 0 and budget <= 1:
                     break
-                if budget > 1 and fold_ix == self.budget2kfold[budget]:
+                # when  budget  > 1 , budget will be interpreted as kfolds num by 'budget2kfold'
+                # for example, budget = 4 , budget2kfold = {4: 10}, we only do 10 times cross-validation,
+                # so we break when fold_ix == 10 - 1 == 9
+                if budget > 1 and fold_ix == self.budget2kfold[budget] - 1:
                     break
             if self.ml_task.mainTask == "classification":
                 additional_info["confusion_matrices"] = confusion_matrices
@@ -270,7 +297,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         X_train, y_train, X_test, y_test = self.get_Xy()
         # todo: iter budget类型的支持
         # 3. 进行评价
-        info = self.evaluate(model, X_train, y_train, X_test, y_test, budget)
+        info = self.evaluate(config_id, model, X_train, y_train, X_test, y_test, budget)
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id
@@ -393,3 +420,6 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             component
         ])
         return pipeline_list
+
+    def get_cache_key(self, config_id, X_train: DataFrameContainer, y_train: NdArrayContainer):
+        return "-".join([config_id, X_train.get_hash(), y_train.get_hash()])
