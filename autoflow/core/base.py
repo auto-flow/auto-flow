@@ -82,6 +82,7 @@ class AutoFlowEstimator(BaseEstimator):
             should_finally_fit: bool = False,
             should_calc_all_metrics: bool = True,
             should_stack_X: bool = True,
+            debug_evaluator: bool = False,
             **kwargs
     ):
         '''
@@ -137,6 +138,7 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        self.debug_evaluator = debug_evaluator
         self.only_use_subsamples_budget_mode = only_use_subsamples_budget_mode
         if algo2iter is None:
             algo2iter = get_default_algo2iter()
@@ -414,11 +416,13 @@ class AutoFlowEstimator(BaseEstimator):
             budget2kfold=self.budget2kfold,
             algo2budget_mode=self.algo2budget_mode,
             algo2iter=self.algo2iter,
+            max_budget=self.max_budget,
             nameserver=self.ns_host,
             nameserver_port=self.ns_port,
             host=worker_host,
             worker_id=worker_id,
-            timeout=None
+            timeout=None,
+            debug=self.debug_evaluator,
         )
         self.worker_cnt += 1
         self.evaluators.append(evaluator)
@@ -711,6 +715,7 @@ class AutoFlowEstimator(BaseEstimator):
             self,
             task_id=None,
             hdl_id=None,
+            budget_id=None,
             trials_fetcher="GetBestK",
             trials_fetcher_params=frozendict(k=10),
             ensemble_type="stack",
@@ -726,8 +731,10 @@ class AutoFlowEstimator(BaseEstimator):
             task_id = self.resource_manager.task_id
         self.task_id = task_id
         self.hdl_id = hdl_id
+        self.budget_id=budget_id
         self.resource_manager.task_id = task_id
         self.resource_manager.hdl_id = hdl_id
+        self.resource_manager.budget_id=budget_id
         if fit_ensemble_alone:
             setup_logger(self.log_path, self.log_config)
             if fit_ensemble_alone:

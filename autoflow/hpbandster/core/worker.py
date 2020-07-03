@@ -2,6 +2,7 @@ import multiprocessing
 import os
 import pickle
 import socket
+import sys
 import threading
 import time
 import traceback
@@ -10,6 +11,7 @@ from uuid import uuid4
 import Pyro4
 
 from autoflow.utils.logging_ import get_logger
+from autoflow.utils.sys_ import get_trance_back_msg
 
 
 class Worker(object):
@@ -29,7 +31,8 @@ class Worker(object):
             nameserver_port=None,
             host=None,
             worker_id=None,
-            timeout=None
+            timeout=None,
+            debug=False
     ):
         """
 
@@ -53,6 +56,7 @@ class Worker(object):
             a timeout that is roughly half the time it would take for the second largest budget to finish.
             The default (None) means that the worker will wait indefinitely and never shutdown on its own.
         """
+        self.debug = debug
         self.run_id = run_id
         self.host = host
         self.nameserver = nameserver
@@ -218,8 +222,13 @@ class Worker(object):
             result = {'result': self.compute(*args, config_id=config_id, **kwargs),
                       'exception': None}
         except Exception as e:
+            self.logger.error(str(e))
+            failed_info = get_trance_back_msg()
+            if self.debug:
+                self.logger.error("re-raise exception")
+                raise sys.exc_info()[1]
             result = {'result': None,
-                      'exception': traceback.format_exc()}
+                      'exception': failed_info}
         finally:
             self.logger.debug('WORKER: done with job %s, trying to register it.' % str(config_id))
             with self.thread_cond:

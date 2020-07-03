@@ -10,9 +10,9 @@ from autoflow import ResourceManager
 rm = ResourceManager()
 result, _, _ = rm.get_result_from_trial_table(
     task_id="2435e32babd7d09b6357e99aa7fa3b89",
-    hdl_id="f289af8e23544a108bba6c8bc99673c3",
+    hdl_id="5bd41e3199cfd0b28ffc36d5dfd42636",
     user_id=0,
-    budget_id="410cc77e823f11113afae5e323429d91",
+    budget_id="afff102b36a43efe4f68e299ff21cadd",
 )
 
 # get all executed runs

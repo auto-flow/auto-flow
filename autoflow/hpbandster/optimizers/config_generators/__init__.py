@@ -1,2 +1,3 @@
 from autoflow.hpbandster.optimizers.config_generators.random_sampling import RandomSampling
 from autoflow.hpbandster.optimizers.config_generators.bohb import BOHB
+from autoflow.hpbandster.optimizers.config_generators.bocg import BayesianOptimizationConfigGenerator

@@ -21,7 +21,7 @@ class RandomSampling(BaseConfigGenerator):
             see  hyperband.config_generators.base.BaseConfigGenerator for additional arguments
         """
 
-        super().__init__(**kwargs)
+        super().__init__()
         self.configspace = configspace
 
 

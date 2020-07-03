@@ -17,7 +17,7 @@ y_test_ = NdArrayContainer(dataset_instance=y_test)
 pipe = AutoFlowClassifier()
 estimator = pipe.fit_ensemble(
     task_id="2435e32babd7d09b6357e99aa7fa3b89",
-    hdl_id="f289af8e23544a108bba6c8bc99673c3",
+    budget_id="afff102b36a43efe4f68e299ff21cadd",
     trials_fetcher_params={"k": 50}
 )
 # pipe.fit(X_train, y_train, fit_ensemble_params=False)

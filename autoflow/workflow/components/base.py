@@ -299,7 +299,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
         elif (self.should_early_stopping):
             self.logger.info(
                 f"{self.__class__.__name__} is early stopping because "
-                f"validation-set performance no longer improves.")
+                f"valid-set performance no longer improves. max_iter = {self.max_iterations}.")
             return True
         else:
             return False
@@ -354,7 +354,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
         self.set_addition_info({self.iterations_name: max_iter})
         self.max_iterations_ = max_iter
 
-    def finish_fitting(self):
+    def finish_evaluation(self):
         self.best_estimators = None
 
 
@@ -365,3 +365,6 @@ class BoostingModelMixin():
             self.hyperparams["n_estimators"] = max_iter
         else:
             self.component.n_estimators = max_iter
+
+    def finish_evaluation(self):
+        pass

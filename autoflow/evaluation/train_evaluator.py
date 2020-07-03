@@ -25,7 +25,6 @@ from autoflow.utils.ml_task import MLTask
 from autoflow.utils.packages import get_class_object_in_pipeline_components
 from autoflow.utils.pipeline import concat_pipeline
 from autoflow.utils.sys_ import get_trance_back_msg
-from autoflow.workflow.components.base import AutoFlowIterComponent
 from autoflow.workflow.ml_workflow import ML_Workflow
 
 
@@ -47,15 +46,18 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             budget2kfold: Optional[Dict[float, int]] = None,
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
+            max_budget: float = np.inf,
             nameserver=None,
             nameserver_port=None,
             host=None,
             worker_id=None,
             timeout=None,
+            debug: bool = False,
     ):
         super(TrainEvaluator, self).__init__(
-            run_id, nameserver, nameserver_port, host, worker_id, timeout
+            run_id, nameserver, nameserver_port, host, worker_id, timeout, debug
         )
+        self.max_budget = max_budget
         self.algo2iter = algo2iter
         self.algo2budget_mode = algo2budget_mode
         self.budget2kfold = budget2kfold
@@ -77,7 +79,6 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         self.random_state = random_state
         self.run_id = run_id
         # ---member variable----
-        self.debug = False
         self.ml_task: MLTask = self.data_manager.ml_task
         if self.ml_task.mainTask == "regression":
             self.predict_function = self._predict_regression
@@ -174,7 +175,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 try:
                     procedure_result = cloned_model.procedure(
                         self.ml_task, X_train, y_train, X_valid, y_valid,
-                        X_test, y_test, max_iter
+                        X_test, y_test, max_iter, budget, (budget == self.max_budget)
                     )
                 except Exception as e:
                     self.logger.error(str(e))
@@ -185,9 +186,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                         raise sys.exc_info()[1]
                     break
                 # save model as cache
-                if (budget_mode == ITERATIONS_BUDGET_MODE and budget <= 1 and
-                    isinstance(final_model, AutoFlowIterComponent)) or \
-                        (budget == 1):
+                if (budget_mode == ITERATIONS_BUDGET_MODE and budget <= 1) or \
+                        (budget == 1):  # and isinstance(final_model, AutoFlowIterComponent)
                     self.resource_manager.cache.set(cache_key, cloned_model)
                 intermediate_results.append(cloned_model.intermediate_result)
                 models.append(cloned_model)
@@ -309,7 +309,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         # info["program_hyper_param"] = shp
         info["dict_hyper_param"] = dhp
         estimator = list(dhp.get(PHASE2, {"unk": ""}).keys())[0]
-        info["component"] = estimator
+        info["estimator"] = estimator
         info["cost_time"] = cost_time
         # info["additional_info"].update({
         #     "config_origin": getattr(shp, "origin", "unk")

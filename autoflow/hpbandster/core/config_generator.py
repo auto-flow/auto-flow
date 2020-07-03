@@ -1,13 +1,16 @@
 import logging
 import traceback
 
+from autoflow.utils.logging_ import get_logger
+
+
 class BaseConfigGenerator(object):
     """
     The config generator determines how new configurations are sampled. This can take very different levels of
     complexity, from random sampling to the construction of complex empirical prediction models for promising
     configurations.
     """
-    def __init__(self, logger=None):
+    def __init__(self):
         """
         Parameters
         ----------
@@ -23,10 +26,7 @@ class BaseConfigGenerator(object):
 
         """
 
-        if logger is None:
-            self.logger=logging.getLogger('hpbandster')
-        else:
-            self.logger=logger
+        self.logger=get_logger(self)
 
     def get_config(self, budget):
         """

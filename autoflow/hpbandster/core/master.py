@@ -255,19 +255,20 @@ class Master(object):
         with self.thread_cond:
             self.logger.debug('job_callback for %s got condition' % str(job.id))
             self.num_running_jobs -= 1
-            budget = job.kwargs["budget"]
-            challenger = job.kwargs["config"]
-            challenger_performance = job.result["loss"]
-            incumbent_performance = self.incumbent_performances[budget]
-            incumbent = self.incumbents[budget]
-            if challenger_performance < incumbent_performance:
-                if np.isfinite(self.incumbent_performances[budget]):
-                    print_incumbent_trajectory(
-                        challenger_performance, incumbent_performance,
-                        challenger, incumbent, budget
-                    )
-                self.incumbent_performances[budget] = challenger_performance
-                self.incumbents[budget] = challenger
+            if job.result is not None:
+                budget = job.kwargs["budget"]
+                challenger = job.kwargs["config"]
+                challenger_performance = job.result["loss"]
+                incumbent_performance = self.incumbent_performances[budget]
+                incumbent = self.incumbents[budget]
+                if challenger_performance < incumbent_performance:
+                    if np.isfinite(self.incumbent_performances[budget]):
+                        print_incumbent_trajectory(
+                            challenger_performance, incumbent_performance,
+                            challenger, incumbent, budget
+                        )
+                    self.incumbent_performances[budget] = challenger_performance
+                    self.incumbents[budget] = challenger
             if not self.result_logger is None:
                 self.result_logger(job)
             self.iterations[job.id[0]].register_result(job)

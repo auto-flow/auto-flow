@@ -30,6 +30,10 @@ class ML_Workflow(Pipeline):
         self.intermediate_result = {}
         self.logger = get_logger(self)
         self.fitted = False
+        self.budget = 0
+
+    def set_budget(self, budget):
+        self.budget = budget
 
     @property
     def is_estimator(self):
@@ -151,20 +155,25 @@ class ML_Workflow(Pipeline):
 
     def procedure(
             self, ml_task: MLTask, X_train, y_train, X_valid=None, y_valid=None,
-            X_test=None, y_test=None, max_iter=-1
+            X_test=None, y_test=None, max_iter=-1, budget=0, should_finish_evaluation=False
     ):
         if max_iter > 0:
             # set final model' max_iter param
             self[-1].set_max_iter(max_iter)
-        if max_iter > 0 and self.fitted:
+        # 高budget的模型不能在低budget时刻被加载
+        if self.fitted and self.budget <= budget:
             self.last_data = self.transform(X_train, X_valid, X_test, y_train)
-            self[-1].fit(
-                self.last_data.get("X_train"), self.last_data.get("y_train"),
-                self.last_data.get("X_valid"),y_valid,
-                self.last_data.get("X_test"), y_test
-            )
+            if max_iter > 0:
+                self[-1].fit(
+                    self.last_data.get("X_train"), self.last_data.get("y_train"),
+                    self.last_data.get("X_valid"), y_valid,
+                    self.last_data.get("X_test"), y_test
+                )
         else:
             self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+        self.set_budget(budget)
+        if max_iter>0 and should_finish_evaluation:
+            self[-1].finish_evaluation()
         X_train = self.last_data["X_train"]
         y_train = self.last_data["y_train"]
         X_valid = self.last_data.get("X_valid")

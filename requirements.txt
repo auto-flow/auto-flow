@@ -13,7 +13,7 @@ seaborn==0.9.0
 matplotlib==3.0.0
 ruamel.yaml==0.16.0
 scikit_learn==0.22.2
-psutil==5.5.1
+psutil>=5.5.1
 pynisher>=0.4.1
 imbalanced-learn==0.6.2
 sobol-seq==0.1.2

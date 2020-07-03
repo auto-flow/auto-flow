@@ -3,9 +3,11 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 from fractions import Fraction
-from typing import Dict
+from typing import Dict, Optional, Union
 
 import numpy as np
+from ConfigSpace import ConfigurationSpace, Constant, CategoricalHyperparameter, Configuration
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from autoflow.utils.logging_ import get_logger
 
@@ -44,3 +46,81 @@ def pprint_budget(budget: float):
         return str(int(budget))
     fraction = Fraction.from_float(budget)
     return f"{fraction.numerator}/{fraction.denominator}"
+
+
+class ConfigSpaceTransformer():
+    def __init__(self, impute: Optional[float] = -1, ohe: bool = True):
+        self.impute = impute
+        self.ohe = ohe
+
+    def fit(self, config_space: ConfigurationSpace):
+        mask = []
+        n_choices_list = []
+        n_constants = 0
+        n_variables = 0
+        n_top_levels = 0
+        for hp in config_space.get_hyperparameters():
+            if isinstance(hp, Constant) or (isinstance(hp, CategoricalHyperparameter) and len(hp.choices) == 1):
+                # ignore
+                mask.append(False)
+                n_constants += 1
+            else:
+                mask.append(True)
+                n_variables += 1
+                if isinstance(hp, CategoricalHyperparameter):
+                    n_choices_list.append(len(hp.choices))
+                else:
+                    n_choices_list.append(0)
+                parents = config_space.get_parents_of(hp.name)
+                if len(parents) == 0:
+                    n_top_levels += 1
+
+        self.mask = np.array(mask, dtype="bool")
+        self.n_choices_list = n_choices_list
+        self.n_constants = n_constants
+        self.n_variables = n_variables
+        self.n_top_levels = n_top_levels
+        # todo：判断n_parents
+        return self
+
+    def transform(self, vectors: np.ndarray) -> np.ndarray:
+        vectors = vectors[:, self.mask]
+        if self.ohe:
+            self.encoder=OneHotEncoder(self.n_choices_list)
+            vectors=self.encoder.fit_transform(vectors)
+
+        if self.impute is not None:
+            vectors[np.isnan(vectors)] = float(self.impute)
+        return vectors
+
+    def inverse_transform(self, array: np.ndarray) -> np.ndarray:
+        assert self.ohe == False
+        result = np.zeros([len(self.mask)])
+        result[self.mask] = array
+        return result
+
+
+class OneHotEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self, n_choices_list):
+        self.n_choices_list = n_choices_list
+
+    def fit(self, X=None, y=None):
+        assert len(self.n_choices_list) == X.shape[1]
+        return self
+
+    def transform(self, X):
+        assert len(self.n_choices_list) == X.shape[1]
+        N = X.shape[0]
+        result = np.ones(shape=(N, 0), dtype="float32")
+        for i, n_choices in enumerate(self.n_choices_list):
+            if n_choices == 0:
+                col_vector = X[:, i]
+            elif n_choices > 0:
+                col_vector = np.zeros(shape=(N, n_choices), dtype="float32")
+                mask = (~np.isnan(X[:, i]))
+                mask_vector = X[:, i][mask]
+                col_vector[mask] = np.eye(mask_vector)[mask_vector]
+            else:
+                raise ValueError
+            result = np.hstack((result, col_vector))
+        return result

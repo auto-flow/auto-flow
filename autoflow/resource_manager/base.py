@@ -16,7 +16,7 @@ from frozendict import frozendict
 # from playhouse.fields import PickleField
 from playhouse.reflection import generate_models
 from redis import Redis
-
+import joblib
 from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POOL_CLOSE_MSG, START_SAFE_CLOSE_MSG, \
     END_SAFE_CLOSE_MSG, ExperimentType
 from autoflow.data_manager import DataManager
@@ -301,22 +301,34 @@ class ResourceManager(StrSignatureMixin):
         record = self._get_trial_records_by_id(trial_id, self.task_id, self.user_id)[0]
         return record["dict_hyper_param"]
 
+    def _load_estimators_in_trials(self,record):
+        exists = True
+        if not self.file_system.exists(record["models_path"]):
+            exists = False
+            estimator=None
+        else:
+            estimator=self.file_system.load_pickle(record["models_path"])
+        if exists:
+            y_info = self.file_system.load_pickle(record["y_info_path"])
+            y_true_indexes=y_info["y_true_indexes"]
+            y_preds=y_info["y_preds"]
+            return estimator,y_true_indexes,y_preds
+        else:
+            return None
+
     def load_estimators_in_trials(self, trials: Union[List, Tuple]) -> Tuple[List, List, List]:
         self.init_trial_table()
         records = self._get_trial_records_by_ids(trials, self.task_id, self.user_id)
-        estimator_list = []
-        y_true_indexes_list = []
-        y_preds_list = []
-        for record in records:
-            exists = True
-            if not self.file_system.exists(record["models_path"]):
-                exists = False
-            else:
-                estimator_list.append(self.file_system.load_pickle(record["models_path"]))
-            if exists:
-                y_info = self.file_system.load_pickle(record["y_info_path"])
-                y_true_indexes_list.append(y_info["y_true_indexes"])
-                y_preds_list.append(y_info["y_preds"])
+        # 用多进程读入
+        with joblib.parallel_backend('loky', n_jobs=-1):
+            results = joblib.Parallel()(
+                joblib.delayed(self._load_estimators_in_trials)(record)
+                for record in records
+            )
+            results=[result  for result in results if result is not None]
+            estimator_list=[result[0] for result in results]
+            y_true_indexes_list=[result[1] for result in results]
+            y_preds_list=[result[2] for result in results]
         return estimator_list, y_true_indexes_list, y_preds_list
 
     # ----------runhistory------------------------------------------------------------------
@@ -1035,9 +1047,13 @@ class ResourceManager(StrSignatureMixin):
 
     def insert_trial_record(self, info: Dict):
         self.init_trial_table()
+        # fixme: 之所以如此苟是因为trial_id不可知
         config_id = info.get("config_id")
+        budget_id = self.budget_id
+        budget = str(info.get("budget"))
+        model_id = "-".join([config_id, budget_id, budget])
         models_path, finally_fit_model_path, y_info_path = \
-            self.persistent_evaluated_model(info, config_id)
+            self.persistent_evaluated_model(info, model_id)
         info.update(
             models_path=models_path,
             finally_fit_model_path=finally_fit_model_path,
@@ -1121,7 +1137,7 @@ class ResourceManager(StrSignatureMixin):
             budget_id=budget_id,  # new
             budget=info.get("budget", 0),  # new
             experiment_id=experiment_id,
-            estimator=info.get("component", ""),
+            estimator=info.get("estimator", ""),
             loss=info.get("loss", 65535),
             losses=info.get("losses", []),
             test_loss=info.get("test_loss", 65535),
