@@ -1,38 +1,11 @@
 import threading
-import logging
 import queue
 import time
 
 import Pyro4
 
+from autoflow.opt.structure import Job
 from autoflow.utils.logging_ import get_logger
-
-
-class Job(object):
-    def __init__(self, id, **kwargs):
-        self.id = id
-        
-        self.kwargs = kwargs
-        
-        self.timestamps = {}
-
-        self.result = None
-        self.exception = None
-        self.worker_name = None
-
-    def time_it(self, which_time):
-        self.timestamps[which_time] = time.time()
-
-    def __repr__(self):
-        return(\
-            "job_id: " +str(self.id) + "\n" + \
-            "kwargs: " + str(self.kwargs) + "\n" + \
-            "result: " + str(self.result)+ "\n" +\
-            "exception: "+ str(self.exception) + "\n"
-        )
-
-
-
 
 
 class Worker(object):
@@ -73,7 +46,7 @@ class Dispatcher(object):
         Parameters
         ----------
         new_result_callback: function
-            function that will be called with a `Job instance <hpbandster.core.dispatcher.Job>`_ as argument.
+            function that will be called with a `Job instance <opt.core.dispatcher.Job>`_ as argument.
             From the `Job` the result can be read and e.g. logged.
         run_id: str
             unique run_id associated with the HPB run
@@ -112,7 +85,7 @@ class Dispatcher(object):
         self.runner_cond = threading.Condition(self.thread_lock)
         self.discover_cond = threading.Condition(self.thread_lock)
 
-        self.pyro_id="hpbandster.run_%s.dispatcher"%self.run_id
+        self.pyro_id="opt.run_%s.dispatcher"%self.run_id
 
 
     def run(self):
@@ -186,7 +159,7 @@ class Dispatcher(object):
             update = False
         
             with Pyro4.locateNS(host=self.nameserver, port=self.nameserver_port) as ns:
-                worker_names = ns.list(prefix="hpbandster.run_%s.worker."%self.run_id)
+                worker_names = ns.list(prefix="opt.run_%s.worker."%self.run_id)
                 self.logger.debug("DISPATCHER: Found %i potential workers, %i currently in the pool."
                                   %(len(worker_names), len(self.worker_pool)))
                 

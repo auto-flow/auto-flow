@@ -61,7 +61,7 @@ class Worker(object):
         self.host = host
         self.nameserver = nameserver
         self.nameserver_port = nameserver_port
-        self.worker_id = "hpbandster.run_%s.worker.%s.%i" % (self.run_id, socket.gethostname(), os.getpid())
+        self.worker_id = "opt.run_%s.worker.%s.%i" % (self.run_id, socket.gethostname(), os.getpid())
         self.manifest_id = uuid4().hex[-8:]
         self.timeout = timeout
         self.timer = None
@@ -136,7 +136,7 @@ class Worker(object):
         try:
             with Pyro4.locateNS(host=self.nameserver, port=self.nameserver_port) as ns:
                 self.logger.debug('WORKER: Connected to nameserver %s' % (str(ns)))
-                dispatchers = ns.list(prefix="hpbandster.run_%s.dispatcher" % self.run_id)
+                dispatchers = ns.list(prefix="opt.run_%s.dispatcher" % self.run_id)
         except Pyro4.errors.NamingError:
             if self.thread is None:
                 raise RuntimeError(
@@ -203,7 +203,7 @@ class Worker(object):
         """
 
         raise NotImplementedError(
-            "Subclass hpbandster.distributed.worker and overwrite the compute method in your worker script")
+            "Subclass opt.distributed.worker and overwrite the compute method in your worker script")
 
     @Pyro4.expose
     @Pyro4.oneway

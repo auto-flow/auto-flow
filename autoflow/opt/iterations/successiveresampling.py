@@ -1,13 +1,11 @@
-import sys
-
-from autoflow.hpbandster.core.base_iteration import BaseIteration
-
 import numpy as np
 
+from .base import BaseIteration
 
+# todo: 4paradigm 提到的重要性采样
 class SuccessiveResampling(BaseIteration):
-    
-    def __init__(self, *args, resampling_rate = 0.5, min_samples_advance = 1, **kwargs):
+
+    def __init__(self, *args, resampling_rate=0.5, min_samples_advance=1, **kwargs):
         """
             Iteration class to resample new configurations along side keeping the good ones
             in SuccessiveHalving.
@@ -24,11 +22,13 @@ class SuccessiveResampling(BaseIteration):
         self.resampling_rate = resampling_rate
         self.min_samples_advance = min_samples_advance
 
-
     def _advance_to_next_stage(self, config_ids, losses):
         """
             SuccessiveHalving simply continues the best based on the current loss.
         """
-        
+
         ranks = np.argsort(np.argsort(losses))
-        return(ranks < max(self.min_samples_advance, self.num_configs[self.stage] * (1-self.resampling_rate)) )
+        return ranks < max(
+            self.min_samples_advance,
+            self.num_configs[self.stage] * (1 - self.resampling_rate)
+        )

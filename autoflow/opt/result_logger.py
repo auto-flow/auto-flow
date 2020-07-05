@@ -6,7 +6,7 @@ import json
 import os
 
 from autoflow.resource_manager.base import ResourceManager
-from autoflow.hpbandster.core.dispatcher import Job
+from .structure import Job
 
 
 class DatabaseResultLogger():

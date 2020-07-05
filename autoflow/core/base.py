@@ -11,7 +11,7 @@ from frozendict import frozendict
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold, StratifiedKFold, ShuffleSplit
 
-import autoflow.hpbandster.core.nameserver as hpns
+import autoflow.opt.core.nameserver as hpns
 from autoflow import constants
 from autoflow.constants import ExperimentType, SUBSAMPLES_BUDGET_MODE
 from autoflow.data_container import DataFrameContainer
@@ -23,8 +23,8 @@ from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2b
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.hpbandster.core.result_logger import DatabaseResultLogger
-from autoflow.hpbandster.utils import get_max_SH_iter, get_budgets
+from autoflow.opt.result_logger import DatabaseResultLogger
+from autoflow.opt.utils import get_max_SH_iter, get_budgets
 from autoflow.metrics import r2, accuracy
 from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
@@ -451,7 +451,7 @@ class AutoFlowEstimator(BaseEstimator):
         ):
             self.run_evaluator(worker_host_, background_, concurrent_type_, worker_id_)
 
-    # Semantic compatibility with hpbandster
+    # Semantic compatibility with opt
     run_workers = run_evaluators
 
     def run_optimizer(
@@ -471,7 +471,7 @@ class AutoFlowEstimator(BaseEstimator):
             self.logger.info(f"'{self.config_generator}' is a class from '{self.config_generator.__module__}' module.")
             cg_cls = self.config_generator
         elif isinstance(self.config_generator, str):
-            module = import_module("autoflow.hpbandster.optimizers.config_generators")
+            module = import_module("autoflow.opt.config_generators")
             cg_cls = getattr(module, self.config_generator)
         else:
             raise NotImplementedError
@@ -504,7 +504,7 @@ class AutoFlowEstimator(BaseEstimator):
         )
         self.hpbandstr_result = self.optimizer.run(self.n_iterations, self.min_n_workers)
 
-    # Semantic compatibility with hpbandster
+    # Semantic compatibility with opt
     run_master = run_optimizer
 
     def fit(

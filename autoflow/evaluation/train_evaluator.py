@@ -15,7 +15,7 @@ from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.budget import implement_subsample_budget
 from autoflow.hdl.shp2dhp import SHP2DHP
-from autoflow.hpbandster.core.worker import Worker
+from autoflow.opt.core.worker import Worker
 from autoflow.metrics import Scorer, calculate_score, calculate_confusion_matrix
 from autoflow.resource_manager.base import ResourceManager
 from autoflow.utils.dict_ import group_dict_items_before_first_token

@@ -22,8 +22,8 @@ from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POO
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
-from autoflow.hpbandster.core.result import Result
-from autoflow.hpbandster.utils import modify_timestamps
+from autoflow.opt.result import Result
+from autoflow.opt.utils import modify_timestamps
 from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict
 from autoflow.utils.dict_ import update_data_structure, object_kwargs2dict

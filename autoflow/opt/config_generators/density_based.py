@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
-from autoflow.hpbandster.optimizers.config_generators import BayesianOptimizationConfigGenerator
+from .bocg import BayesianOptimizationConfigGenerator
 
 
 class TPE(BayesianOptimizationConfigGenerator):

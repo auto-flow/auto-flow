@@ -2,27 +2,7 @@ import logging
 
 import numpy as np
 
-from autoflow.hpbandster.core.dispatcher import Job
-
-
-class Datum(object):
-    def __init__(self, config, config_info, results=None, timestamps=None, exceptions=None, status='QUEUED', budget=0):
-        self.config = config
-        self.config_info = config_info
-        self.results = results if not results is None else {}
-        self.timestamps = timestamps if not timestamps is None else {}
-        self.exceptions = exceptions if not exceptions is None else {}
-        self.status = status
-        self.budget = budget
-
-    def __repr__(self):
-        return ( \
-                    "\nconfig:{}\n".format(self.config) + \
-                    "config_info:\n{}\n".format(self.config_info) + \
-                    "losses:\n"
-                    '\t'.join(["{}: {}\t".format(k, v['loss']) for k, v in self.results.items()]) + \
-                    "time stamps: {}".format(self.timestamps)
-        )
+from ..structure import Datum, Job
 
 
 class BaseIteration(object):
@@ -50,7 +30,7 @@ class BaseIteration(object):
             that perform best after this particular budget is exhausted
             to build a better autoML system.
         logger: a logger
-        result_logger: hpbandster.api.results.util.JsonResultLogger object
+        result_logger: opt.api.results.util.JsonResultLogger object
             a result logger that writes live results to disk
         """
 
@@ -63,7 +43,7 @@ class BaseIteration(object):
         self.actual_num_configs = [0] * len(num_configs)
         self.config_sampler = config_sampler
         self.num_running = 0
-        self.logger = logger if not logger is None else logging.getLogger('hpbandster')
+        self.logger = logger if not logger is None else logging.getLogger('opt')
         self.result_logger = result_logger
 
     def __str__(self):

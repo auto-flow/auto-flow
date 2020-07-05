@@ -17,7 +17,7 @@ class BaseConfigGenerator(object):
 
         directory: string
             where the results are logged
-        logger: hpbandster.utils.result_logger_v??
+        logger: opt.utils.result_logger_v??
             the logger to store the data, defaults to v1
         overwrite: bool
             whether or not existing data will be overwritten
@@ -56,7 +56,7 @@ class BaseConfigGenerator(object):
 
         Parameters
         ----------
-        job: instance of hpbandster.distributed.dispatcher.Job
+        job: instance of opt.distributed.dispatcher.Job
             contains all necessary information about the job
         update_model: boolean
             determines whether a model inside the config_generator should be updated

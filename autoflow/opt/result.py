@@ -2,7 +2,7 @@ import copy
 import json
 import os
 
-from autoflow.hpbandster.core.base_iteration import Datum
+from .structure  import Datum
 
 
 class Run(object):
@@ -80,7 +80,7 @@ def logged_results_to_HBS_result(directory):
 
     Returns
     -------
-    hpbandster.core.result.Result: :object:
+    opt.core.result.Result: :object:
         TODO
     
     """

@@ -1,4 +1,4 @@
-from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
+from autoflow.opt.config_generators.base import BaseConfigGenerator
 
 
 

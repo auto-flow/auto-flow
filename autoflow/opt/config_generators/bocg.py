@@ -10,11 +10,11 @@ from frozendict import frozendict
 from skopt.learning.forest import RandomForestRegressor, ExtraTreesRegressor
 from skopt.learning.gbrt import GradientBoostingQuantileRegressor
 
-from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
-from autoflow.hpbandster.core.dispatcher import Job
-from autoflow.hpbandster.optimizers.config_generators.config_evaluator import ConfigEvaluator, DensityConfigEvaluator
-from autoflow.hpbandster.optimizers.config_generators.density_estimator.tpe import TreeBasedParzenEstimator
-from autoflow.hpbandster.utils import ConfigurationTransformer, LossTransformer, ScaledLossTransformer, \
+from .base import BaseConfigGenerator
+from .config_evaluator import ConfigEvaluator, DensityConfigEvaluator
+from .density_estimator.tpe import TreeBasedParzenEstimator
+from ..structure import Job
+from ..utils import ConfigurationTransformer, LossTransformer, ScaledLossTransformer, \
     LogScaledLossTransformer
 
 epm_str2cls = {
@@ -89,7 +89,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         # todo: 更好的形式
         if config_evaluator_cls == "ConfigEvaluator":
             config_evaluator_cls = ConfigEvaluator
-        elif config_evaluator_cls=="DensityConfigEvaluator":
+        elif config_evaluator_cls == "DensityConfigEvaluator":
             config_evaluator_cls = DensityConfigEvaluator
         else:
             raise NotImplementedError

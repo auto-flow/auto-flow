@@ -7,9 +7,9 @@ import numpy as np
 import scipy.stats as sps
 import statsmodels.api as sm
 
-from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
-from autoflow.hpbandster.core.dispatcher import Job
-from autoflow.hpbandster.utils import ConfigurationTransformer
+from .base import BaseConfigGenerator
+from autoflow.opt.structure import Job
+from autoflow.opt.utils import ConfigurationTransformer
 
 
 class BOHB(BaseConfigGenerator):
@@ -303,7 +303,7 @@ class BOHB(BaseConfigGenerator):
 
             Parameters:
             -----------
-            job: hpbandster.distributed.dispatcher.Job object
+            job: opt.distributed.dispatcher.Job object
                 contains all the info about the run
         """
 

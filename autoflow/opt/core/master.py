@@ -3,15 +3,15 @@ import os
 import threading
 import time
 from collections import defaultdict
-
-import numpy as np
 from typing import Dict
 
-from autoflow.hpbandster.core.base_iteration import WarmStartIteration
-from autoflow.hpbandster.core.dispatcher import Dispatcher
-from autoflow.hpbandster.core.result import Result
-from autoflow.hpbandster.utils import print_incumbent_trajectory
+import numpy as np
+
 from autoflow.utils.logging_ import get_logger
+from .dispatcher import Dispatcher
+from ..iterations import WarmStartIteration
+from ..result import Result
+from ..utils import print_incumbent_trajectory
 
 
 class Master(object):
@@ -28,8 +28,8 @@ class Master(object):
                  dynamic_queue_size=True,
                  result_logger=None,
                  previous_result=None,
-                 incumbents:Dict[float,dict]=None,
-                 incumbent_performances:Dict[float,float]=None
+                 incumbents: Dict[float, dict] = None,
+                 incumbent_performances: Dict[float, float] = None
                  ):
         """The Master class is responsible for the book keeping and to decide what to run next. Optimizers are
                 instantiations of Master, that handle the important steps of deciding what configurations to run on what
@@ -40,7 +40,7 @@ class Master(object):
         run_id : string
             A unique identifier of that Hyperband run. Use, for example, the cluster's JobID when running multiple
             concurrent runs to separate them
-        config_generator: hpbandster.config_generators object
+        config_generator: opt.config_generators object
             An object that can generate new configurations and registers results of executed runs
         working_directory: string
             The top level working directory accessible to all compute nodes(shared filesystem).
@@ -73,9 +73,9 @@ class Master(object):
             If true (default), the job_queue_sizes are relative to the current number of workers.
         logger: logging.logger like object
             the logger to output some (more or less meaningful) information
-        result_logger: hpbandster.api.results.util.JsonResultLogger object
+        result_logger: opt.api.results.util.JsonResultLogger object
             a result logger that writes live results to disk
-        previous_result: hpbandster.core.result.Result object
+        previous_result: opt.core.result.Result object
             previous run to warmstart the run
         """
 

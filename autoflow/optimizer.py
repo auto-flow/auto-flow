@@ -6,9 +6,9 @@ import numpy as np
 from frozendict import frozendict
 from typing import Dict
 
-from autoflow.hpbandster.core.master import Master
-from autoflow.hpbandster.optimizers.iterations.successivehalving import SuccessiveHalving
-from autoflow.hpbandster.utils import get_max_SH_iter
+from autoflow.opt.core.master import Master
+from autoflow.opt.iterations.successivehalving import SuccessiveHalving
+from autoflow.opt.utils import get_max_SH_iter
 
 
 class Optimizer(Master):

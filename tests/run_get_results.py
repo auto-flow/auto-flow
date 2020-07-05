@@ -4,7 +4,7 @@
 # @Contact    : tqichun@gmail.com
 import pylab as plt
 
-import autoflow.hpbandster.visualization as hpvis
+import autoflow.opt.visualization as hpvis
 from autoflow import ResourceManager
 
 rm = ResourceManager()
