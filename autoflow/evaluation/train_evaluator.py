@@ -9,7 +9,7 @@ from typing import Dict, Optional, List
 import numpy as np
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
-    SUBSAMPLES_BUDGET_MODE, ITERATIONS_BUDGET_MODE
+    SUBSAMPLES_BUDGET_MODE, ITERATIONS_BUDGET_MODE, ERR_LOSS
 from autoflow.data_container import DataFrameContainer, NdArrayContainer
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
@@ -237,7 +237,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             if len(losses) > 0:
                 final_loss = float(np.array(losses).mean())
             else:
-                final_loss = 65535
+                # train and validation is failed.
+                final_loss = ERR_LOSS
             if len(all_scores) > 0 and all_scores[0]:
                 all_score = defaultdict(list)
                 for cur_all_score in all_scores:

@@ -18,7 +18,7 @@ from playhouse.reflection import generate_models
 from redis import Redis
 import joblib
 from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POOL_CLOSE_MSG, START_SAFE_CLOSE_MSG, \
-    END_SAFE_CLOSE_MSG, ExperimentType
+    END_SAFE_CLOSE_MSG, ExperimentType, ERR_LOSS
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
@@ -1007,7 +1007,7 @@ class ResourceManager(StrSignatureMixin):
             budget_id = pw.FixedCharField(max_length=32)  # new
             budget = pw.FloatField()  # new
             estimator = pw.CharField(max_length=256, default="")
-            loss = pw.FloatField(default=65535)
+            loss = pw.FloatField(default=ERR_LOSS)
             losses = self.JSONField(default=[])
             test_loss = self.JSONField(default=[])
             all_score = self.JSONField(default={})
@@ -1019,7 +1019,7 @@ class ResourceManager(StrSignatureMixin):
             additional_info = self.JSONField(default={})
             # smac_hyper_param = PickleField(default=0)
             dict_hyper_param = self.JSONField(default={})
-            cost_time = pw.FloatField(default=65535)
+            cost_time = pw.FloatField(default=ERR_LOSS)
             status = pw.CharField(max_length=32, default="SUCCESS")
             failed_info = pw.TextField(default="")
             warning_info = pw.TextField(default="")
@@ -1138,9 +1138,9 @@ class ResourceManager(StrSignatureMixin):
             budget=info.get("budget", 0),  # new
             experiment_id=experiment_id,
             estimator=info.get("estimator", ""),
-            loss=info.get("loss", 65535),
+            loss=info.get("loss", ERR_LOSS),
             losses=info.get("losses", []),
-            test_loss=info.get("test_loss", 65535),
+            test_loss=info.get("test_loss", ERR_LOSS),
             all_score=info.get("all_score", {}),
             all_scores=info.get("all_scores", []),
             test_all_score=info.get("test_all_score", {}),
@@ -1150,7 +1150,7 @@ class ResourceManager(StrSignatureMixin):
             additional_info=info.get("additional_info", {}),
             # smac_hyper_param=info.get("program_hyper_param"),
             dict_hyper_param=info.get("dict_hyper_param", {}),
-            cost_time=info.get("cost_time", 65535),
+            cost_time=info.get("cost_time", ERR_LOSS),
             status=info.get("status", "failed"),
             failed_info=info.get("failed_info", ""),
             warning_info=info.get("warning_info", ""),

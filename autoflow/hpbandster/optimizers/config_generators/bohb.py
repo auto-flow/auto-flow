@@ -9,7 +9,7 @@ import statsmodels.api as sm
 
 from autoflow.hpbandster.core.config_generator import BaseConfigGenerator
 from autoflow.hpbandster.core.dispatcher import Job
-from autoflow.hpbandster.utils import ConfigSpaceTransformer
+from autoflow.hpbandster.utils import ConfigurationTransformer
 
 
 class BOHB(BaseConfigGenerator):
@@ -49,7 +49,7 @@ class BOHB(BaseConfigGenerator):
         self.bandwidth_factor = bandwidth_factor
         self.min_bandwidth = min_bandwidth
         self.min_points_in_model = min_points_in_model
-        self.transformer = ConfigSpaceTransformer(impute=None, ohe=False).fit(configspace)
+        self.transformer = ConfigurationTransformer(impute=None, ohe=False).fit(configspace)
         self.n_variables = self.transformer.n_variables
         if min_points_in_model is None:
             self.min_points_in_model = self.n_variables + 1

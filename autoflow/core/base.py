@@ -1,6 +1,4 @@
 import inspect
-import math
-import multiprocessing
 import os
 from copy import deepcopy
 from importlib import import_module
@@ -26,13 +24,11 @@ from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
 from autoflow.hpbandster.core.result_logger import DatabaseResultLogger
-from autoflow.hpbandster.utils import get_max_SH_iter
+from autoflow.hpbandster.utils import get_max_SH_iter, get_budgets
 from autoflow.metrics import r2, accuracy
 from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
-from autoflow.tuner import Tuner
-from autoflow.utils.concurrence import get_chunks
-from autoflow.utils.config_space import estimate_config_space_numbers, replace_phps
+from autoflow.utils.config_space import replace_phps
 from autoflow.utils.klass import instancing, get_valid_params_in_kwargs, set_if_not_None
 from autoflow.utils.list_ import multiply_to_list
 from autoflow.utils.logging_ import get_logger, setup_logger
@@ -60,7 +56,8 @@ class AutoFlowEstimator(BaseEstimator):
             n_keep_samples: int = 30000,
             min_n_samples_for_SH: int = 1000,
             max_n_samples_for_CV: int = 5000,
-            config_generator: Union[str, Type] = "BOHB",
+            warm_start=True,
+            config_generator: Union[str, Type] = "ET",
             config_generator_params: dict = frozendict(),
             ns_host: str = "127.0.0.1",
             ns_port: int = 9090,
@@ -88,8 +85,6 @@ class AutoFlowEstimator(BaseEstimator):
         '''
         Parameters
         ----------
-        tuner: :class:`autoflow.tuner.Tuner` or None
-            ``Tuner`` if class who agent an abstract search process.
 
         hdl_constructor: :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or None
             ``HDL`` is abbreviation of Hyper-parameter Descriptions Language.
@@ -117,7 +112,7 @@ class AutoFlowEstimator(BaseEstimator):
             high ratio categorical feature's cardinality threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
 
         kwargs
-            if parameters like ``tuner`` or ``hdl_constructor`` and ``resource_manager`` are passing None,
+            if parameters like  or ``hdl_constructor`` and ``resource_manager`` are passing None,
 
             you can passing kwargs to make passed parameter work. See the following example.
 
@@ -138,6 +133,7 @@ class AutoFlowEstimator(BaseEstimator):
             hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
             included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
         '''
+        self.warm_start = warm_start
         self.debug_evaluator = debug_evaluator
         self.only_use_subsamples_budget_mode = only_use_subsamples_budget_mode
         if algo2iter is None:
@@ -378,7 +374,7 @@ class AutoFlowEstimator(BaseEstimator):
             "log_config": self.log_config,
         }
         # fixme
-        is_manual = False  # self.start_tuner(tuner, hdl)
+        is_manual = False
         if is_manual:
             experiment_type = ExperimentType.MANUAL
         else:
@@ -455,7 +451,8 @@ class AutoFlowEstimator(BaseEstimator):
         ):
             self.run_evaluator(worker_host_, background_, concurrent_type_, worker_id_)
 
-    run_workers = run_evaluators  # Semantic compatibility with hpbandster
+    # Semantic compatibility with hpbandster
+    run_workers = run_evaluators
 
     def run_optimizer(
             self, master_host=None, min_budget=None, max_budget=None, eta=None,
@@ -472,20 +469,24 @@ class AutoFlowEstimator(BaseEstimator):
         set_if_not_None(self, "min_n_workers", min_n_workers)
         if inspect.isclass(self.config_generator):
             self.logger.info(f"'{self.config_generator}' is a class from '{self.config_generator.__module__}' module.")
-            cls = self.config_generator
+            cg_cls = self.config_generator
         elif isinstance(self.config_generator, str):
             module = import_module("autoflow.hpbandster.optimizers.config_generators")
-            cls = getattr(module, self.config_generator)
+            cg_cls = getattr(module, self.config_generator)
         else:
             raise NotImplementedError
-        config_generator = cls(self.config_space, **self.config_generator_params)
+        budgets = get_budgets(self.min_budget, self.max_budget, self.eta)
+        config_generator = cg_cls(self.config_space, budgets, self.random_state, **self.config_generator_params)
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
-        previous_result, incumbents, incumbent_performances = self.resource_manager.get_result_from_trial_table(
-            task_id=self.task_id,
-            hdl_id=self.hdl_id,
-            user_id=self.user_id,
-            budget_id=self.budget_id,
-        )
+        if self.warm_start:
+            previous_result, incumbents, incumbent_performances = self.resource_manager.get_result_from_trial_table(
+                task_id=self.task_id,
+                hdl_id=self.hdl_id,
+                user_id=self.user_id,
+                budget_id=self.budget_id,
+            )
+        else:
+            previous_result, incumbents, incumbent_performances = None, None, None
         self.optimizer = Optimizer(
             self.run_id,
             config_generator,
@@ -503,7 +504,8 @@ class AutoFlowEstimator(BaseEstimator):
         )
         self.hpbandstr_result = self.optimizer.run(self.n_iterations, self.min_n_workers)
 
-    run_master = run_optimizer  # Semantic compatibility with hpbandster
+    # Semantic compatibility with hpbandster
+    run_master = run_optimizer
 
     def fit(
             self,
@@ -579,59 +581,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.resource_manager.finish_experiment(self.log_path, self)
         return self
         # todo: 重新实现手动建模
-        # if is_manual:
-        #     tuner.evaluator.init_data(**self.get_evaluator_params())
-        #     # dhp, self.estimator = tuner.evaluator.shp2model(tuner.shps.sample_configuration())
-        #     tuner.evaluator(tuner.shps.sample_configuration())
-        #     self.start_final_step(False)
-        #     self.resource_manager.finish_experiment(self.log_path, self)
-        #     break
-        # self.run_tuner(tuner)
-        # if step == n_step - 1:
 
-    def start_tuner(self, tuner: Tuner, hdl: dict):
-        self.logger.debug(f"Start fine tune task, \nwhich HDL(Hyperparams Descriptions Language) is:\n{hdl}")
-        self.logger.debug(f"which Tuner is:\n{tuner}")
-        tuner.set_data_manager(self.data_manager)
-        tuner.set_random_state(self.random_state)
-        tuner.set_hdl(hdl)  # just for get shps of tuner
-        is_manual = False
-        if estimate_config_space_numbers(tuner.shps) == 1:
-            self.logger.info("HDL(Hyperparams Descriptions Language) is a constant space, using manual modeling.")
-            is_manual = True
-        return is_manual
-
-    def run_tuner(self, tuner: Tuner):
-        n_jobs = tuner.n_jobs
-        run_limits = [math.ceil(tuner.run_limit / n_jobs)] * n_jobs
-        is_master_list = [False] * n_jobs
-        is_master_list[0] = True
-        initial_configs_list = get_chunks(
-            tuner.design_initial_configs(n_jobs),
-            n_jobs)
-        random_states = np.arange(n_jobs) + self.random_state
-        sync_dict = self.get_sync_dict(n_jobs, tuner)
-        # self.resource_manager.clear_pid_list()
-        self.resource_manager.start_safe_close()
-        self.resource_manager.close_all()
-        resource_managers = [deepcopy(self.resource_manager) for i in range(n_jobs)]
-        tuners = [deepcopy(tuner) for i in range(n_jobs)]
-        self.resource_manager.end_safe_close()
-        processes = []
-        for tuner, resource_manager, run_limit, initial_configs, is_master, random_state in \
-                zip(tuners, resource_managers, run_limits, initial_configs_list, is_master_list, random_states):
-            args = (tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict)
-            if n_jobs == 1:
-                self.run(*args)
-            else:
-                p = multiprocessing.Process(
-                    target=self.run,
-                    args=args
-                )
-                processes.append(p)
-                p.start()
-        for p in processes:
-            p.join()
 
     def start_final_step(self, fit_ensemble_params):
         if isinstance(fit_ensemble_params, str):
@@ -682,34 +632,7 @@ class AutoFlowEstimator(BaseEstimator):
             instance_id=self.instance_id
         )
 
-    def run(self, tuner, resource_manager, run_limit, initial_configs, is_master, random_state, sync_dict=None):
-        if sync_dict:
-            sync_dict[os.getpid()] = 0
-            resource_manager.sync_dict = sync_dict
-        resource_manager.set_is_master(is_master)
-        # resource_manager.push_pid_list()
-        # random_state: 1. set_hdl中传给phps 2. 传给所有配置
-        tuner.random_state = random_state
-        tuner.run_limit = run_limit
-        tuner.set_resource_manager(resource_manager)
-        # 替换搜索空间中的 random_state
 
-        tuner.shps.seed(random_state)
-        self.instance_id = resource_manager.task_id + "-" + resource_manager.hdl_id + "-" + \
-                           str(resource_manager.user_id)
-        tuner.run(
-            initial_configs=initial_configs,
-            evaluator_params=self.get_evaluator_params(
-                random_state=random_state,
-                resource_manager=resource_manager
-            ),
-            instance_id=self.instance_id,
-            rh_db_type=resource_manager.db_type,
-            rh_db_params=resource_manager.runhistory_db_params,
-            rh_db_table_name=resource_manager.runhistory_table_name
-        )
-        if sync_dict:
-            sync_dict[os.getpid()] = 1
 
     def fit_ensemble(
             self,
@@ -731,10 +654,10 @@ class AutoFlowEstimator(BaseEstimator):
             task_id = self.resource_manager.task_id
         self.task_id = task_id
         self.hdl_id = hdl_id
-        self.budget_id=budget_id
+        self.budget_id = budget_id
         self.resource_manager.task_id = task_id
         self.resource_manager.hdl_id = hdl_id
-        self.resource_manager.budget_id=budget_id
+        self.resource_manager.budget_id = budget_id
         if fit_ensemble_alone:
             setup_logger(self.log_path, self.log_config)
             if fit_ensemble_alone:
