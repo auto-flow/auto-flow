@@ -21,7 +21,7 @@ if os.name != 'posix':
         'Detected unsupported operating system: %s. '
     )
 
-if sys.version_info < (3, 5):
+if sys.version_info <= (3, 5):
     raise ValueError(
         'Unsupported Python version %d.%d.%d found. AutoFlow requires Python '
         '3.6 or higher.' % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
@@ -76,15 +76,16 @@ setup(
     long_description=long_description,
     long_description_content_type='text/x-rst',
     license='BSD',
-    url='https://github.com/auto-flow/autoflow',
+    url='https://github.com/auto-flow/auto-flow',
     packages=find_packages("./", exclude=['test', 'examples', 'autoflow_server']),
     package_dir={
         'autoflow': './autoflow',
-        'dsmac': './dsmac',
+        # 'dsmac': './dsmac',
         'generic_fs': './generic_fs'
     },
     package_data={'autoflow': get_package_data('autoflow', needed_suffixes),
-                  'dsmac': get_package_data('dsmac', needed_suffixes)},
+                  # 'dsmac': get_package_data('dsmac', needed_suffixes)
+                  },
     python_requires='>=3.6.*',
     install_requires=install_requires,
     platforms=['Linux'],

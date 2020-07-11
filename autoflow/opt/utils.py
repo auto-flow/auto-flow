@@ -140,7 +140,10 @@ class ConfigurationTransformer():
             vectors = self.encoder.fit_transform(vectors)
 
         if self.impute is not None:
-            vectors[np.isnan(vectors)] = float(self.impute)
+            if self.impute=="random_choice":
+                vectors=self.impute_conditional_data(vectors)
+            else:
+                vectors[np.isnan(vectors)] = float(self.impute)
         return vectors
 
     def inverse_transform(self, array: np.ndarray) -> np.ndarray:
@@ -151,6 +154,33 @@ class ConfigurationTransformer():
         result[self.mask] = array
         return result
 
+    def impute_conditional_data(self, array):
+
+        return_array = np.empty_like(array)
+
+        for i in range(array.shape[0]):
+            datum = np.copy(array[i])
+            nan_indices = np.argwhere(np.isnan(datum)).flatten()
+
+            while (np.any(nan_indices)):
+                nan_idx = nan_indices[0]
+                valid_indices = np.argwhere(np.isfinite(array[:, nan_idx])).flatten()
+
+                if len(valid_indices) > 0:
+                    # pick one of them at random and overwrite all NaN values
+                    row_idx = np.random.choice(valid_indices)
+                    datum[nan_indices] = array[row_idx, nan_indices]
+
+                else:
+                    # no good point in the data has this value activated, so fill it with a valid but random value
+                    t = self.n_choices_list[nan_idx]
+                    if t == 0:
+                        datum[nan_idx] = np.random.rand()
+                    else:
+                        datum[nan_idx] = np.random.randint(t)
+                nan_indices = np.argwhere(np.isnan(datum)).flatten()
+            return_array[i, :] = datum
+        return (return_array)
 
 class LossTransformer(TransformerMixin, BaseEstimator):
     def fit_transform(self, y, *args):

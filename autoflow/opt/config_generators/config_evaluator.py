@@ -9,7 +9,7 @@ from frozendict import frozendict
 from scipy.stats import norm
 
 
-# todo: logEI PI LCB
+# todo:  PI LCB
 
 class LogEI():
     def __init__(self, xi=0.01):

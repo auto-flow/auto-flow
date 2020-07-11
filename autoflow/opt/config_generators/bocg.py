@@ -12,6 +12,7 @@ from skopt.learning.gbrt import GradientBoostingQuantileRegressor
 
 from .base import BaseConfigGenerator
 from .config_evaluator import ConfigEvaluator, DensityConfigEvaluator
+from .density_estimator.kde import KDE4BO
 from .density_estimator.tpe import TreeBasedParzenEstimator
 from ..structure import Job
 from ..utils import ConfigurationTransformer, LossTransformer, ScaledLossTransformer, \
@@ -22,6 +23,7 @@ epm_str2cls = {
     "RF": RandomForestRegressor,
     "GBRT": GradientBoostingQuantileRegressor,
     "TPE": TreeBasedParzenEstimator,
+    "KDE": KDE4BO
 }
 
 
@@ -137,8 +139,10 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         ### 3. training empirical performance model  ###
         ################################################
         if self.budget2epm[budget] is None:
-            self.budget2epm[budget] = deepcopy(self.epm)
-        self.budget2epm[budget].fit(X_obvs, y_obvs)
+            epm = deepcopy(self.epm)
+        else:
+            epm = self.budget2epm[budget]
+        self.budget2epm[budget] = epm.fit(X_obvs, y_obvs)
 
     def get_config(self, budget):
         budget = self.get_available_max_budget()

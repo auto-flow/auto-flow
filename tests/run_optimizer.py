@@ -12,22 +12,22 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 pipe = AutoFlowClassifier(
     DAG_workflow={
         "num->target": [
-            "liblinear_svc",
-            "libsvm_svc",
+            # "liblinear_svc",
+            # "libsvm_svc",
             "logistic_regression",
             "random_forest",
             # "catboost",
         ]
     },
-    config_generator="TPE",
+    config_generator="KDE",
     config_generator_params={
         # "acq_func": "EI",
         # "xi": 0,
         # "loss_transformer":None,
-        "fill_deactivated_value":False,
+        "n_samples":500,
         "min_points_in_model": 40
     },
-    warm_start=False,
+    warm_start=True,
     random_state=0,
     min_n_samples_for_SH=50,
     concurrent_type="thread",
@@ -37,7 +37,7 @@ pipe = AutoFlowClassifier(
     SH_only=True,
     min_budget=1/16,
     max_budget=1/16,
-    n_iterations=100,
+    n_iterations=200,
     # min_budget=1 / 4,
     debug_evaluator=True,
 )
@@ -48,4 +48,3 @@ pipe.fit(
 # score = accuracy_score(y_test, y_pred)
 score = pipe.score(X_test, y_test)
 print(score)
-from scipy.stats import kde
