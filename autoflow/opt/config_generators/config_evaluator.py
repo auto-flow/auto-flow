@@ -88,4 +88,5 @@ class DensityConfigEvaluator:
 
     def __call__(self, X, y_opt):
         epm = self.budget2epm[self.budget]
-        return epm.predict(X)
+        result= epm.predict(X)
+        return result

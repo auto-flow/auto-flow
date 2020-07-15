@@ -9,6 +9,9 @@ import numpy as np
 from scipy.stats import truncnorm
 from sklearn.base import BaseEstimator
 
+from autoflow.opt.utils import ConfigurationTransformer
+from autoflow.utils.logging_ import get_logger
+
 
 class BaseDensityEstimator(BaseEstimator):
     def __init__(
@@ -21,16 +24,17 @@ class BaseDensityEstimator(BaseEstimator):
         self.min_bandwidth = min_bandwidth
         self.bandwidth_factor = bandwidth_factor
         self.top_n_percent = top_n_percent
-        self.n_choices_list: Optional[List[int]] = None
+        self.config_transformer: Optional[ConfigurationTransformer]= None
+        self.logger=get_logger(self)
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        assert self.n_choices_list is not None
-        assert X.shape[1] == len(self.n_choices_list)
+        assert self.config_transformer is not None
+        assert X.shape[1] == len(self.config_transformer.n_choices_list)
         return self
 
     def predict(self, X: np.ndarray):
-        assert self.n_choices_list is not None
-        assert X.shape[1] == len(self.n_choices_list)
+        assert self.config_transformer is not None
+        assert X.shape[1] == len(self.config_transformer.n_choices_list)
 
     def process_constants_vector(self, vec: np.ndarray, n_choices, bw, mode="extend"):
         if np.unique(vec).size == 1:

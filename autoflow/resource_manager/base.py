@@ -1197,6 +1197,8 @@ class ResourceManager(StrSignatureMixin):
         experiments = set()
         for record in records:
             experiment_id = record["experiment_id"]
+            if not record["timestamps"]: # default = {}
+                continue
             experiment2min_started[experiment_id] = min(experiment2min_started[experiment_id],
                                                         record["timestamps"]["started"])
             experiment2max_finished[experiment_id] = max(experiment2max_finished[experiment_id],

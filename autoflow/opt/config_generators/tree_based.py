@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+from frozendict import frozendict
 
 from .bocg import BayesianOptimizationConfigGenerator
 
@@ -11,8 +12,12 @@ class RF(BayesianOptimizationConfigGenerator):
 
     def __init__(
             self, config_space, budgets, random_state=None,
-            acq_func="EI", xi=0, kappa=1.96, n_samples=5000,
+            acq_func="LogEI", xi=0, kappa=1.96, n_samples=5000,
             min_points_in_model=None,loss_transformer="log_scaled",
+            use_local_search=False,
+            # TS
+            use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=10,
+            tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True,
             # RF parameters
             n_estimators=10, max_depth=None, min_samples_split=2,
             min_samples_leaf=1, min_weight_fraction_leaf=0, max_features="auto",
@@ -52,6 +57,16 @@ class RF(BayesianOptimizationConfigGenerator):
             config_transformer_params={"impute": -1, "ohe": False},
             n_samples=n_samples,
             loss_transformer=self.loss_transformer,
+            use_local_search=use_local_search,
+            use_thompson_sampling=use_thompson_sampling, # for TS
+            alpha=alpha,
+            beta=beta,
+            top_n_percent=top_n_percent,
+            hit_top_n_percent=hit_top_n_percent,
+            tpe_params=tpe_params,
+            max_repeated_samples=max_repeated_samples,
+            n_candidates=n_candidates,
+            sort_by_EI=sort_by_EI
         )
 
 class ET(RF):
@@ -63,7 +78,7 @@ class GBRT(BayesianOptimizationConfigGenerator):
 
     def __init__(
             self, config_space, budgets, random_state=None,
-            acq_func="EI", xi=0, kappa=1.96, n_samples=5000,
+            acq_func="LogEI", xi=0, kappa=1.96, n_samples=5000,
             min_points_in_model=None,loss_transformer="log_scaled",
             n_jobs=1
     ):

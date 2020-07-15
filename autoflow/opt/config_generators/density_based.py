@@ -14,7 +14,8 @@ class TPE(BayesianOptimizationConfigGenerator):
             min_points_in_model=None,
             # TPE parameters
             top_n_percent=15, bandwidth_factor=3, min_bandwidth=1e3,
-            bw_estimation="normal_reference",min_points_in_kde=2,
+            bw_estimation="normal_reference", min_points_in_kde=2,
+            bw_method="scott", cv_times=100, kde_sample_weight_scaler=None,
             fill_deactivated_value=False
     ):
         epm_params = dict(
@@ -23,7 +24,10 @@ class TPE(BayesianOptimizationConfigGenerator):
             min_bandwidth=min_bandwidth,
             bw_estimation=bw_estimation,
             min_points_in_kde=min_points_in_kde,
-            fill_deactivated_value=fill_deactivated_value
+            fill_deactivated_value=fill_deactivated_value,
+            bw_method=bw_method,
+            cv_times=cv_times,
+            kde_sample_weight_scaler=kde_sample_weight_scaler
         )
         config_evaluator_params = {
         }
@@ -46,7 +50,7 @@ class KDE(BayesianOptimizationConfigGenerator):
             min_points_in_model=None,
             # KDE parameters
             top_n_percent=15, bandwidth_factor=3, min_bandwidth=1e3,
-            bw_estimation="normal_reference",min_points_in_kde=2
+            bw_estimation="normal_reference", min_points_in_kde=2
     ):
         epm_params = dict(
             top_n_percent=top_n_percent,

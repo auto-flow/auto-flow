@@ -12,22 +12,26 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 pipe = AutoFlowClassifier(
     DAG_workflow={
         "num->target": [
-            # "liblinear_svc",
-            # "libsvm_svc",
+            "liblinear_svc",
+            "libsvm_svc",
             "logistic_regression",
             "random_forest",
             # "catboost",
         ]
     },
-    config_generator="KDE",
+    config_generator="ET",
     config_generator_params={
         # "acq_func": "EI",
         # "xi": 0,
         # "loss_transformer":None,
-        "n_samples":500,
-        "min_points_in_model": 40
+        # "bw_method": "scott",
+        # "n_samples": 5000,
+        "min_points_in_model": 30,
+        "use_local_search":True,
+        # "use_thompson_sampling":False,
+        # "kde_sample_weight_scaler": None
     },
-    warm_start=True,
+    warm_start=False,
     random_state=0,
     min_n_samples_for_SH=50,
     concurrent_type="thread",
@@ -35,9 +39,9 @@ pipe = AutoFlowClassifier(
     n_jobs_in_algorithm=3,
     n_workers=1,
     SH_only=True,
-    min_budget=1/16,
-    max_budget=1/16,
-    n_iterations=200,
+    min_budget=1 / 16,
+    max_budget=1 / 16,
+    n_iterations=100,
     # min_budget=1 / 4,
     debug_evaluator=True,
 )

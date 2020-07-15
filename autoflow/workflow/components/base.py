@@ -241,6 +241,9 @@ class AutoFlowIterComponent(AutoFlowComponent):
 
     def __init__(self, **kwargs):
         super(AutoFlowIterComponent, self).__init__(**kwargs)
+        self.init_variables()
+
+    def init_variables(self):
         # 迭代式地训练，并引入早停机制
         if not hasattr(self, "iter_inc"):
             self.iter_inc = 10
@@ -308,6 +311,9 @@ class AutoFlowIterComponent(AutoFlowComponent):
                  y_test=None, feature_groups=None):
         if self.backup_component is not None:
             self.component = self.backup_component
+        if self.best_estimators is None:
+            # reload
+            self.init_variables()
         while True:
             self.iterative_fit(X, y, X_valid, y_valid)
             if self.is_fully_fitted:

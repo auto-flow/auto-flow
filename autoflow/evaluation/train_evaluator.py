@@ -15,8 +15,8 @@ from autoflow.data_manager import DataManager
 from autoflow.ensemble.utils import vote_predicts, mean_predicts
 from autoflow.evaluation.budget import implement_subsample_budget
 from autoflow.hdl.shp2dhp import SHP2DHP
-from autoflow.opt.core.worker import Worker
 from autoflow.metrics import Scorer, calculate_score, calculate_confusion_matrix
+from autoflow.opt.core.worker import Worker
 from autoflow.resource_manager.base import ResourceManager
 from autoflow.utils.dict_ import group_dict_items_before_first_token
 from autoflow.utils.hash import get_hash_of_config
@@ -423,4 +423,5 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         return pipeline_list
 
     def get_cache_key(self, config_id, X_train: DataFrameContainer, y_train: NdArrayContainer):
-        return "-".join([config_id, X_train.get_hash(), y_train.get_hash()])
+        experiment_id = str(self.resource_manager.experiment_id)
+        return "-".join([experiment_id, config_id, X_train.get_hash(), y_train.get_hash()])
