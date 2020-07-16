@@ -1,0 +1,1981 @@
+[
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 14.906288366101643,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.55,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 13,
+      "estimating:random_forest:min_samples_split": 13,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 0.18293439416272847,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.0007277830554702453,
+      "estimating:libsvm_svc:kernel": "poly",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool",
+      "estimating:libsvm_svc:coef0": 0.0,
+      "estimating:libsvm_svc:degree": 2
+    },
+    "loss": 0.09999999999999998
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 13.787588744022004,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.025110999012081334,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": 1.0
+    },
+    "loss": 0.9
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 1197.986805556919,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.7000000000000001,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 3.737766830157568,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.1,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 17,
+      "estimating:random_forest:min_samples_split": 12,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.029629629629629672
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 0.021184973741527013,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.2,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 119.22206532486973,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.01470535009396174,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool",
+      "estimating:libsvm_svc:coef0": 0.0
+    },
+    "loss": 0.9
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 0.19048986069549934,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.5,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.029629629629629672
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 12,
+      "estimating:random_forest:min_samples_split": 13,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "liblinear_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:liblinear_svc:C": 0.039972715595675896,
+      "estimating:liblinear_svc:dual": "True:bool",
+      "estimating:liblinear_svc:loss": "squared_hinge",
+      "estimating:liblinear_svc:max_iter": 2300,
+      "estimating:liblinear_svc:multi_class": "ovr",
+      "estimating:liblinear_svc:penalty": "l2",
+      "estimating:liblinear_svc:random_state": "42:int"
+    },
+    "loss": 0.11851851851851847
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 7779.941634605798,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.008632686891560942,
+      "estimating:libsvm_svc:kernel": "poly",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": 1.0,
+      "estimating:libsvm_svc:degree": 5
+    },
+    "loss": 0.16666666666666663
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 9,
+      "estimating:random_forest:min_samples_split": 12,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 125.80213548123623,
+      "estimating:libsvm_svc:class_weight": "None:NoneType",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.00047166892483837647,
+      "estimating:libsvm_svc:kernel": "poly",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": 0.0,
+      "estimating:libsvm_svc:degree": 3
+    },
+    "loss": 0.09259259259259256
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 12.972118072871549,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.025661852140038018,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool",
+      "estimating:libsvm_svc:coef0": 0.0
+    },
+    "loss": 0.8925925925925926
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 8,
+      "estimating:random_forest:min_samples_split": 8,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 0.9124420479643373,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.042387758972619725,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool"
+    },
+    "loss": 0.9074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 12,
+      "estimating:random_forest:min_samples_split": 7,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 775.8877162335914,
+      "estimating:libsvm_svc:class_weight": "None:NoneType",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 5.247194558504997,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": 1.0
+    },
+    "loss": 0.9074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 4.963064189163307,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.8991018779964705,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool"
+    },
+    "loss": 0.8925925925925926
+  },
+  {
+    "config": {
+      "estimating:__choice__": "liblinear_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:liblinear_svc:C": 0.571168421877612,
+      "estimating:liblinear_svc:dual": "True:bool",
+      "estimating:liblinear_svc:loss": "hinge",
+      "estimating:liblinear_svc:max_iter": 1300,
+      "estimating:liblinear_svc:multi_class": "ovr",
+      "estimating:liblinear_svc:penalty": "l2",
+      "estimating:liblinear_svc:random_state": "42:int"
+    },
+    "loss": 0.12222222222222223
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 1492.4894881878377,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.0003142495360779588,
+      "estimating:libsvm_svc:kernel": "poly",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": 1.0,
+      "estimating:libsvm_svc:degree": 5
+    },
+    "loss": 0.09259259259259256
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 1.1367524687221007,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.65,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.029629629629629672
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 0.016451401614691635,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.15000000000000002,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 386.6979289778525,
+      "estimating:libsvm_svc:class_weight": "None:NoneType",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.0009560396100389675,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool"
+    },
+    "loss": 0.09999999999999998
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 10,
+      "estimating:random_forest:min_samples_split": 4,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 106.73352973647582,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.16346698553719693,
+      "estimating:libsvm_svc:kernel": "poly",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": -1.0,
+      "estimating:libsvm_svc:degree": 3
+    },
+    "loss": 0.09629629629629632
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 165.69331191419872,
+      "estimating:libsvm_svc:class_weight": "None:NoneType",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 4.590954871757631,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool"
+    },
+    "loss": 0.8925925925925926
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 0.38925857656200075,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 2.439334930148158e-05,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": 0.0
+    },
+    "loss": 0.9074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 12,
+      "estimating:random_forest:min_samples_split": 12,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.029629629629629672
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 572.7598617930469,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.05,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "liblinear_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:liblinear_svc:C": 0.26945778914770613,
+      "estimating:liblinear_svc:dual": "True:bool",
+      "estimating:liblinear_svc:loss": "squared_hinge",
+      "estimating:liblinear_svc:max_iter": 1900,
+      "estimating:liblinear_svc:multi_class": "ovr",
+      "estimating:liblinear_svc:penalty": "l2",
+      "estimating:liblinear_svc:random_state": "42:int"
+    },
+    "loss": 0.11851851851851847
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 5,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 13,
+      "estimating:random_forest:min_samples_split": 12,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 405.6431441494961,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.4,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 7,
+      "estimating:random_forest:min_samples_split": 3,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 7,
+      "estimating:random_forest:min_samples_split": 13,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 10,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 1012.1361361475084,
+      "estimating:libsvm_svc:class_weight": "None:NoneType",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.2779211054483671,
+      "estimating:libsvm_svc:kernel": "poly",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool",
+      "estimating:libsvm_svc:coef0": 1.0,
+      "estimating:libsvm_svc:degree": 5
+    },
+    "loss": 0.16666666666666663
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 6.149961295461695,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.25,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 4,
+      "estimating:random_forest:min_samples_split": 4,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 13,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 3.079525782359901,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 6.367123214994327e-05,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool"
+    },
+    "loss": 0.1074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 0.03256385154556405,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.4,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.029629629629629672
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 122.25299073795361,
+      "estimating:libsvm_svc:class_weight": "None:NoneType",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 5.2697610697421675,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool",
+      "estimating:libsvm_svc:coef0": -1.0
+    },
+    "loss": 0.9074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 0.01,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 1e-05,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "True:bool"
+    },
+    "loss": 0.9074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 13,
+      "estimating:random_forest:min_samples_split": 15,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 15,
+      "estimating:random_forest:min_samples_split": 8,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.033333333333333326
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 6,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 14,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 12,
+      "estimating:random_forest:min_samples_split": 20,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.033333333333333326
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 5,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 7,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 16,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 12,
+      "estimating:random_forest:min_samples_split": 16,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 10,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 14,
+      "estimating:random_forest:min_samples_split": 8,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.033333333333333326
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 18,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "sqrt",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 13,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "liblinear_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:liblinear_svc:C": 14.244970519207156,
+      "estimating:liblinear_svc:dual": "False:bool",
+      "estimating:liblinear_svc:loss": "squared_hinge",
+      "estimating:liblinear_svc:max_iter": 2800,
+      "estimating:liblinear_svc:multi_class": "ovr",
+      "estimating:liblinear_svc:penalty": "l2",
+      "estimating:liblinear_svc:random_state": "42:int"
+    },
+    "loss": 0.12222222222222223
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 6,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 0.04257746287948562,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.000436284606480908,
+      "estimating:libsvm_svc:kernel": "rbf",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool"
+    },
+    "loss": 0.9074074074074074
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 8,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 5,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 6,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 6,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.011111111111111072
+  },
+  {
+    "config": {
+      "estimating:__choice__": "libsvm_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:libsvm_svc:C": 0.5099111438963146,
+      "estimating:libsvm_svc:class_weight": "balanced",
+      "estimating:libsvm_svc:decision_function_shape": "ovr",
+      "estimating:libsvm_svc:gamma": 0.0028367844834435263,
+      "estimating:libsvm_svc:kernel": "sigmoid",
+      "estimating:libsvm_svc:probability": "True:bool",
+      "estimating:libsvm_svc:random_state": "42:int",
+      "estimating:libsvm_svc:shrinking": "False:bool",
+      "estimating:libsvm_svc:coef0": 1.0
+    },
+    "loss": 0.9
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 5,
+      "estimating:random_forest:min_samples_split": 11,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 3,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 9,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.011111111111111072
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 10,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.022222222222222254
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 6,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "logistic_regression",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:logistic_regression:C": 34.936764625560116,
+      "estimating:logistic_regression:early_stopping_rounds": "5:int",
+      "estimating:logistic_regression:early_stopping_tol": "0.0:float",
+      "estimating:logistic_regression:iter_inc": "100:int",
+      "estimating:logistic_regression:l1_ratio": 0.8,
+      "estimating:logistic_regression:max_iter": "5000:int",
+      "estimating:logistic_regression:n_jobs": "3:int",
+      "estimating:logistic_regression:penalty": "elasticnet",
+      "estimating:logistic_regression:random_state": "42:int",
+      "estimating:logistic_regression:solver": "saga"
+    },
+    "loss": 0.025925925925925908
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 4,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "liblinear_svc",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:liblinear_svc:C": 2985.1685580775397,
+      "estimating:liblinear_svc:dual": "False:bool",
+      "estimating:liblinear_svc:loss": "squared_hinge",
+      "estimating:liblinear_svc:max_iter": 1400,
+      "estimating:liblinear_svc:multi_class": "ovr",
+      "estimating:liblinear_svc:penalty": "l2",
+      "estimating:liblinear_svc:random_state": "42:int"
+    },
+    "loss": 0.12222222222222223
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 5,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.011111111111111072
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 2,
+      "estimating:random_forest:min_samples_split": 3,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 3,
+      "estimating:random_forest:min_samples_split": 2,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 7,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "gini",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 6,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.007407407407407418
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 3,
+      "estimating:random_forest:min_samples_split": 6,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "False:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 7,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.014814814814814836
+  },
+  {
+    "config": {
+      "estimating:__choice__": "random_forest",
+      "preprocessing:placeholder": "placeholder",
+      "estimating:random_forest:bootstrap": "True:bool",
+      "estimating:random_forest:criterion": "entropy",
+      "estimating:random_forest:early_stopping_rounds": "10:int",
+      "estimating:random_forest:early_stopping_tol": "0.0:float",
+      "estimating:random_forest:iter_inc": "25:int",
+      "estimating:random_forest:max_depth": "None:NoneType",
+      "estimating:random_forest:max_features": "log2",
+      "estimating:random_forest:max_leaf_nodes": "None:NoneType",
+      "estimating:random_forest:min_impurity_decrease": "0.0:float",
+      "estimating:random_forest:min_samples_leaf": 1,
+      "estimating:random_forest:min_samples_split": 20,
+      "estimating:random_forest:min_weight_fraction_leaf": "0.0:float",
+      "estimating:random_forest:n_estimators": "5000:int",
+      "estimating:random_forest:n_jobs": "3:int",
+      "estimating:random_forest:random_state": "42:int"
+    },
+    "loss": 0.01851851851851849
+  }
+]

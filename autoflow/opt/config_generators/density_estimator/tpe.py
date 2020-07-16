@@ -159,7 +159,11 @@ class TreeStructuredParzenEstimator(BaseDensityEstimator):
         result = good_log_pdf.sum(axis=1) - bad_log_pdf.sum(axis=1)
         return result
 
-    def sample(self, n_candidates=20, sort_by_EI=False) -> List[Configuration]:
+    def sample(self, n_candidates=20, sort_by_EI=False, random_state=None) -> List[Configuration]:
+        # todo: 规范化这个类里的random_state
+        # todo: 增加参数：bandwidth_factor， 采样时让bandwidth翻倍，增大采样范围跳出局部最优
+        # fixme: sampled_matrix 没有 nan
+        # todo: tsne支持ohe-only
         n_choices_list = np.array(self.config_transformer.n_choices_list)
         groups = np.array(self.config_transformer.groups)
         # n_groups = self.config_transformer.n_groups
@@ -171,7 +175,7 @@ class TreeStructuredParzenEstimator(BaseDensityEstimator):
             group_mask = groups == group
             if good_kde:
                 # KDE采样
-                result = good_kde.sample(n_candidates)
+                result = good_kde.sample(n_candidates, random_state=random_state)
                 result = mixed_tsne_encoder.inverse_transform(result)
             else:
                 # 随机采样

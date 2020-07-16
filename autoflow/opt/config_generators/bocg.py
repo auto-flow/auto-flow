@@ -12,6 +12,7 @@ from ConfigSpace import Configuration
 from ConfigSpace.util import get_one_exchange_neighbourhood
 from frozendict import frozendict
 from scipy.stats import beta
+from sklearn.preprocessing import KBinsDiscretizer
 from skopt.learning.forest import RandomForestRegressor, ExtraTreesRegressor
 from skopt.learning.gbrt import GradientBoostingQuantileRegressor
 
@@ -42,10 +43,20 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             loss_transformer=None,
             use_local_search=False,
             use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=8,
-            tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True
+            tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True,
+            # meta learn and multi task learn
+            meta_alpha=40, meta_beta=10, support_ensemble_epms=True, update_weight_steps=10
     ):
         super(BayesianOptimizationConfigGenerator, self).__init__()
         # ----member variable-----------------------
+        self.update_weight_steps = max(5, update_weight_steps)
+        if len(budgets) <= 1 and support_ensemble_epms:
+            self.logger.warning(
+                f"'support_weighted_epsm' is True but len(budgets) <= 1 ,  This value is corrected to False.")
+            support_ensemble_epms = False
+        self.support_ensemble_epms = support_ensemble_epms
+        self.meta_beta = meta_beta
+        self.meta_alpha = meta_alpha
         self.use_local_search = use_local_search
         self.sort_by_EI = sort_by_EI
         self.n_candidates = n_candidates
@@ -63,6 +74,10 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         self.n_samples = n_samples
         self.config_space = config_space
         self.budgets = budgets
+        # ----thompson sampling-------------------
+        self.budget2theta = {budget: {"alpha": self.alpha, "beta": self.beta} for budget in budgets}
+        if 0 in budgets:
+            self.budget2theta[0] = {"alpha": self.meta_alpha, "beta": self.meta_beta}
         # ----EPM (empirical performance model)------
         self.epm_params = dict(epm_params)
         if isinstance(epm, str):
@@ -75,7 +90,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         if epm_cls is not None:
             self.epm = epm_cls(**self.epm_params)
         # ----config_transformer-----------------------
-        # todo: 没有必要做这一步，由子类决定
+        # todo: 没有必要做这一步，由子类决定 (config_transformer_params的默认参数变成fronzendict())
         if config_transformer_params is None:
             if epm in ("ET", "RF", "GBRT"):
                 config_transformer_params = {"impute": -1, "ohe": False}
@@ -104,6 +119,8 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         # todo: 这样的判断是否合理？
         if min_points_in_model is None:
             min_points_in_model = max(int(2 * self.config_transformer.n_top_levels), 20)
+        if self.support_ensemble_epms:
+            min_points_in_model += self.update_weight_steps
         self.min_points_in_model = min_points_in_model
         # ----TPE------------------------
         self.tpe_params.update({"top_n_percent": self.top_n_percent})
@@ -127,7 +144,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         self.budget2confevt = {}
         for budget in budgets:
             # todo: budget2weight
-            config_evaluator = config_evaluator_cls(self.budget2epm, budget, None, **self.config_evaluator_params)
+            config_evaluator = config_evaluator_cls(self.budget2epm, budget, **self.config_evaluator_params)
             self.budget2confevt[budget] = config_evaluator
 
     def new_result(self, job: Job, update_model=True):
@@ -164,11 +181,14 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             L = losses.size
             if loss <= sorted_losses[max(1, int(round(L * (self.hit_top_n_percent / 100))))]:
                 state = "hit"
-                self.alpha += 1
+                self.budget2theta[budget]["alpha"] += 1
             else:
                 state = "miss"
-                self.beta += 1
-            self.logger.info(f"Updated beta distributions, state = {state}, alpha = {self.alpha}, beta = {self.beta} .")
+                self.budget2theta[budget]["beta"] += 1
+            alpha = self.budget2theta[budget]["alpha"]
+            beta = self.budget2theta[budget]["beta"]
+            self.logger.info(f"Updated budget {budget} 's beta distributions, state = {state}, "
+                             f"alpha = {alpha}, beta = {beta} .")
         ###################################################################
         ### 3. Judge whether the EPM training conditions are satisfied  ###
         ###################################################################
@@ -190,6 +210,10 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         else:
             epm = self.budget2epm[budget]
         self.budget2epm[budget] = epm.fit(X_obvs, y_obvs)
+        ###########################################
+        ### 6. update surragete model's weight  ###
+        ###########################################
+        self.update_weight()
 
     def transform(self, configs: List[Configuration]):
         X = np.array([config.get_array() for config in configs], dtype="float32")
@@ -221,9 +245,57 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         y_opt = np.min(self.budget2obvs[budget]["losses"])
         return y_opt
 
+    def update_weight(self, force_update=False):
+        # 判断是否要更新权重
+        max_budget = self.get_available_max_budget()
+        # fixme: 热启动时更新权重 : force_update
+        if self.support_ensemble_epms:
+            available_budgets = self.get_available_budgets()
+            if len(available_budgets) < 2:
+                return
+            n_exceed_points = (len(self.budget2obvs[max_budget]["losses"]) - self.min_points_in_model)
+            if force_update or (n_exceed_points >= 0 and n_exceed_points % self.update_weight_steps == 0):
+                force_msg = "force" if force_update else ""
+                self.logger.info(f"In max_budget {max_budget}, n_exceed_points = {n_exceed_points}, "
+                                 f"{force_msg} updating EPMs' weight.")
+                config_evaluator = self.budget2confevt[max_budget]
+                configs = self.budget2obvs[max_budget]["configs"]
+                losses = np.array(self.budget2obvs[max_budget]["losses"])
+                X = self.transform(configs)
+                #  调整各个epm的权重，使得对max_budget的update_weight_steps个观测的rank_loss最小
+                # 从max_budget对应的losses中，按照分布分为update_weight_steps个bins，然后从每个bins中取一个样本
+                # 取出的样本当做训练数据X_test, y_test, 剩下的用来训练max_budget_epm
+                n_test_points = min(self.update_weight_steps, len(losses) // 2)
+                # fixme: 这个报警告。有报错的可能吗？
+                # todo: 引入ensemble_test_size参数，增大测试集的规模
+                kbins = KBinsDiscretizer(n_test_points, strategy="kmeans", encode="ordinal")
+                bins = kbins.fit_transform(losses[:, None]).flatten()
+                sampled_indexes = []
+                indexes = np.arange(len(losses), dtype="int")
+                # 每个bins中抽一个样本
+                for bin_id in np.unique(bins):
+                    mask = bins == bin_id
+                    masked_indexes = indexes[mask]
+                    sampled_indexes.append(self.rng.choice(masked_indexes))  # fixme: 由于算法问题导致采样过少
+                sampled_indexes = np.array(sampled_indexes)
+                # 现在， 已经均匀地从样本中抽了 n_test_points 个样本 ，抽出来的样本用来当EPMs的训练集，
+                # 剩下的样本用来训练max_busget_epm
+                rest_indexes = np.setdiff1d(indexes, sampled_indexes)
+                if len(sampled_indexes) < n_test_points:
+                    n_additional_points = n_test_points - len(sampled_indexes)
+                    additional_indexes = self.rng.choice(rest_indexes, size=n_additional_points, replace=False)
+                    sampled_indexes = np.hstack([sampled_indexes, additional_indexes])
+                    rest_indexes = np.setdiff1d(indexes, sampled_indexes)
+                losses_trans = self.loss_transformer.fit_transform(losses)
+                y_test = losses_trans[sampled_indexes]
+                X_test = X[sampled_indexes, :]
+                max_budget_epm = deepcopy(self.epm)
+                max_budget_epm.fit(X[rest_indexes, :], losses_trans[rest_indexes])
+                config_evaluator.update_weight(max_budget_epm, X_test, y_test)
+
     def get_config(self, budget):
-        budget = self.get_available_max_budget()
-        epm = self.budget2epm[budget]
+        max_budget = self.get_available_max_budget()
+        epm = self.budget2epm[max_budget]
         if epm is None:
             max_sample = 1000
             i = 0
@@ -231,7 +303,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             while i < max_sample:
                 i += 1
                 config = self.config_space.sample_configuration()
-                if self.is_config_exist(budget, config):
+                if self.is_config_exist(max_budget, config):
                     self.logger.info(f"The sample already exists and needs to be resampled. "
                                      f"It's the {i}-th time sampling in random sampling. ")
                 else:
@@ -246,17 +318,17 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         info_dict = {"model_based_pick": True}
         # thompson sampling
         if self.use_thompson_sampling:
-            ts_config, ts_info_dict = self.thompson_sampling(budget, info_dict)
+            ts_config, ts_info_dict = self.thompson_sampling(max_budget, info_dict)
             if ts_config is not None:
                 self.logger.info("Using thompson sampling near the dominant samples.")
                 return ts_config.get_dictionary(), ts_info_dict
         # 让config_evaluator给所有的随机样本打分
         configs = self.config_space.sample_configuration(self.n_samples)
-        losses, configs_sorted = self.evaluate(configs, budget, return_loss_config=True)
+        losses, configs_sorted = self.evaluate(configs, max_budget, return_loss_config=True)
         if self.use_local_search:
-            start_points = self.get_local_search_initial_points(budget, 10, configs_sorted)  # todo 最后把以前跑过的样本删掉
+            start_points = self.get_local_search_initial_points(max_budget, 10, configs_sorted)  # todo 最后把以前跑过的样本删掉
             local_losses, local_configs = self.local_search(start_points,
-                                                            budget)  # todo: 判断start_points 与local_configs的关系
+                                                            max_budget)  # todo: 判断start_points 与local_configs的关系
             concat_losses = np.hstack([losses.flatten(), local_losses.flatten()])
             concat_configs = configs + local_configs
             random_var = self.rng.rand(len(concat_losses))
@@ -266,14 +338,14 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         else:
             concat_losses, concat_configs_sorted = losses, configs_sorted
         # 选取获益最大，且没有出现过的一个配置
-        # todo: 局部搜索
+        # todo: 考虑多worker条件下的config加锁
         for i, config in enumerate(concat_configs_sorted):
-            if self.is_config_exist(budget, config):
+            if self.is_config_exist(max_budget, config):
                 self.logger.info(f"The sample already exists and needs to be resampled. "
                                  f"It's the {i}-th time sampling in bayesian sampling. ")
                 # 超过 max_repeated_samples ， 用TS算法采样
                 if i >= self.max_repeated_samples and self.use_thompson_sampling:
-                    ts_config, ts_info_dict = self.thompson_sampling(budget, info_dict, True)
+                    ts_config, ts_info_dict = self.thompson_sampling(max_budget, info_dict, True)
                     return ts_config.get_dictionary(), ts_info_dict
             else:
                 return config.get_dictionary(), info_dict
@@ -472,16 +544,25 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
 
     def get_available_max_budget(self):
         sorted_budgets = sorted(self.budget2epm.keys())
-        for budget in sorted(self.budget2epm.keys()):
+        for budget in sorted(self.budget2epm.keys(), reverse=True):
             if self.budget2epm[budget] is not None:
                 return budget
         return sorted_budgets[0]
 
+    def get_available_budgets(self):
+        available_budgets = []
+        for budget in sorted(self.budget2epm.keys()):
+            if self.budget2epm[budget] is not None:
+                available_budgets.append(budget)
+            else:
+                break
+        return available_budgets
+
     def thompson_sampling(self, budget, info_dict, hit=False) -> Tuple[Optional[Configuration], Optional[dict]]:
         # todo: 增加 n_candidates, sort_by_EI参数
         info_dict = deepcopy(info_dict)
-        rv = beta(self.alpha, self.beta)
-        prob = rv.rvs()
+        rv = beta(self.budget2theta[budget]["alpha"], self.budget2theta[budget]["beta"])
+        prob = rv.rvs(random_state=self.rng)
         # Samples were taken near the dominant samples
         if (self.rng.rand() < prob) or hit:
             epm = self.budget2epm[budget]
@@ -494,7 +575,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
                 y_obvs = self.tpe_loss_transformer.fit_transform(losses)
                 self.tpe.fit(X_obvs, y_obvs)
                 sampler = self.tpe
-            kwargs = {"n_candidates": self.n_candidates, "sort_by_EI": self.sort_by_EI}
+            kwargs = {"n_candidates": self.n_candidates, "sort_by_EI": self.sort_by_EI, "random_state": self.rng}
             samples = sampler.sample(**get_valid_params_in_kwargs(sampler.sample, kwargs))
             for i, sample in enumerate(samples):
                 if self.is_config_exist(budget, sample):
