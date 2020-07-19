@@ -148,8 +148,8 @@ class ResourceManager(StrSignatureMixin):
         assert db_type in ("sqlite", "postgresql", "mysql")
         self.db_type = db_type
         self.db_params = dict(db_params)
-        if db_type == "sqlite":
-            assert self.file_system_type == "local"
+        # if db_type == "sqlite": # compatible Nitrogen FS
+        #     assert self.file_system_type == "local"
         # ---redis----------------
         self.redis_params = dict(redis_params)
         # ---max_persistent_model---
@@ -249,7 +249,7 @@ class ResourceManager(StrSignatureMixin):
         self.trial_dir = self.file_system.join(self.parent_trials_dir, str(self.user_id), self.task_id, self.hdl_id)
         self.file_system.mkdir(self.trial_dir)
         # ----get specific URL---------
-        models_path = self.file_system.join(self.trial_dir, f"{model_id}_models.{self.compress_suffix}")
+        models_path = self.file_system.join(self.trial_dir, f"{model_id}_models.{self.compress_suffix}") # compatible Nitrogen FS
         y_info_path = self.file_system.join(self.trial_dir, f"{model_id}_y-info.{self.compress_suffix}")
         if info.get("finally_fit_model") is not None:
             finally_fit_model_path = self.file_system.join(self.trial_dir,
@@ -257,8 +257,8 @@ class ResourceManager(StrSignatureMixin):
         else:
             finally_fit_model_path = ""
         # ----do dump---------------
-        self.file_system.dump_pickle(info.pop("models"), models_path)
-        self.file_system.dump_pickle(y_info, y_info_path)
+        models_path = self.file_system.dump_pickle(info.pop("models"), models_path)
+        y_info_path = self.file_system.dump_pickle(y_info, y_info_path)
         if finally_fit_model_path:
             self.file_system.dump_pickle(info.pop("finally_fit_model"), finally_fit_model_path)
         # ----return----------------
@@ -469,10 +469,18 @@ class ResourceManager(StrSignatureMixin):
         self.record_db.create_tables([Dataset])
         return Dataset
 
+    def get_dataset_path(self, dataset_id):
+        dataset_dir = self.file_system.join(self.datasets_dir, str(self.user_id))
+        self.file_system.mkdir(dataset_dir)
+        dataset_path = self.file_system.join(dataset_dir, f"{dataset_id}.h5")
+        return dataset_path
+
     def insert_dataset_record(
             self,
             dataset_id,
             dataset_metadata,
+            dataset_type,
+            dataset_path,
             upload_type,
             dataset_source,
             column_descriptions,
@@ -480,15 +488,11 @@ class ResourceManager(StrSignatureMixin):
             columns
     ):
         self.init_dataset_table()
-        dataset_path = ""
-        if upload_type == "fs":
-            dataset_dir = self.file_system.join(self.datasets_dir, str(self.user_id))
-            self.file_system.mkdir(dataset_dir)
-            dataset_path = self.file_system.join(dataset_dir, f"{dataset_id}.h5")
         return self._insert_dataset_record(
             self.user_id,
             dataset_id,
             dataset_metadata,
+            dataset_type,
             dataset_path,
             upload_type,
             dataset_source,
@@ -502,6 +506,7 @@ class ResourceManager(StrSignatureMixin):
             user_id: int,
             dataset_id: str,
             dataset_metadata: Dict[str, Any],
+            dataset_type: str,
             dataset_path: str,
             upload_type: str,
             dataset_source: str,
@@ -524,7 +529,7 @@ class ResourceManager(StrSignatureMixin):
                 user_id=self.user_id,
                 dataset_metadata=dataset_metadata,
                 dataset_path=dataset_path,
-                dataset_type="dataframe",
+                dataset_type=dataset_type,
                 upload_type=upload_type,
                 dataset_source=dataset_source,
                 column_descriptions=column_descriptions,
@@ -579,7 +584,7 @@ class ResourceManager(StrSignatureMixin):
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
         df.to_hdf(tmp_path, "dataset")
-        self.file_system.upload(dataset_path, tmp_path)
+        return self.file_system.upload(dataset_path, tmp_path)
 
     def upload_ndarray_to_fs(self, arr: np.ndarray, dataset_path):
         tmp_path = f"/tmp/tmp_arr_{os.getpid()}.h5"
@@ -587,7 +592,7 @@ class ResourceManager(StrSignatureMixin):
             os.remove(tmp_path)
         with h5py.File(tmp_path, 'w') as hf:
             hf.create_dataset("dataset", data=arr)
-        self.file_system.upload(dataset_path, tmp_path)
+        return self.file_system.upload(dataset_path, tmp_path)
 
     def get_dataset_records(self, dataset_id) -> List[Dict[str, Any]]:
         self.init_dataset_table()
@@ -633,8 +638,8 @@ class ResourceManager(StrSignatureMixin):
         tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
         self.file_system.download(dataset_path, tmp_path)
         df: pd.DataFrame = pd.read_hdf(tmp_path, "dataset")
-        if columns is not None:
-            df = df[columns]
+        # if columns is not None:
+        #     df = df[columns]
         return df
 
     def download_arr_from_fs(self, dataset_path):
@@ -706,10 +711,9 @@ class ResourceManager(StrSignatureMixin):
         experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
         # 实验结果模型序列化
         final_model = final_model.copy()
-        if final_model.data_manager is not None:
-            assert final_model.data_manager.is_empty()
+        assert final_model.data_manager.is_empty()
         self.start_safe_close()
-        self.file_system.dump_pickle(final_model, experiment_model_path)
+        experiment_model_path = self.file_system.dump_pickle(final_model, experiment_model_path)
         self.end_safe_close()
         # 日志上传
         if os.path.exists(local_log_path):
@@ -719,14 +723,13 @@ class ResourceManager(StrSignatureMixin):
             shutil.copy(local_log_path, tmp_log_path)
             if del_local_log_path:
                 os.remove(local_log_path)
-            self.file_system.upload(experiment_log_path, tmp_log_path)
-            if os.path.exists(local_log_path):
-                os.remove(local_log_path)
+            experiment_log_path = self.file_system.upload(experiment_log_path, tmp_log_path)
         else:
             experiment_log_path = ""
             self.logger.warning(f"Local log path : '{local_log_path}' didn't exist!")
         # 信息上传数据库
         self.finish_experiment_update_info(experiment_model_path, experiment_log_path, datetime.datetime.now())
+
 
     def finish_experiment_update_info(self, final_model_path, log_path, end_time):
         self.init_experiment_table()
@@ -739,6 +742,11 @@ class ResourceManager(StrSignatureMixin):
         experiment.log_path = log_path
         experiment.end_time = end_time
         experiment.save()
+
+    def _get_experiment_record(self, experiment_id):
+        experiment_records = self.ExperimentModel.select().where(
+            self.ExperimentModel.experiment_id == experiment_id).dicts()
+        return list(experiment_records)
 
     def init_experiment_table(self):
         if self.is_init_experiment:
@@ -819,7 +827,8 @@ class ResourceManager(StrSignatureMixin):
         task_metadata = dict(
             dataset_metadata=dataset_metadata, **task_metadata
         )
-        self.task_id = self._insert_task_record(
+        self.task_id = task_id
+        self._insert_task_record(
             task_id, self.user_id, metric_str, splitter_dict, ml_task_dict, train_set_id,
             test_set_id, train_label_id, test_label_id, specific_task_token, task_metadata,
             sub_sample_indexes, sub_feature_indexes
@@ -897,7 +906,8 @@ class ResourceManager(StrSignatureMixin):
         self.init_hdl_table()
         hdl_hash = get_hash_of_dict(hdl)
         hdl_id = hdl_hash
-        self.hdl_id = self._insert_hdl_record(self.task_id, hdl_id, self.user_id, hdl, hdl_metadata)
+        self.hdl_id = hdl_id
+        self._insert_hdl_record(self.task_id, hdl_id, self.user_id, hdl, hdl_metadata)
 
     def _insert_hdl_record(self, task_id: str, hdl_id: str, user_id: int, hdl: dict, hdl_metadata: Dict[str, Any]):
         records = self.HdlModel.select().where(

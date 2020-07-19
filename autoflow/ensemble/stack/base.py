@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression, ElasticNet
 
 from autoflow.ensemble.base import EnsembleEstimator
 from autoflow.utils import typing_
+from autoflow.utils.logging_ import get_logger
 
 
 class StackEstimator(EnsembleEstimator):
@@ -18,11 +19,17 @@ class StackEstimator(EnsembleEstimator):
         assert self.mainTask in ("classification", "regression")
         if not meta_learner:
             if self.mainTask == "classification":
-                meta_learner = LogisticRegression(penalty='l2', solver="lbfgs", multi_class="auto",
-                                                  random_state=10)
+                meta_learner = LogisticRegression(
+                    penalty='elasticnet',
+                    solver="saga",
+                    l1_ratio=0.5,
+                    C=1.0,
+                    fit_intercept=False
+                )
             elif self.mainTask == "regression":
-                meta_learner = ElasticNet()
+                meta_learner = ElasticNet(fit_intercept=False,random_state=10)
         self.meta_learner = meta_learner
+        self.logger=get_logger(self)
 
     def fit(self, X, y):
         # fixme: 2020-4-9 更新后， 此方法弃用
@@ -40,7 +47,13 @@ class StackEstimator(EnsembleEstimator):
     ):
         super(StackEstimator, self).fit_trained_data(estimators_list, y_preds_list, y_true_indexes_list, y_true)
         meta_features = self.predict_meta_features(None, True)
+        # todo: 对元学习器做 automl
         self.meta_learner.fit(meta_features, self.stacked_y_true)
+        score=self.meta_learner.score(meta_features, self.stacked_y_true)
+        self.logger.info(f"meta_learner's performance: {score}")
+        self.logger.info(f"meta_learner's coefficient: {self.meta_learner.coef_}")
+
+
 
     def predict_meta_features(self, X, is_train):
         raise NotImplementedError

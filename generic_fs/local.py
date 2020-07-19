@@ -52,6 +52,7 @@ class LocalFS(FileSystem):
 
     def dump_pickle(self, data, path):
         dump(data, path)
+        return path
 
     def load_pickle(self, path):
         return load(path)
@@ -67,6 +68,7 @@ class LocalFS(FileSystem):
             logger.warning(f"{path} already exists, don't upload.")
             return
         shutil.move(local_path, path)
+        return path
 
     def download(self, path, local_path):
         if os.path.exists(local_path):

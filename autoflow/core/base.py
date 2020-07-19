@@ -16,16 +16,17 @@ from autoflow import constants
 from autoflow.constants import ExperimentType, SUBSAMPLES_BUDGET_MODE
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_manager import DataManager
-from autoflow.ensemble.base import EnsembleEstimator
+from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
+from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2budget_mode
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.metrics import r2, accuracy
 from autoflow.opt.result_logger import DatabaseResultLogger
 from autoflow.opt.utils import get_max_SH_iter, get_budgets
-from autoflow.metrics import r2, accuracy
 from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
 from autoflow.utils.config_space import replace_phps
@@ -582,7 +583,6 @@ class AutoFlowEstimator(BaseEstimator):
         return self
         # todo: 重新实现手动建模
 
-
     def start_final_step(self, fit_ensemble_params):
         if isinstance(fit_ensemble_params, str):
             if fit_ensemble_params == "auto":
@@ -632,13 +632,10 @@ class AutoFlowEstimator(BaseEstimator):
             instance_id=self.instance_id
         )
 
-
-
     def fit_ensemble(
             self,
             task_id=None,
             hdl_id=None,
-            budget_id=None,
             trials_fetcher="GetBestK",
             trials_fetcher_params=frozendict(k=10),
             ensemble_type="stack",
@@ -653,11 +650,10 @@ class AutoFlowEstimator(BaseEstimator):
             assert hasattr(self.resource_manager, "task_id") and self.resource_manager.task_id is not None
             task_id = self.resource_manager.task_id
         self.task_id = task_id
-        self.hdl_id = hdl_id
-        self.budget_id = budget_id
         self.resource_manager.task_id = task_id
-        self.resource_manager.hdl_id = hdl_id
-        self.resource_manager.budget_id = budget_id
+        if hdl_id is not None:
+            self.hdl_id = hdl_id
+            self.resource_manager.hdl_id = hdl_id
         if fit_ensemble_alone:
             setup_logger(self.log_path, self.log_config)
             if fit_ensemble_alone:
@@ -681,14 +677,25 @@ class AutoFlowEstimator(BaseEstimator):
             task_id, hdl_id, trial_ids, self.resource_manager).fetch()
         # todo: 在这里，只取了验证集的数据，没有取测试集的数据。待拓展
         ml_task, y_true = self.resource_manager.get_ensemble_needed_info(task_id)
-        ensemble_estimator_package_name = f"autoflow.ensemble.{ensemble_type}.{ml_task.role}"
-        ensemble_estimator_package = import_module(ensemble_estimator_package_name)
-        ensemble_estimator_class_name = get_class_name_of_module(ensemble_estimator_package_name)
-        ensemble_estimator_class = getattr(ensemble_estimator_package, ensemble_estimator_class_name)
-        ensemble_estimator: EnsembleEstimator = ensemble_estimator_class(**ensemble_params)
-        ensemble_estimator.fit_trained_data(estimator_list, y_true_indexes_list, y_preds_list, y_true)
+        if len(estimator_list) == 0:
+            raise ValueError("Length of estimator_list must >=1. ")
+        elif len(estimator_list) == 1:
+            self.logger.info("Length of estimator_list == 1, don't do ensemble.")
+            if ml_task.mainTask == "classification":
+                ensemble_estimator = VoteClassifier(estimator_list[0])
+            else:
+                ensemble_estimator = MeanRegressor(estimator_list[0])
+        else:
+            ensemble_estimator_package_name = f"autoflow.ensemble.{ensemble_type}.{ml_task.role}"
+            ensemble_estimator_package = import_module(ensemble_estimator_package_name)
+            ensemble_estimator_class_name = get_class_name_of_module(ensemble_estimator_package_name)
+            ensemble_estimator_class = getattr(ensemble_estimator_package, ensemble_estimator_class_name)
+            # ensemble_estimator : EnsembleEstimator
+            ensemble_estimator = ensemble_estimator_class(**ensemble_params)
+            ensemble_estimator.fit_trained_data(estimator_list, y_true_indexes_list, y_preds_list, y_true)
         self.ensemble_estimator = ensemble_estimator
         if fit_ensemble_alone:
+            self.estimator = self.ensemble_estimator
             self.resource_manager.finish_experiment(self.log_path, self)
         return self.ensemble_estimator
 

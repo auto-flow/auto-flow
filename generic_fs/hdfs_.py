@@ -113,6 +113,7 @@ class HDFS(FileSystem):
         dump(data, tmp_path)
         self.client.upload_remote(path, tmp_path)
         os.remove(tmp_path)
+        return path
 
     def load_pickle(self, path):
         # todo : 对比远程与本地的MD5 建立缓存系统？
@@ -128,6 +129,7 @@ class HDFS(FileSystem):
         self.connect_fs()
         self.client.upload_remote(path, local_path)
         os.remove(local_path)
+        return path
 
     def download(self, path, local_path):
         self.connect_fs()

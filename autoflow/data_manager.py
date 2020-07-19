@@ -383,6 +383,8 @@ class DataManager(StrSignatureMixin):
             if not np.all(X.columns == self.columns):
                 self.logger.warning(f"{X.dataset_source}'s columns do not match the TrainSet's columns by position!")
                 X.data = X.data[self.columns]
+        elif isinstance(X_origin,DataFrameContainer):
+            pass
         else:
             raise NotImplementedError
         X.set_feature_groups(self.feature_groups)

@@ -85,17 +85,16 @@ class DataFrameContainer(DataContainer):
         self.dataset_id = self.get_hash()
         if self.dataset_id == self.uploaded_hash:
             return
-        respond = self.resource_manager.insert_dataset_record(
-            self.dataset_id, self.dataset_metadata, upload_type, self.dataset_source, self.column_descriptions,
-            self.columns_mapper, list(self.columns))
-        L, dataset_id, dataset_path = respond["length"], respond["dataset_id"], respond["dataset_path"]
-        if L != 0:
-            self.logger.info(f"Dataset ID: {dataset_id} is already exists, {self.dataset_source} will not upload. ")
-        else:
-            if upload_type == "table":
-                self.resource_manager.upload_df_to_table(self.data, self.dataset_id, self.columns_mapper)
-            else:
-                self.resource_manager.upload_df_to_fs(self.data, dataset_path)
+        dataset_path = self.resource_manager.get_dataset_path(self.dataset_id)
+        dataset_path = self.resource_manager.upload_df_to_fs(self.data, dataset_path)
+        response = self.resource_manager.insert_dataset_record(
+            self.dataset_id, self.dataset_metadata, self.dataset_type, dataset_path,
+            upload_type, self.dataset_source, self.column_descriptions,
+            self.columns_mapper, list(self.columns)
+        )
+        if response["length"] == 0:
+            self.logger.info(f"Dataset ID: {self.dataset_id} is already exists, "
+                             f"{self.dataset_source} will not upload. ")
         super(DataFrameContainer, self).upload(upload_type)
 
     def download(self, dataset_id):
@@ -114,8 +113,8 @@ class DataFrameContainer(DataContainer):
             df = self.resource_manager.download_df_from_table(dataset_id, columns, self.columns_mapper)
         else:
             df = self.resource_manager.download_df_from_fs(dataset_path, columns)
-        inverse_columns_mapper = inverse_dict(self.columns_mapper)
-        df.columns.map(inverse_columns_mapper)
+        # inverse_columns_mapper = inverse_dict(self.columns_mapper)
+        # df.columns.map(inverse_columns_mapper)
         # todo: 建立本地缓存，防止二次下载
         self.data = df
         self.set_column_descriptions(column_descriptions)
