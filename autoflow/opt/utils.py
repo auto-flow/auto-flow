@@ -4,7 +4,7 @@
 # @Contact    : tqichun@gmail.com
 from copy import deepcopy
 from fractions import Fraction
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List
 
 import numpy as np
 from ConfigSpace import ConfigurationSpace, Constant, CategoricalHyperparameter, Configuration
@@ -20,24 +20,26 @@ from autoflow.utils.logging_ import get_logger
 inc_logger = get_logger("incumbent trajectory")
 logger = get_logger(__name__)
 
-def is_top_level_activated(config_space,config,hp_name,hp_value=None):
-    parent_conditions=config_space.get_parent_conditions_of(hp_name)
+
+def is_top_level_activated(config_space, config, hp_name, hp_value=None):
+    parent_conditions = config_space.get_parent_conditions_of(hp_name)
     if len(parent_conditions):
         parent_condition = parent_conditions[0]
         parent_value = parent_condition.value
         parent_name = parent_condition.parent.name
-        return is_top_level_activated(config_space,config,parent_name,parent_value)
+        return is_top_level_activated(config_space, config, parent_name, parent_value)
     # 没有条件依赖，就是parent
     if hp_value is None:
         return True
-    return config[hp_name]==hp_value
+    return config[hp_name] == hp_value
+
 
 def deactivate(config_space, vector):
     result = deepcopy(vector)
     config = Configuration(config_space, vector=vector)
     for i, hp in enumerate(config_space.get_hyperparameters()):
         name = hp.name
-        if not is_top_level_activated(config_space,config,name,None):
+        if not is_top_level_activated(config_space, config, name, None):
             result[i] = np.nan
     result_config = Configuration(configuration_space=config_space, vector=result)
     return result_config
@@ -354,6 +356,23 @@ class LogScaledLossTransformer(LossTransformer):
         y[y == -np.inf] = f_min
         y[y == np.inf] = f_max
         return y
+
+
+def add_configs_origin(configs: List[Configuration], origin):
+    if isinstance(configs, Configuration):
+        configs = [configs]
+    for config in configs:
+        config.origin = origin
+
+
+def process_config_info_pair(config: Configuration, info_dict: dict):
+    info_dict = deepcopy(info_dict)
+    if config.origin is None:
+        config.origin = "unknown"
+    info_dict.update({
+        "origin": config.origin
+    })
+    return config.get_dictionary(), info_dict
 
 
 if __name__ == '__main__':

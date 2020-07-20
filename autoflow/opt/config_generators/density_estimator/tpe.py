@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 from sklearn.neighbors import KernelDensity
 
 from autoflow.opt.config_generators.density_estimator.base import BaseDensityEstimator
-from autoflow.opt.utils import LabelTsneEncoder, MixedTsneEncoder
+from autoflow.opt.utils import LabelTsneEncoder, MixedTsneEncoder, add_configs_origin
 
 
 def estimate_bw(data, bw_method="scott", cv_times=100):
@@ -201,6 +201,9 @@ class TreeStructuredParzenEstimator(BaseDensityEstimator):
                 candidates.append(config)
             else:
                 n_fails += 1
+        add_configs_origin(candidates, "TPE sampling")
         if n_fails:
-            candidates.append(self.config_transformer.config_space.sample_configuration(n_fails))
+            random_candidates = self.config_transformer.config_space.sample_configuration(n_fails)
+            add_configs_origin(random_candidates, "Random Search")
+            candidates.extend(random_candidates)
         return candidates

@@ -24,7 +24,7 @@ from .density_estimator.kde import KDE4BO
 from .density_estimator.tpe import TreeStructuredParzenEstimator
 from ..structure import Job
 from ..utils import ConfigurationTransformer, LossTransformer, ScaledLossTransformer, \
-    LogScaledLossTransformer
+    LogScaledLossTransformer, add_configs_origin, process_config_info_pair, pprint_budget
 
 epm_str2cls = {
     "ET": ExtraTreesRegressor,
@@ -179,16 +179,17 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         if config_info.get("thompson_sampling", False):
             sorted_losses = np.sort(losses)
             L = losses.size
-            if loss <= sorted_losses[max(1, int(round(L * (self.hit_top_n_percent / 100))))]:
-                state = "hit"
-                self.budget2theta[budget]["alpha"] += 1
-            else:
-                state = "miss"
-                self.budget2theta[budget]["beta"] += 1
-            alpha = self.budget2theta[budget]["alpha"]
-            beta = self.budget2theta[budget]["beta"]
-            self.logger.info(f"Updated budget {budget} 's beta distributions, state = {state}, "
-                             f"alpha = {alpha}, beta = {beta} .")
+            if L >= 2:
+                if loss <= sorted_losses[max(0, int(round(L * (self.hit_top_n_percent / 100))))]:
+                    state = "hit"
+                    self.budget2theta[budget]["alpha"] += 1
+                else:
+                    state = "miss"
+                    self.budget2theta[budget]["beta"] += 1
+                alpha = self.budget2theta[budget]["alpha"]
+                beta = self.budget2theta[budget]["beta"]
+                self.logger.info(f"Updated budget {pprint_budget(budget)} 's beta distributions, state = {state}, "
+                                 f"alpha = {alpha}, beta = {beta} .")
         ###################################################################
         ### 3. Judge whether the EPM training conditions are satisfied  ###
         ###################################################################
@@ -303,17 +304,19 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             while i < max_sample:
                 i += 1
                 config = self.config_space.sample_configuration()
+                add_configs_origin(config, "Initial Design")
                 if self.is_config_exist(max_budget, config):
                     self.logger.info(f"The sample already exists and needs to be resampled. "
                                      f"It's the {i}-th time sampling in random sampling. ")
                 else:
-                    return config.get_dictionary(), info_dict
+                    return process_config_info_pair(config, info_dict)
             # todo: 收纳这个代码块
             seed = self.rng.randint(1, 8888)
             self.config_space.seed()
             config = self.config_space.sample_configuration()
+            add_configs_origin(config, "Initial Design")
             info_dict.update({"sampling_different_samples_failed": True, "seed": seed})
-            return config.get_dictionary(), info_dict
+            return process_config_info_pair(config, info_dict)
 
         info_dict = {"model_based_pick": True}
         # thompson sampling
@@ -321,14 +324,16 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             ts_config, ts_info_dict = self.thompson_sampling(max_budget, info_dict)
             if ts_config is not None:
                 self.logger.info("Using thompson sampling near the dominant samples.")
-                return ts_config.get_dictionary(), ts_info_dict
+                return process_config_info_pair(ts_config, ts_info_dict)
         # 让config_evaluator给所有的随机样本打分
         configs = self.config_space.sample_configuration(self.n_samples)
         losses, configs_sorted = self.evaluate(configs, max_budget, return_loss_config=True)
+        add_configs_origin(configs_sorted, "Random Search (Sorted)")
         if self.use_local_search:
             start_points = self.get_local_search_initial_points(max_budget, 10, configs_sorted)  # todo 最后把以前跑过的样本删掉
             local_losses, local_configs = self.local_search(start_points,
                                                             max_budget)  # todo: 判断start_points 与local_configs的关系
+            add_configs_origin(local_configs, "Local Search")
             concat_losses = np.hstack([losses.flatten(), local_losses.flatten()])
             concat_configs = configs + local_configs
             random_var = self.rng.rand(len(concat_losses))
@@ -346,15 +351,16 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
                 # 超过 max_repeated_samples ， 用TS算法采样
                 if i >= self.max_repeated_samples and self.use_thompson_sampling:
                     ts_config, ts_info_dict = self.thompson_sampling(max_budget, info_dict, True)
-                    return ts_config.get_dictionary(), ts_info_dict
+                    return process_config_info_pair(ts_config, ts_info_dict)
             else:
-                return config.get_dictionary(), info_dict
+                return process_config_info_pair(config, info_dict)
         # todo: 收纳这个代码块
         seed = self.rng.randint(1, 8888)
         self.config_space.seed(seed)
         config = self.config_space.sample_configuration()
+        add_configs_origin(config, "Initial Design")
         info_dict.update({"sampling_different_samples_failed": True, "seed": seed})
-        return config.get_dictionary(), info_dict
+        return process_config_info_pair(config, info_dict)
 
     def get_local_search_initial_points(self, budget, num_points, additional_start_points):
         # 对之前的样本做评价
