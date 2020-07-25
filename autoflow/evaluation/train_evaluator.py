@@ -213,8 +213,9 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 # when  budget  > 1 , budget will be interpreted as kfolds num by 'budget2kfold'
                 # for example, budget = 4 , budget2kfold = {4: 10}, we only do 10 times cross-validation,
                 # so we break when fold_ix == 10 - 1 == 9
-                if budget > 1 and fold_ix == self.budget2kfold[budget] - 1:
-                    break
+                if isinstance(self.budget2kfold,dict) and budget in self.budget2kfold:
+                    if budget > 1 and fold_ix == self.budget2kfold[budget] - 1:
+                        break
             if self.ml_task.mainTask == "classification":
                 additional_info["confusion_matrices"] = confusion_matrices
             if support_early_stopping:

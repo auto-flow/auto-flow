@@ -299,6 +299,8 @@ class AutoFlowEstimator(BaseEstimator):
                     self.budget2kfold = {}
                 else:
                     self.budget2kfold = {self.max_budget: self.n_splits}
+        if self.budget2kfold is None:
+            self.budget2kfold = {}
         # set n_iterations
         # fixme: 有拍脑袋的嫌疑
         if self.n_iterations is None:

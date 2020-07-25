@@ -14,7 +14,7 @@
 //      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
-      "n_estimators": 5000,
+      "n_estimators": 2000,
 //      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
@@ -36,14 +36,14 @@
       "random_state": 42
     },
     "extra_trees": {
-      "n_estimators": 5000,
+      "n_estimators": 1000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
       "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
 //      "max_features": {"_type": "uniform", "_value": [0.01, 1.0],"_default": 1},
-      "max_depth":  null, //{"_type": "int_uniform", "_value": [5, 100],"_default": 30},
+      "max_depth":  {"_type": "int_uniform", "_value": [5, 100],"_default": 30},
       "min_samples_split": {"_type": "int_uniform", "_value": [2, 20],"_default": 2},
       "min_samples_leaf": {"_type": "int_uniform", "_value": [1, 20],"_default": 1},
       "min_weight_fraction_leaf": 0,
@@ -56,7 +56,7 @@
     "gaussian_nb": {
     },
     "gradient_boosting": {
-      "n_estimators": 5000,
+      "n_estimators": 2000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
       "iter_inc": 25,
@@ -81,7 +81,7 @@
       "_n_components__sp1_ratio": {"_type": "quniform", "_value": [0.1,0.9],"_default": 0.5}
     },
     "liblinear_svc": {
-      "max_iter": 3000,
+      "max_iter": {"_type": "int_quniform","_value": [300, 3000, 100], "_default": 600},
       "penalty":  {"_type": "choice", "_value": ["l1", "l2"],"_default": "l2"},
       "dual": {"_type": "choice", "_value": [true,false],"_default": false},
       "loss":  {"_type": "choice", "_value": ["hinge", "squared_hinge"],"_default": "squared_hinge"},
@@ -115,8 +115,8 @@
       "random_state": 42
     },
     "lightgbm": {
-      "n_estimators": 5000,
-      "boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"],"_default": "gbdt"},
+      "n_estimators": 2000,
+      "boosting_type":  "gbdt",
       "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,100],"_default": 31},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
@@ -138,7 +138,7 @@
       "C": {"_type": "loguniform", "_value": [0.01, 10000],"_default": 1.0},
       "random_state": 42,
       "n_jobs": 1,
-      "max_iter": 5000,
+      "max_iter": 1000,
       "early_stopping_rounds": 5,
       "early_stopping_tol": 0.0,
       "iter_inc": 100
@@ -151,14 +151,14 @@
       "reg_param": {"_type": "quniform", "_value": [0.0,1.0],"_default": 0}
     },
     "random_forest": {
-      "n_estimators": 5000,
+      "n_estimators": 1000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
       "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
 //      "max_features": {"_type": "uniform", "_value": [0.01, 1.0],"_default": 1},
-      "max_depth":  null, //{"_type": "int_uniform", "_value": [5, 100],"_default": 30},
+      "max_depth":  {"_type": "int_uniform", "_value": [5, 100],"_default": 30},
       "min_samples_split": {"_type": "int_uniform", "_value": [2, 20],"_default": 2},
       "min_samples_leaf": {"_type": "int_uniform", "_value": [1, 20],"_default": 1},
       "min_weight_fraction_leaf": 0.0,
@@ -169,7 +169,7 @@
       "random_state": 42
     },
     "sgd": {
-      "max_iter": 5000,
+      "max_iter": 1000,
       "early_stopping_rounds": 5,
       "early_stopping_tol": 0.0,
       "iter_inc": 100,
@@ -210,7 +210,7 @@
       "normalize": {"_type": "choice", "_value": [true,false],"_default": true},
       "fit_intercept": true,
     },
-    "ard_regression": {
+    "ard_regression": {  // basically not applicable
       "n_iter": 300,
       "alpha_1": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
       "alpha_2": {"_type": "loguniform", "_value": [1e-10,10e-3],"_default": 1e-6},
@@ -223,7 +223,7 @@
 //      "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,15],"_default": 7},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
-      "n_estimators": 5000,
+      "n_estimators": 2000,
 //      "min_data_in_leaf": {"_type": "int_quniform","_value": [0,6,1],"_default": 1},  //todo :
       "subsample":  {"_type": "quniform", "_value": [0.1,1],"_default": 1},
       "l2_leaf_reg": {"_type": "loguniform","_value": [0.1,100], "_default": 3},
@@ -245,7 +245,7 @@
       "random_state": 42
     },
     "elasticnet": {
-      "max_iter":  5000,
+      "max_iter":  1000,
       "early_stopping_rounds": 5,
       "early_stopping_tol": 0.0,
       "iter_inc": 100,
@@ -258,14 +258,14 @@
       "random_state": 42
     },
     "extra_trees": {
-      "n_estimators": 5000,
+      "n_estimators": 1000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
       "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},//delete "mae"
 //      "max_features": {"_type": "uniform", "_value": [0.01, 1.0],"_default": 1},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
-      "max_depth":  null, //{"_type": "int_uniform", "_value": [5, 100],"_default": 30},
+      "max_depth":  {"_type": "int_uniform", "_value": [5, 100],"_default": 30},
       "min_samples_split": {"_type": "int_uniform", "_value": [2, 20],"_default": 2},
       "min_samples_leaf": {"_type": "int_uniform", "_value": [1, 20],"_default": 1},
       "min_weight_fraction_leaf": 0,
@@ -273,7 +273,7 @@
       "min_impurity_decrease": 0,
       "bootstrap": {"_type": "choice","_value": [true,false],"_default": true},
       "random_state": 42,
-      "n_jobs": -1
+      "n_jobs": 1
     },
     "gaussian_process": {
       "n_restarts_optimizer": 10,
@@ -286,7 +286,7 @@
       "random_state": 42
     },
     "gradient_boosting": {
-      "n_estimators": 5000,
+      "n_estimators": 2000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
       "iter_inc": 25,
@@ -347,8 +347,8 @@
       "random_state": 42
     },
     "lightgbm": {
-      "n_estimators": 5000,
-      "boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"],"_default": "gbdt"},
+      "n_estimators": 2000,
+      "boosting_type":  "gbdt",
       "num_leaves":  {"_type": "int_quniform", "_value": [10,150],"_default": 31},
       "max_depth": {"_type": "int_quniform", "_value": [1,100],"_default": 31},
       "learning_rate": {"_type": "loguniform", "_value": [1e-2,0.2],"_default": 0.1},
@@ -364,14 +364,14 @@
       "random_state": 42
     },
     "random_forest": {
-      "n_estimators": 5000,
+      "n_estimators": 1000,
       "early_stopping_rounds": 10,
       "early_stopping_tol": 0.0,
       "iter_inc": 25,
       "criterion": {"_type": "choice","_value": ["mse", "friedman_mse"],"_default": "friedman_mse"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
 //      "max_features": {"_type": "uniform", "_value": [0.01, 1.0],"_default": 1},
-      "max_depth":  null, //{"_type": "int_uniform", "_value": [5, 100],"_default": 30},
+      "max_depth":  {"_type": "int_uniform", "_value": [5, 100],"_default": 30},
       "min_samples_split": {"_type": "int_uniform", "_value": [2, 20],"_default": 2},
       "min_samples_leaf": {"_type": "int_uniform", "_value": [1, 20],"_default": 1},
       "min_weight_fraction_leaf": 0.0,
@@ -382,7 +382,7 @@
       "random_state": 42
     },
     "sgd": {
-      "max_iter": 5000,
+      "max_iter": 1000,
       "early_stopping_rounds": 5,
       "early_stopping_tol": 0.0,
       "iter_inc": 100,
