@@ -39,6 +39,7 @@ hdl={
 
 hdl2shps=HDL2SHPS()
 shps=hdl2shps(hdl)
+exit(0)
 # print(shps)
 
 # Configuration space object:

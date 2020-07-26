@@ -2,7 +2,6 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Union, Tuple, List, Any, Dict
 
-import numpy as np
 import pandas as pd
 from frozendict import frozendict
 
@@ -37,13 +36,14 @@ class HDL_Constructor(StrSignatureMixin):
             hdl_bank_path=None,
             hdl_bank=None,
             hdl_metadata=frozendict(),
+            balance_strategies=("weight", "None"),
             included_classifiers=(
-                    "adaboost", "catboost", "decision_tree", "extra_trees", "gaussian_nb", "k_nearest_neighbors",
-                    "liblinear_svc", "libsvm_svc", "lightgbm", "logistic_regression", "random_forest", "sgd"),
+                    "adaboost", "catboost", "decision_tree", "extra_trees", "gaussian_nb", "knn",
+                    "linearsvc", "svc", "lightgbm", "logistic_regression", "random_forest", "sgd"),
             included_regressors=(
                     "adaboost", "bayesian_ridge", "catboost", "decision_tree", "elasticnet", "extra_trees",
-                    "gaussian_process", "k_nearest_neighbors", "kernel_ridge",
-                    "liblinear_svr", "lightgbm", "random_forest", "sgd"),
+                    "gaussian_process", "knn", "kernel_ridge",
+                    "linearsvr", "lightgbm", "random_forest", "sgd"),
             included_highR_nan_imputers=("operate.drop", "operate.keep_going"),
             included_nan_imputers=(
                     "impute.adaptive_fill",),
@@ -68,123 +68,7 @@ class HDL_Constructor(StrSignatureMixin):
             })
 
     ):
-        '''
-
-        Parameters
-        ----------
-        DAG_workflow: str or dict, default="generic_recommend"
-
-            directed acyclic graph (DAG) workflow to describe the machine-learning procedure.
-
-            By default, this value is  "generic_recommend", means HDL_Constructor will analyze the training data
-            to recommend a valid DAG workflow.
-
-            If you want design DAG workflow by yourself, you can seed a dict .
-
-        hdl_bank_path: str, default=None
-
-            ``hdl_bank`` is a json file which contains  all the hyper-parameters of the algorithm.
-
-            ``hdl_bank_path`` is this file's path. If it is None, ``autoflow/hdl/hdl_bank.json`` will be choosed.
-
-        hdl_bank: dict, default=None
-
-            If you pass param ``hdl_bank_path=None`` and pass  ``hdl_bank`` as a dict,
-            program will not load ``hdl_bank.json``, it uses passed ``hdl_bank`` directly.
-
-        included_classifiers: list or tuple
-
-            active if ``DAG_workflow="generic_recommend"``, and all of the following params will active in such situation.
-
-            It decides which **classifiers** will consider in the algorithm selection.
-
-        included_regressors: list or tuple
-
-            It decides which **regressors** will consider in the algorithm selection.
-
-        included_highR_nan_imputers: list or tuple
-
-            ``highR_nan`` is a feature_group, means ``NaN`` has a high ratio in a column.
-
-            for example:
-
-            >>> from numpy import NaN
-            >>> column = [1, 2, NaN, NaN, NaN]    # nan ratio is 60% , more than 50% (default highR_nan_threshold)
-
-            ``highR_nan_imputers`` algorithms will handle such columns contain high ratio missing value.
-
-        included_cat_nan_imputers: list or tuple
-
-            ``cat_nan`` is a feature_group, means a categorical feature column contains ``NaN`` value.
-
-            for example:
-
-            >>> column = ["a", "b", "c", "d", NaN]
-
-            ``cat_nan_imputers`` algorithms will handle such columns.
-
-        included_num_nan_imputers: list or tuple
-
-            ``num_nan`` is a feature_group, means a numerical feature column contains ``NaN`` value.
-
-            for example:
-
-            >>> column = [1, 2, 3, 4, NaN]
-
-            ``num_nan_imputers`` algorithms will handle such columns.
-
-        included_highR_cat_encoders: list or tuple
-
-            ``highR_cat`` is a feature_group, means a categorical feature column contains highly cardinality ratio.
-
-            for example:
-
-            >>> import numpy as np
-            >>> column = ["a", "b", "c", "d", "a"]
-            >>> rows = len(column)
-            >>> np.unique(column).size / rows  # result is 0.8 , is higher than 0.5 (default highR_cat_ratio)
-            0.8
-            
-            ``highR_cat_imputers`` algorithms will handle such columns.
-
-        included_lowR_cat_encoders: list or tuple
-        
-            ``lowR_cat`` is a feature_group, means a categorical feature column contains lowly cardinality ratio.
-
-            for example:
-
-            >>> import numpy as np
-            >>> column = ["a", "a", "a", "d", "a"]
-            >>> rows = len(column)
-            >>> np.unique(column).size / rows  # result is 0.4 , is lower than 0.5 (default lowR_cat_ratio)
-            0.4
-            
-            ``lowR_cat_imputers`` algorithms will handle such columns.
-
-        Attributes
-        ----------
-        random_state: int
-
-        ml_task: :class:`autoflow.utils.ml_task.MLTask`
-
-        data_manager: :class:`autoflow.manager.data_manager.DataManager`
-
-        hdl: dict
-            construct by :meth:`run`
-
-        Examples
-        ----------
-        >>> import numpy as np
-        >>> from autoflow.manager.data_manager import DataManager
-        >>> from autoflow.hdl.hdl_constructor import  HDL_Constructor
-        >>> hdl_constructor = HDL_Constructor(DAG_workflow={"num->target":["lightgbm"]},
-        ...   hdl_bank={"classification":{"lightgbm":{"boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"]}}}})
-        >>> data_manager = DataManager(X_train=np.random.rand(3,3), y_train=np.arange(3))
-        >>> hdl_constructor.run(data_manager, 42, 0.5)
-        >>> hdl_constructor.hdl
-        {'preprocessing': {}, 'estimating(choice)': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
-
-        '''
+        self.balance_strategies = balance_strategies
         self.date2purified_workflow = date2purified_workflow
         self.text2purified_workflow = text2purified_workflow
         self.purified2final_workflow = purified2final_workflow
@@ -500,7 +384,7 @@ class HDL_Constructor(StrSignatureMixin):
 
         '''
         if model_registry is None:
-            model_registry={}
+            model_registry = {}
         self.data_manager = data_manager
         self.ml_task = data_manager.ml_task
         self.highR_cat_threshold = data_manager.highR_cat_threshold
@@ -542,7 +426,7 @@ class HDL_Constructor(StrSignatureMixin):
             sub_dict = {}
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
-                assert get_class_object_in_pipeline_components("preprocessing", packages, model_registry) is not None,\
+                assert get_class_object_in_pipeline_components("preprocessing", packages, model_registry) is not None, \
                     f"In step '{step}', user defined packege : '{packages}' does not exist!"
                 # todo: 适配用户自定义模型
                 params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE1, mainTask)
@@ -553,7 +437,8 @@ class HDL_Constructor(StrSignatureMixin):
         estimator_dict = {}
         for estimator_value in estimator_values:
             packages, addition_dict, is_vanilla = self.parse_item(estimator_value)
-            assert get_class_object_in_pipeline_components(data_manager.ml_task.mainTask, packages, model_registry) is not None, \
+            assert get_class_object_in_pipeline_components(data_manager.ml_task.mainTask, packages,
+                                                           model_registry) is not None, \
                 f"In step '{target_key}', user defined packege : '{packages}' does not exist!"
             params = {} if is_vanilla else self.get_params_in_dict(hdl_bank, packages, PHASE2, mainTask)
             estimator_dict[packages] = params
@@ -562,6 +447,10 @@ class HDL_Constructor(StrSignatureMixin):
             PHASE1: preprocessing_dict,
             f"{PHASE2}(choice)": estimator_dict
         }
+        if self.ml_task.mainTask == "classification":
+            final_dict["strategies"] = {
+                "balance(choice)": {k: {} for k in self.balance_strategies}
+            }
         self.hdl = final_dict
 
     def get_hdl(self) -> Dict[str, Any]:

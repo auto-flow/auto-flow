@@ -1,8 +1,8 @@
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 
-__all__ = ["LibSVM_SVC"]
+__all__ = ["SVC"]
 
 
-class LibSVM_SVC(AutoFlowClassificationAlgorithm):
+class SVC(AutoFlowClassificationAlgorithm):
     class__ = "SVC"
     module__ = "sklearn.svm"

@@ -6,7 +6,7 @@ from typing import Dict, List
 
 import numpy as np
 from ConfigSpace import CategoricalHyperparameter, Constant
-from ConfigSpace import ConfigurationSpace
+from ConfigSpace import ConfigurationSpace, Configuration
 from ConfigSpace import ForbiddenInClause, ForbiddenEqualsClause, ForbiddenAndConjunction
 from ConfigSpace import InCondition, EqualsCondition
 from hyperopt import fmin, tpe, hp
@@ -315,7 +315,119 @@ class HDL2SHPS(StrSignatureMixin):
                 )
                 cs.add_condition(cond)
 
-    def recursion(self, hdl: Dict, path=()) -> ConfigurationSpace:
+    def eliminate_suffix(self, key: str):
+        s = "(choice)"
+        if key.endswith(s):
+            key = key[:-len(s)]
+        return key
+
+    def add_configuration_space(
+            self, cs: ConfigurationSpace, cs_name: str, hdl_value: dict, is_choice: bool,
+            option_hp: Configuration, children_is_choice=False):
+        if is_choice:
+            cs.add_configuration_space(cs_name, self.recursion(hdl_value, children_is_choice),
+                                       parent_hyperparameter={"parent": option_hp, "value": cs_name})
+        else:
+            cs.add_configuration_space(cs_name, self.recursion(hdl_value, children_is_choice))
+
+    def recursion(self, hdl, is_choice=False):
+        ############ Declare ConfigurationSpace variables ###################
+        cs = ConfigurationSpace()
+        ####### Fill placeholder to empty ConfigurationSpace ################
+        key_list = list(hdl.keys())
+        if len(key_list) == 0:
+            cs.add_hyperparameter(Constant("placeholder", "placeholder"))
+            return cs
+        ###################### Declare common variables #####################
+        option_hp = None
+        pattern = re.compile(r"(.*)\((.*)\)")
+        store = {}
+        conditions_dict = {}
+        ########### If parent is choice configuration_space #################
+        if is_choice:
+            choices = []
+            choice2proba = {}
+            not_specific_proba_choices = []
+            sum_proba = 0
+            for k, v in hdl.items():
+                if not is_hdl_bottom(k, v) and isinstance(v,dict):
+                    k=self.eliminate_suffix(k)
+                    if "__proba" in v:
+                        proba = v.pop("__proba")
+                        choice2proba[k] = proba
+                        sum_proba += proba
+                    else:
+                        not_specific_proba_choices.append(k)
+                    choices.append(self.eliminate_suffix(k))
+            if sum_proba <= 1:
+                if len(not_specific_proba_choices) > 0:
+                    p_rest = (1 - sum_proba) / len(not_specific_proba_choices)
+                    for not_specific_proba_choice in not_specific_proba_choices:
+                        choice2proba[not_specific_proba_choice] = p_rest
+            else:
+                choice2proba = {k: 1 / len(choices) for k in choices}
+            proba_list = [choice2proba[k] for k in choices]
+            # fixme: choices = list(map(smac_hdl._encode, choices))
+            option_hp = CategoricalHyperparameter('__choice__', choices, weights=proba_list)
+            cs.add_hyperparameter(option_hp)  # todo: weight
+        #### Travel key,value in hdl items, if value is dict(hdl), do recursion ######
+        for hdl_key, hdl_value in hdl.items():
+            mat = pattern.match(hdl_key)
+            # add_configuration_space (choice)
+            if mat and isinstance(hdl_value, dict):
+                groups = mat.groups()
+                assert len(groups) == 2, ValueError(f"Invalid hdl_key {hdl_key}")
+                cs_name, method = groups
+                assert method == "choice", ValueError(f"Invalid suffix {method}")
+                self.add_configuration_space(cs, cs_name, hdl_value, is_choice, option_hp, True)
+            elif is_hdl_bottom(hdl_key, hdl_value):
+                if purify_key(hdl_key).startswith("__"):
+                    conditions_dict[hdl_key] = hdl_value
+                else:
+                    hp = self.__parse_dict_to_config(hdl_key, hdl_value)
+                    cs.add_hyperparameter(hp)
+                    store[hdl_key] = hp
+            # add_configuration_space
+            elif isinstance(hdl_value, dict):
+                cs_name = hdl_key
+                self.add_configuration_space(cs, cs_name, hdl_value, is_choice, option_hp)
+            else:
+                raise NotImplementedError
+        ########### Processing conditional hyperparameters #################
+        for key, value in conditions_dict.items():
+            if SERIES_CONNECT_LEADER_TOKEN in key:
+                leader_model, condition_indicator = key.split(SERIES_CONNECT_LEADER_TOKEN)
+            else:
+                leader_model, condition_indicator = None, key
+            if condition_indicator == "__condition":
+                assert isinstance(value, list)
+                for item in value:
+                    cond = self.__condition(item, store, leader_model)
+                    cs.add_condition(cond)
+            elif condition_indicator == "__activate":
+                self.__activate(value, store, cs, leader_model)
+            elif condition_indicator == "__forbidden":
+                self.__forbidden(value, store, cs, leader_model)
+            else:
+                self.logger.warning(f"Invalid condition_indicator: {condition_indicator}")
+            # fixme: remove 'rely_model'
+        return cs
+        # add_hyperparameter
+
+    def __parse_dict_to_config(self, key, value):
+        if isinstance(value, dict):
+            _type = value.get("_type")
+            _value = value.get("_value")
+            _default = value.get("_default")
+            assert _value is not None
+            if _type == "choice":
+                return smac_hdl.choice(key, _value, _default)
+            else:
+                return eval(f'''smac_hdl.{_type}("{key}",*_value,default=_default)''')
+        else:
+            return Constant(key, smac_hdl._encode(value))
+
+    def recursion_origin(self, hdl: Dict, path=()) -> ConfigurationSpace:
         cs = ConfigurationSpace()
         # 检测一下这个dict是否在直接描述超参
         key_list = list(hdl.keys())
@@ -398,27 +510,14 @@ class HDL2SHPS(StrSignatureMixin):
                 cur_cs.add_hyperparameter(option_param)
                 for sub_key, sub_value in value.items():
                     assert isinstance(sub_value, dict)
-                    sub_cs = self.recursion(sub_value, path=list(path) + [prefix_name, sub_key])
+                    sub_cs = self.recursion_origin(sub_value, path=list(path) + [prefix_name, sub_key])
                     parent_hyperparameter = {'parent': option_param, 'value': sub_key}
                     cur_cs.add_configuration_space(sub_key, sub_cs, parent_hyperparameter=parent_hyperparameter)
                 cs.add_configuration_space(prefix_name, cur_cs)
             elif isinstance(value, dict):
-                sub_cs = self.recursion(value, path=list(path) + [key])
+                sub_cs = self.recursion_origin(value, path=list(path) + [key])
                 cs.add_configuration_space(key, sub_cs)
             else:
                 raise NotImplementedError()
 
         return cs
-
-    def __parse_dict_to_config(self, key, value):
-        if isinstance(value, dict):
-            _type = value.get("_type")
-            _value = value.get("_value")
-            _default = value.get("_default")
-            assert _value is not None
-            if _type == "choice":
-                return smac_hdl.choice(key, _value, _default)
-            else:
-                return eval(f'''smac_hdl.{_type}("{key}",*_value,default=_default)''')
-        else:
-            return Constant(key, smac_hdl._encode(value))

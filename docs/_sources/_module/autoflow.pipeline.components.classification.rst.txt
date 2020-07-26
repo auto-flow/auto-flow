@@ -63,7 +63,7 @@ autoflow.pipeline.components.classification.gradient\_boosting module
 autoflow.pipeline.components.classification.k\_nearest\_neighbors module
 ------------------------------------------------------------------------
 
-.. automodule:: autoflow.pipeline.components.classification.k_nearest_neighbors
+.. automodule:: autoflow.pipeline.components.classification.knn
    :members:
    :undoc-members:
    :show-inheritance:
@@ -79,7 +79,7 @@ autoflow.pipeline.components.classification.lda module
 autoflow.pipeline.components.classification.liblinear\_svc module
 -----------------------------------------------------------------
 
-.. automodule:: autoflow.pipeline.components.classification.liblinear_svc
+.. automodule:: autoflow.pipeline.components.classification.linearsvc
    :members:
    :undoc-members:
    :show-inheritance:
@@ -87,7 +87,7 @@ autoflow.pipeline.components.classification.liblinear\_svc module
 autoflow.pipeline.components.classification.libsvm\_svc module
 --------------------------------------------------------------
 
-.. automodule:: autoflow.pipeline.components.classification.libsvm_svc
+.. automodule:: autoflow.pipeline.components.classification.svc
    :members:
    :undoc-members:
    :show-inheritance:

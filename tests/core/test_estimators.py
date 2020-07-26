@@ -19,7 +19,7 @@ class TestEstimators(LocalResourceTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=1,
             run_limit=1,
@@ -56,7 +56,7 @@ class TestEstimators(LocalResourceTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=1,
             run_limit=1,
@@ -118,7 +118,7 @@ class TestEstimators(LocalResourceTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=1,
             run_limit=1,
@@ -145,7 +145,7 @@ class TestShouldStackX(LogTestCase):
             DAG_workflow={
                 "num->scale": "scale.standardize",
                 "scale->trans": "transform.power",
-                "trans->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "trans->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=1,
             run_limit=1,

@@ -454,13 +454,13 @@ but also want trial scaling-needed algorithm like <code class="docutils literal 
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trained_pipeline</span> <span class="o">=</span> <span class="n">AutoFlowClassifier</span><span class="p">(</span>
     <span class="n">initial_runs</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">run_limit</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">included_classifiers</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">&quot;scale.standardize|libsvm_svc&quot;</span><span class="p">,</span> <span class="s2">&quot;scale.standardize|k_nearest_neighbors&quot;</span><span class="p">,</span> <span class="s2">&quot;scale.standardize|logistic_regression&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scale.standardize|svc&quot;</span><span class="p">,</span> <span class="s2">&quot;scale.standardize|knn&quot;</span><span class="p">,</span> <span class="s2">&quot;scale.standardize|logistic_regression&quot;</span><span class="p">,</span>
         <span class="s2">&quot;gaussian_nb&quot;</span><span class="p">,</span> <span class="s2">&quot;extra_trees&quot;</span><span class="p">,</span> <span class="s2">&quot;lightgbm&quot;</span>
     <span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">&quot;scale.standardize|libsvm_svc&quot;</span></code> means do <code class="docutils literal notranslate"><span class="pre">scale.standardize</span></code> firstly, and do <code class="docutils literal notranslate"><span class="pre">libsvm_svc</span></code> as a classifier secondly.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;scale.standardize|svc&quot;</span></code> means do <code class="docutils literal notranslate"><span class="pre">scale.standardize</span></code> firstly, and do <code class="docutils literal notranslate"><span class="pre">svc</span></code> as a classifier secondly.</p>
 </div>
 <div class="section" id="store-your-data-in-remote">
 <h2>Store your data in remote<a class="headerlink" href="#store-your-data-in-remote" title="Permalink to this headline">¶</a></h2>

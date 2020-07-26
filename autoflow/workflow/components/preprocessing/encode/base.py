@@ -13,7 +13,7 @@ class BaseEncoder(AutoFlowFeatureEngineerAlgorithm):
             trans = self.component.transform(X_)
             return trans
 
-    def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feature_groups=None, columns_metadata=None):
-        X_ = X.astype(str)
-        return estimator.fit(X_,y)
+    def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feature_groups=None, **kwargs):
+        X_ = X.astype(str) # fixme
+        return estimator.fit(X_,y, **kwargs)

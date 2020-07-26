@@ -45,6 +45,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             model_registry: dict,
             budget2kfold: Optional[Dict[float, int]] = None,
             algo2budget_mode: Optional[Dict[str, str]] = None,
+            algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
             max_budget: float = np.inf,
             nameserver=None,
@@ -57,6 +58,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         super(TrainEvaluator, self).__init__(
             run_id, nameserver, nameserver_port, host, worker_id, timeout, debug
         )
+        self.algo2weight_mode = algo2weight_mode
         self.max_budget = max_budget
         self.algo2iter = algo2iter
         self.algo2budget_mode = algo2budget_mode
@@ -116,6 +118,19 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             y_pred = y_pred.reshape((-1, 1))
         return y_pred
 
+    def calc_balanced_sample_weight(self, y_train: np.ndarray):
+
+        unique, counts = np.unique(y_train, return_counts=True)
+        # This will result in an average weight of 1!
+        cw = 1 / (counts / np.sum(counts)) / len(unique)
+
+        sample_weights = np.ones(y_train.shape)
+
+        for i, ue in enumerate(unique):
+            mask = y_train == ue
+            sample_weights[mask] *= cw[i]
+        return sample_weights
+
     def get_Xy(self):
         # fixme: 会出现结果被改变的情况！
         #  目前这个bug在autoflow.workflow.components.preprocessing.operate.keep_going.KeepGoing 出现过
@@ -124,7 +139,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def evaluate(self, config_id, model: ML_Workflow, X, y, X_test, y_test, budget):
+    def evaluate(self, config_id, model: ML_Workflow, X, y, X_test, y_test, budget, dhp):
         warning_info = StringIO()
         additional_info = {}
         final_model = model[-1]
@@ -140,6 +155,22 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             else:
                 fraction = 1
             max_iter = max(round(self.algo2iter[final_model_name] * fraction), 1)
+        balance_strategy: Optional[dict] = dhp.get("strategies", {}).get("balance")
+        if isinstance(balance_strategy,dict):
+            balance_strategy_name: str = list(balance_strategy.keys())[0]
+            balance_strategy_params: dict = balance_strategy[balance_strategy_name]
+        else:
+            balance_strategy_name: str = "None"
+            balance_strategy_params: dict = {}
+        if balance_strategy_name == "weight":
+            algo_name = model[-1].__class__.__name__
+            if algo_name not in self.algo2weight_mode:
+                self.logger.warning(f"Algorithm '{algo_name}' not in self.algo2weight_mode !")
+            weight_mode = self.algo2weight_mode.get(algo_name)
+        else:
+            weight_mode = None
+        if weight_mode == "class_weight":
+            model[-1].update_hyperparams({"class_weight": "balanced"})
         with redirect_stderr(warning_info):
             losses = []
             models = []
@@ -172,19 +203,25 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     cloned_model = cached_model
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
-                try:
+                if weight_mode == "sample_weight":
+                    cloned_model[-1].set_addition_info({"sample_weight":self.calc_balanced_sample_weight(y_train.data)})
+                if self.debug:
                     procedure_result = cloned_model.procedure(
                         self.ml_task, X_train, y_train, X_valid, y_valid,
                         X_test, y_test, max_iter, budget, (budget == self.max_budget)
                     )
-                except Exception as e:
-                    self.logger.error(str(e))
-                    failed_info = get_trance_back_msg()
-                    status = "FAILED"  # todo: 实现 timeout， memory out
-                    if self.debug:
+                else:
+                    try:
+                        procedure_result = cloned_model.procedure(
+                            self.ml_task, X_train, y_train, X_valid, y_valid,
+                            X_test, y_test, max_iter, budget, (budget == self.max_budget)
+                        )
+                    except Exception as e:
+                        self.logger.error(str(e))
+                        failed_info = get_trance_back_msg()
+                        status = "FAILED"  # todo: 实现 timeout， memory out
                         self.logger.error("re-raise exception")
-                        raise sys.exc_info()[1]
-                    break
+                        break
                 # save model as cache
                 if (budget_mode == ITERATIONS_BUDGET_MODE and budget <= 1) or \
                         (budget == 1):  # and isinstance(final_model, AutoFlowIterComponent)
@@ -213,7 +250,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 # when  budget  > 1 , budget will be interpreted as kfolds num by 'budget2kfold'
                 # for example, budget = 4 , budget2kfold = {4: 10}, we only do 10 times cross-validation,
                 # so we break when fold_ix == 10 - 1 == 9
-                if isinstance(self.budget2kfold,dict) and budget in self.budget2kfold:
+                if isinstance(self.budget2kfold, dict) and budget in self.budget2kfold:
                     if budget > 1 and fold_ix == self.budget2kfold[budget] - 1:
                         break
             if self.ml_task.mainTask == "classification":
@@ -299,7 +336,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         X_train, y_train, X_test, y_test = self.get_Xy()
         # todo: iter budget类型的支持
         # 3. 进行评价
-        info = self.evaluate(config_id, model, X_train, y_train, X_test, y_test, budget)
+        info = self.evaluate(config_id, model, X_train, y_train, X_test, y_test, budget, dhp)
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id

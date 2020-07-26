@@ -79,7 +79,7 @@ autoflow.pipeline.components.regression.gradient\_boosting module
 autoflow.pipeline.components.regression.k\_nearest\_neighbors module
 --------------------------------------------------------------------
 
-.. automodule:: autoflow.pipeline.components.regression.k_nearest_neighbors
+.. automodule:: autoflow.pipeline.components.regression.knn
    :members:
    :undoc-members:
    :show-inheritance:
@@ -95,7 +95,7 @@ autoflow.pipeline.components.regression.kernel\_ridge module
 autoflow.pipeline.components.regression.liblinear\_svr module
 -------------------------------------------------------------
 
-.. automodule:: autoflow.pipeline.components.regression.liblinear_svr
+.. automodule:: autoflow.pipeline.components.regression.linearsvr
    :members:
    :undoc-members:
    :show-inheritance:

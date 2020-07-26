@@ -67,15 +67,17 @@ def _get_default_algo2budget_mode() -> Dict[str, str]:
     return algo2budget_mode
 
 
-memory = Memory(JOBLIB_CACHE, verbose=1)
-get_default_algo2budget_mode = memory.cache(_get_default_algo2budget_mode)
-
-
 def _get_default_algo2iter():
     return json.loads((Path(__file__).parent / "algo2iter.json").read_text())
 
+def _get_default_algo2weight_mode():
+    return json.loads((Path(__file__).parent / "algo2weight_mode.json").read_text())
 
+
+memory = Memory(JOBLIB_CACHE, verbose=1)
+get_default_algo2budget_mode = memory.cache(_get_default_algo2budget_mode)
 get_default_algo2iter = memory.cache(_get_default_algo2iter)
+get_default_algo2weight_mode = memory.cache(_get_default_algo2weight_mode)
 
 if __name__ == '__main__':
     from pprint import pprint

@@ -20,7 +20,7 @@ from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
 from autoflow.ensemble.vote.classifier import VoteClassifier
-from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2budget_mode
+from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2budget_mode, get_default_algo2weight_mode
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
@@ -50,6 +50,7 @@ class AutoFlowEstimator(BaseEstimator):
             SH_only: bool = False,
             budget2kfold: Optional[Dict[float, int]] = None,
             algo2budget_mode: Optional[Dict[str, str]] = None,
+            algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
             only_use_subsamples_budget_mode: bool = False,
             n_folds: int = 5,
@@ -83,68 +84,20 @@ class AutoFlowEstimator(BaseEstimator):
             debug_evaluator: bool = False,
             **kwargs
     ):
-        '''
-        Parameters
-        ----------
-
-        hdl_constructor: :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or None
-            ``HDL`` is abbreviation of Hyper-parameter Descriptions Language.
-
-            It describes an abstract hyperparametric space that independent with concrete implementation.
-
-            ``HDL_Constructor`` is a class who is responsible for translating dict-type ``DAG-workflow`` into ``H.D.L`` .
-
-        resource_manager: :class:`autoflow.manager.resource_manager.ResourceManager` or None
-            ``ResourceManager`` is a class manager computer resources such like ``file_system`` and ``data_base``.
-
-        random_state: int
-            random state
-
-        log_path: path
-            which file to store log, if is None, ``autoflow.log`` will be used.
-
-        log_config: dict
-            logging configuration
-
-        highR_nan_threshold: float
-            high ratio NaN threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
-
-        highR_cat_threshold: float
-            high ratio categorical feature's cardinality threshold, you can find example and practice in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
-
-        kwargs
-            if parameters like  or ``hdl_constructor`` and ``resource_manager`` are passing None,
-
-            you can passing kwargs to make passed parameter work. See the following example.
-
-        Examples
-        ---------
-        In this example, you can see a trick to seed kwargs parameters with out initializing
-        :class:`autoflow.hdl.hdl_constructor.HDL_Constructor` or other class.
-
-        In following example, user pass ``DAG_workflow`` and ``hdl_bank`` by key-work arguments method.
-        And we can see  hdl_constructor is instanced by kwargs implicitly.
-
-        >>> from autoflow import AutoFlowClassifier
-        >>> classifier = AutoFlowClassifier(DAG_workflow={"num->target":["lightgbm"]},
-        ...   hdl_bank={"classification":{"lightgbm":{"boosting_type":  {"_type": "choice", "_value":["gbdt","dart","goss"]}}}})
-        AutoFlowClassifier(hdl_constructor=HDL_Constructor(
-            DAG_workflow={'num->target': ['lightgbm']}
-            hdl_bank_path=None
-            hdl_bank={'classification': {'lightgbm': {'boosting_type': {'_type': 'choice', '_value': ['gbdt', 'dart', 'goss']}}}}
-            included_classifiers=('adaboost', 'catboost', 'decision_tree', 'extra_trees', 'gaussian_nb', 'k_nearest_neighbors', 'liblinear_svc', 'lib...
-        '''
         self.warm_start = warm_start
         self.debug_evaluator = debug_evaluator
         self.only_use_subsamples_budget_mode = only_use_subsamples_budget_mode
         if algo2iter is None:
             algo2iter = get_default_algo2iter()
+        if algo2weight_mode is None:
+            algo2weight_mode = get_default_algo2weight_mode()
         if algo2budget_mode is None:
             algo2budget_mode = get_default_algo2budget_mode()
         if only_use_subsamples_budget_mode:
             algo2budget_mode = {key: SUBSAMPLES_BUDGET_MODE for key in algo2budget_mode}
         self.algo2iter = algo2iter
         self.algo2budget_mode = algo2budget_mode
+        self.algo2weight_mode = algo2weight_mode
         self.budget2kfold = budget2kfold
         self.max_n_samples_for_CV = max_n_samples_for_CV
         self.min_n_samples_for_SH = min_n_samples_for_SH
@@ -414,6 +367,7 @@ class AutoFlowEstimator(BaseEstimator):
             model_registry=self.model_registry,
             budget2kfold=self.budget2kfold,
             algo2budget_mode=self.algo2budget_mode,
+            algo2weight_mode=self.algo2weight_mode,
             algo2iter=self.algo2iter,
             max_budget=self.max_budget,
             nameserver=self.ns_host,

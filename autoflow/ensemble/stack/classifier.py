@@ -14,7 +14,7 @@ class StackClassifier(StackEstimator, ClassifierMixin):
             self,
             meta_learner=None,
             use_features_in_secondary=False,
-            drop_last_proba=False,
+            drop_last_proba=True,
             use_probas=True
     ):
         super(StackClassifier, self).__init__(meta_learner, use_features_in_secondary)

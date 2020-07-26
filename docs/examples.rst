@@ -301,12 +301,12 @@ The answer is very esay, what you should do is only connect two or more algorith
     trained_pipeline = AutoFlowClassifier(
         initial_runs=12, run_limit=12, n_jobs=3,
         included_classifiers=[
-            "scale.standardize|libsvm_svc", "scale.standardize|k_nearest_neighbors", "scale.standardize|logistic_regression",
+            "scale.standardize|svc", "scale.standardize|knn", "scale.standardize|logistic_regression",
             "gaussian_nb", "extra_trees", "lightgbm"
         ],
     )
 
-``"scale.standardize|libsvm_svc"`` means do ``scale.standardize`` firstly, and do ``libsvm_svc`` as a classifier secondly.
+``"scale.standardize|svc"`` means do ``scale.standardize`` firstly, and do ``svc`` as a classifier secondly.
 
 Store your data in remote
 -----------------------------

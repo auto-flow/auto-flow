@@ -2,10 +2,10 @@ from copy import deepcopy
 
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
-__all__ = ["GaussianProcess"]
+__all__ = ["GaussianProcessRegressor"]
 
 
-class GaussianProcess(AutoFlowRegressionAlgorithm):
+class GaussianProcessRegressor(AutoFlowRegressionAlgorithm):
     class__ = "GaussianProcessRegressor"
     module__ = "sklearn.gaussian_process"
 

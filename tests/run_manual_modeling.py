@@ -18,7 +18,7 @@ pipe = AutoFlowClassifier(
             "_vanilla":True
         },
         "scaled->target": {
-            "_name": "liblinear_svc",
+            "_name": "linearsvc",
             "random_state":42,
             "_vanilla": True
         }

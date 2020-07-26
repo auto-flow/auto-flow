@@ -63,7 +63,7 @@ class TestEstimatorsHttp(LocalResourceTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=3,
             run_limit=9,
@@ -85,7 +85,7 @@ class TestEstimatorsHttp(LocalResourceTestCase):
         hdl_constructors = [
             HDL_Constructor(
                 DAG_workflow={
-                    "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                    "num->target": ["linearsvc", "svc", "logistic_regression"]
                 },
             )
         ]*2

@@ -1,0 +1,19 @@
+{
+  "AdaBoostClassifier": "sample_weight",
+  "BernoulliNB": "sample_weight",
+  "CatBoostClassifier": "sample_weight",
+  "DecisionTreeClassifier": "class_weight",
+  "ExtraTreesClassifier": "sample_weight",
+  "GaussianNB": "sample_weight",
+  "GradientBoostingClassifier": "sample_weight",
+  "KNeighborsClassifier": null,
+  "LinearDiscriminantAnalysis": null,
+  "LGBMClassifier": "class_weight",
+  "LinearSVC": "class_weight",
+  "LogisticRegression": "class_weight",
+  "MultinomialNB": "sample_weight",
+  "QuadraticDiscriminantAnalysis": null,
+  "RandomForestClassifier": "sample_weight",
+  "SGDClassifier": "class_weight",
+  "SVC": "class_weight"
+}

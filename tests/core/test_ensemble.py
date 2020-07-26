@@ -23,7 +23,7 @@ class TestEnsemble(LocalResourceTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=2,
             run_limit=2,
@@ -88,7 +88,7 @@ class TestEnsembleAlone(LocalResourceTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=6,
             run_limit=6,

@@ -1,8 +1,8 @@
 
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
-__all__ = ["DecisionTree"]
+__all__ = ["DecisionTreeRegressor"]
 
-class DecisionTree(AutoFlowRegressionAlgorithm):
+class DecisionTreeRegressor(AutoFlowRegressionAlgorithm):
     module__ = "sklearn.tree"
     class__ = "DecisionTreeRegressor"

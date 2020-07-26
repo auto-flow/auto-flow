@@ -17,7 +17,7 @@ from autoflow.workflow.components.preprocessing.operate.keep_going import KeepGo
 from autoflow.workflow.components.preprocessing.transform.quantile import QuantileTransformer
 from autoflow.workflow.components.preprocessing.transform.power import PowerTransformer
 
-from autoflow.workflow.components.regression.liblinear_svr import LibLinear_SVR
+from autoflow.workflow.components.regression.linearsvr import LinearSVR
 from autoflow.workflow.ml_workflow import ML_Workflow
 
 
@@ -88,7 +88,7 @@ class TestTransformer(LocalResourceTestCase):
                     out_feature_groups="scaled",
                     **hp
                 )),
-                ("rf", LibLinear_SVR(
+                ("rf", LinearSVR(
                     random_state=0
                 ))
             ], resource_manager=self.mock_resource_manager)

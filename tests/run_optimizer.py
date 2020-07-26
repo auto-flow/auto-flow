@@ -12,8 +12,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 pipe = AutoFlowClassifier(
     DAG_workflow={
         "num->target": [
-            "liblinear_svc",
-            "libsvm_svc",
+            "linearsvc",
+            "svc",
             "logistic_regression",
             "random_forest",
             # "catboost",
@@ -26,7 +26,7 @@ pipe = AutoFlowClassifier(
         # "loss_transformer":None,
         # "bw_method": "scott",
         # "n_samples": 5000,
-        "min_points_in_model": 30,
+        "min_points_in_model": 50,
         "use_local_search":True,
         # "use_thompson_sampling":False,
         # "kde_sample_weight_scaler": None

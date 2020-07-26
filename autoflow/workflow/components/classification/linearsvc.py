@@ -2,10 +2,10 @@ from autoflow.data_container import DataFrameContainer
 from autoflow.utils.data import softmax
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 
-__all__ = ["LibLinear_SVC"]
+__all__ = ["LinearSVC"]
 
 
-class LibLinear_SVC(AutoFlowClassificationAlgorithm):
+class LinearSVC(AutoFlowClassificationAlgorithm):
     class__ = "LinearSVC"
     module__ = "sklearn.svm"
     OVR__ = True

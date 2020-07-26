@@ -18,7 +18,7 @@ class CatBoostClassifier(AutoFlowClassificationAlgorithm, BoostingModelMixin):
     support_early_stopping = True
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feature_groups=None):
+                 y_test=None, feature_groups=None,**kwargs):
         categorical_features_indices = None # get_categorical_features_indices(X)
         if (X_valid is not None) and (y_valid is not None):
             eval_set = (X_valid, y_valid)
@@ -26,7 +26,7 @@ class CatBoostClassifier(AutoFlowClassificationAlgorithm, BoostingModelMixin):
             eval_set = None
         return self.component.fit(
             X, y, cat_features=categorical_features_indices,
-            eval_set=eval_set, silent=True
+            eval_set=eval_set, silent=True, **kwargs
         )
 
     def after_process_hyperparams(self, hyperparams) -> Dict:

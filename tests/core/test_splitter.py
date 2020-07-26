@@ -18,7 +18,7 @@ class TestSplitter(LocalResourceTestCase):
         groups[:len(groups) // 2] = 1
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=1,
             run_limit=1,

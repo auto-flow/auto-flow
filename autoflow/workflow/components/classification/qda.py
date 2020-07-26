@@ -1,8 +1,9 @@
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 
-__all__=["QDA"]
+__all__ = ["QuadraticDiscriminantAnalysis"]
 
-class QDA(AutoFlowClassificationAlgorithm):
+
+class QuadraticDiscriminantAnalysis(AutoFlowClassificationAlgorithm):
     class__ = "QuadraticDiscriminantAnalysis"
     module__ = "sklearn.discriminant_analysis"
     OVR__ = True

@@ -15,7 +15,7 @@ from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
 from autoflow.hdl.utils import get_default_hp_of_cls
 from autoflow.tests.base import LocalResourceTestCase
-from autoflow.workflow.components.classification.liblinear_svc import LibLinear_SVC
+from autoflow.workflow.components.classification.linearsvc import LinearSVC
 # todo: 调研并增加超参数
 from autoflow.workflow.components.preprocessing.balance.under_sample.all_knn import AllKNN
 from autoflow.workflow.components.preprocessing.balance.under_sample.cluster_centroids import ClusterCentroids
@@ -81,8 +81,8 @@ class TestBalance(LocalResourceTestCase):
             balancer = cls(
                 **get_default_hp_of_cls(cls)
             )
-            classifier = LibLinear_SVC(
-                **get_default_hp_of_cls(LibLinear_SVC)
+            classifier = LinearSVC(
+                **get_default_hp_of_cls(LinearSVC)
             )
             pipeline = ML_Workflow(
                 [
@@ -126,8 +126,8 @@ class TestBalance(LocalResourceTestCase):
             balancer = cls(
                 **get_default_hp_of_cls(cls)
             )
-            classifier = LibLinear_SVC(
-                **get_default_hp_of_cls(LibLinear_SVC)
+            classifier = LinearSVC(
+                **get_default_hp_of_cls(LinearSVC)
             )
             pipeline = ML_Workflow(
                 [

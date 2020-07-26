@@ -24,7 +24,7 @@ http_resource_manager = HttpResourceManager(db_params={
 hdl_constructors = [
     HDL_Constructor(
         DAG_workflow={
-            "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+            "num->target": ["linearsvc", "svc", "logistic_regression"]
         },
     )
 ]*2

@@ -5,10 +5,10 @@ from sklearn.preprocessing import StandardScaler
 from autoflow.data_container import NdArrayContainer
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
-__all__ = ["LibLinear_SVR"]
+__all__ = ["LinearSVR"]
 
 
-class LibLinear_SVR(AutoFlowRegressionAlgorithm):
+class LinearSVR(AutoFlowRegressionAlgorithm):
     class__ = "LinearSVR"
     module__ = "sklearn.svm"
 

@@ -7,6 +7,7 @@ from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
+from frozendict import frozendict
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils._testing import ignore_warnings
@@ -36,6 +37,10 @@ class AutoFlowComponent(BaseEstimator):
         self.hyperparams = kwargs
         self.set_addition_info(kwargs)
         self.logger = get_logger(self)
+
+    def update_hyperparams(self, kwargs):
+        self.hyperparams.update(kwargs)
+        self.set_addition_info(kwargs)
 
     def _get_param_names(cls):
         return sorted(cls.hyperparams.keys())
@@ -163,12 +168,18 @@ class AutoFlowComponent(BaseEstimator):
              y_valid=None, X_test=None, y_test=None, feature_groups=None):
         # 保留其他数据集的参数，方便模型拓展
         X = self.prepare_X_to_fit(X_train, X_valid, X_test)
-        fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, feature_groups)
+        kwargs={}
+        if hasattr(self, "sample_weight"):
+            if isinstance(self.sample_weight, np.ndarray) and self.sample_weight.shape[0]==y_train.shape[0]:
+                kwargs.update({"sample_weight": self.sample_weight})
+            else:
+                self.logger.warning(f"Invalid sample_weight. ")
+        fitted_estimator = self.core_fit(estimator, X, y_train, X_valid, y_valid, X_test, y_test, feature_groups, **kwargs)
         return fitted_estimator
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feature_groups=None):
-        return estimator.fit(X, y)
+                 y_test=None, feature_groups=None, **kwargs):
+        return estimator.fit(X, y, **kwargs)
 
     def set_addition_info(self, dict_: dict):
         for key, value in dict_.items():
@@ -268,9 +279,9 @@ class AutoFlowIterComponent(AutoFlowComponent):
         self.should_early_stopping = False
 
     @ignore_warnings(category=ConvergenceWarning)
-    def iterative_fit(self, X, y, X_valid, y_valid):
+    def iterative_fit(self, X, y, X_valid, y_valid, **kwargs):
         s = time()
-        self.component.fit(X, y)
+        self.component.fit(X, y, **kwargs)
         self.fit_times += time() - s
         early_stopping_tol = getattr(self, "early_stopping_tol", 0.001)
         N = len(self.performance_history)
@@ -308,14 +319,14 @@ class AutoFlowIterComponent(AutoFlowComponent):
             return False
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
-                 y_test=None, feature_groups=None):
+                 y_test=None, feature_groups=None, **kwargs):
         if self.backup_component is not None:
             self.component = self.backup_component
         if self.best_estimators is None:
             # reload
             self.init_variables()
         while True:
-            self.iterative_fit(X, y, X_valid, y_valid)
+            self.iterative_fit(X, y, X_valid, y_valid, **kwargs)
             if self.is_fully_fitted:
                 break
             self.iteration_ = getattr(self.component, self.iterations_name)
@@ -365,6 +376,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
 
 
 class BoostingModelMixin():
+    # todo: lgbm iterative learning
     def set_max_iter(self, max_iter):
         max_iter = int(max_iter)
         if self.component is None:

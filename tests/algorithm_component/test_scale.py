@@ -19,7 +19,7 @@ from autoflow.workflow.components.preprocessing.scale.normalize import Normalize
 from autoflow.workflow.components.preprocessing.scale.quantile import QuantileTransformer
 from autoflow.workflow.components.preprocessing.scale.robust import RobustScaler
 from autoflow.workflow.components.preprocessing.scale.standardize import StandardScaler
-from autoflow.workflow.components.regression.liblinear_svr import LibLinear_SVR
+from autoflow.workflow.components.regression.linearsvr import LinearSVR
 from autoflow.workflow.ml_workflow import ML_Workflow
 
 
@@ -96,7 +96,7 @@ class TestScaler(LocalResourceTestCase):
                     out_feature_groups="scaled",
                     **hp
                 )),
-                ("rf", LibLinear_SVR(
+                ("rf", LinearSVR(
                     random_state=0
                 ))
             ], resource_manager=self.mock_resource_manager)

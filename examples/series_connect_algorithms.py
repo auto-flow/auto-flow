@@ -14,7 +14,7 @@ test_df = pd.read_csv("./data/test_classification.csv")
 trained_pipeline = AutoFlowClassifier(
     initial_runs=12, run_limit=12, n_jobs=3,
     included_classifiers=[
-        "scale.standardize|libsvm_svc", "scale.standardize|k_nearest_neighbors", "scale.standardize|logistic_regression",
+        "scale.standardize|svc", "scale.standardize|knn", "scale.standardize|logistic_regression",
         "gaussian_nb", "extra_trees", "lightgbm"
     ],
 )

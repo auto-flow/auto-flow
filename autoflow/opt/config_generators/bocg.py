@@ -52,7 +52,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         self.update_weight_steps = max(5, update_weight_steps)
         if len(budgets) <= 1 and support_ensemble_epms:
             self.logger.warning(
-                f"'support_weighted_epsm' is True but len(budgets) <= 1 ,  This value is corrected to False.")
+                f"'support_ensemble_epms' is True but len(budgets) <= 1 ,  This value is corrected to False.")
             support_ensemble_epms = False
         self.support_ensemble_epms = support_ensemble_epms
         self.meta_beta = meta_beta

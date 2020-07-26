@@ -21,7 +21,7 @@ class TestCloseAll(LogTestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         pipe = AutoFlowClassifier(
             DAG_workflow={
-                "num->target": ["liblinear_svc", "libsvm_svc", "logistic_regression"]
+                "num->target": ["linearsvc", "svc", "logistic_regression"]
             },
             initial_runs=2,
             run_limit=2,
