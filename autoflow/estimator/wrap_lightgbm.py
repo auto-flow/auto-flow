@@ -39,8 +39,8 @@ class LGBMEstimator(BaseEstimator):
             verbose=-1,
             n_jobs=1,
     ):
-        self.n_jobs = n_jobs
         assert self.is_classification is not None, NotImplementedError
+        self.n_jobs = n_jobs
         self.objective = objective
         self.verbose = verbose
         self.early_stopping_rounds = early_stopping_rounds

@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+import multiprocessing as mp
 from typing import Union
 
 import numpy as np
@@ -6,6 +7,16 @@ import pandas as pd
 from datefinder import find_dates
 from scipy.sparse import issparse
 from sklearn.utils.multiclass import type_of_target
+
+
+def check_n_jobs(n_jobs):
+    cpu_count = mp.cpu_count()
+    if n_jobs == 0:
+        return 1
+    elif n_jobs > 0:
+        return min(cpu_count, n_jobs)
+    else:
+        return max(1, cpu_count + 1 + n_jobs)
 
 
 def convert_to_num(Ybin):

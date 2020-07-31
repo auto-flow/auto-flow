@@ -249,6 +249,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
     warm_start_name = "warm_start"
     iterations_name = "n_estimators"
     support_early_stopping = True
+    # todo 早停后不再训练
 
     def __init__(self, **kwargs):
         super(AutoFlowIterComponent, self).__init__(**kwargs)
@@ -276,7 +277,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
         self.best_estimators = np.zeros([N], dtype="object")
         self.iter_ix = 0
         self.backup_component = None
-        self.should_early_stopping = False
+        self.early_stopped = False
 
     @ignore_warnings(category=ConvergenceWarning)
     def iterative_fit(self, X, y, X_valid, y_valid, **kwargs):
@@ -301,7 +302,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
                 self.performance_history[index] = test_performance
                 self.iteration_history[index] = self.iteration
             else:
-                self.should_early_stopping = True
+                self.early_stopped = True
 
     @property
     def is_fully_fitted(self):
@@ -310,7 +311,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
                 f"{self.__class__.__name__}'s next iteration "
                 f"{self.iteration_ + self.iter_inc} is greater than max iterations {self.max_iterations}.")
             return True
-        elif (self.should_early_stopping):
+        elif (self.early_stopped):
             self.logger.info(
                 f"{self.__class__.__name__} is early stopping because "
                 f"valid-set performance no longer improves. max_iter = {self.max_iterations}.")
@@ -379,9 +380,8 @@ class BoostingModelMixin():
     # todo: lgbm iterative learning
     def set_max_iter(self, max_iter):
         max_iter = int(max_iter)
-        if self.component is None:
-            self.hyperparams["n_estimators"] = max_iter
-        else:
+        self.hyperparams["n_estimators"] = max_iter
+        if self.component is not None:
             self.component.n_estimators = max_iter
 
     def finish_evaluation(self):
