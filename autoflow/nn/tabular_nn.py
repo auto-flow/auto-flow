@@ -35,7 +35,7 @@ class TabularNN(nn.Module):
             use_bn=True
     ):
         super(TabularNN, self).__init__()
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(self)
         self.af_output = af_output
         self.af_hidden = af_hidden
         self.max_epoch = 0
@@ -57,7 +57,7 @@ class TabularNN(nn.Module):
                 round(layers[0] * prop_vector_features * np.log10(vector_dim + 10)),
                 min_layer_width, max_layer_width
             ))
-            msg += f"numeric_embed_dim = {numeric_embed_dim}; "
+            msg += f"numeric_block = {vector_dim}->{numeric_embed_dim}; "
             self.numeric_block = nn.Sequential(
                 nn.Linear(vector_dim, numeric_embed_dim),
                 self.get_activate_function(self.af_hidden)
@@ -73,7 +73,9 @@ class TabularNN(nn.Module):
                 nn.Embedding(int(n_unique), int(embed_dim))
                 for n_unique, embed_dim in zip(self.n_uniques, self.embed_dims)
             ])
-            msg += f"embed_dims.sum() = {self.embed_dims.sum()}; "
+            emb_arch = ', '.join(
+                [f'{n_unique:d}->{embed_dim:d}' for n_unique, embed_dim in zip(self.n_uniques, self.embed_dims)])
+            msg += f"embedding_blocks = {emb_arch}; "
         else:
             msg += f"embedding_blocks is None; "
             self.embed_dims = np.array([])
@@ -212,7 +214,7 @@ def train_tabular_nn(
         nn_optimizer = torch.optim.SGD(tabular_nn.parameters(), lr=lr)
     else:
         raise ValueError(f"Unknown optimizer {optimizer}")
-    start = time()
+    start_time = time()
     if n_class >= 2:
         y_tensor = torch.from_numpy(y).long()
     else:
@@ -225,12 +227,19 @@ def train_tabular_nn(
         weight = None
     init_epoch = getattr(tabular_nn, "max_epoch", 0)
     for epoch_index in range(init_epoch, max_epoch):
-        # todo : batch(OK) validate(OK)  warm_start(OK)
-        # todo : early_stopping(OK) multiclass_metric(OK) sample_weight
         tabular_nn.train(True)
         # batch
         permutation = rng.permutation(len(y))
-        batch_ixs = [permutation[i * batch_size:(i + 1) * batch_size] for i in range(ceil(len(y) / batch_size))]
+        batch_ixs = []
+        for i in range(ceil(len(y) / batch_size)):
+            start = min(i * batch_size, len(y))
+            end = min((i + 1) * batch_size, len(y))
+            batch_ix = permutation[start:end]
+            if end - start < batch_size:
+                diff = batch_size - (end - start)
+                diff = min(diff, start)
+                batch_ix = np.hstack([batch_ix, rng.choice(permutation[:start], diff, replace=False)])
+            batch_ixs.append(batch_ix)
         for batch_ix in batch_ixs:
             nn_optimizer.zero_grad()
             outputs = tabular_nn(X[batch_ix, :])
@@ -247,6 +256,6 @@ def train_tabular_nn(
                 break
     end = time()
     tabular_nn.max_epoch = max_epoch
-    tabular_nn.logger.info(f"TabularNN training time = {end - start:.2f}s")
+    tabular_nn.logger.info(f"TabularNN training time = {end - start_time:.2f}s")
     tabular_nn.eval()
     return tabular_nn

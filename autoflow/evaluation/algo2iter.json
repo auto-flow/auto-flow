@@ -12,5 +12,7 @@
   "RandomForestClassifier": 1000,
   "RandomForestRegressor": 1000,
   "SGDClassifier": 2000,
-  "SGDRegressor": 2000
+  "SGDRegressor": 2000,
+  "TabularNNClassifier": 64,
+  "TabularNNRegressor": 64
 }

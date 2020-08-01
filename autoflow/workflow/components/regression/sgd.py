@@ -3,7 +3,7 @@ from copy import deepcopy
 from sklearn.preprocessing import StandardScaler
 
 from autoflow.data_container import NdArrayContainer
-from autoflow.workflow.components.base import AutoFlowIterComponent
+from autoflow.workflow.components.iter_algo import AutoFlowIterComponent
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
 __all__ = ["SGDRegressor"]

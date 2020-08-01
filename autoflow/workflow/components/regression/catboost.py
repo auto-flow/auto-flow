@@ -4,13 +4,13 @@ from typing import Dict
 import numpy as np
 
 from autoflow.data_container import DataFrameContainer
-from autoflow.workflow.components.base import BoostingModelMixin
+from autoflow.workflow.components.iter_algo import LgbmIterativeMixIn
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 
 __all__ = ["CatBoostRegressor"]
 
 
-class CatBoostRegressor(AutoFlowRegressionAlgorithm, BoostingModelMixin):
+class CatBoostRegressor(AutoFlowRegressionAlgorithm, LgbmIterativeMixIn):
     class__ = "CatBoostRegressor"
     module__ = "catboost"
 

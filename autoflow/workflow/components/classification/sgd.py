@@ -1,6 +1,6 @@
 from autoflow.data_container import DataFrameContainer
 from autoflow.utils.data import softmax
-from autoflow.workflow.components.base import AutoFlowIterComponent
+from autoflow.workflow.components.iter_algo import AutoFlowIterComponent
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 
 __all__ = ["SGDClassifier"]

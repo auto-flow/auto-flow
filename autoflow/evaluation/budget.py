@@ -14,7 +14,7 @@ from autoflow.constants import JOBLIB_CACHE, ITERATIONS_BUDGET_MODE, SUBSAMPLES_
 from autoflow.data_container import DataFrameContainer, NdArrayContainer
 from autoflow.utils.array_ import get_stratified_sampling_index
 from autoflow.utils.packages import find_components
-from autoflow.workflow.components.base import AutoFlowIterComponent
+from autoflow.workflow.components.iter_algo import AutoFlowIterComponent
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
 

@@ -8,6 +8,7 @@ from typing import List, Optional
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.metrics import accuracy_score, r2_score
+from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_array
 
 from autoflow.nn.tabular_nn import train_tabular_nn
@@ -23,23 +24,25 @@ class TabularNNEstimator(BaseEstimator):
             max_layer_width=2056,
             min_layer_width=32,
             dropout_hidden=0.1,
+            dropout_output=0.2,
             af_hidden="relu",
             af_output="linear",
-            dropout_output=0.2,
             layer1=256,
             layer2=128,
             use_bn=True,
             lr=1e-2,
-            max_epoch=32,
+            max_epoch=64,
             random_state=1000,
             batch_size=1024,
             optimizer="adam",
-            early_stopping_rounds=8,
+            early_stopping_rounds=16,
             early_stopping_tol=0,
             verbose=-1,
             n_jobs=-1,
-            class_weight=None
+            class_weight=None,
+            normalize=True
     ):
+        self.normalize = normalize
         self.class_weight = class_weight
         self.n_jobs = n_jobs
         self.verbose = verbose
@@ -60,7 +63,10 @@ class TabularNNEstimator(BaseEstimator):
         self.dropout_hidden = dropout_hidden
         self.min_layer_width = min_layer_width
         self.max_layer_width = max_layer_width
-        # member variable
+        self.init_variables()
+
+    def init_variables(self):
+        self.scaler = StandardScaler(copy=True)
         self.rng = np.random.RandomState(self.random_state)
         self.logger = get_logger(self)
         self.model = None
@@ -78,13 +84,19 @@ class TabularNNEstimator(BaseEstimator):
         else:
             self.score_func = r2_score
         self.early_stopped = False
-        self.best_iteration_ = 0
+        self.best_iteration = 0
+
 
     def fit(self, X, y, X_valid=None, y_valid=None, categorical_feature: Optional[List[int]] = None):
         if self.early_stopped:
             return self
         X = check_array(X)
         y = check_array(y, ensure_2d=False, dtype="float")
+        if self.normalize and (not self.is_classification):
+            self.scaler.fit(y[:,None])
+            y= self.scaler.transform(y[:,None]).flatten()
+            if y_valid is not None:
+                y_valid= self.scaler.transform(y_valid[:,None]).flatten()
         if X_valid is not None:
             X_valid = check_array(X_valid)
         if y_valid is not None:
@@ -100,13 +112,15 @@ class TabularNNEstimator(BaseEstimator):
             min_layer_width=self.min_layer_width
         )
         if categorical_feature is not None:
-            cat_indexes = check_array(y, ensure_2d=False, dtype="int")
+            cat_indexes = check_array(categorical_feature, ensure_2d=False, dtype="int")
         else:
             cat_indexes = np.array([])
         if self.is_classification:
             n_class = None
         else:
             n_class = 1
+        if self.best_estimators is None:
+            self.init_variables()
         self.model = train_tabular_nn(
             X, y, cat_indexes, X_valid, y_valid,
             lr=self.lr,
@@ -122,17 +136,22 @@ class TabularNNEstimator(BaseEstimator):
         )
         if self.early_stopped:
             index = int(np.lexsort((self.iteration_history, -self.performance_history))[0])
-            self.best_iteration_ = int(self.iteration_history[index])
+            self.best_iteration = int(self.iteration_history[index])
             best_estimator = self.best_estimators[index]
             self.model = best_estimator
             self.logger.info(f"{self.__class__.__name__} is early_stopped, "
-                             f"best_iteration_ = {self.best_iteration_}, "
-                             f"best_performace in validation_set = {self.performance_history[index]:.3f}")
+                             f"best_iteration = {self.best_iteration}, "
+                             f"best_performance in validation_set = {self.performance_history[index]:.3f}")
             self.best_estimators = None  # do not train any more
+        else:
+            self.best_iteration = self.max_epoch
         return self
 
     def predict(self, X):
-        return self._predict(self.model, X)
+        y_pred= self._predict(self.model, X)
+        if self.normalize and (not self.is_classification):
+            return self.scaler.inverse_transform(y_pred)
+        return y_pred
 
     def _predict(self, model, X):
         X = check_array(X)

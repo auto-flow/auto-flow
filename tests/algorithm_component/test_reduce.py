@@ -5,7 +5,7 @@
 from copy import deepcopy
 from time import time
 
-from autoflow import DataFrameContainer, NdArrayContainer
+from autoflow.data_container import DataFrameContainer, NdArrayContainer
 from autoflow.datasets import load
 from autoflow.hdl.utils import get_default_hp_of_cls
 from autoflow.tests.base import LocalResourceTestCase
