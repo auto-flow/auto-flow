@@ -5,6 +5,7 @@ autoflow*
 *.html
 *.xls
 *.xlsx
+*.csv
 run*.py
 !run_estimator_http.py
 !run_optimizer*.py

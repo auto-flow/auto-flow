@@ -86,17 +86,16 @@ class TabularNNEstimator(BaseEstimator):
         self.early_stopped = False
         self.best_iteration = 0
 
-
     def fit(self, X, y, X_valid=None, y_valid=None, categorical_feature: Optional[List[int]] = None):
         if self.early_stopped:
             return self
         X = check_array(X)
         y = check_array(y, ensure_2d=False, dtype="float")
         if self.normalize and (not self.is_classification):
-            self.scaler.fit(y[:,None])
-            y= self.scaler.transform(y[:,None]).flatten()
+            self.scaler.fit(y[:, None])
+            y = self.scaler.transform(y[:, None]).flatten()
             if y_valid is not None:
-                y_valid= self.scaler.transform(y_valid[:,None]).flatten()
+                y_valid = self.scaler.transform(y_valid[:, None]).flatten()
         if X_valid is not None:
             X_valid = check_array(X_valid)
         if y_valid is not None:
@@ -112,7 +111,7 @@ class TabularNNEstimator(BaseEstimator):
             min_layer_width=self.min_layer_width
         )
         if categorical_feature is not None:
-            cat_indexes = check_array(categorical_feature, ensure_2d=False, dtype="int")
+            cat_indexes = check_array(categorical_feature, ensure_2d=False, dtype="int", ensure_min_samples=0)
         else:
             cat_indexes = np.array([])
         if self.is_classification:
@@ -148,7 +147,7 @@ class TabularNNEstimator(BaseEstimator):
         return self
 
     def predict(self, X):
-        y_pred= self._predict(self.model, X)
+        y_pred = self._predict(self.model, X)
         if self.normalize and (not self.is_classification):
             return self.scaler.inverse_transform(y_pred)
         return y_pred

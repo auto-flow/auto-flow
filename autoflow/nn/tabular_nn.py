@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+from copy import deepcopy
 from math import ceil
 from time import time
 from typing import List, Union, Optional
@@ -157,8 +158,13 @@ class TabularNN(nn.Module):
     def forward(self, X: np.ndarray):
         embeds = []
         if self.embedding_blocks is not None:
-            embeds += [self.embedding_blocks[i](torch.from_numpy(X[:, col].astype("int64")))
-                       for i, col in enumerate(self.cat_indexes)]
+            # fixme: handle unknown
+            for i, col in enumerate(self.cat_indexes):
+                col_vec = deepcopy(X[:, col])
+                col_vec[col_vec >= self.n_uniques[i]] = 0
+                embeds.append(
+                    self.embedding_blocks[i](torch.from_numpy(col_vec.astype("int64")))
+                )
         num_indexed = np.setdiff1d(np.arange(X.shape[1]), self.cat_indexes)
         if self.numeric_block is not None:
             embeds.append(self.numeric_block(torch.from_numpy(X[:, num_indexed].astype("float32"))))
