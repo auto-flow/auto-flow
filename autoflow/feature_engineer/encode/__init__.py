@@ -1,1 +1,1 @@
-from .one_hot_encode import OneHotEncoder
+from .combine_rare import CombineRare

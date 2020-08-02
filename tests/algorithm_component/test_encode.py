@@ -7,10 +7,12 @@ from time import time
 
 import numpy as np
 import pandas as pd
+from pandas import CategoricalDtype
 from sklearn.datasets import load_boston
 from sklearn.metrics import r2_score
 
 from autoflow import AutoFlowRegressor
+from autoflow.data_container import DataFrameContainer, NdArrayContainer
 from autoflow.tests.base import LocalResourceTestCase
 from autoflow.workflow.components.preprocessing.encode.binary import BinaryEncoder
 from autoflow.workflow.components.preprocessing.encode.cat_boost import CatBoostEncoder
@@ -52,7 +54,6 @@ class TestCoding(LocalResourceTestCase):
         self.X_test.index = test_ix
         self.y_test = pipe.data_manager.y_test
         self.index = deepcopy(train_ix)
-
 
     def test_io(self):
         for cls in [
@@ -103,11 +104,66 @@ class TestCoding(LocalResourceTestCase):
                 ("rf", RandomForestRegressor(
                     random_state=0
                 ))
-            ],resource_manager=self.mock_resource_manager)
+            ], resource_manager=self.mock_resource_manager)
             workflow.fit(X_train=self.X_train, X_valid=self.X_test, y_train=self.y_train, y_valid=self.y_test)
             y_pred = workflow.predict(self.X_test)
             score = r2_score(self.y_test.data, y_pred)
             print("r2 = ", score)
             print("time = ", time() - start)
-            print("\n"*2)
+            print("\n" * 2)
 
+    def test_ordinal_encode_category(self):
+        df2 = pd.DataFrame([
+            ['C', '3'],
+            ['D', '4'],
+            ['D', '4'],
+        ], columns=['alpha', 'digits'])
+        df2["digits"] = df2["digits"].astype(CategoricalDtype(categories=["4", "3"], ordered=True))
+        df2["alpha"] = df2["alpha"].astype(CategoricalDtype(categories=["D", "C"], ordered=True))
+        df2_ = df2.loc[1:, :]
+        df2_1 = df2.loc[:1, :]
+        df2_c = pd.concat([df2_, df2_1])
+        df2_c.index = range(4)
+        encoder = OrdinalEncoder()
+
+        encoder.in_feature_groups = "cat"
+        encoder.out_feature_groups = "ordinal"
+        # RunFeatureSelection().test_univar_clf()
+        # RunCoding().test_procedure()
+        dc = DataFrameContainer(dataset_instance=df2_c)
+        dc.set_feature_groups(["cat"] * 2)
+        encoder.fit(X_train=dc)
+        result = encoder.transform(X_train=dc)["X_train"]
+        print(result)
+        should_be = pd.DataFrame({'alpha': {0: 0, 1: 0, 2: 1, 3: 0}, 'digits': {0: 0, 1: 0, 2: 1, 3: 0}})
+        assert np.all(result.data == should_be)
+
+    def test_orinal_encode_handle_unknown(self):
+        X_train = pd.DataFrame([
+            ['A', 'alpha', 0],
+            ['A', 'alpha', 1],
+            ['B', 'beta', 2],
+            ['B', 'beta', 3],
+            ['C', 'gamma', 4],
+            ['C', 'gamma', 5],
+        ], columns=['col1', 'col2', 'col3'])
+        X_valid = pd.DataFrame([
+            ['D', 'kappa', 6],
+            ['D', 'kappa', 6],
+            ['E', 'sigma', 7],
+            ['E', 'sigma', 7],
+            ['F', 'mu', 8],
+            ['F', 'mu', 8],
+        ], columns=['col1', 'col2', 'col3'])
+        X_train = DataFrameContainer(dataset_instance=X_train)
+        X_valid = DataFrameContainer(dataset_instance=X_valid)
+        X_train.set_feature_groups(['cat'] * 3)
+        X_valid.set_feature_groups(['cat'] * 3)
+        y_train = NdArrayContainer(dataset_instance=[0, 1, 0, 1, 0, 1])
+        for cls in [OrdinalEncoder, OneHotEncoder, TargetEncoder, CatBoostEncoder]:
+            encoder = cls()
+            encoder.in_feature_groups = "cat"
+            encoder.out_feature_groups = "ordinal"
+            result = encoder.fit_transform(X_train=X_train, X_valid=X_valid, y_train=y_train)
+            assert np.all(encoder.transform(X_train)['X_train'].data == result['X_train'].data)
+            assert np.all(encoder.transform(X_valid)['X_train'].data == result['X_valid'].data)

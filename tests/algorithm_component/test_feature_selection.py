@@ -7,7 +7,7 @@ from time import time
 
 import numpy as np
 
-from autoflow import DataFrameContainer, NdArrayContainer
+from autoflow.data_container import DataFrameContainer, NdArrayContainer
 from autoflow.datasets import load
 from autoflow.tests.base import LocalResourceTestCase
 from autoflow.workflow.components.preprocessing.select.from_model_clf import SelectFromModelClf

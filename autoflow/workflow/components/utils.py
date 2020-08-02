@@ -5,8 +5,6 @@ import pandas as pd
 from sklearn.utils.multiclass import type_of_target
 
 
-
-
 def stack_Xs(X_train=None, X_valid=None, X_test=None):
     Xs = []
     if X_train is not None:
@@ -19,7 +17,7 @@ def stack_Xs(X_train=None, X_valid=None, X_test=None):
     if isinstance(Xs[0], pd.DataFrame):
         # 如果拼接后Xs的index已经无序了，先设置一个有序的index
         check_and_adjust_Xs_index(Xs)
-        df = pd.concat(Xs, axis=0, sort=False)
+        df = pd.concat(Xs, axis=0, sort=False)  # todo: categories
         df.sort_index(inplace=True)
         return df
     elif isinstance(Xs[0], np.ndarray):
@@ -48,7 +46,7 @@ def get_categorical_features_indices(X):
             col = col.astype("float")
         except Exception:
             pass
-        if type_of_target(col) in ( "multiclass",):  # todo: debug
+        if type_of_target(col) in ("multiclass",):  # todo: debug
             categorical_features_indices.append(i)
     if not categorical_features_indices:
         return None

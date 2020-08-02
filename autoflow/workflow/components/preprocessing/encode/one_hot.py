@@ -4,5 +4,5 @@ __all__ = ["OneHotEncoder"]
 
 
 class OneHotEncoder(BaseEncoder):
-    class__ = "OneHotEncoder"
-    module__ = "autoflow.feature_engineer.encode"
+    class__ = "CombineRare"
+    module__ = "category_encoders"

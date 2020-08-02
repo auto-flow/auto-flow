@@ -3,7 +3,6 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 import os
-import shutil
 from time import time
 
 import numpy as np
@@ -31,8 +30,8 @@ class TestIterAlforithm(LocalResourceTestCase):
     def setUp(self) -> None:
         super(TestIterAlforithm, self).setUp()
         self.plot_dir = os.getcwd() + "/test_iter_algorithm"
-    #     if os.path.exists(self.plot_dir):
-    #         shutil.rmtree(self.plot_dir)
+        #     if os.path.exists(self.plot_dir):
+        #         shutil.rmtree(self.plot_dir)
         from pathlib import Path
         Path(self.plot_dir).mkdir(parents=True, exist_ok=True)
 
@@ -83,7 +82,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             plt.grid()
             plt.plot(learning_curve[0], learning_curve[1], label="Train Set")
             plt.plot(learning_curve[0], learning_curve[2], label="Valid Set")
-            plt.xlabel( est.iterations_name)
+            plt.xlabel(est.iterations_name)
             plt.ylabel("Accuracy")
             title = cls.__name__
             plt.title(title)
@@ -140,7 +139,7 @@ class TestIterAlforithm(LocalResourceTestCase):
             plt.grid()
             plt.plot(learning_curve[0], learning_curve[1], label="Train Set")
             plt.plot(learning_curve[0], learning_curve[2], label="Valid Set")
-            plt.xlabel( est.iterations_name)
+            plt.xlabel(est.iterations_name)
             plt.ylabel("R2")
             title = cls.__name__
             plt.title(title)
