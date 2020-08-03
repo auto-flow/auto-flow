@@ -7,6 +7,7 @@ from copy import deepcopy
 
 import numpy as np
 from category_encoders.utils import convert_input
+from pandas.api.types import is_numeric_dtype
 from sklearn.base import BaseEstimator, TransformerMixin
 
 __all__ = ["CombineRare"]
@@ -18,9 +19,11 @@ class CombineRare(BaseEstimator, TransformerMixin):
             self,
             minimum_fraction=0.1,
             rare_category="Others Infrequent",
+            rare_category_numeric=999,
             copy=True,
             drop_invariant=True
     ):
+        self.rare_category_numeric = rare_category_numeric
         self.drop_invariant = drop_invariant
         self.copy = copy
         self.rare_category = rare_category
@@ -53,6 +56,10 @@ class CombineRare(BaseEstimator, TransformerMixin):
         invariant_cols = []
         for i, column in enumerate(X.columns):
             dtype = X[column].dtype
+            if is_numeric_dtype(dtype):
+                rare_category = self.rare_category_numeric
+            else:
+                rare_category = self.rare_category
             is_cat_dtype = True if dtype.name == "category" else False
             valid_cats = self.do_not_replace_by_other_[i]
             if len(valid_cats) == 0:
@@ -64,11 +71,11 @@ class CombineRare(BaseEstimator, TransformerMixin):
                 continue
             if is_cat_dtype:
                 # add rare_category avoid error
-                X[column].cat.add_categories(self.rare_category, inplace=True)
-            X.loc[rare_mask, column] = self.rare_category
+                X[column].cat.add_categories(rare_category, inplace=True)
+            X.loc[rare_mask, column] = rare_category
             if is_cat_dtype:
                 # reset category , only keep used categories
-                new_cat = valid_cats + [self.rare_category]
+                new_cat = valid_cats + [rare_category]
                 X[column].cat.set_categories(new_cat, inplace=True)
         X.drop(invariant_cols, axis=1, inplace=True)
         return X

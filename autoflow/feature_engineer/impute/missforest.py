@@ -478,9 +478,9 @@ class MissForest(BaseEstimator, TransformerMixin):
         # Check if any column has all missing
         mask = _get_mask(X_, self.missing_values)
         if np.any(mask.sum(axis=0) >= (X_.shape[0])):
-            logger.warning("One or more columns have all rows missing. Using AdaptiveSimpleImputer to do imputing.")
-            from autoflow.feature_engineer.impute import AdaptiveSimpleImputer
-            return AdaptiveSimpleImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat). \
+            logger.warning("One or more columns have all rows missing. Using AdaptiveImputer to do imputing.")
+            from autoflow.feature_engineer.impute import AdaptiveImputer
+            return AdaptiveImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat). \
                 fit_transform(X)
 
         # Get fitted X_ col count and ensure correct dimension

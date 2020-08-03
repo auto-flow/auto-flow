@@ -13,9 +13,11 @@ from sklearn.metrics import r2_score
 
 from autoflow import AutoFlowRegressor
 from autoflow.data_container import DataFrameContainer, NdArrayContainer
+from autoflow.hdl.utils import get_default_hp_of_cls
 from autoflow.tests.base import LocalResourceTestCase
 from autoflow.workflow.components.preprocessing.encode.binary import BinaryEncoder
 from autoflow.workflow.components.preprocessing.encode.cat_boost import CatBoostEncoder
+from autoflow.workflow.components.preprocessing.encode.entity import EntityEncoder
 from autoflow.workflow.components.preprocessing.encode.leave_one_out import LeaveOneOutEncoder
 from autoflow.workflow.components.preprocessing.encode.one_hot import OneHotEncoder
 from autoflow.workflow.components.preprocessing.encode.ordinal import OrdinalEncoder
@@ -84,6 +86,7 @@ class TestCoding(LocalResourceTestCase):
 
     def test_procedure(self):
         for cls in [
+            EntityEncoder,
             TargetEncoder,
             BinaryEncoder,
             CatBoostEncoder,
@@ -96,10 +99,12 @@ class TestCoding(LocalResourceTestCase):
             print(cls.__name__)
             print("=========================")
             start = time()
+            hp = get_default_hp_of_cls(cls)
             workflow = ML_Workflow(steps=[
                 ("encoder", cls(
                     in_feature_groups="cat",
-                    out_feature_groups="num"
+                    out_feature_groups="num",
+                    **hp
                 )),
                 ("rf", RandomForestRegressor(
                     random_state=0
@@ -138,9 +143,9 @@ class TestCoding(LocalResourceTestCase):
         should_be = pd.DataFrame({'alpha': {0: 0, 1: 0, 2: 1, 3: 0}, 'digits': {0: 0, 1: 0, 2: 1, 3: 0}})
         assert np.all(result.data == should_be)
 
-    def test_orinal_encode_handle_unknown(self):
+    def test_handle_unknown(self):
         X_train = pd.DataFrame([
-            ['A', 'alpha', 0],
+            ['A', 'alpha', 9],
             ['A', 'alpha', 1],
             ['B', 'beta', 2],
             ['B', 'beta', 3],
@@ -160,8 +165,9 @@ class TestCoding(LocalResourceTestCase):
         X_train.set_feature_groups(['cat'] * 3)
         X_valid.set_feature_groups(['cat'] * 3)
         y_train = NdArrayContainer(dataset_instance=[0, 1, 0, 1, 0, 1])
-        for cls in [OrdinalEncoder, OneHotEncoder, TargetEncoder, CatBoostEncoder]:
-            encoder = cls()
+        for cls in [EntityEncoder, OrdinalEncoder, OneHotEncoder, TargetEncoder, CatBoostEncoder]:
+            hp = get_default_hp_of_cls(cls)
+            encoder = cls(**hp)
             encoder.in_feature_groups = "cat"
             encoder.out_feature_groups = "ordinal"
             result = encoder.fit_transform(X_train=X_train, X_valid=X_valid, y_train=y_train)

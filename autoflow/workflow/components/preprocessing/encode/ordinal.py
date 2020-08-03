@@ -14,7 +14,7 @@ class OrdinalEncoder(AutoFlowFeatureEngineerAlgorithm):
         uniques = []
         for X in Xs:
             uniques.extend(X[column].unique().tolist())
-        return list(set(uniques))
+        return sorted(list(set(uniques)))
 
     def after_process_estimator(self, estimator, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None,
                                 y_test=None):

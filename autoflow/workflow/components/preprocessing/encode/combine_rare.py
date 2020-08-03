@@ -4,9 +4,9 @@
 # @Contact    : tqichun@gmail.com
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
-__all__ = ["AdaptiveSimpleImputer"]
+__all__ = ["CombineRare"]
 
 
-class AdaptiveSimpleImputer(AutoFlowFeatureEngineerAlgorithm):
-    class__ = "AdaptiveImputer"
-    module__ = "autoflow.feature_engineer.impute"
+class CombineRare(AutoFlowFeatureEngineerAlgorithm):
+    class__ = "CombineRare"
+    module__ = "autoflow.feature_engineer.encode"

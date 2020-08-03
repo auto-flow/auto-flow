@@ -80,3 +80,5 @@ class TestTabularNNEstimator(EstimatorTestCase):
         )
         tabular.fit(X_train, self.y_train, categorical_feature=cat_indexes.tolist())
         score = tabular.score(X_test, self.y_test)
+
+    # todo: 测试regression 但是y为multiclass的情形

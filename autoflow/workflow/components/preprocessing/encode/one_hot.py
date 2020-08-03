@@ -4,5 +4,5 @@ __all__ = ["OneHotEncoder"]
 
 
 class OneHotEncoder(BaseEncoder):
-    class__ = "CombineRare"
+    class__ = "OneHotEncoder"
     module__ = "category_encoders"

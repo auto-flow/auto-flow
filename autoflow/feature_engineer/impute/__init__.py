@@ -1,5 +1,5 @@
 from .knnimpute import KNNImputer
 from .missforest import MissForest
-from .adaptive import AdaptiveSimpleImputer
+from .adaptive import AdaptiveImputer
 
-__all__ = ['KNNImputer', 'MissForest', "AdaptiveSimpleImputer"]
+__all__ = ['KNNImputer', 'MissForest', "AdaptiveImputer"]

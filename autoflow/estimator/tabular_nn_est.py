@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_array
 
-from autoflow.nn.tabular_nn import train_tabular_nn
+from autoflow.tnn.tabular_nn import TabularNNTrainer, TabularNN
 from autoflow.utils.logging_ import get_logger
 
 
@@ -42,13 +42,13 @@ class TabularNNEstimator(BaseEstimator):
             class_weight=None,
             normalize=True
     ):
+        assert self.is_classification is not None, NotImplementedError
         self.normalize = normalize
         self.class_weight = class_weight
         self.n_jobs = n_jobs
         self.verbose = verbose
         self.early_stopping_tol = early_stopping_tol
         self.early_stopping_rounds = early_stopping_rounds
-        assert self.is_classification is not None, NotImplementedError
         self.optimizer = optimizer
         self.batch_size = batch_size
         self.random_state = random_state
@@ -64,6 +64,31 @@ class TabularNNEstimator(BaseEstimator):
         self.min_layer_width = min_layer_width
         self.max_layer_width = max_layer_width
         self.init_variables()
+        if self.is_classification:
+            n_class = None
+        else:
+            n_class = 1
+        self.nn_param = dict(
+            use_bn=self.use_bn,
+            dropout_output=self.dropout_output,
+            dropout_hidden=self.dropout_hidden,
+            layers=(self.layer1, self.layer2),
+            af_hidden=self.af_hidden,
+            af_output=self.af_output,
+            max_layer_width=self.max_layer_width,
+            min_layer_width=self.min_layer_width
+        )
+        self.tabular_nn_trainer = TabularNNTrainer(
+            lr=self.lr,
+            max_epoch=self.max_epoch,
+            n_class=n_class,
+            nn_params=self.nn_param,
+            random_state=self.rng,
+            batch_size=self.batch_size,
+            optimizer=self.optimizer,
+            n_jobs=self.n_jobs,
+            class_weight=self.class_weight
+        )
 
     def init_variables(self):
         self.scaler = StandardScaler(copy=True)
@@ -100,38 +125,17 @@ class TabularNNEstimator(BaseEstimator):
             X_valid = check_array(X_valid)
         if y_valid is not None:
             y_valid = check_array(y_valid, ensure_2d=False, dtype="float")
-        nn_param = dict(
-            use_bn=self.use_bn,
-            dropout_output=self.dropout_output,
-            dropout_hidden=self.dropout_hidden,
-            layers=(self.layer1, self.layer2),
-            af_hidden=self.af_hidden,
-            af_output=self.af_output,
-            max_layer_width=self.max_layer_width,
-            min_layer_width=self.min_layer_width
-        )
+
         if categorical_feature is not None:
             cat_indexes = check_array(categorical_feature, ensure_2d=False, dtype="int", ensure_min_samples=0)
         else:
             cat_indexes = np.array([])
-        if self.is_classification:
-            n_class = None
-        else:
-            n_class = 1
         if self.best_estimators is None:
             self.init_variables()
-        self.model = train_tabular_nn(
-            X, y, cat_indexes, X_valid, y_valid,
-            lr=self.lr,
-            max_epoch=self.max_epoch,
-            init_model=self.model,
-            callback=self.callback, nn_params=nn_param,
-            random_state=self.rng,
-            n_class=n_class,
-            batch_size=self.batch_size,
-            optimizer=self.optimizer,
-            n_jobs=self.n_jobs,
-            class_weight=self.class_weight
+        self.tabular_nn_trainer.max_epoch = self.max_epoch
+        self.model = self.tabular_nn_trainer.train(
+            self.model, TabularNN, X, y, X_valid, y_valid,
+            self.callback, cat_indexes=cat_indexes
         )
         if self.early_stopped:
             index = int(np.lexsort((self.iteration_history, -self.performance_history))[0])
