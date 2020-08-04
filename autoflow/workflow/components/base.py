@@ -240,5 +240,3 @@ class AutoFlowComponent(BaseEstimator):
 
     def before_pred_X(self, X: DataFrameContainer):
         return X.data
-
-

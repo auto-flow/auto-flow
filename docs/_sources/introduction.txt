@@ -40,7 +40,7 @@ Their are some common ``feature group`` built-in the AutoFlow:
     * ``cat_nan``  - categorical features contains missing values. such as ["a", "b", NaN].
     * ``highR_nan``  - highly ratio NaN. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
     * ``lowR_nan``   - lowly ratio NaN. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
-    * ``highR_cat``  - highly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
+    * ``highC_cat``  - highly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
     * ``lowR_cat``  -  lowly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
 
 Work Flow

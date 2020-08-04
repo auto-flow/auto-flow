@@ -131,8 +131,8 @@ def is_highR_nan(s: pd.Series, threshold):
     return (np.count_nonzero(pd.isna(s)) / s.size) > threshold
 
 
-def is_highR_cat(s: pd.Series, threshold):
-    return (np.unique(s.astype("str")).size / s.size) > threshold
+def is_highC_cat(s: pd.Series, threshold):
+    return (np.unique(s.astype("str")).size) > threshold
 
 
 def is_nan(s: pd.Series):
@@ -155,11 +155,9 @@ def is_text(s, cat_been_checked=False):
             return False
     s = s.dropna()
     s = s.astype(str)
-    if is_highR_cat(s, 0.8):
-        s = s.str.split(" ")
-        s = s.apply(len)
-        return np.all(s >= 2)
-    return False
+    s = s.str.split(" ")
+    s = s.apply(len)
+    return np.all(s >= 2) # todo 参考 AG
 
 
 def is_date(s, cat_been_checked=False):
@@ -169,7 +167,7 @@ def is_date(s, cat_been_checked=False):
         if not is_cat(s, consider_ordinal_as_cat=False):
             return False
     s = s.dropna()
-    s = s.astype(str)
+    s = s.astype(str)  # todo 参考 AG
     return all(bool(list(find_dates(elem, strict=True))) for elem in s)
 
 

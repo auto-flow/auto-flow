@@ -66,11 +66,11 @@ class TestDataFrameContainer(LocalResourceTestCase):
                                      'text': ['Name'],
                                      'num': ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare'],
                                      'cat': ['Sex', 'Cabin', 'Embarked'],
-                                     'highR_cat': ['Ticket']}
+                                     'highC_cat': ['Ticket']}
         train_df, test_df = load("titanic", return_train_test=True)
         origin = deepcopy(test_df)
         test_dc = DataFrameContainer("Unittest", dataset_instance=test_df, resource_manager=self.mock_resource_manager)
         test_dc.set_column_descriptions(final_column_descriptions)
         self.assertTrue(np.all(test_dc.feature_groups == pd.Series(
-            ['id', 'num', 'text', 'cat', 'num', 'num', 'num', 'highR_cat', 'num', 'cat', 'cat'])))
+            ['id', 'num', 'text', 'cat', 'num', 'num', 'num', 'highC_cat', 'num', 'cat', 'cat'])))
         self.assertTrue(np.all(origin.columns == test_dc.columns))

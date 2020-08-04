@@ -13,7 +13,7 @@ from autoflow.constants import AUXILIARY_FEATURE_GROUPS, NAN_FEATURE_GROUPS, UNI
 from autoflow.data_container import DataFrameContainer
 from autoflow.data_container import NdArrayContainer
 from autoflow.data_container.base import get_container_data
-from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highR_cat, is_date, is_text, \
+from autoflow.utils.data import is_nan, is_cat, is_highR_nan, to_array, is_highC_cat, is_date, is_text, \
     is_target_need_label_encode
 from autoflow.utils.dataframe import get_unique_col_name
 from autoflow.utils.klass import StrSignatureMixin
@@ -48,7 +48,7 @@ class DataManager(StrSignatureMixin):
             dataset_metadata: Dict[str, Any] = frozendict(),
             column_descriptions: Dict[str, Union[List[str], str]] = frozendict(),
             highR_nan_threshold: float = 0.5,
-            highR_cat_threshold: float = 0.5,
+            highC_cat_threshold: int = 4,
             consider_ordinal_as_cat=False,
             upload_type="fs"
     ):
@@ -77,7 +77,7 @@ class DataManager(StrSignatureMixin):
                 * ``cat_nan``  - categorical features contains missing values. such as ["a", "b", NaN].
                 * ``highR_nan``  - highly ratio NaN. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
                 * ``lowR_nan``   - lowly ratio NaN. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
-                * ``highR_cat``  - highly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
+                * ``highC_cat``  - highly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
                 * ``lowR_cat``  -  lowly cardinality ratio categorical. You can find explain in :class:`autoflow.hdl.hdl_constructor.HDL_Constructor`
 
         highR_nan_threshold: float
@@ -92,7 +92,7 @@ class DataManager(StrSignatureMixin):
             resource_manager = ResourceManager()
         self.resource_manager: ResourceManager = resource_manager
         self.resource_manager = resource_manager
-        self.highR_cat_threshold = highR_cat_threshold
+        self.highC_cat_threshold = highC_cat_threshold
         self.consider_ordinal_as_cat = consider_ordinal_as_cat
         dataset_metadata = dict(dataset_metadata)
         self.highR_nan_threshold = highR_nan_threshold
@@ -125,7 +125,7 @@ class DataManager(StrSignatureMixin):
                     if isinstance(cols, str):
                         final_column_descriptions[feat_grp] = [cols]
             # 然后开始更新
-            for column, essential_feature_group in self.column2essential_feature_groups.items():
+            for column, essential_feature_group in self.column2feature_groups.items():
                 if column not in final_column_descriptions[essential_feature_group]:
                     final_column_descriptions[essential_feature_group].append(column)
             self.final_column_descriptions = final_column_descriptions
@@ -161,7 +161,7 @@ class DataManager(StrSignatureMixin):
         y_train = to_array(y_train)
         y_test = to_array(y_test)
         # encode label
-        assert y_train is not None, f"{self.target_col_name} does not exist!"
+        assert y_train is not None, ValueError(f"{self.target_col_name} does not exist!")
         self.label_encoder = None
         if is_target_need_label_encode(y_train):
             self.label_encoder = LabelEncoder()
@@ -275,8 +275,8 @@ class DataManager(StrSignatureMixin):
             elif is_text(series, True):
                 feature_group = "text"
             else:
-                if is_highR_cat(series, self.highR_cat_threshold):
-                    feature_group = "highR_cat"
+                if is_highC_cat(series, self.highC_cat_threshold):
+                    feature_group = "highC_cat"
                 else:
                     feature_group = "cat"
         else:
@@ -299,50 +299,54 @@ class DataManager(StrSignatureMixin):
             if isinstance(columns, str):
                 columns = [columns]
             for column in columns:
-                userDefined_column2feature_groups[column] = feat_grp
+                userDefined_column2feature_groups[column] = feat_grp # todo: highC_cat
         # `column2feature_groups` and `column2essential_feature_groups` 's k-v will
-        column2feature_groups.update(deepcopy(userDefined_column2feature_groups))
-        column2essential_feature_groups = deepcopy(column2feature_groups)
+        # column2essential_feature_groups = deepcopy(column2feature_groups)
         # ----尝试将X_train与X_test拼在一起，然后做解析---------
         X = stack_Xs(
             get_container_data(self.X_train),
             None,
             get_container_data(self.X_test)
         )  # fixme:target列会变成nan
-        # --识别用户自定义列中的nan--
-        for column, feature_group in list(column2feature_groups.items()):
-            # 注意，此时feature_groups与columns不是一一匹配的，删除了辅助特征组
-            if feature_group in AUXILIARY_FEATURE_GROUPS:  # ("id", "target", "ignore")
-                continue
-            nan_col = self.detect_nan_feature_group(X[column])
-            if nan_col is not None:
-                column2feature_groups[column] = nan_col
+        for column, feature_group in userDefined_column2feature_groups.items():
+            if feature_group=="cat":
+                if is_highC_cat(X[column],self.highC_cat_threshold):
+                    userDefined_column2feature_groups[column]="highC_cat"
+        column2feature_groups.update(deepcopy(userDefined_column2feature_groups))
+        # --识别用户自定义列中的nan--  # fixme: 不考虑 nan
+        # for column, feature_group in list(column2feature_groups.items()):
+        #     # 注意，此时feature_groups与columns不是一一匹配的，删除了辅助特征组
+        #     if feature_group in AUXILIARY_FEATURE_GROUPS:  # ("id", "target", "ignore")
+        #         continue
+        #     nan_col = self.detect_nan_feature_group(X[column])
+        #     if nan_col is not None:
+        #         column2feature_groups[column] = nan_col
                 # 只会涉及 feature_groups, 不会涉及essential_feature_groups
-        # ----对于没有标注的列，打上nan, highR_nan, cat, highR_cat num三种标记---
+        # ----对于没有标注的列，打上nan, highR_nan, cat, highC_cat num三种标记---
         # 实测发现这个循环很耗时(cat多的情况)
         for column in X.columns:
             if column not in column2feature_groups:
                 # if nan appear, will be consider as nan
-                feature_group = self.parse_feature_group(X[column], consider_nan=True)
+                feature_group = self.parse_feature_group(X[column], consider_nan=False)
                 # set column2feature_groups
                 column2feature_groups[column] = feature_group
-                # set column2essential_feature_groups
-                if column not in column2essential_feature_groups:
-                    if feature_group in NAN_FEATURE_GROUPS:  # ("nan", "highR_nan")
-                        essential_feature_group = self.parse_feature_group(X[column], consider_nan=False)
-                    else:
-                        essential_feature_group = feature_group
-                    column2essential_feature_groups[column] = essential_feature_group
+                # set column2essential_feature_groups  # fixme: 不再用 essential_feature_group
+                # if column not in column2essential_feature_groups:
+                #     if feature_group in NAN_FEATURE_GROUPS:  # ("nan", "highR_nan")
+                #         essential_feature_group = self.parse_feature_group(X[column], consider_nan=False)
+                #     else:
+                #         essential_feature_group = feature_group
+                #     column2essential_feature_groups[column] = essential_feature_group
         feature_groups = []
-        essential_feature_groups = []
+        # essential_feature_groups = []
         # assemble `feature_groups` , `essential_feature_groups`
         for column in X.columns:
             feature_group = column2feature_groups[column]
             if feature_group not in AUXILIARY_FEATURE_GROUPS:
                 feature_groups.append(feature_group)
-            essential_feature_group = column2essential_feature_groups[column]
-            if essential_feature_group not in AUXILIARY_FEATURE_GROUPS:
-                essential_feature_groups.append(essential_feature_group)
+            # essential_feature_group = column2essential_feature_groups[column]
+            # if essential_feature_group not in AUXILIARY_FEATURE_GROUPS:
+            #     essential_feature_groups.append(essential_feature_group)
         # reindex X_train and X_test
         L1 = self.X_train.shape[0] if self.X_train is not None else 0
         if self.X_test is not None:
@@ -352,9 +356,9 @@ class DataManager(StrSignatureMixin):
         self.feature_groups = feature_groups
         self.column2feature_groups = column2feature_groups
         self.userDefined_column2feature_groups = userDefined_column2feature_groups
-        self.essential_feature_groups = essential_feature_groups
-        self.column2essential_feature_groups = column2essential_feature_groups
-        self.nan_column2essential_fg = self.get_nan_column2essential_fg()
+        # self.essential_feature_groups = essential_feature_groups
+        # self.column2essential_feature_groups = column2essential_feature_groups
+        # self.nan_column2essential_fg = self.get_nan_column2essential_fg()
         # todo: 对用户自定义特征组的验证（HDL_Constructor?）
 
     def get_nan_column2essential_fg(self):

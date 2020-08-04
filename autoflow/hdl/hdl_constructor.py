@@ -1,19 +1,20 @@
 from collections import OrderedDict
 from copy import deepcopy
 from typing import Union, Tuple, List, Any, Dict
-
+import numpy as np
 import pandas as pd
 from frozendict import frozendict
 
 from autoflow.constants import PHASE1, PHASE2, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN
-from autoflow.hdl.smac import _encode
+from autoflow.data_container.base import get_container_data
 from autoflow.hdl.utils import get_hdl_bank, get_default_hdl_bank
-from autoflow.utils.dict_ import add_prefix_in_dict_keys, sort_dict
+from autoflow.utils.dict_ import add_prefix_in_dict_keys
 from autoflow.utils.graphviz import ColorSelector
 from autoflow.utils.klass import StrSignatureMixin
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.math_ import get_int_length
 from autoflow.utils.packages import get_class_object_in_pipeline_components
+from autoflow.workflow.components.utils import stack_Xs
 
 
 class HDL_Constructor(StrSignatureMixin):
@@ -38,46 +39,40 @@ class HDL_Constructor(StrSignatureMixin):
             hdl_metadata=frozendict(),
             balance_strategies=("weight", "None"),
             included_classifiers=(
-                    "adaboost", "catboost", "decision_tree", "extra_trees", "gaussian_nb", "knn",
-                    "linearsvc", "svc", "lightgbm", "logistic_regression", "random_forest", "sgd"),
+                    "extra_trees", "lightgbm", "logistic_regression", "random_forest", "sgd", "tabular_nn"),
             included_regressors=(
-                    "adaboost", "bayesian_ridge", "catboost", "decision_tree", "elasticnet", "extra_trees",
-                    "gaussian_process", "knn", "kernel_ridge",
-                    "linearsvr", "lightgbm", "random_forest", "sgd"),
-            included_highR_nan_imputers=("operate.drop", "operate.keep_going"),
-            included_nan_imputers=(
-                    "impute.adaptive_fill",),
-            included_highR_cat_encoders=("operate.drop", "encode.ordinal", "encode.cat_boost"),
+                    "extra_trees", "lightgbm", "elasticnet", "random_forest", "sgd", "tabular_nn"),
+            included_imputers=("impute.adaptive",),
+            included_highC_cat_encoders=("encode.entity", "encode.ordinal", "encode.cat_boost"),
             included_cat_encoders=("encode.one_hot", "encode.ordinal", "encode.cat_boost"),
-            num2purified_workflow=frozendict({
+            num2normed_workflow=frozendict({
                 "num->scaled": ["scale.standardize", "operate.keep_going"],
-                "scaled->purified": ["operate.keep_going", "transform.power"]
+                "scaled->normed": ["operate.keep_going", "transform.power"]
             }),
-            text2purified_workflow=frozendict({
+            text2normed_workflow=frozendict({
                 "text->tokenized": "text.tokenize.simple",
-                "tokenized->purified": [
+                "tokenized->normed": [
                     "text.topic.tsvd",
                     "text.topic.lsi",
                     "text.topic.nmf",
                 ]
             }),
-            date2purified_workflow=frozendict({
+            date2normed_workflow=frozendict({
             }),
-            purified2final_workflow=frozendict({
-                "purified->final": ["operate.keep_going"]
+            normed2final_workflow=frozendict({
+                "normed->final": ["operate.keep_going"]
             })
 
     ):
         self.balance_strategies = balance_strategies
-        self.date2purified_workflow = date2purified_workflow
-        self.text2purified_workflow = text2purified_workflow
-        self.purified2final_workflow = purified2final_workflow
-        self.num2purified_workflow = num2purified_workflow
+        self.date2normed_workflow = date2normed_workflow
+        self.text2normed_workflow = text2normed_workflow
+        self.normed2final_workflow = normed2final_workflow
+        self.num2normed_workflow = num2normed_workflow
         self.hdl_metadata = dict(hdl_metadata)
         self.included_cat_encoders = included_cat_encoders
-        self.included_highR_cat_encoders = included_highR_cat_encoders
-        self.included_nan_imputers = included_nan_imputers
-        self.included_highR_nan_imputers = included_highR_nan_imputers
+        self.included_highC_cat_encoders = included_highC_cat_encoders
+        self.included_imputers = included_imputers
         self.included_regressors = included_regressors
         self.included_classifiers = included_classifiers
         self.logger = get_logger(self)
@@ -158,43 +153,28 @@ class HDL_Constructor(StrSignatureMixin):
 
         '''
         DAG_workflow = OrderedDict()
-        contain_highR_nan = False
-        essential_feature_groups = self.data_manager.essential_feature_groups
-        nan_column2essential_fg = self.data_manager.nan_column2essential_fg
-        fg_set = set(essential_feature_groups)
-        nan_fg_set = set(nan_column2essential_fg.values())
+        X_train_=get_container_data(self.data_manager.X_train)
+        X_test_=get_container_data(self.data_manager.X_test)
+        X_stack=stack_Xs(X_train_,None,X_test_)
+        fg_set=self.data_manager.X_train.feature_groups.unique()
         # --------Start imputing missing(nan) value--------------------
-        if "highR_nan" in self.data_manager.feature_groups:
-            DAG_workflow["highR_nan->nan"] = self.included_highR_nan_imputers
-            contain_highR_nan = True
-        if contain_highR_nan or "nan" in self.data_manager.feature_groups:
-            DAG_workflow["nan->imputed"] = self.included_nan_imputers
-            if len(nan_fg_set) > 1:
-                sorted_nan_column2essential_fg = sort_dict(nan_column2essential_fg)
-                sorted_nan_fg = sort_dict(list(nan_fg_set))
-                DAG_workflow[f"imputed->{','.join(sorted_nan_fg)}"] = {"_name": "operate.split",
-                                                                       "column2fg": _encode(
-                                                                           sorted_nan_column2essential_fg)}
-            elif len(nan_fg_set) == 1:
-                elem = list(nan_fg_set)[0]
-                DAG_workflow[f"imputed->{elem}"] = "operate.keep_going"
-            else:
-                raise NotImplementedError
+        if np.count_nonzero(pd.isna(X_stack)):
+            DAG_workflow["impute"] = self.included_imputers
         # --------Start encoding categorical(cat) value --------------------
         if "cat" in fg_set:
-            DAG_workflow["cat->purified"] = self.included_cat_encoders
-        if "highR_cat" in fg_set:
-            DAG_workflow["highR_cat->purified"] = self.included_highR_cat_encoders
+            DAG_workflow["cat->normed"] = self.included_cat_encoders
+        if "highC_cat" in fg_set:
+            DAG_workflow["highC_cat->normed"] = self.included_highC_cat_encoders
         # --------processing text features--------------------
         if "text" in fg_set:
-            for k, v in self.text2purified_workflow.items():
+            for k, v in self.text2normed_workflow.items():
                 DAG_workflow[k] = v
         # --------processing numerical features--------------------
         if "num" in fg_set:
-            for k, v in self.num2purified_workflow.items():
+            for k, v in self.num2normed_workflow.items():
                 DAG_workflow[k] = v
         # --------finally processing--------------------
-        for k, v in self.purified2final_workflow.items():
+        for k, v in self.normed2final_workflow.items():
             DAG_workflow[k] = v
         # --------Start estimating--------------------
         mainTask = self.ml_task.mainTask
@@ -204,8 +184,6 @@ class HDL_Constructor(StrSignatureMixin):
             DAG_workflow["final->target"] = self.included_regressors
         else:
             raise NotImplementedError
-        # todo: 如果特征多，做特征选择或者降维。如果特征少，做增维
-        # todo: 处理样本不平衡
         return DAG_workflow
 
     def draw_workflow_space(
@@ -380,14 +358,14 @@ class HDL_Constructor(StrSignatureMixin):
         Parameters
         ----------
         data_manager: :class:`autoflow.manager.data_manager.DataManager`
-        highR_cat_threshold: float
+        highC_cat_threshold: float
 
         '''
         if model_registry is None:
             model_registry = {}
         self.data_manager = data_manager
         self.ml_task = data_manager.ml_task
-        self.highR_cat_threshold = data_manager.highR_cat_threshold
+        self.highC_cat_threshold = data_manager.highC_cat_threshold
         self.highR_nan_threshold = data_manager.highR_nan_threshold
         self.consider_ordinal_as_cat = data_manager.consider_ordinal_as_cat
         if isinstance(self.DAG_workflow, str):
@@ -422,7 +400,7 @@ class HDL_Constructor(StrSignatureMixin):
         n_steps = len(DAG_workflow)
         int_len = get_int_length(n_steps)
         for i, (step, values) in enumerate(DAG_workflow.items()):
-            formed_key = f"{i:0{int_len}d}{step}(choice)"
+            formed_key = f"{step}(choice)"
             sub_dict = {}
             for value in values:
                 packages, addition_dict, is_vanilla = self.parse_item(value)
@@ -451,6 +429,7 @@ class HDL_Constructor(StrSignatureMixin):
             final_dict["strategies"] = {
                 "balance(choice)": {k: {} for k in self.balance_strategies}
             }
+        final_dict["process_sequence"] = ";".join(DAG_workflow.keys())
         self.hdl = final_dict
 
     def get_hdl(self) -> Dict[str, Any]:

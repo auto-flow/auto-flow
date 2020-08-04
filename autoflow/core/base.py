@@ -75,7 +75,7 @@ class AutoFlowEstimator(BaseEstimator):
             log_path: str = "autoflow.log",
             log_config: Optional[dict] = None,
             highR_nan_threshold: float = 0.5,
-            highR_cat_threshold: float = 0.3,
+            highC_cat_threshold: int = 4,
             consider_ordinal_as_cat: bool = False,
             should_store_intermediate_result: bool = False,
             should_finally_fit: bool = False,
@@ -135,7 +135,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.should_calc_all_metrics = should_calc_all_metrics
         self.log_config = log_config
         self.highR_nan_threshold = highR_nan_threshold
-        self.highR_cat_threshold = highR_cat_threshold
+        self.highC_cat_threshold = highC_cat_threshold
         # ---logger------------------------------------
         self.log_path = os.path.expandvars(os.path.expanduser(log_path))
         setup_logger(self.log_path, self.log_config)
@@ -187,7 +187,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.data_manager: DataManager = DataManager(
             self.resource_manager,
             X_train, y_train, X_test, y_test, dataset_metadata, column_descriptions, self.highR_nan_threshold,
-            self.highR_cat_threshold, self.consider_ordinal_as_cat, upload_type
+            self.highC_cat_threshold, self.consider_ordinal_as_cat, upload_type
         )
         # parse ml_task
         self.ml_task = self.data_manager.ml_task
@@ -323,7 +323,7 @@ class AutoFlowEstimator(BaseEstimator):
             "should_store_intermediate_result": self.should_store_intermediate_result,
             "fit_ensemble_params": str(fit_ensemble_params),
             "highR_nan_threshold": self.highR_nan_threshold,
-            "highR_cat_threshold": self.highR_cat_threshold,
+            "highC_cat_threshold": self.highC_cat_threshold,
             "consider_ordinal_as_cat": self.consider_ordinal_as_cat,
             "random_state": self.random_state,
             "log_path": self.log_path,

@@ -5,7 +5,7 @@ from contextlib import redirect_stderr
 from io import StringIO
 from time import time
 from typing import Dict, Optional, List
-
+from collections import OrderedDict
 import numpy as np
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
@@ -41,7 +41,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             splitter,
             should_store_intermediate_result: bool,
             should_stack_X: bool,
-            should_finally_fit: bool,
+            should_finally_fit: bool,  # todo: rename to refit
             model_registry: dict,
             budget2kfold: Optional[Dict[float, int]] = None,
             algo2budget_mode: Optional[Dict[str, str]] = None,
@@ -367,22 +367,18 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         shp2dhp = SHP2DHP()
         dhp = shp2dhp(shp)
         # todo : 引入一个参数，描述运行模式。一共有3种模式：普通，深度学习，大数据。对以下三个翻译的步骤进行重构
+        preprocessing = dhp.pop("preprocessing")
+        sorted_preprocessing=OrderedDict()
+        process_sequence=dhp["process_sequence"].split(";")
+        for key in process_sequence:
+            sorted_preprocessing[key]=preprocessing[key]
+        dhp["preprocessing"]=dict(sorted_preprocessing)
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
         return dhp, pipeline
 
     def parse_key(self, key: str):
-        cnt = ""
-        ix = 0
-        for i, c in enumerate(key):
-            if c.isdigit():
-                cnt += c
-            else:
-                ix = i
-                break
-        cnt = int(cnt)
-        key = key[ix:]
         # todo: 支持多结点的输入输出，与dataframe.py耦合
         if "->" in key:
             _from, _to = key.split("->")

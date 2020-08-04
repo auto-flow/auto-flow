@@ -74,17 +74,17 @@
 <polygon fill="black" stroke="black" points="178.5,-69.1754 175,-59.1754 171.5,-69.1755 178.5,-69.1754"/>
 <text text-anchor="start" x="175" y="-80.8" font-family="Times,serif" font-size="14.00" fill="#333366">lightgbm</text>
 </g>
-<!-- highR_cat -->
-<g id="node8" class="node"><title>highR_cat</title>
+<!-- highC_cat -->
+<g id="node8" class="node"><title>highC_cat</title>
 <ellipse fill="none" stroke="#663399" cx="84" cy="-215" rx="46.5926" ry="18"/>
-<text text-anchor="start" x="56" y="-211.3" font-family="Times,serif" font-size="14.00" fill="#663399">highR_cat</text>
+<text text-anchor="start" x="56" y="-211.3" font-family="Times,serif" font-size="14.00" fill="#663399">highC_cat</text>
 </g>
-<!-- cat&#45;&gt;highR_cat -->
-<g id="edge10" class="edge"><title>cat&#45;&gt;highR_cat</title>
+<!-- cat&#45;&gt;highC_cat -->
+<g id="edge10" class="edge"><title>cat&#45;&gt;highC_cat</title>
 <path fill="none" stroke="black" d="M169.667,-297.595C148.466,-293.531 119.283,-284.751 101,-266 94.9022,-259.746 90.9886,-251.223 88.478,-242.985"/>
 <polygon fill="black" stroke="black" points="91.8673,-242.111 86.0589,-233.25 85.0739,-243.799 91.8673,-242.111"/>
 <text text-anchor="start" x="101" y="-255.8" font-family="Times,serif" font-size="14.00">operate.split.cat: </text>
-<text text-anchor="start" x="195" y="-255.8" font-family="Times,serif" font-size="14.00" fill="#663399">highR_cat</text>
+<text text-anchor="start" x="195" y="-255.8" font-family="Times,serif" font-size="14.00" fill="#663399">highC_cat</text>
 </g>
 <!-- lowR_cat -->
 <g id="node9" class="node"><title>lowR_cat</title>
@@ -152,8 +152,8 @@
 <text text-anchor="start" x="722" y="-255.8" font-family="Times,serif" font-size="14.00" fill="#333366">impute.fill_abnormal</text>
 <text text-anchor="start" x="839" y="-255.8" font-family="Times,serif" font-size="14.00">}</text>
 </g>
-<!-- highR_cat&#45;&gt;num -->
-<g id="edge12" class="edge"><title>highR_cat&#45;&gt;num</title>
+<!-- highC_cat&#45;&gt;num -->
+<g id="edge12" class="edge"><title>highC_cat&#45;&gt;num</title>
 <path fill="none" stroke="black" d="M55.6272,-200.637C39.1316,-191.027 23.4875,-177.441 34,-164 46.7474,-147.702 101.074,-137.918 138.445,-132.993"/>
 <polygon fill="black" stroke="black" points="139.002,-136.451 148.488,-131.732 138.13,-129.505 139.002,-136.451"/>
 <text text-anchor="start" x="34" y="-168.8" font-family="Times,serif" font-size="14.00">{</text>

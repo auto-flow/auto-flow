@@ -101,10 +101,10 @@ For example:
 
 NaN ratio is 0.4, less than 0.5 (default ``highR_nan_threshold``)
 
-highR_cat
+highC_cat
 ::::::::::
-``highR_cat`` is abbreviation of ``high cardinality ratio categorical``, indicating this this column is a categorical column (see in :ref:`cat`),
-and the unique value of this column divided by the total number of this column is more than ``highR_cat_threshold`` .
+``highC_cat`` is abbreviation of ``high cardinality ratio categorical``, indicating this this column is a categorical column (see in :ref:`cat`),
+and the unique value of this column divided by the total number of this column is more than ``highC_cat_threshold`` .
 
 For example:
 
@@ -113,7 +113,7 @@ For example:
 >>> np.unique(column).size / rows
 0.8
 
-cardinality ratio is 0.8, more than 0.5 (default ``highR_cat_threshold``)
+cardinality ratio is 0.8, more than 0.5 (default ``highC_cat_threshold``)
 
 lowR_cat
 ::::::::::
@@ -255,9 +255,9 @@ This corresponds to this figure:
 -----------------------------------------------------------------------------------
 
 **Fifth step**, using ``operate.split.cat`` algorithm to split :ref:`cat` to two
-feature groups: :ref:`highR_cat` and :ref:`lowR_cat`.
+feature groups: :ref:`highC_cat` and :ref:`lowR_cat`.
 
-.. csv-table:: Fifth Step : Split Categorical to :ref:`highR_cat` and :ref:`lowR_cat`
+.. csv-table:: Fifth Step : Split Categorical to :ref:`highC_cat` and :ref:`lowR_cat`
    :file: csv/split_cat.csv
 
 This corresponds to this figure:
@@ -274,7 +274,7 @@ This corresponds to this figure:
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
       "num_nan" -> "num" [ label="impute.fill_num" ];
-      "cat" -> "highR_cat" [ label="operate.split.cat: highR_cat" ];
+      "cat" -> "highC_cat" [ label="operate.split.cat: highC_cat" ];
       "cat" -> "lowR_cat" [ label="operate.split.cat: lowR_cat" ];
    }
 
@@ -282,7 +282,7 @@ This corresponds to this figure:
 -----------------------------------------------------------------------------------
 
 
-**Sixth step**, we encode :ref:`highR_cat` to :ref:`num` by ``label_encoder``,
+**Sixth step**, we encode :ref:`highC_cat` to :ref:`num` by ``label_encoder``,
 we encode :ref:`lowR_cat` to :ref:`num` by ``one_hot_encoder``,
 
 .. csv-table:: Sixth Step : Encoding Categorical to Numerical
@@ -302,8 +302,8 @@ This corresponds to this figure:
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
       "num_nan" -> "num" [ label="impute.fill_num" ];
-      "cat" -> "highR_cat" [ label="operate.split.cat: highR_cat" ];
-      "highR_cat" -> "num" [ label="encode.label" ];
+      "cat" -> "highC_cat" [ label="operate.split.cat: highC_cat" ];
+      "highC_cat" -> "num" [ label="encode.label" ];
       "cat" -> "lowR_cat" [ label="operate.split.cat: lowR_cat" ];
       "lowR_cat" -> "num" [ label="encode.one_hot" ];
    }
@@ -327,8 +327,8 @@ This corresponds to this figure:
       "nan" -> "num_nan" [ label="operate.split.cat_num: num_nan" ];
       "cat_nan" -> "cat" [ label="impute.fill_cat" ];
       "num_nan" -> "num" [ label="impute.fill_num" ];
-      "cat" -> "highR_cat" [ label="operate.split.cat: highR_cat" ];
-      "highR_cat" -> "num" [ label="encode.label" ];
+      "cat" -> "highC_cat" [ label="operate.split.cat: highC_cat" ];
+      "highC_cat" -> "num" [ label="encode.label" ];
       "cat" -> "lowR_cat" [ label="operate.split.cat: lowR_cat" ];
       "lowR_cat" -> "num" [ label="encode.one_hot" ];
       "num" -> "target" [ label="{lightgbm, random_forest}" ];

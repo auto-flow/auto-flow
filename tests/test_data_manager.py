@@ -20,7 +20,7 @@ class TestDataManager(LocalResourceTestCase):
                                          'text': ['Name'],
                                          'num': ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare'],
                                          'cat': ['Sex', 'Cabin', 'Embarked'],
-                                         'highR_cat': ['Ticket']}
+                                         'highC_cat': ['Ticket']}
             assert sort_dict(data_manager.final_column_descriptions) == sort_dict(final_column_descriptions)
             if not remote:
                 assert sort_dict(data_manager.column_descriptions) == sort_dict({'id': 'PassengerId', 'target': 'Survived', 'text': 'Name'})
@@ -28,11 +28,11 @@ class TestDataManager(LocalResourceTestCase):
                 assert sort_dict(data_manager.column_descriptions) == sort_dict(final_column_descriptions)
             if stacked:
                 assert np.all(pd.Series(data_manager.feature_groups) == pd.Series(['num', 'text', 'cat', 'nan',
-                                                                                   'num', 'num', 'highR_cat', 'nan',
+                                                                                   'num', 'num', 'highC_cat', 'nan',
                                                                                    'highR_nan', 'nan']))
             else:
                 assert np.all(pd.Series(data_manager.feature_groups) == pd.Series(['num', 'text', 'cat', 'nan',
-                                                                                   'num', 'num', 'highR_cat', 'num',
+                                                                                   'num', 'num', 'highC_cat', 'num',
                                                                                    'highR_nan', 'nan']))
             assert np.all(
                 data_manager.columns == Index(['Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare',

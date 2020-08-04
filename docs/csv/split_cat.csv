@@ -1,4 +1,4 @@
-Name(highR_cat),Age(num),SibSp(num),Ticket(highR_cat),Fare(num),Embarked(lowR_cat)
+Name(highC_cat),Age(num),SibSp(num),Ticket(highC_cat),Fare(num),Embarked(lowR_cat)
 "Braund, Mr. Owen Harris",22,1,A/5 21171,7.25,S
 "Cumings, Mrs. John Bradley (Florence Briggs Thayer)",38,1,PC 17599,71.2833,C
 "Heikkinen, Miss. Laina",26,0,STON/O2. 3101282,7.925,S

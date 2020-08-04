@@ -177,6 +177,8 @@ class DataFrameContainer(DataContainer):
         self.feature_groups = self.column_descriptions2feature_groups(column_descriptions)
 
     def filter_feature_groups(self, feature_group: Union[List, str], copy=True, isin=True):  # , inplace=False
+        if feature_group is None:
+            return self
         if feature_group == "all":  # todo 用正则表达式判断
             feature_group = np.unique(self.feature_groups).tolist()
         # 用于过滤feature_groups
@@ -219,6 +221,13 @@ class DataFrameContainer(DataContainer):
                                new_feature_group: Union[str, List[str], pd.Series]):
         if old_feature_group == "all":
             old_feature_group = np.unique(self.feature_groups).tolist()
+        if new_feature_group is None:
+            self.logger.debug("new_feature_group is None, return all feature_groups")
+            assert values.shape[1]==self.shape[1]
+            assert isinstance(values, pd.DataFrame)
+            result=self.copy()
+            result.data=values
+            return result
         if isinstance(old_feature_group, str):
             old_feature_group = [old_feature_group]
 

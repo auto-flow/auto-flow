@@ -18,12 +18,12 @@ PHASE1 = "preprocessing"
 PHASE2 = "estimating"
 SERIES_CONNECT_LEADER_TOKEN = "#"
 SERIES_CONNECT_SEPARATOR_TOKEN = "|"
-NATIVE_FEATURE_GROUPS = ("text", "date", "cat", "highR_cat", "num")
+NATIVE_FEATURE_GROUPS = ("text", "date", "cat", "highC_cat", "num")
 AUXILIARY_FEATURE_GROUPS = ("id", "target", "ignore")
 UNIQUE_FEATURE_GROUPS = ("id", "target")
 NAN_FEATURE_GROUPS = ("nan", "highR_nan")
 VARIABLE_PATTERN = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")
-JOBLIB_CACHE = "/tmp/joblib_cache"
+JOBLIB_CACHE = "/tmp/autoflow_joblib_cache"
 ITERATIONS_BUDGET_MODE = "iterations"
 SUBSAMPLES_BUDGET_MODE = "subsamples"
 RESOURCE_MANAGER_CLOSE_ALL_LOGGER = "ResourceManager.close_all"
@@ -39,5 +39,5 @@ LOGGING_LEVELS = {
     "DEBUG": 10,
     "NOTSET": 0,
 }
-ERR_LOSS=65535
-MINIMAL_COST_FOR_LOG=0.001
+ERR_LOSS = 65535
+MINIMAL_COST_FOR_LOG = 0.001

@@ -100,7 +100,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#cat-nan">cat_nan</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#highr-nan">highR_nan</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#lowr-nan">lowR_nan</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#highr-cat">highR_cat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#highr-cat">highC_cat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#lowr-cat">lowR_cat</a></li>
 </ul>
 </li>
@@ -400,9 +400,9 @@ the remaining columns are called <code class="docutils literal notranslate"><spa
 <p>NaN ratio is 0.4, less than 0.5 (default <code class="docutils literal notranslate"><span class="pre">highR_nan_threshold</span></code>)</p>
 </div>
 <div class="section" id="highr-cat">
-<h4>highR_cat<a class="headerlink" href="#highr-cat" title="Permalink to this headline">¶</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">highR_cat</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">cardinality</span> <span class="pre">ratio</span> <span class="pre">categorical</span></code>, indicating this this column is a categorical column (see in <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a>),
-and the unique value of this column divided by the total number of this column is more than <code class="docutils literal notranslate"><span class="pre">highR_cat_threshold</span></code> .</p>
+<h4>highC_cat<a class="headerlink" href="#highr-cat" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">highC_cat</span></code> is abbreviation of <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">cardinality</span> <span class="pre">ratio</span> <span class="pre">categorical</span></code>, indicating this this column is a categorical column (see in <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a>),
+and the unique value of this column divided by the total number of this column is more than <code class="docutils literal notranslate"><span class="pre">highC_cat_threshold</span></code> .</p>
 <p>For example:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
@@ -410,7 +410,7 @@ and the unique value of this column divided by the total number of this column i
 <span class="go">0.8</span>
 </pre></div>
 </div>
-<p>cardinality ratio is 0.8, more than 0.5 (default <code class="docutils literal notranslate"><span class="pre">highR_cat_threshold</span></code>)</p>
+<p>cardinality ratio is 0.8, more than 0.5 (default <code class="docutils literal notranslate"><span class="pre">highC_cat_threshold</span></code>)</p>
 </div>
 <div class="section" id="lowr-cat">
 <h4>lowR_cat<a class="headerlink" href="#lowr-cat" title="Permalink to this headline">¶</a></h4>
@@ -931,9 +931,9 @@ feature groups: <a class="reference internal" href="#cat-nan"><span class="std s
 }" class="graphviz" /></div>
 <hr class="docutils" />
 <p><strong>Fifth step</strong>, using <code class="docutils literal notranslate"><span class="pre">operate.split.cat</span></code> algorithm to split <a class="reference internal" href="#cat"><span class="std std-ref">cat</span></a> to two
-feature groups: <a class="reference internal" href="#highr-cat"><span class="std std-ref">highR_cat</span></a> and <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a>.</p>
+feature groups: <a class="reference internal" href="#highr-cat"><span class="std std-ref">highC_cat</span></a> and <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a>.</p>
 <table class="docutils align-default" id="id7">
-<caption><span class="caption-text">Fifth Step : Split Categorical to <a class="reference internal" href="#highr-cat"><span class="std std-ref">highR_cat</span></a> and <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a></span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">Fifth Step : Split Categorical to <a class="reference internal" href="#highr-cat"><span class="std std-ref">highC_cat</span></a> and <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a></span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 17%" />
 <col style="width: 17%" />
@@ -943,10 +943,10 @@ feature groups: <a class="reference internal" href="#highr-cat"><span class="std
 <col style="width: 17%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p>Name(highR_cat)</p></td>
+<tr class="row-odd"><td><p>Name(highC_cat)</p></td>
 <td><p>Age(num)</p></td>
 <td><p>SibSp(num)</p></td>
-<td><p>Ticket(highR_cat)</p></td>
+<td><p>Ticket(highC_cat)</p></td>
 <td><p>Fare(num)</p></td>
 <td><p>Embarked(lowR_cat)</p></td>
 </tr>
@@ -1047,11 +1047,11 @@ feature groups: <a class="reference internal" href="#highr-cat"><span class="std
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
    &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
-   &quot;cat&quot; -&gt; &quot;highR_cat&quot; [ label=&quot;operate.split.cat: highR_cat&quot; ];
+   &quot;cat&quot; -&gt; &quot;highC_cat&quot; [ label=&quot;operate.split.cat: highC_cat&quot; ];
    &quot;cat&quot; -&gt; &quot;lowR_cat&quot; [ label=&quot;operate.split.cat: lowR_cat&quot; ];
 }" class="graphviz" /></div>
 <hr class="docutils" />
-<p><strong>Sixth step</strong>, we encode <a class="reference internal" href="#highr-cat"><span class="std std-ref">highR_cat</span></a> to <a class="reference internal" href="#num"><span class="std std-ref">num</span></a> by <code class="docutils literal notranslate"><span class="pre">label_encoder</span></code>,
+<p><strong>Sixth step</strong>, we encode <a class="reference internal" href="#highr-cat"><span class="std std-ref">highC_cat</span></a> to <a class="reference internal" href="#num"><span class="std std-ref">num</span></a> by <code class="docutils literal notranslate"><span class="pre">label_encoder</span></code>,
 we encode <a class="reference internal" href="#lowr-cat"><span class="std std-ref">lowR_cat</span></a> to <a class="reference internal" href="#num"><span class="std std-ref">num</span></a> by <code class="docutils literal notranslate"><span class="pre">one_hot_encoder</span></code>,</p>
 <table class="docutils align-default" id="id8">
 <caption><span class="caption-text">Sixth Step : Encoding Categorical to Numerical</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
@@ -1182,8 +1182,8 @@ we encode <a class="reference internal" href="#lowr-cat"><span class="std std-re
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
    &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
-   &quot;cat&quot; -&gt; &quot;highR_cat&quot; [ label=&quot;operate.split.cat: highR_cat&quot; ];
-   &quot;highR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.label&quot; ];
+   &quot;cat&quot; -&gt; &quot;highC_cat&quot; [ label=&quot;operate.split.cat: highC_cat&quot; ];
+   &quot;highC_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.label&quot; ];
    &quot;cat&quot; -&gt; &quot;lowR_cat&quot; [ label=&quot;operate.split.cat: lowR_cat&quot; ];
    &quot;lowR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.one_hot&quot; ];
 }" class="graphviz" /></div>
@@ -1201,8 +1201,8 @@ now we should do estimating. <code class="docutils literal notranslate"><span cl
    &quot;nan&quot; -&gt; &quot;num_nan&quot; [ label=&quot;operate.split.cat_num: num_nan&quot; ];
    &quot;cat_nan&quot; -&gt; &quot;cat&quot; [ label=&quot;impute.fill_cat&quot; ];
    &quot;num_nan&quot; -&gt; &quot;num&quot; [ label=&quot;impute.fill_num&quot; ];
-   &quot;cat&quot; -&gt; &quot;highR_cat&quot; [ label=&quot;operate.split.cat: highR_cat&quot; ];
-   &quot;highR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.label&quot; ];
+   &quot;cat&quot; -&gt; &quot;highC_cat&quot; [ label=&quot;operate.split.cat: highC_cat&quot; ];
+   &quot;highC_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.label&quot; ];
    &quot;cat&quot; -&gt; &quot;lowR_cat&quot; [ label=&quot;operate.split.cat: lowR_cat&quot; ];
    &quot;lowR_cat&quot; -&gt; &quot;num&quot; [ label=&quot;encode.one_hot&quot; ];
    &quot;num&quot; -&gt; &quot;target&quot; [ label=&quot;{lightgbm, random_forest}&quot; ];
