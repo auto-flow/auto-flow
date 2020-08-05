@@ -244,8 +244,8 @@ class KNNImputer(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ["fitted_X_", "statistics_", "do_simple_imputing", "idx2encoder", "dtypes"])
         if self.do_simple_imputing:
             logger.debug("KNNImputer is doing adaptive simple imputation.")
-            from autoflow.feature_engineer.impute import AdaptiveImputer
-            return AdaptiveImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat).fit_transform(X)
+            from autoflow.feature_engineer.impute import SimpleImputer
+            return SimpleImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat).fit_transform(X)
         X_ = process_dataframe(X)
         columns = X.columns
         index = X.index

@@ -5,6 +5,7 @@
 # todo 早停策略MixIn
 from autoflow.workflow.components.iter_algo import TabularNNIterativeMixIn
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
+import numpy as np
 
 __all__ = ["TabularNNRegressor"]
 
@@ -17,7 +18,7 @@ class TabularNNRegressor(AutoFlowRegressionAlgorithm, TabularNNIterativeMixIn):
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None, **kwargs):
-        categorical_features_indices = None  # todo: 配合 OrdinalEncoder
+        categorical_features_indices = np.arange(len(feature_groups))[feature_groups == "ordinal"]
         component = self.component.fit(
             X, y, X_valid, y_valid, categorical_feature=categorical_features_indices
         )

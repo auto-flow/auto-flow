@@ -52,6 +52,7 @@ class AutoFlowEstimator(BaseEstimator):
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
+            specific_out_feature_groups_mapper: Dict[str, str] = frozendict({"encode.ordinal": "ordinal"}),
             only_use_subsamples_budget_mode: bool = False,
             n_folds: int = 5,
             holdout_test_size: float = 1 / 3,
@@ -84,6 +85,7 @@ class AutoFlowEstimator(BaseEstimator):
             debug_evaluator: bool = False,
             **kwargs
     ):
+        self.specific_out_feature_groups_mapper = specific_out_feature_groups_mapper
         self.warm_start = warm_start
         self.debug_evaluator = debug_evaluator
         self.only_use_subsamples_budget_mode = only_use_subsamples_budget_mode
@@ -369,6 +371,7 @@ class AutoFlowEstimator(BaseEstimator):
             algo2budget_mode=self.algo2budget_mode,
             algo2weight_mode=self.algo2weight_mode,
             algo2iter=self.algo2iter,
+            specific_out_feature_groups_mapper=self.specific_out_feature_groups_mapper,
             max_budget=self.max_budget,
             nameserver=self.ns_host,
             nameserver_port=self.ns_port,

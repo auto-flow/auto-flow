@@ -11,7 +11,7 @@ import pandas as pd
 from pandas.core.common import SettingWithCopyWarning
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
-from sklearn.impute import SimpleImputer
+from sklearn.impute import SimpleImputer as SklearnSimpleImputer
 from sklearn.utils._testing import ignore_warnings
 
 
@@ -51,7 +51,7 @@ class CategoricalImputer(BaseEstimator, TransformerMixin):
         return X
 
 
-class AdaptiveImputer(BaseEstimator, TransformerMixin):
+class SimpleImputer(BaseEstimator, TransformerMixin):
     def __init__(
             self,
             categorical_feature=None,
@@ -89,7 +89,7 @@ class AdaptiveImputer(BaseEstimator, TransformerMixin):
         else:
             num_cols = np.array([])
         if num_cols.size:
-            self.num_imputer = SimpleImputer(strategy=self.num_strategy).fit(X[num_cols])
+            self.num_imputer = SklearnSimpleImputer(strategy=self.num_strategy).fit(X[num_cols])
         else:
             self.num_imputer = None
         if cat_cols.size:

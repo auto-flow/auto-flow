@@ -1,8 +1,8 @@
-from autoflow.workflow.components.preprocessing.encode.base import BaseEncoder
+from autoflow.workflow.components.preprocessing.encode.base import BaseCategoryEncoders
 
 __all__ = ["OneHotEncoder"]
 
 
-class OneHotEncoder(BaseEncoder):
+class OneHotEncoder(BaseCategoryEncoders):
     class__ = "OneHotEncoder"
     module__ = "category_encoders"

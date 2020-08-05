@@ -1,9 +1,9 @@
-from autoflow.workflow.components.preprocessing.encode.base import BaseEncoder
+from autoflow.workflow.components.preprocessing.encode.base import BaseCategoryEncoders
 
 __all__ = ["WOEEncoder"]
 
 
-class WOEEncoder(BaseEncoder):
+class WOEEncoder(BaseCategoryEncoders):
     class__ = "WOEEncoder"
     module__ = "category_encoders"
     need_y = True

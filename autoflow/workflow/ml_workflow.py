@@ -1,5 +1,4 @@
 import hashlib
-import pickle
 from copy import deepcopy
 from typing import Dict
 
@@ -7,12 +6,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
 from autoflow.data_container import DataFrameContainer
-from autoflow.data_container.base import DataContainer
+from autoflow.data_container.base import DataContainer, get_container_data
 from autoflow.utils.hash import get_hash_of_dict, get_hash_of_str
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
+from autoflow.workflow.components.utils import stack_Xs
 
 __all__ = ["ML_Workflow"]
 
@@ -21,6 +21,12 @@ class ML_Workflow(Pipeline):
     # todo: 现在是用类似拓扑排序的方式实现，但是计算是线性的，希望以后能用更科学的方法！
     # 可以当做Transformer，又可以当做estimator！
     def __init__(self, steps, should_store_intermediate_result=False, resource_manager=None):
+        self.logger = get_logger(self)
+        if resource_manager is None:
+            from autoflow import ResourceManager
+            self.logger.warning(
+                "In ML_Workflow __init__, resource_manager is None, create a default local resource_manager.")
+            resource_manager = ResourceManager()
         self.resource_manager = resource_manager
         self.should_store_intermediate_result = should_store_intermediate_result
         self.steps = steps
@@ -28,7 +34,6 @@ class ML_Workflow(Pipeline):
         self.verbose = False
         self._validate_steps()
         self.intermediate_result = {}
-        self.logger = get_logger(self)
         self.fitted = False
         self.budget = 0
 
@@ -58,11 +63,20 @@ class ML_Workflow(Pipeline):
     def assemble_result(self, name, X, X_transformed_stack: DataFrameContainer, result):
         # fixme: 不支持重采样的preprocess
         if X is not None:
-            data_container = X_transformed_stack.sub_sample(X.index)
+            data_container = X_transformed_stack.sub_sample(X.index)  # index 对应 loc
             data_container.resource_manager = self.resource_manager
             result[name] = data_container
         else:
             result[name] = None
+
+    def stack_X_after_transform(self, X_train, X_valid, X_test, **kwargs):
+        X_stack = X_train.copy()
+        X_stack.data = stack_Xs(
+            get_container_data(X_train),
+            get_container_data(X_valid),
+            get_container_data(X_test),
+        )
+        return X_stack
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, fit_final_estimator=True):
         # set default `self.last_data` to prevent exception in only classifier cases
@@ -90,40 +104,48 @@ class ML_Workflow(Pipeline):
                         cache_intermediate = True
             if cache_intermediate:
                 if hasattr(transformer, "prepare_X_to_fit"):
-                    def stack_X(X_train, X_valid, X_test, **kwargs):
+                    def stack_X_before_fit(X_train, X_valid, X_test, **kwargs):
                         X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)
-                        X_stack = DataFrameContainer("CalculateCache", dataset_instance=X_stack_,
-                                                     resource_manager=self.resource_manager)
-                        X_stack.set_feature_groups(X_train.feature_groups)
+                        X_stack = X_train.copy()
+                        X_stack.values = X_stack_
                         return X_stack
 
                 else:
-                    def stack_X(X_train, X_valid, X_test, **kwargs):
+                    def stack_X_before_fit(X_train, X_valid, X_test, **kwargs):
                         self.logger.warning(
                             f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
                         return X_train
-                X_stack = stack_X(X_train, X_valid, X_test)
+
+                X_stack = stack_X_before_fit(X_train, X_valid, X_test)
                 dataset_id = X_stack.get_hash()
                 component_name = transformer.__class__.__name__
                 m = hashlib.md5()
                 get_hash_of_str(component_name, m)
                 component_hash = get_hash_of_dict(hyperparams, m)
-                redis_key = f"{component_hash}-{dataset_id}"
-                redis_result = self.resource_manager.redis_hgetall(redis_key)
-                if isinstance(redis_result, dict) and b"component" in redis_result and b"result" in redis_result:
-                    X_transformed_stack = pickle.loads(redis_result[b"result"])
-                    fitted_transformer = pickle.loads(redis_result[b"component"])
+                cache_key = f"workflow-{component_hash}-{dataset_id}"
+                results = self.resource_manager.cache.get(cache_key)
+                if results is not None and isinstance(results, dict) and "result" in results and "component" in results:
+                    self.logger.debug(f"workflow cache hit, component_name = {component_name},"
+                                      f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
+                    X_transformed_stack = results["result"]
+                    fitted_transformer = results["component"]
                     result = {"y_train": y_train}
                     self.assemble_result("X_train", X_train, X_transformed_stack, result)
                     self.assemble_result("X_valid", X_valid, X_transformed_stack, result)
                     self.assemble_result("X_test", X_test, X_transformed_stack, result)
                 else:
+                    self.logger.debug(f"workflow cache miss, component_name = {component_name},"
+                                      f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
                     fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
                     result = transformer.transform(X_train, X_valid, X_test, y_train)
-                    X_transformed_stack = stack_X(**result)
+                    X_transformed_stack = self.stack_X_after_transform(**result)
                     X_transformed_stack.resource_manager = None
-                    self.resource_manager.redis_hset(redis_key, "component", pickle.dumps(fitted_transformer))
-                    self.resource_manager.redis_hset(redis_key, "result", pickle.dumps(X_transformed_stack))
+                    self.resource_manager.cache.set(
+                        cache_key, {
+                            "result": X_transformed_stack,
+                            "component": fitted_transformer
+                        }
+                    )
                     # todo: 增加一些元信息
             else:
                 fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
@@ -172,7 +194,7 @@ class ML_Workflow(Pipeline):
         else:
             self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         self.set_budget(budget)
-        if max_iter>0 and should_finish_evaluation:
+        if max_iter > 0 and should_finish_evaluation:
             self[-1].finish_evaluation()
         X_train = self.last_data["X_train"]
         y_train = self.last_data["y_train"]

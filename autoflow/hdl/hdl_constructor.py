@@ -42,7 +42,7 @@ class HDL_Constructor(StrSignatureMixin):
                     "extra_trees", "lightgbm", "logistic_regression", "random_forest", "sgd", "tabular_nn"),
             included_regressors=(
                     "extra_trees", "lightgbm", "elasticnet", "random_forest", "sgd", "tabular_nn"),
-            included_imputers=("impute.adaptive",),
+            included_imputers=("impute.simple",),
             included_highC_cat_encoders=("encode.entity", "encode.ordinal", "encode.cat_boost"),
             included_cat_encoders=("encode.one_hot", "encode.ordinal", "encode.cat_boost"),
             num2normed_workflow=frozendict({

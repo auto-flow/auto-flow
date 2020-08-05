@@ -261,8 +261,8 @@ class DataFrameContainer(DataContainer):
 
     def sub_sample(self, index):
         new_df = self.copy()
-        # fixme
-        new_df.data = deepcopy(new_df.data.iloc[index, :])
+        # fixme iloc 与 loc
+        new_df.data = deepcopy(new_df.data.loc[index, :])
         return new_df
 
     def sub_feature(self, index):

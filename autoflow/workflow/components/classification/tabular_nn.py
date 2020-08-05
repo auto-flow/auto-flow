@@ -3,8 +3,10 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 # todo 早停策略MixIn
-from autoflow.workflow.components.iter_algo import TabularNNIterativeMixIn
+import numpy as np
+
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
+from autoflow.workflow.components.iter_algo import TabularNNIterativeMixIn
 
 __all__ = ["TabularNNClassifier"]
 
@@ -17,7 +19,7 @@ class TabularNNClassifier(AutoFlowClassificationAlgorithm, TabularNNIterativeMix
 
     def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None, **kwargs):
-        categorical_features_indices = None  # todo: 配合 OrdinalEncoder
+        categorical_features_indices = np.arange(len(feature_groups))[feature_groups == "ordinal"]
         component = self.component.fit(
             X, y, X_valid, y_valid, categorical_feature=categorical_features_indices
         )

@@ -4,11 +4,11 @@
 # @Contact    : tqichun@gmail.com
 from autoflow.workflow.components.feature_engineer_base import AutoFlowFeatureEngineerAlgorithm
 
-__all__ = ["AdaptiveImputer"]
+__all__ = ["SimpleImputer"]
 
 
-class AdaptiveImputer(AutoFlowFeatureEngineerAlgorithm):
-    class__ = "AdaptiveImputer"
+class SimpleImputer(AutoFlowFeatureEngineerAlgorithm):
+    class__ = "SimpleImputer"
     module__ = "autoflow.feature_engineer.impute"
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,

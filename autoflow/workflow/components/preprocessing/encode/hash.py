@@ -1,11 +1,11 @@
 import numpy as np
-from sklearn.preprocessing import  LabelEncoder
-from autoflow.workflow.components.preprocessing.encode.base import BaseEncoder
+
+from autoflow.workflow.components.preprocessing.encode.base import BaseCategoryEncoders
 
 __all__ = ["HashingEncoder"]
 
 
-class HashingEncoder(BaseEncoder):
+class HashingEncoder(BaseCategoryEncoders):
     class__ = "HashingEncoder"
     module__ = "category_encoders"
 

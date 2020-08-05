@@ -1,12 +1,13 @@
 import datetime
-import sys
+from collections import OrderedDict
 from collections import defaultdict
 from contextlib import redirect_stderr
 from io import StringIO
 from time import time
 from typing import Dict, Optional, List
-from collections import OrderedDict
+
 import numpy as np
+from frozendict import frozendict
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
     SUBSAMPLES_BUDGET_MODE, ITERATIONS_BUDGET_MODE, ERR_LOSS
@@ -47,6 +48,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
+            specific_out_feature_groups_mapper: Dict[str, str] = frozendict(),
             max_budget: float = np.inf,
             nameserver=None,
             nameserver_port=None,
@@ -58,6 +60,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         super(TrainEvaluator, self).__init__(
             run_id, nameserver, nameserver_port, host, worker_id, timeout, debug
         )
+        self.specific_out_feature_groups_mapper = dict(specific_out_feature_groups_mapper)
         self.algo2weight_mode = algo2weight_mode
         self.max_budget = max_budget
         self.algo2iter = algo2iter
@@ -156,7 +159,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 fraction = 1
             max_iter = max(round(self.algo2iter[final_model_name] * fraction), 1)
         balance_strategy: Optional[dict] = dhp.get("strategies", {}).get("balance")
-        if isinstance(balance_strategy,dict):
+        if isinstance(balance_strategy, dict):
             balance_strategy_name: str = list(balance_strategy.keys())[0]
             balance_strategy_params: dict = balance_strategy[balance_strategy_name]
         else:
@@ -204,7 +207,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
                 if weight_mode == "sample_weight":
-                    cloned_model[-1].set_addition_info({"sample_weight":self.calc_balanced_sample_weight(y_train.data)})
+                    cloned_model[-1].set_addition_info(
+                        {"sample_weight": self.calc_balanced_sample_weight(y_train.data)})
                 if self.debug:
                     procedure_result = cloned_model.procedure(
                         self.ml_task, X_train, y_train, X_valid, y_valid,
@@ -237,7 +241,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     estimator = cloned_model.steps[-1][1]
                     # todo: 重构 LGBM等
                     best_iterations.append(getattr(
-                        estimator, "best_iteration_", getattr(estimator.component, "best_iteration_", -1)))
+                        estimator, "best_iteration_", -1))
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
                     y_test_preds.append(y_test_pred)
@@ -368,11 +372,11 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         dhp = shp2dhp(shp)
         # todo : 引入一个参数，描述运行模式。一共有3种模式：普通，深度学习，大数据。对以下三个翻译的步骤进行重构
         preprocessing = dhp.pop("preprocessing")
-        sorted_preprocessing=OrderedDict()
-        process_sequence=dhp["process_sequence"].split(";")
+        sorted_preprocessing = OrderedDict()
+        process_sequence = dhp["process_sequence"].split(";")
         for key in process_sequence:
-            sorted_preprocessing[key]=preprocessing[key]
-        dhp["preprocessing"]=dict(sorted_preprocessing)
+            sorted_preprocessing[key] = preprocessing[key]
+        dhp["preprocessing"] = dict(sorted_preprocessing)
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
@@ -399,6 +403,11 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             name = key  # like: "cat->num"
             in_feature_groups, out_feature_groups = self.parse_key(key)
             sub_dict = preprocessing_dict[name]
+            component_name = list(sub_dict.keys())[0]
+            # todo: 根据Component name 调整 out_feature_groups
+            specific_out_feature_groups = self.specific_out_feature_groups_mapper.get(component_name)
+            if specific_out_feature_groups is not None:
+                out_feature_groups = specific_out_feature_groups
             if sub_dict is None:
                 continue
             preprocessor = self.create_component(sub_dict, PHASE1, name, in_feature_groups, out_feature_groups,

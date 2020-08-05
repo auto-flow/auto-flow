@@ -96,10 +96,12 @@ def get_hash_of_dataframe_csv(df: pd.DataFrame, m=None, L=500):
 def get_hash_of_dataframe(df: pd.DataFrame, m=None, L=500):
     if m is None:
         m = hashlib.md5()
-    eq_obj = (df.dtypes == object)
-    if np.any(eq_obj):
-        get_hash_of_dataframe_csv(df.select_dtypes(include=object), m, L)
-        result = get_hash_of_array(df.select_dtypes(exclude=object).values, m)
+    cat_obj_dtypes = ["object", "category"]  # fixme : datetime 等
+    cat_df = df.select_dtypes(include=cat_obj_dtypes)
+    num_df = df.select_dtypes(exclude=cat_obj_dtypes)
+    if cat_df.shape[1] > 0:  # todo: 更多的单元测试，更复杂的边界条件
+        get_hash_of_dataframe_csv(cat_df, m, L)
+        result = get_hash_of_array(num_df.values, m)
     else:
         result = get_hash_of_array(df.values, m)
 

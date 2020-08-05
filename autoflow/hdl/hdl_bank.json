@@ -516,7 +516,7 @@
       }
     },
     "impute": {
-      "adaptive": {
+      "simple": {
         "num_strategy": {"_type": "choice","_value": ["median", "mean"],"_default": "median"},
         "cat_strategy": {"_type": "choice","_value": ["constant", "most_frequent"],"_default": "most_frequent"}
       },
