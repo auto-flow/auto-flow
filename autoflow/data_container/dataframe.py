@@ -4,7 +4,7 @@
 # @Contact    : tqichun@gmail.com
 import hashlib
 from collections import defaultdict
-from copy import deepcopy
+from copy import deepcopy, copy
 from typing import Union, List
 
 import inflection
@@ -14,7 +14,7 @@ from frozendict import frozendict
 
 from autoflow.constants import VARIABLE_PATTERN, UNIQUE_FEATURE_GROUPS
 from autoflow.data_container.base import DataContainer
-from autoflow.utils.dataframe import inverse_dict, process_duplicated_columns, get_unique_col_name
+from autoflow.utils.dataframe import process_duplicated_columns, get_unique_col_name
 from autoflow.utils.hash import get_hash_of_dataframe, get_hash_of_dict, get_hash_of_str
 
 
@@ -222,11 +222,15 @@ class DataFrameContainer(DataContainer):
         if old_feature_group == "all":
             old_feature_group = np.unique(self.feature_groups).tolist()
         if new_feature_group is None:
+            # imputer will trigger this
             self.logger.debug("new_feature_group is None, return all feature_groups")
-            assert values.shape[1]==self.shape[1]
-            assert isinstance(values, pd.DataFrame)
-            result=self.copy()
-            result.data=values
+            assert values.shape[1] == self.shape[1]
+            assert values.shape[0] == self.shape[0]
+            if not  isinstance(values, pd.DataFrame):
+                self.logger.debug(f"values is not DataFrame, is {type(values)}, convert to DataFrame and set column and index same to self.")
+                values=pd.DataFrame(values,columns=self.columns,index=self.index)
+            result = self.copy()
+            result.data = values
             return result
         if isinstance(old_feature_group, str):
             old_feature_group = [old_feature_group]
@@ -262,7 +266,7 @@ class DataFrameContainer(DataContainer):
     def sub_sample(self, index):
         new_df = self.copy()
         # fixme iloc 与 loc
-        new_df.data = deepcopy(new_df.data.loc[index, :])
+        new_df.data = copy(new_df.data.loc[index, :])
         return new_df
 
     def sub_feature(self, index):

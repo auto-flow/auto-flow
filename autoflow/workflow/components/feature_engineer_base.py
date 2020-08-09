@@ -2,6 +2,7 @@ from sklearn.base import TransformerMixin
 
 from autoflow.constants import STACK_X_MSG
 from autoflow.data_container import DataFrameContainer
+from autoflow.data_container.base import get_container_data
 from autoflow.workflow.components.base import AutoFlowComponent
 from autoflow.workflow.components.utils import stack_Xs
 
@@ -13,14 +14,35 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
                       ):
         return self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test).transform(X_train, X_valid, X_test, y_train)
 
+    def assemble_result(self, X_stack, X_origin):
+        if X_origin is None:
+            return None
+        return X_stack.sub_sample(X_origin.index)
+
     def transform(self, X_train=None, X_valid=None, X_test=None, y_train=None):
         if not self.is_fit:
             self.logger.warning(
                 f"Component: {self.__class__.__name__} is not fitted. Maybe it fit a empty data.\nReturn origin X defaultly.")
         else:
-            X_train = self._transform(X_train)
-            X_valid = self._transform(X_valid)
-            X_test = self._transform(X_test)
+            # 1. stack_Xs(values)
+            X_stack = X_train.copy()
+            X_stack.data = stack_Xs(
+                get_container_data(X_train),
+                get_container_data(X_valid),
+                get_container_data(X_test),
+            )
+            # 2. only activated feature_groups
+            X_ = X_stack.filter_feature_groups(self.in_feature_groups, copy=True)
+            # 3. get core data before transform
+            X_data = self.before_trans_X(X_)
+            # 4. transform by component.transform()
+            X_trans = self._transform_procedure(X_data)
+            # replace core data to 'in_feature_groups', and rename feature_groups to 'out_feature_groups'
+            X_stack_trans = X_stack.replace_feature_groups(self.in_feature_groups, X_trans, self.out_feature_groups)
+            X_train = self.assemble_result(X_stack_trans, X_train)
+            X_valid = self.assemble_result(X_stack_trans, X_valid)
+            X_test = self.assemble_result(X_stack_trans, X_test)
+
         return {
             "X_train": X_train,
             "y_train": y_train,

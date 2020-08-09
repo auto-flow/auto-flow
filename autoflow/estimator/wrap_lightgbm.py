@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
-from logging import getLogger
 
 import lightgbm
 import numpy as np
@@ -10,7 +9,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 
-logger = getLogger(__name__)
+from autoflow.utils.logging_ import get_logger
 
 
 class LGBMEstimator(BaseEstimator):
@@ -38,7 +37,9 @@ class LGBMEstimator(BaseEstimator):
             early_stopping_rounds=250,
             verbose=-1,
             n_jobs=1,
+            warm_start=True
     ):
+        self.warm_start = warm_start
         assert self.is_classification is not None, NotImplementedError
         self.n_jobs = n_jobs
         self.objective = objective
@@ -61,6 +62,7 @@ class LGBMEstimator(BaseEstimator):
         self.model = None
         self.current_iterations = 0
         self.early_stopped = False
+        self.logger=get_logger(self)
 
     def fit(self, X, y, X_valid=None, y_valid=None, categorical_feature="auto",
             sample_weight=None, **kwargs):
@@ -102,12 +104,12 @@ class LGBMEstimator(BaseEstimator):
             param.update({"num_class": len(set(y))})
         num_boost_round = self.n_estimators - self.current_iterations
         if num_boost_round <= 0:
-            logger.warning(f"num_boost_round = {num_boost_round}, <=0, "
+            self.logger.warning(f"num_boost_round = {num_boost_round}, <=0, "
                            f"n_estimators = {self.n_estimators}, "
                            f"current_iterations = {self.current_iterations}")
             return self
         if self.early_stopped:
-            logger.info(f"{self.__class__.__name__} is early_stopped, best_iterations = {self.model.best_iteration}")
+            self.logger.info(f"{self.__class__.__name__} is early_stopped, best_iterations = {self.model.best_iteration}")
             return self
         train_set = lightgbm.Dataset(
             X, y,
@@ -129,7 +131,7 @@ class LGBMEstimator(BaseEstimator):
             **kwargs
         )
         self.current_iterations = self.n_estimators
-        if getattr(self.model, "best_iteration", np.inf) < self.n_estimators:
+        if y_valid is not None and getattr(self.model, "best_iteration", np.inf) < self.n_estimators:
             self.early_stopped = True
         return self
 

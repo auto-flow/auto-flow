@@ -3,7 +3,8 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 import functools
-from copy import deepcopy
+import warnings
+from copy import copy
 
 import category_encoders.utils as util
 import numpy as np
@@ -17,7 +18,7 @@ from sklearn.utils.multiclass import type_of_target
 
 from autoflow.tnn.entity_embedding_nn import TrainEntityEmbeddingNN, EntityEmbeddingNN
 from autoflow.utils.logging_ import get_logger
-
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class EntityEncoder(BaseEstimator, TransformerMixin):
     def __init__(
@@ -120,7 +121,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         # first check the type
         X = util.convert_input(X)
         if self.copy:
-            X = deepcopy(X)
+            X = copy(X)
         index = X.index
         X.index = range(X.shape[0])
         # then make sure that it is the right size

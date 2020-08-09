@@ -482,12 +482,14 @@
       "target": {},
       "weight_of_evidence": {},
       "combine_rare": {
-        "minimum_fraction": {"_type": "loguniform", "_value": [1e-4, 0.5],"_default": 0.1}
+        "minimum_fraction": {"_type": "loguniform", "_value": [1e-4, 0.5],"_default": 0.1},
+        "copy": false
       },
       "entity": {
         "max_epoch":20,
         "n_jobs": -1,
-        "random_state": 42
+        "random_state": 42,
+        "copy": false
       }
     },
     "expand": {
@@ -511,14 +513,15 @@
       },
       "polynomial": {
         "degree": {"_type": "choice", "_value": ["poly","rbf", "sigmoid", "cosine"],"_default": "rbf"},
-        "interaction_only":  {"_type": "choice", "_value": [true,false],"_default": true},
-        "include_bias":false
+        "interaction_only":  {"_type": "choice", "_value": [true, false],"_default": true},
+        "include_bias": false
       }
     },
     "impute": {
       "simple": {
         "num_strategy": {"_type": "choice","_value": ["median", "mean"],"_default": "median"},
-        "cat_strategy": {"_type": "choice","_value": ["constant", "most_frequent"],"_default": "most_frequent"}
+        "cat_strategy": {"_type": "choice","_value": ["constant", "most_frequent"],"_default": "most_frequent"},
+        "copy": false
       },
     },
     "reduce": {
@@ -594,6 +597,18 @@
       }
     },
     "select": {
+      "adaptive": {
+        "percentage": {"_type": "quniform", "_value": [0, 100, 0.1],"_default": 80},
+        "feats_must_less_than_rows": true,
+        "lgbm_w": {"_type": "quniform", "_value": [0, 1, 0.1],"_default": 0.5},
+        "et_iters": 100,
+        "lgbm_iters": 100,
+        "et_budget": 1.5,
+        "lgbm_budget": 1.5,
+        "step": 10,
+        "n_jobs": 1,
+        "random_state": 42
+      },
       "from_model_clf": {
         "estimator":{"_type": "choice", "_value": [
           "sklearn.ensemble.ExtraTreesClassifier",
