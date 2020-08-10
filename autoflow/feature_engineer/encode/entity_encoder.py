@@ -18,7 +18,9 @@ from sklearn.utils.multiclass import type_of_target
 
 from autoflow.tnn.entity_embedding_nn import TrainEntityEmbeddingNN, EntityEmbeddingNN
 from autoflow.utils.logging_ import get_logger
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 class EntityEncoder(BaseEstimator, TransformerMixin):
     def __init__(
