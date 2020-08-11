@@ -25,15 +25,20 @@ from autoflow.utils.logging_ import get_logger
 class DichotomyFeatureSelector(BaseEstimator, TransformerMixin):
     def __init__(
             self,
-            base_model="lgbm",
+            base_model="lgbm", # ["lgbm", "et", "ridge"] are recommended
             n_jobs=-1,
             random_state=42,
-            max_dichotomy=10,
+            max_dichotomy=None,
             cv=3,
             cv_budget=2,
             test_size=0.33,
             model_params=frozendict()
     ):
+        if max_dichotomy is None:
+            if base_model in ("et", "lgbm"):
+                max_dichotomy=10
+            else:
+                max_dichotomy=5
         self.model_params = model_params
         self.cv_budget = cv_budget
         self.test_size = test_size
@@ -43,6 +48,7 @@ class DichotomyFeatureSelector(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
         self.base_model = base_model
         self.logger = get_logger(self)
+
 
     def get_model(self):
         lgbm_params = dict(
