@@ -3,19 +3,24 @@
 # License: MIT
 
 from __future__ import unicode_literals, division, print_function, absolute_import
+
+import re
 from builtins import range
-import warnings
+
 import numpy as np
 import pandas as pd
-import sklearn.linear_model as lm
+import pint
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.ensemble import ExtraTreesClassifier, ExtraTreesRegressor
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.base import BaseEstimator, RegressorMixin, ClassifierMixin
+from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sympy.utilities.lambdify import lambdify
-import pint
 
+from autoflow.feature_engineer.select import BorutaFeatureSelector
+from autoflow.utils.data import check_n_jobs
 from .feateng import engineer_features, n_cols_generated, colnames2symbols
-from .featsel import select_features
+from .featsel import FeatureSelector
 
 
 def _parse_units(units, ureg=None, verbose=0):
@@ -39,28 +44,33 @@ def _parse_units(units, ureg=None, verbose=0):
                 parsed_units[c] = ureg.parse_expression(units[c])
             except pint.UndefinedUnitError:
                 if verbose > 0:
-                    print("[AutoFeat] WARNING: unit %r of column %r was not recognized and will be ignored!" % (units[c], c))
+                    print("[AutoFeat] WARNING: unit %r of column %r was not recognized and will be ignored!" % (
+                        units[c], c))
                 parsed_units[c] = ureg.parse_expression("")
             parsed_units[c].__dict__["_magnitude"] = 1.
     return parsed_units
 
 
-class AutoFeatModel(BaseEstimator):
+class AutoFeatGenerator(BaseEstimator, TransformerMixin):
 
     def __init__(
-        self,
-        problem_type="regression",
-        categorical_cols=None,
-        feateng_cols=None,
-        units=None,
-        feateng_steps=2,
-        featsel_runs=5,
-        max_gb=None,
-        transformations=("1/", "exp", "log", "abs", "sqrt", "^2", "^3"),
-        apply_pi_theorem=True,
-        always_return_numpy=False,
-        n_jobs=1,
-        verbose=0,
+            self,
+            problem_type=None,
+            categorical_cols=None,
+            feateng_cols=None,
+            units=None,
+            max_used_feats=10,
+            feateng_steps=2,
+            featsel_runs=5,
+            max_gb=None,
+            transformations=("1/", "exp", "log", "abs", "sqrt", "^2", "^3"),
+            apply_pi_theorem=True,
+            always_return_numpy=False,
+            n_jobs=-1,
+            verbose=0,
+            random_state=0,
+            consider_other=True,
+            regularization="l1"
     ):
         """
         multi-step feature engineering and cross-validated feature selection to generate promising additional
@@ -107,6 +117,10 @@ class AutoFeatModel(BaseEstimator):
 
         Note: when giving categorical_cols or feateng_cols, X later (i.e. when calling fit/fit_transform) has to be a DataFrame
         """
+        self.regularization = regularization
+        self.consider_other = consider_other
+        self.random_state = random_state
+        self.max_used_feats = max_used_feats
         self.problem_type = problem_type
         self.categorical_cols = categorical_cols
         self.feateng_cols = feateng_cols
@@ -117,8 +131,9 @@ class AutoFeatModel(BaseEstimator):
         self.transformations = transformations
         self.apply_pi_theorem = apply_pi_theorem
         self.always_return_numpy = always_return_numpy
-        self.n_jobs = n_jobs
+        self.n_jobs = check_n_jobs(n_jobs)
         self.verbose = verbose
+        self.variable_pattern = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")
 
     def __getstate__(self):
         """
@@ -165,9 +180,9 @@ class AutoFeatModel(BaseEstimator):
                 cols = sorted(r)
                 # only use data points where non of the affected columns are NaNs
                 not_na_idx = df[cols].notna().all(axis=1)
-                ptr = df[cols[0]].to_numpy()[not_na_idx]**r[cols[0]]
+                ptr = df[cols[0]].to_numpy()[not_na_idx] ** r[cols[0]]
                 for c in cols[1:]:
-                    ptr *= df[c].to_numpy()[not_na_idx]**r[c]
+                    ptr *= df[c].to_numpy()[not_na_idx] ** r[c]
                 df.loc[not_na_idx, "PT%i_%s" % (i, pint.formatter(r.items()).replace(" ", ""))] = ptr
         return df
 
@@ -227,7 +242,24 @@ class AutoFeatModel(BaseEstimator):
         df = df.join(pd.DataFrame(feat_array, columns=new_feat_cols, index=df.index))
         return df
 
-    def fit_transform(self, X, y):
+    def convert_colname_to_variables(self, df):
+        ix = 0
+        origin_columns = []
+        new_columns = []
+        for column in df.columns:
+            origin_columns.append(column)
+            column = str(column)
+            if self.variable_pattern.match(column):
+                new_columns.append(column)
+            else:
+                while (f"x{ix:03d}" in df.columns) or (f"x{ix:03d}" in new_columns):
+                    ix += 1
+                new_columns.append(f"x{ix:03d}")
+                ix += 1
+        self.column_mapper = dict(zip(origin_columns, new_columns))
+        df.columns = df.columns.map(self.column_mapper)
+
+    def fit(self, X, y):
         """
         Fits the regression model and returns a new dataframe with the additional features.
 
@@ -249,6 +281,11 @@ class AutoFeatModel(BaseEstimator):
         cols = [str(c) for c in X.columns] if isinstance(X, pd.DataFrame) else []
         # check input variables
         X, target = check_X_y(X, y, y_numeric=self.problem_type == "regression", dtype=None)
+        if self.problem_type is None:
+            if type_of_target(target) == "continuous":
+                self.problem_type = "regression"
+            else:
+                self.problem_type = "classification"
         if not cols:
             # the additional zeros in the name are because of the variable check in _generate_features,
             # where we check if the column name occurs in the the expression. this would lead to many
@@ -256,7 +293,34 @@ class AutoFeatModel(BaseEstimator):
             cols = ["x%03i" % i for i in range(X.shape[1])]
         self.original_columns_ = cols
         # transform X into a dataframe (again)
-        df = pd.DataFrame(X, columns=cols)
+        pre_df = pd.DataFrame(X, columns=cols)
+        # if column_name don't match variable regular-expression-pattern, convert it(keep in mind do same conversion in transform process)
+        self.convert_colname_to_variables(pre_df)
+        if pre_df.shape[1] > self.max_used_feats:
+            # In order to limit the scale of the problem, the number of features is limited to K
+            base_model_cls = ExtraTreesClassifier if self.problem_type == "classification" else ExtraTreesRegressor
+            base_model_params = dict(
+                n_estimators=50,
+                min_samples_leaf=10,
+                min_samples_split=10,
+                random_state=self.random_state,
+                n_jobs=self.n_jobs
+            )
+            feature_importances = base_model_cls(**base_model_params).fit(X, y).feature_importances_
+            pre_activated_indexes = np.argsort(-feature_importances)[:self.max_used_feats]
+        else:
+            pre_activated_indexes = np.arange(pre_df.shape[1])
+        boruta = BorutaFeatureSelector(max_depth=7, n_estimators="auto", max_iter=10, weak=False, random_state=self.random_state).fit(
+            pre_df.values[:, pre_activated_indexes], y)
+        if boruta.weak:
+            boruta_mask = boruta.support_ + boruta.support_weak_
+        else:
+            boruta_mask = boruta.support_
+        activated_indexes = pre_activated_indexes[boruta_mask]
+        df = pre_df.iloc[:, activated_indexes]
+        self.boruta_1 = boruta
+        self.pre_activated_indexes = pre_activated_indexes
+        self.activated_indexes = activated_indexes
         # possibly convert categorical columns
         df = self._transform_categorical_cols(df)
         # if we're not given specific feateng_cols, then just take all columns except categorical
@@ -283,12 +347,16 @@ class AutoFeatModel(BaseEstimator):
         n_cols = n_cols_generated(len(self.feateng_cols_), self.feateng_steps, len(self.transformations))
         n_gb = (len(df) * n_cols) / 250000000
         if self.verbose:
-            print("[AutoFeat] The %i step feature engineering process could generate up to %i features." % (self.feateng_steps, n_cols))
-            print("[AutoFeat] With %i data points this new feature matrix would use about %.2f gb of space." % (len(df), n_gb))
+            print("[AutoFeat] The %i step feature engineering process could generate up to %i features." % (
+                self.feateng_steps, n_cols))
+            print("[AutoFeat] With %i data points this new feature matrix would use about %.2f gb of space." % (
+                len(df), n_gb))
         if self.max_gb and n_gb > self.max_gb:
             n_rows = int(self.max_gb * 250000000 / n_cols)
             if self.verbose:
-                print("[AutoFeat] As you specified a limit of %.1d gb, the number of data points is subsampled to %i" % (self.max_gb, n_rows))
+                print(
+                    "[AutoFeat] As you specified a limit of %.1d gb, the number of data points is subsampled to %i" % (
+                        self.max_gb, n_rows))
             subsample_idx = np.random.permutation(list(df.index))[:n_rows]
             df_subs = df.iloc[subsample_idx]
             df_subs.reset_index(drop=True, inplace=True)
@@ -297,79 +365,31 @@ class AutoFeatModel(BaseEstimator):
             df_subs = df.copy()
             target_sub = target.copy()
         # generate features
-        df_subs, self.feature_formulas_ = engineer_features(df_subs, self.feateng_cols_, _parse_units(self.units, verbose=self.verbose),
+        df_subs, self.feature_formulas_ = engineer_features(df_subs, self.feateng_cols_,
+                                                            _parse_units(self.units, verbose=self.verbose),
                                                             self.feateng_steps, self.transformations, self.verbose)
         # select predictive features
+        self.core_selector = FeatureSelector(self.problem_type, self.featsel_runs, None, self.n_jobs, self.verbose,
+                                             self.random_state, self.consider_other, self.regularization)
         if self.featsel_runs <= 0:
             if self.verbose:
                 print("[AutoFeat] WARNING: Not performing feature selection.")
             good_cols = df_subs.columns
         else:
             if self.problem_type in ("regression", "classification"):
-                good_cols = select_features(df_subs, target_sub, self.featsel_runs, None, self.problem_type, self.n_jobs, self.verbose)
+                good_cols = self.core_selector.fit(df_subs, target_sub).good_cols_
                 # if no features were selected, take the original features
                 if not good_cols:
                     good_cols = list(df.columns)
             else:
-                print("[AutoFeat] WARNING: Unknown problem_type %r - not performing feature selection." % self.problem_type)
+                print(
+                    "[AutoFeat] WARNING: Unknown problem_type %r - not performing feature selection." % self.problem_type)
                 good_cols = df_subs.columns
         # filter out those columns that were original features or generated otherwise
         self.new_feat_cols_ = [c for c in good_cols if c not in list(df.columns)]
         self.good_cols_ = good_cols
         # re-generate all good feature again; for all data points this time
         self.feature_functions_ = {}
-        df = self._generate_features(df, self.new_feat_cols_)
-        # filter out unnecessary junk from self.feature_formulas_
-        self.feature_formulas_ = {f: self.feature_formulas_[f] for f in self.new_feat_cols_ + self.feateng_cols_}
-        self.feature_functions_ = {f: self.feature_functions_[f] for f in self.new_feat_cols_}
-        self.all_columns_ = list(df.columns)
-        # train final prediction model on all selected features
-        if self.verbose:
-            # final dataframe contains original columns and good additional columns
-            print("[AutoFeat] Final dataframe with %i feature columns (%i new)." % (len(df.columns), len(df.columns) - len(self.original_columns_)))
-
-        # train final prediction model
-        if self.problem_type == "regression":
-            model = lm.LassoLarsCV(cv=5)
-        elif self.problem_type == "classification":
-            model = lm.LogisticRegressionCV(cv=5, class_weight="balanced")
-        else:
-            print("[AutoFeat] WARNING: Unknown problem_type %r - not fitting a prediction model." % self.problem_type)
-            model = None
-        if model is not None:
-            if self.verbose:
-                print("[AutoFeat] Training final %s model." % self.problem_type)
-            X = df[self.good_cols_].to_numpy()
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                model.fit(X, target)
-            self.prediction_model_ = model
-            # sklearn requires a "classes_" attribute
-            if self.problem_type == "classification":
-                self.classes_ = model.classes_
-            if self.verbose:
-                if self.problem_type == "regression":
-                    coefs = model.coef_
-                else:
-                    # model.coefs_ is n_classes x n_features, but we need n_features
-                    coefs = np.max(np.abs(model.coef_), axis=0)
-                weights = dict(zip(self.good_cols_, coefs))
-                print("[AutoFeat] Trained model: largest coefficients:")
-                print(model.intercept_)
-                for c in sorted(weights, key=lambda x: abs(weights[x]), reverse=True):
-                    if abs(weights[c]) < 1e-5:
-                        break
-                    print("%.6f * %s" % (weights[c], c))
-                print("[AutoFeat] Final score: %.4f" % model.score(X, target))
-        if self.always_return_numpy:
-            return df.to_numpy()
-        return df
-
-    def fit(self, X, y):
-        if self.verbose:
-            print("[AutoFeat] Warning: This just calls fit_transform() but does not return the transformed dataframe.")
-            print("[AutoFeat] It is much more efficient to call fit_transform() instead of fit() and transform()!")
-        _ = self.fit_transform(X, y)  # noqa
         return self
 
     def transform(self, X):
@@ -392,6 +412,8 @@ class AutoFeatModel(BaseEstimator):
             raise ValueError("[AutoFeat] Not the same features as when calling fit.")
         # transform X into a dataframe (again)
         df = pd.DataFrame(X, columns=cols)
+        # convert_colname_to_variables
+        df.columns = df.columns.map(self.column_mapper)
         # possibly convert categorical columns
         df = self._transform_categorical_cols(df)
         # possibly apply pi-theorem
@@ -401,94 +423,3 @@ class AutoFeatModel(BaseEstimator):
         if self.always_return_numpy:
             return df.to_numpy()
         return df
-
-    def predict(self, X):
-        """
-        Inputs:
-            - X: pandas dataframe or numpy array with original features (n_datapoints x n_features)
-        Returns:
-            - y_pred: predicted targets return by prediction_model.predict()
-        """
-        check_is_fitted(self, ["prediction_model_"])
-        # store column names as they'll be lost in the other check
-        cols = [str(c) for c in X.columns] if isinstance(X, pd.DataFrame) else []
-        # check input variables
-        X = check_array(X, dtype=None)
-        if not cols:
-            cols = ["x%03i" % i for i in range(X.shape[1])]
-        # transform X into a dataframe (again)
-        df = pd.DataFrame(X, columns=cols)
-        # do we need to call transform?
-        if not list(df.columns) == self.all_columns_:
-            temp = self.always_return_numpy
-            self.always_return_numpy = False
-            df = self.transform(df)
-            self.always_return_numpy = temp
-        return self.prediction_model_.predict(df[self.good_cols_].to_numpy())
-
-    def score(self, X, y):
-        """
-        Inputs:
-            - X: pandas dataframe or numpy array with original features (n_datapoints x n_features)
-            - y: pandas dataframe or numpy array with the targets for all n_datapoints
-        Returns:
-            - R^2/Accuracy returned by prediction_model.score()
-        """
-        check_is_fitted(self, ["prediction_model_"])
-        # store column names as they'll be lost in the other check
-        cols = [str(c) for c in X.columns] if isinstance(X, pd.DataFrame) else []
-        # check input variables
-        X, target = check_X_y(X, y, y_numeric=self.problem_type == "regression", dtype=None)
-        if not cols:
-            cols = ["x%03i" % i for i in range(X.shape[1])]
-        # transform X into a dataframe (again)
-        df = pd.DataFrame(X, columns=cols)
-        # do we need to call transform?
-        if not list(df.columns) == self.all_columns_:
-            temp = self.always_return_numpy
-            self.always_return_numpy = False
-            df = self.transform(df)
-            self.always_return_numpy = temp
-        return self.prediction_model_.score(df[self.good_cols_].to_numpy(), target)
-
-
-class AutoFeatRegressor(AutoFeatModel, BaseEstimator, RegressorMixin):
-    """Short-cut initialization for AutoFeatModel with problem_type: regression"""
-
-    def __init__(
-        self,
-        categorical_cols=None,
-        feateng_cols=None,
-        units=None,
-        feateng_steps=2,
-        featsel_runs=5,
-        max_gb=None,
-        transformations=("1/", "exp", "log", "abs", "sqrt", "^2", "^3"),
-        apply_pi_theorem=True,
-        always_return_numpy=False,
-        n_jobs=1,
-        verbose=0,
-    ):
-        super().__init__("regression", categorical_cols, feateng_cols, units, feateng_steps,
-                         featsel_runs, max_gb, transformations, apply_pi_theorem, always_return_numpy, n_jobs, verbose)
-
-
-class AutoFeatClassifier(AutoFeatModel, BaseEstimator, ClassifierMixin):
-    """Short-cut initialization for AutoFeatModel with problem_type: classification"""
-
-    def __init__(
-        self,
-        categorical_cols=None,
-        feateng_cols=None,
-        units=None,
-        feateng_steps=2,
-        featsel_runs=5,
-        max_gb=None,
-        transformations=("1/", "exp", "log", "abs", "sqrt", "^2", "^3"),
-        apply_pi_theorem=True,
-        always_return_numpy=False,
-        n_jobs=1,
-        verbose=0,
-    ):
-        super().__init__("classification", categorical_cols, feateng_cols, units, feateng_steps,
-                         featsel_runs, max_gb, transformations, apply_pi_theorem, always_return_numpy, n_jobs, verbose)

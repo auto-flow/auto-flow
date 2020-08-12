@@ -17,10 +17,14 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.ensemble import ExtraTreesRegressor, ExtraTreesClassifier
 from sklearn.utils import check_random_state, check_X_y
+from sklearn.utils.multiclass import type_of_target
+
+from autoflow.utils.logging_ import get_logger
 
 
-class BorutaPy(BaseEstimator, TransformerMixin):
+class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
     """
     Improved Python implementation of the Boruta R package.
 
@@ -28,7 +32,7 @@ class BorutaPy(BaseEstimator, TransformerMixin):
     - Faster run times:
         Thanks to scikit-learn's fast implementation of the ensemble methods.
     - Scikit-learn like interface:
-        Use BorutaPy just like any other scikit learner: fit, fit_transform and
+        Use BorutaFeatureSelector just like any other scikit learner: fit, fit_transform and
         transform are all implemented in a similar fashion.
     - Modularity:
         Any ensemble method could be used: random forest, extra trees
@@ -51,7 +55,7 @@ class BorutaPy(BaseEstimator, TransformerMixin):
         This way more trees are used when the training data has many feautres
         and less when most of the features have been rejected.
     - Ranking of features:
-        After fitting BorutaPy it provides the user with ranking of features.
+        After fitting BorutaFeatureSelector it provides the user with ranking of features.
         Confirmed ones are 1, Tentatives are 2, and the rejected are ranked
         starting from 3, based on their feautre importance history through
         the iterations.
@@ -145,10 +149,10 @@ class BorutaPy(BaseEstimator, TransformerMixin):
     
     import pandas as pd
     from sklearn.ensemble import RandomForestClassifier
-    from boruta import BorutaPy
+    from boruta import BorutaFeatureSelector
     
     # load X and y
-    # NOTE BorutaPy accepts numpy arrays only, hence the .values attribute
+    # NOTE BorutaFeatureSelector accepts numpy arrays only, hence the .values attribute
     X = pd.read_csv('examples/test_X.csv', index_col=0).values
     y = pd.read_csv('examples/test_y.csv', header=None, index_col=0).values
     y = y.ravel()
@@ -158,7 +162,7 @@ class BorutaPy(BaseEstimator, TransformerMixin):
     rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
     
     # define Boruta feature selection method
-    feat_selector = BorutaPy(rf, n_estimators='auto', verbose=2, random_state=1)
+    feat_selector = BorutaFeatureSelector(rf, n_estimators='auto', verbose=2, random_state=1)
     
     # find all relevant features - 5 features should be selected
     feat_selector.fit(X, y)
@@ -179,8 +183,10 @@ class BorutaPy(BaseEstimator, TransformerMixin):
         Journal of Statistical Software, Vol. 36, Issue 11, Sep 2010
     """
 
-    def __init__(self, estimator, n_estimators=1000, perc=100, alpha=0.05,
-                 two_step=True, max_iter=100, random_state=42, verbose=0, budget=10, weak=True):
+    def __init__(self, estimator=None, max_depth=7, n_estimators="auto", perc=100, alpha=0.05,
+                 two_step=True, max_iter=10, random_state=42, verbose=0, budget=10, weak=True, n_jobs=-1):
+        self.n_jobs = n_jobs
+        self.max_depth = max_depth
         self.weak = weak
         self.budget = budget
         self.estimator = estimator
@@ -193,6 +199,8 @@ class BorutaPy(BaseEstimator, TransformerMixin):
         self.verbose = verbose
         self.__version__ = '0.3'
         self._is_lightgbm = 'lightgbm' in str(type(self.estimator))
+        self.logger = get_logger(self)
+        self.logging_level = 20 if self.verbose > 0 else 10
 
     def fit(self, X, y):
         """
@@ -251,6 +259,19 @@ class BorutaPy(BaseEstimator, TransformerMixin):
         if not isinstance(y, np.ndarray):
             y = self._validate_pandas_input(y)
 
+        if self.estimator is None:
+            params = dict(
+                n_jobs=self.n_jobs,
+                class_weight=None,
+                max_depth=self.max_depth,
+                random_state=self.random_state
+            )
+            if type_of_target(y) == "continuous":
+                cls = ExtraTreesRegressor
+            else:
+                cls = ExtraTreesClassifier
+            self.estimator = cls(**params)
+
         self.random_state = check_random_state(self.random_state)
         # setup variables for Boruta
         n_sample, n_feat = X.shape
@@ -278,8 +299,7 @@ class BorutaPy(BaseEstimator, TransformerMixin):
                 # number of features that aren't rejected
                 not_rejected = np.where(dec_reg >= 0)[0].shape[0]
                 n_tree = self._get_tree_num(not_rejected)
-                if self.verbose > 0:
-                    print(f"n_estimators == 'auto', calculated n_tree = {n_tree}")
+                self.logger.log(self.logging_level, f"n_estimators == 'auto', calculated n_tree = {n_tree}")
                 self.estimator.set_params(n_estimators=n_tree)
 
             # make sure we start with a new tree in each iteration
@@ -308,8 +328,8 @@ class BorutaPy(BaseEstimator, TransformerMixin):
             if self.verbose > 0 and _iter < self.max_iter:
                 self._print_results(dec_reg, _iter, 0)
             if time() - start_time > self.budget:
-                if self.verbose > 0:
-                    print(f"max time budget {self.budget}s is used up, iter = {_iter}, early stopping ... ")
+                self.logger.log(self.logging_level,
+                                f"max time budget {self.budget}s is used up, iter = {_iter}, early stopping ... ")
                 break
             if _iter < self.max_iter:
                 _iter += 1
@@ -326,15 +346,15 @@ class BorutaPy(BaseEstimator, TransformerMixin):
         if confirmed.size == 0 and tentative.size == 0:
             for fraction in np.linspace(0.999, 0, 1000):
                 new_mask = imp_history[-1, :] > fraction * sha_max_history[-1]
-                if np.count_nonzero(new_mask)>0:
-                    tentative=np.where(new_mask == True)[0]
+                if np.count_nonzero(new_mask) >= 2:
+                    tentative = np.where(new_mask == True)[0]
                     break
         # basic result variables
         self.n_features_ = confirmed.shape[0]
         if self.n_features_ == 0 and self.weak == False:
             self.weak = True
-            if self.verbose > 0:
-                print(f"self.n_features_ = {self.n_features_}, but self.weak = False, self.weak is forced to True.")
+            self.logger.log(self.logging_level,
+                            f"self.n_features_ = {self.n_features_}, but self.weak = False, self.weak is forced to True.")
         self.support_ = np.zeros(n_feat, dtype=np.bool)
         self.support_[confirmed] = 1
         self.support_weak_ = np.zeros(n_feat, dtype=np.bool)
@@ -413,7 +433,7 @@ class BorutaPy(BaseEstimator, TransformerMixin):
 
     def _get_imp(self, X, y):
         try:
-            self.estimator.fit(X, y)   # todo: 采用早停策略，保证不超过budget
+            self.estimator.fit(X, y)  # todo: 采用早停策略，保证不超过budget
         except Exception as e:
             raise ValueError('Please check your X and y variable. The provided '
                              'estimator cannot be fitted to your data.\n' + str(e))
@@ -421,7 +441,7 @@ class BorutaPy(BaseEstimator, TransformerMixin):
             imp = self.estimator.feature_importances_
         except Exception:
             raise ValueError('Only methods with feature_importance_ attribute '
-                             'are currently supported in BorutaPy.')
+                             'are currently supported in BorutaFeatureSelector.')
         return imp
 
     def _get_shuffle(self, seq):
@@ -574,5 +594,5 @@ class BorutaPy(BaseEstimator, TransformerMixin):
             n_rejected = np.sum(~(self.support_ | self.support_weak_))
             content = map(str, [n_iter, n_confirmed, n_tentative, n_rejected])
             result = '\n'.join([x[0] + '\t' + x[1] for x in zip(cols, content)])
-            output = "\n\nBorutaPy finished running.\n\n" + result
-        print(output)
+            output = "\n\nBorutaFeatureSelector finished running.\n\n" + result
+        self.logger.log(self.logging_level, output)

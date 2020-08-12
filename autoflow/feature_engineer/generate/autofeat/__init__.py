@@ -4,5 +4,5 @@
 
 name = "autofeat"
 __version__ = "1.1.3"
-from .autofeat import AutoFeatModel, AutoFeatRegressor, AutoFeatClassifier  # noqa
+from .autofeat import AutoFeatGenerator
 from .featsel import FeatureSelector  # noqa
