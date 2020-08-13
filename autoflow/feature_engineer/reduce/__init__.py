@@ -2,3 +2,4 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+from .generic import GenericDimentionReducer

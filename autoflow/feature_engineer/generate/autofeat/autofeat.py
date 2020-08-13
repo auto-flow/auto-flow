@@ -309,6 +309,11 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         """
         # store column names as they'll be lost in the other check
         cols = [str(c) for c in X.columns] if isinstance(X, pd.DataFrame) else []
+        if self.problem_type is None:
+            if type_of_target(y) == "continuous":
+                self.problem_type = "regression"
+            else:
+                self.problem_type = "classification"
         # check input variables
         X, target = check_X_y(X, y, y_numeric=self.problem_type == "regression", dtype=None)
         if self.regularization is None:
@@ -316,11 +321,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
                 self.regularization = "l2"
             else:
                 self.regularization = "l1"
-        if self.problem_type is None:
-            if type_of_target(target) == "continuous":
-                self.problem_type = "regression"
-            else:
-                self.problem_type = "classification"
         if not cols:
             # the additional zeros in the name are because of the variable check in _generate_features,
             # where we check if the column name occurs in the the expression. this would lead to many
