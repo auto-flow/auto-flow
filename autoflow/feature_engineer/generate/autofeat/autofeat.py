@@ -12,7 +12,7 @@ import pandas as pd
 import pint
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import ExtraTreesClassifier, ExtraTreesRegressor
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sympy.utilities.lambdify import lambdify
@@ -51,7 +51,7 @@ def _parse_units(units, ureg=None, verbose=0):
     return parsed_units
 
 
-class AutoFeatGenerator(BaseEstimator, TransformerMixin):
+class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
 
     def __init__(
             self,
@@ -61,16 +61,24 @@ class AutoFeatGenerator(BaseEstimator, TransformerMixin):
             units=None,
             max_used_feats=10,
             feateng_steps=2,
-            featsel_runs=5,
+            featsel_runs=3,
             max_gb=None,
-            transformations=("1/", "exp", "log", "abs", "sqrt", "^2", "^3"),
+            transformations=None,
             apply_pi_theorem=True,
             always_return_numpy=False,
             n_jobs=-1,
             verbose=0,
             random_state=0,
-            consider_other=True,
-            regularization="l1"
+            consider_other=False,
+            regularization=None,
+            div_op=True,
+            exp_op=False,
+            log_op=False,
+            abs_op=False,
+            sqrt_op=False,
+            sqr_op=True,
+            do_final_selection=True,
+            standardize=False
     ):
         """
         multi-step feature engineering and cross-validated feature selection to generate promising additional
@@ -117,6 +125,28 @@ class AutoFeatGenerator(BaseEstimator, TransformerMixin):
 
         Note: when giving categorical_cols or feateng_cols, X later (i.e. when calling fit/fit_transform) has to be a DataFrame
         """
+        self.standardize = standardize
+        self.do_final_selection = do_final_selection
+        if transformations is None:
+            transformations = []
+            if div_op:
+                transformations.append("1/")
+            if exp_op:
+                transformations.append("exp")
+            if log_op:
+                transformations.append("log")
+            if abs_op:
+                transformations.append("abs")
+            if sqrt_op:
+                transformations.append("sqrt")
+            if sqr_op:
+                transformations.append("^2")
+        self.sqr_op = sqr_op
+        self.sqrt_op = sqrt_op
+        self.abs_op = abs_op
+        self.log_op = log_op
+        self.exp_op = exp_op
+        self.div_op = div_op
         self.regularization = regularization
         self.consider_other = consider_other
         self.random_state = random_state
@@ -281,6 +311,11 @@ class AutoFeatGenerator(BaseEstimator, TransformerMixin):
         cols = [str(c) for c in X.columns] if isinstance(X, pd.DataFrame) else []
         # check input variables
         X, target = check_X_y(X, y, y_numeric=self.problem_type == "regression", dtype=None)
+        if self.regularization is None:
+            if X.shape[0] > 2000:
+                self.regularization = "l2"
+            else:
+                self.regularization = "l1"
         if self.problem_type is None:
             if type_of_target(target) == "continuous":
                 self.problem_type = "regression"
@@ -310,7 +345,8 @@ class AutoFeatGenerator(BaseEstimator, TransformerMixin):
             pre_activated_indexes = np.argsort(-feature_importances)[:self.max_used_feats]
         else:
             pre_activated_indexes = np.arange(pre_df.shape[1])
-        boruta = BorutaFeatureSelector(max_depth=7, n_estimators="auto", max_iter=10, weak=False, random_state=self.random_state).fit(
+        boruta = BorutaFeatureSelector(max_depth=7, n_estimators="auto", max_iter=10, weak=False,
+                                       random_state=self.random_state, verbose=self.verbose).fit(
             pre_df.values[:, pre_activated_indexes], y)
         if boruta.weak:
             boruta_mask = boruta.support_ + boruta.support_weak_
@@ -371,25 +407,47 @@ class AutoFeatGenerator(BaseEstimator, TransformerMixin):
         # select predictive features
         self.core_selector = FeatureSelector(self.problem_type, self.featsel_runs, None, self.n_jobs, self.verbose,
                                              self.random_state, self.consider_other, self.regularization)
+
         if self.featsel_runs <= 0:
             if self.verbose:
                 print("[AutoFeat] WARNING: Not performing feature selection.")
             good_cols = df_subs.columns
         else:
-            if self.problem_type in ("regression", "classification"):
-                good_cols = self.core_selector.fit(df_subs, target_sub).good_cols_
-                # if no features were selected, take the original features
-                if not good_cols:
-                    good_cols = list(df.columns)
-            else:
-                print(
-                    "[AutoFeat] WARNING: Unknown problem_type %r - not performing feature selection." % self.problem_type)
-                good_cols = df_subs.columns
+            good_cols = self.core_selector.fit(df_subs, target_sub).good_cols_
+            # if no features were selected, take the original features
+            if not good_cols:
+                good_cols = list(df.columns)
         # filter out those columns that were original features or generated otherwise
         self.new_feat_cols_ = [c for c in good_cols if c not in list(df.columns)]
-        self.good_cols_ = good_cols
-        # re-generate all good feature again; for all data points this time
         self.feature_functions_ = {}
+        self.good_cols_ = good_cols
+        if self.standardize or self.do_final_selection:
+            df_final = self._generate_features(pre_df, self.new_feat_cols_)
+            if self.do_final_selection:
+                boruta = BorutaFeatureSelector(max_depth=7, n_estimators="auto", max_iter=10, weak=False,
+                                               random_state=self.random_state, verbose=self.verbose).fit(df_final, y)
+                support_mask = boruta.support_
+                self.boruta_2 = boruta
+                if boruta.weak:
+                    support_mask += boruta.support_weak_
+                origin_columns = pre_df.columns
+                gen_columns = df_final.columns[pre_df.shape[1]:]
+                origin_mask = support_mask[:pre_df.shape[1]]
+                gen_mask = support_mask[pre_df.shape[1]:]
+                gen_valid_cols = gen_columns[gen_mask].tolist()
+                self.new_feat_cols_ = [c for c in self.new_feat_cols_ if c in gen_valid_cols]
+                origin_valid_cols = origin_columns[origin_mask].tolist()
+                self.valid_cols_ = origin_valid_cols + gen_valid_cols
+                df_final = df_final[self.valid_cols_]
+            else:
+                self.valid_cols_ = None
+            if self.standardize:
+                self.standardizer_ = StandardScaler().fit(df_final)
+            else:
+                self.standardizer_ = None
+        else:
+            self.standardizer_ = None
+            self.valid_cols_ = None
         return self
 
     def transform(self, X):
@@ -422,4 +480,8 @@ class AutoFeatGenerator(BaseEstimator, TransformerMixin):
         df = self._generate_features(df, self.new_feat_cols_)
         if self.always_return_numpy:
             return df.to_numpy()
+        if self.valid_cols_ is not None:
+            df = df[self.valid_cols_]
+        if self.standardizer_ is not None:
+            df =pd.DataFrame(self.standardizer_.transform(df.values), columns=df.columns, index=df.index)
         return df

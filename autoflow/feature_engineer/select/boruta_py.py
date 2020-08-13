@@ -184,7 +184,9 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, estimator=None, max_depth=7, n_estimators="auto", perc=100, alpha=0.05,
-                 two_step=True, max_iter=10, random_state=42, verbose=0, budget=10, weak=True, n_jobs=-1):
+                 two_step=True, max_iter=10, random_state=42, verbose=0, budget=10, weak=True, n_jobs=-1,
+                 imp_mask=None):
+        self.imp_mask = imp_mask
         self.n_jobs = n_jobs
         self.max_depth = max_depth
         self.weak = weak
@@ -454,7 +456,11 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
         x_cur = np.copy(X[:, x_cur_ind])
         x_cur_w = x_cur.shape[1]
         # deep copy the matrix for the shadow matrix
-        x_sha = np.copy(x_cur)
+        if self.imp_mask is not None:
+            X_cur_for_sha = X[:, (dec_reg >= 0) & self.imp_mask]
+        else:
+            X_cur_for_sha = x_cur
+        x_sha = np.copy(X_cur_for_sha)
         # make sure there's at least 5 columns in the shadow matrix for
         while (x_sha.shape[1] < 5):
             x_sha = np.hstack((x_sha, x_sha))

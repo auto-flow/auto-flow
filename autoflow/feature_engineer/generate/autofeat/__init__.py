@@ -4,5 +4,5 @@
 
 name = "autofeat"
 __version__ = "1.1.3"
-from .autofeat import AutoFeatGenerator
+from .autofeat import AutoFeatureGenerator
 from .featsel import FeatureSelector  # noqa
