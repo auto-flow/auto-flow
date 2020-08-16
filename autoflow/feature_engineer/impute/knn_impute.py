@@ -13,9 +13,8 @@ from sklearn.neighbors._base import _get_weights
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils.validation import check_is_fitted
 
-from autoflow.feature_engineer.impute.utils import process_dataframe, parse_cat_col, build_encoder, encode_data, decode_data
-from autoflow.feature_engineer.impute.wrapped_encodes.target_encoder import TargetEncoder
-from .pairwise_external import _get_mask
+from .utils import process_dataframe, parse_cat_col, build_encoder, encode_data, decode_data
+from .wrapped_encodes.target_encoder import TargetEncoder
 from .pairwise_external import pairwise_distances
 
 __all__ = [

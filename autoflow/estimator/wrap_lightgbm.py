@@ -17,7 +17,7 @@ class LGBMEstimator(BaseEstimator):
 
     def __init__(
             self,
-            n_estimators=2000,
+            n_estimators=2048,
             objective=None,
             boosting_type="gbdt",
             # objective="binary",
@@ -34,7 +34,7 @@ class LGBMEstimator(BaseEstimator):
             subsample_for_bin=40000,
             # min_data_in_leaf=4,
             min_child_weight=0.01,
-            early_stopping_rounds=250,
+            early_stopping_rounds=256,
             verbose=-1,
             n_jobs=1,
             warm_start=True

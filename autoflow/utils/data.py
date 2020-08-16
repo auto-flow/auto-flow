@@ -132,7 +132,7 @@ def is_highR_nan(s: pd.Series, threshold):
 
 
 def is_highC_cat(s: pd.Series, threshold):
-    return (np.unique(s.astype("str")).size) > threshold
+    return (np.unique(s.astype("str")).size) >= threshold
 
 
 def is_nan(s: pd.Series):

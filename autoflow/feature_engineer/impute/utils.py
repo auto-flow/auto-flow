@@ -183,27 +183,38 @@ def parse_cat_col(X_: pd.DataFrame, consider_ordinal_as_cat):
     return np.array(num_idx), np.array(cat_idx)
 
 
-def build_encoder(X_: pd.DataFrame, y, cat_idx, passed_encoder, additional_data_list: List[np.ndarray], target_type):
+def build_encoder(X: pd.DataFrame, y, categorical_feature, passed_encoder, additional_data_list: List[np.ndarray],
+                  target_type, print_func=None):
+    if print_func is None:
+        print_func = print
     pd.set_option('mode.chained_assignment', None)
-    idx2encoder = {}
+    column2encoder = {}
+    cat_col = X.select_dtypes('category').columns
+    if cat_col.size:
+        print_func(f"category dtypes exists: {repr(list(cat_col))} , convert them to object dtypes")
+    X[cat_col] = X[cat_col].astype(object)
     result_additional_data_list = deepcopy(additional_data_list)
-    for idx in cat_idx:
-        col = X_.values[:, idx]
+    for idx, column in enumerate(categorical_feature):
+        col = X[column]
         valid_mask = ~pd.isna(col)
-        masked_col = col[valid_mask]
+        masked_col = np.array(col[valid_mask])  # prevent category dtype
         if y is not None:
             masked_y = y[valid_mask]
         else:
             masked_y = None
         masked_col = masked_col.reshape(-1, 1).astype(str)
-        encoder = clone(passed_encoder)
+        encoder = clone(passed_encoder)  # OrdinalEncoder default return float64 dtype
         encoder.fit(masked_col, masked_y)
-        idx2encoder[idx] = encoder
+        column2encoder[column] = encoder
         col[valid_mask] = encoder.transform(masked_col).squeeze()
-        X_.iloc[:, idx] = col.astype(target_type)
-        for additional_data in result_additional_data_list:
-            additional_data[idx] = encoder.transform([[str(additional_data[idx])]])[0][0]
-    return idx2encoder, X_, result_additional_data_list
+        X[column] = col.astype(target_type)
+        # print_func(f"encoder categories: {repr(list(encoder.categories_[0]))}")
+        for ad_ix, additional_data in enumerate(result_additional_data_list):
+            origin = str(additional_data[idx])
+            converted = encoder.transform([[origin]]).flatten()[0]
+            additional_data[idx] = converted
+            print_func(f"In additional_data({ad_ix}), {origin} -> {converted}  ")
+    return column2encoder, X, result_additional_data_list
 
 
 def encode_data(X_: pd.DataFrame, idx2encoder, target_type):
@@ -218,10 +229,8 @@ def encode_data(X_: pd.DataFrame, idx2encoder, target_type):
     return X_.astype(target_type)
 
 
-def decode_data(X, idx2encoder):
-    for idx, encoder in idx2encoder.items():
-        column = X.columns[idx]
+def decode_data(X, column2encoder):
+    for column, encoder in column2encoder.items():
         sub_df = X[[column]]
-        sub_df.columns = [0]
         X[[column]] = encoder.inverse_transform(sub_df)  # .astype(target_types[idx])
     return X
