@@ -5,6 +5,7 @@
 import functools
 import warnings
 from copy import copy
+from time import time
 
 import category_encoders.utils as util
 import numpy as np
@@ -40,8 +41,10 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
             batch_size=1024,
             optimizer="adam",
             normalize=True,
-            copy=True
+            copy=True,
+            budget=10
     ):
+        self.budget = budget
         self.normalize = normalize
         self.copy = copy
         self.optimizer = optimizer
@@ -88,7 +91,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         # first check the type
         X = util.convert_input(X)
         self._dim = X.shape[1]
-
+        self.start_time = time()
         # if columns aren't passed, just use every string column
         if self.cols is None:
             self.cols = util.get_obj_cols(X)
@@ -204,4 +207,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
             self.logger.info(msg)
         else:
             self.logger.debug(msg)
+        if time() - self.start_time > self.budget:
+            self.logger.info(f"Exceeded budget time({self.budget}), {self.__class__.__name__} is early stopping ...")
+            return True
         return False

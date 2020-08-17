@@ -14,6 +14,7 @@ class DatabaseResultLogger():
         self.resource_manager = resource_manager
 
     def __call__(self, job: Job):
+        self.resource_manager.init_trial_table()
         self.resource_manager._finish_trial_update_info(job.result["info"]["trial_id"], job.timestamps)
 
     def new_config(self, config_id, config, config_info):

@@ -1,6 +1,7 @@
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from copy import deepcopy
 from typing import Union, Tuple, List, Any, Dict
+
 import numpy as np
 import pandas as pd
 from frozendict import frozendict
@@ -39,15 +40,15 @@ class HDL_Constructor(StrSignatureMixin):
             hdl_metadata=frozendict(),
             balance_strategies=("weight", "None"),
             included_classifiers=(
-                    "extra_trees", "lightgbm", "logistic_regression", "random_forest", "sgd", "tabular_nn"),
+                    "extra_trees", "lightgbm", "logistic_regression", "random_forest", "gbt_lr", "tabular_nn"),
             included_regressors=(
-                    "extra_trees", "lightgbm", "elasticnet", "random_forest", "sgd", "tabular_nn"),
-            included_imputers=("impute.simple",),
+                    "extra_trees", "lightgbm", "elasticnet", "random_forest", "gbt_lr", "tabular_nn"),
+            included_imputers=("impute.simple", "impute.gbt"),
             included_highC_cat_encoders=("encode.entity", "encode.ordinal", "encode.cat_boost"),
-            included_cat_encoders=("encode.one_hot", "encode.ordinal", "encode.cat_boost"),
+            combine_rare=True,
+            included_cat_encoders=("encode.one_hot", "encode.ordinal"),
             num2normed_workflow=frozendict({
-                "num->scaled": ["scale.standardize", "operate.keep_going"],
-                "scaled->normed": ["operate.keep_going", "transform.power"]
+                "num->normed": ["scale.standard", "operate.keep_going"],  # "scale.adaptive",
             }),
             text2normed_workflow=frozendict({
                 "text->tokenized": "text.tokenize.simple",
@@ -60,10 +61,11 @@ class HDL_Constructor(StrSignatureMixin):
             date2normed_workflow=frozendict({
             }),
             normed2final_workflow=frozendict({
-                "normed->final": ["operate.keep_going"]
+                "normed->final": ["operate.keep_going", "select.boruta", "generate.autofeat"]
             })
 
     ):
+        self.combine_rare = combine_rare
         self.balance_strategies = balance_strategies
         self.date2normed_workflow = date2normed_workflow
         self.text2normed_workflow = text2normed_workflow
@@ -153,10 +155,10 @@ class HDL_Constructor(StrSignatureMixin):
 
         '''
         DAG_workflow = OrderedDict()
-        X_train_=get_container_data(self.data_manager.X_train)
-        X_test_=get_container_data(self.data_manager.X_test)
-        X_stack=stack_Xs(X_train_,None,X_test_)
-        fg_set=self.data_manager.X_train.feature_groups.unique()
+        X_train_ = get_container_data(self.data_manager.X_train)
+        X_test_ = get_container_data(self.data_manager.X_test)
+        X_stack = stack_Xs(X_train_, None, X_test_)
+        fg_set = self.data_manager.X_train.feature_groups.unique()
         # --------Start imputing missing(nan) value--------------------
         if np.count_nonzero(pd.isna(X_stack)):
             DAG_workflow["impute"] = self.included_imputers
@@ -164,7 +166,11 @@ class HDL_Constructor(StrSignatureMixin):
         if "cat" in fg_set:
             DAG_workflow["cat->normed"] = self.included_cat_encoders
         if "highC_cat" in fg_set:
-            DAG_workflow["highC_cat->normed"] = self.included_highC_cat_encoders
+            if self.combine_rare:
+                DAG_workflow["highC_cat->combined"] = "encode.combine_rare"
+                DAG_workflow["combined->normed"] = self.included_highC_cat_encoders
+            else:
+                DAG_workflow["highC_cat->normed"] = self.included_highC_cat_encoders
         # --------processing text features--------------------
         if "text" in fg_set:
             for k, v in self.text2normed_workflow.items():
@@ -371,7 +377,7 @@ class HDL_Constructor(StrSignatureMixin):
         if isinstance(self.DAG_workflow, str):
             if self.DAG_workflow == "generic_recommend":
                 self.hdl_metadata.update({"source": "generic_recommend"})
-                self.logger.info("Using 'generic_recommend' method to initialize a generic DAG_workflow, \n"
+                self.logger.info("Using 'generic_recommend' method to initialize a generic DAG_workflow, "
                                  "to Adapt to various data such like NaN and categorical features.")
                 self.DAG_workflow = self.generic_recommend()
             else:
@@ -426,9 +432,13 @@ class HDL_Constructor(StrSignatureMixin):
             f"{PHASE2}(choice)": estimator_dict
         }
         if self.ml_task.mainTask == "classification":
-            final_dict["strategies"] = {
-                "balance(choice)": {k: {} for k in self.balance_strategies}
-            }
+            y_train = self.data_manager.y_train.data
+            most_common = Counter(y_train).most_common()
+            imbalance = most_common[0][1] / most_common[-1][1]
+            if imbalance > 2:
+                final_dict["strategies"] = {
+                    "balance(choice)": {k: {} for k in self.balance_strategies}
+                }
         final_dict["process_sequence"] = ";".join(DAG_workflow.keys())
         self.hdl = final_dict
 

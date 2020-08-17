@@ -4,5 +4,5 @@ __all__ = ["KNNImputer"]
 
 
 class KNNImputer(AutoFlowFeatureEngineerAlgorithm):
-    class__ = "KNNImputer"
+    class__ = "GBTImputer"
     module__ = "autoflow.feature_engineer.impute"

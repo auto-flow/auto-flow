@@ -18,7 +18,7 @@ from autoflow.workflow.components.preprocessing.scale.minmax import MinMaxScaler
 from autoflow.workflow.components.preprocessing.scale.normalize import Normalizer
 from autoflow.workflow.components.preprocessing.scale.quantile import QuantileTransformer
 from autoflow.workflow.components.preprocessing.scale.robust import RobustScaler
-from autoflow.workflow.components.preprocessing.scale.standardize import StandardScaler
+from autoflow.workflow.components.preprocessing.scale.standard import StandardScaler
 from autoflow.workflow.components.regression.linearsvr import LinearSVR
 from autoflow.workflow.ml_workflow import ML_Workflow
 

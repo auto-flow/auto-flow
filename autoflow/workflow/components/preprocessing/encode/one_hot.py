@@ -6,3 +6,4 @@ __all__ = ["OneHotEncoder"]
 class OneHotEncoder(BaseCategoryEncoders):
     class__ = "OneHotEncoder"
     module__ = "category_encoders"
+    cache_intermediate = True

@@ -4,4 +4,4 @@
 # @Contact    : tqichun@gmail.com
 from .adaptive import AdaptiveFeatureSelector
 from .dichotomy import DichotomyFeatureSelector
-from .boruta_py import BorutaFeatureSelector
+from .boruta import BorutaFeatureSelector

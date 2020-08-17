@@ -77,7 +77,7 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
             abs_op=False,
             sqrt_op=False,
             sqr_op=True,
-            do_final_selection=True,
+            do_final_selection=False,
             standardize=False
     ):
         """

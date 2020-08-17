@@ -206,7 +206,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     cloned_model = cached_model
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
-                if weight_mode == "sample_weight":
+                if weight_mode == "sample_weight": # sample_weight balance
                     cloned_model[-1].set_addition_info(
                         {"sample_weight": self.calc_balanced_sample_weight(y_train.data)})
                 if self.debug:

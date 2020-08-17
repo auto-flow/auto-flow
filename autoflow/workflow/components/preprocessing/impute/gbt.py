@@ -4,9 +4,10 @@
 # @Contact    : tqichun@gmail.com
 from .base import BaseImputer
 
-__all__ = ["SimpleImputer"]
+__all__ = ["GBTImputer"]
 
 
-class SimpleImputer(BaseImputer):
-    class__ = "SimpleImputer"
+class GBTImputer(BaseImputer):
+    class__ = "GBTImputer"
     module__ = "autoflow.feature_engineer.impute"
+    need_y = True

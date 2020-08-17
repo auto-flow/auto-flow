@@ -241,7 +241,7 @@ class PredictiveImputer(BaseImputer):
         # Check if any column has all missing
         mask = pd.isna(X).values
         if np.any(mask.sum(axis=0) >= (X.shape[0])):
-            self.logger.warning("One or more columns have all rows missing. Using SimpleImputer to do imputing.")
+            self.logger.warning("One or more columns have all rows missing. Using BaseImputer to do imputing.")
             return SimpleImputer(
                 categorical_feature=self.categorical_feature,
                 numerical_feature=self.numerical_feature,

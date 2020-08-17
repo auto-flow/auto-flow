@@ -107,7 +107,7 @@ class ML_Workflow(Pipeline):
                     def stack_X_before_fit(X_train, X_valid, X_test, **kwargs):
                         X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)
                         X_stack = X_train.copy()
-                        X_stack.values = X_stack_
+                        X_stack.data = X_stack_
                         return X_stack
 
                 else:
@@ -123,12 +123,13 @@ class ML_Workflow(Pipeline):
                 get_hash_of_str(component_name, m)
                 component_hash = get_hash_of_dict(hyperparams, m)
                 cache_key = f"workflow-{component_hash}-{dataset_id}"
-                results = self.resource_manager.cache.get(cache_key)
-                if results is not None and isinstance(results, dict) and "result" in results and "component" in results:
+                cache_results = self.resource_manager.cache.get(cache_key)
+                if cache_results is not None and isinstance(cache_results, dict) and "result" in cache_results and "component" in cache_results:
                     self.logger.debug(f"workflow cache hit, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
-                    X_transformed_stack = results["result"]
-                    fitted_transformer = results["component"]
+                    X_transformed_stack = cache_results["result"]
+                    fitted_transformer = cache_results["component"]
+                    self.steps[step_idx][1] = fitted_transformer
                     result = {"y_train": y_train}
                     self.assemble_result("X_train", X_train, X_transformed_stack, result)
                     self.assemble_result("X_valid", X_valid, X_transformed_stack, result)

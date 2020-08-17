@@ -82,7 +82,7 @@ class EstimatorTestCase(unittest.TestCase):
         cat_na_mask = (nan_cnt > 0) & cat
         num_na_mask = (nan_cnt > 0) & (~cat)
         cat_imputer = SimpleImputer(strategy="constant", fill_value="NA").fit(X_train.loc[:, cat_na_mask])
-        # num_imputer = SimpleImputer(strategy="median").fit(X_train.loc[:, num_na_mask])
+        # num_imputer = BaseImputer(strategy="median").fit(X_train.loc[:, num_na_mask])
         X_train.loc[:, cat_na_mask] = cat_imputer.transform(X_train.loc[:, cat_na_mask])
         X_test.loc[:, cat_na_mask] = cat_imputer.transform(X_test.loc[:, cat_na_mask])
         # X_train.loc[:, num_na_mask] = num_imputer.transform(X_train.loc[:, num_na_mask])

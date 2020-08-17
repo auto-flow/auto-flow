@@ -5,3 +5,4 @@ __all__=["StandardScaler"]
 class StandardScaler(AutoFlowFeatureEngineerAlgorithm):
     class__ = "StandardScaler"
     module__ = "sklearn.preprocessing"
+    cache_intermediate = True

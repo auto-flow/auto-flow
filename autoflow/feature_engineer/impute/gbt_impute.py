@@ -8,11 +8,11 @@ from autoflow.estimator.wrap_lightgbm import LGBMClassifier, LGBMRegressor
 from .predictive import PredictiveImputer
 
 __all__ = [
-    'GBMImputer',
+    'GBTImputer',
 ]
 
 
-class GBMImputer(PredictiveImputer):
+class GBTImputer(PredictiveImputer):
     reg_cls = LGBMRegressor
     clf_cls =LGBMClassifier
 
@@ -42,7 +42,7 @@ class GBMImputer(PredictiveImputer):
         self.copy = copy
         self.numerical_feature = numerical_feature
         self.categorical_feature = categorical_feature
-        super(GBMImputer, self).__init__(
+        super(GBTImputer, self).__init__(
             categorical_feature=categorical_feature,
             numerical_feature=numerical_feature,
             copy=copy,

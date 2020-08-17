@@ -20,7 +20,7 @@ class GBTLRClassifier(LGBMClassifier):
             n_estimators=256,
             objective=None,
             boosting_type="gbdt",
-            learning_rate=0.01,
+            learning_rate=0.1,
             max_depth=31,
             num_leaves=31,
             feature_fraction=0.8,

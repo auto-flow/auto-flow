@@ -8,6 +8,7 @@ __all__ = ["OrdinalEncoder"]
 class OrdinalEncoder(AutoFlowFeatureEngineerAlgorithm):
     class__ = "OrdinalEncoder"
     module__ = "sklearn.preprocessing"
+    cache_intermediate = True
 
     def get_category(self, Xs, column):
         Xs = [arg for arg in Xs if arg is not None]

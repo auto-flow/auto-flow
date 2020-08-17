@@ -103,10 +103,10 @@ class KNNImputer(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> from autoflow.feature_engineer.impute import KNNImputer
+    >>> from autoflow.feature_engineer.impute import GBTImputer
     >>> nan = float("NaN")
     >>> X = [[1, 2, nan], [3, 4, 3], [nan, 6, 5], [8, 8, 7]]
-    >>> imputer = KNNImputer(n_neighbors=2, weights="uniform")
+    >>> imputer = GBTImputer(n_neighbors=2, weights="uniform")
     >>> imputer.fit_transform(X)
     array([[1. , 2. , 4. ],
            [3. , 4. , 3. ],
@@ -242,7 +242,7 @@ class KNNImputer(BaseEstimator, TransformerMixin):
 
         check_is_fitted(self, ["fitted_X_", "statistics_", "do_simple_imputing", "idx2encoder", "dtypes"])
         if self.do_simple_imputing:
-            logger.debug("KNNImputer is doing adaptive simple imputation.")
+            logger.debug("GBTImputer is doing adaptive simple imputation.")
             from autoflow.feature_engineer.impute import SimpleImputer
             return SimpleImputer(consider_ordinal_as_cat=self.consider_ordinal_as_cat).fit_transform(X)
         X_ = process_dataframe(X)

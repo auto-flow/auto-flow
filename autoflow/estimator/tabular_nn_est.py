@@ -32,7 +32,7 @@ class TabularNNEstimator(BaseEstimator):
             layer2=128,
             use_bn=True,
             lr=1e-2,
-            max_epoch=64,
+            max_epoch=128,
             random_state=1000,
             batch_size=1024,
             optimizer="adam",

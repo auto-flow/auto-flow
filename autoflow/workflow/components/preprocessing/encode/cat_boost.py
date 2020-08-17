@@ -7,3 +7,4 @@ class CatBoostEncoder(BaseCategoryEncoders):
     class__ = "CatBoostEncoder"
     module__ = "category_encoders"
     need_y = True
+    cache_intermediate = True

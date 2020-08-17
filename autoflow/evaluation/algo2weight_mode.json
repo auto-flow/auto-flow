@@ -17,4 +17,5 @@
   "SGDClassifier": "class_weight",
   "SVC": "class_weight",
   "TabularNNClassifier": "class_weight",
+  "GBTLRClassifier": "sample_weight",
 }
