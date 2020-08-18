@@ -1,4 +1,5 @@
 import inspect
+import multiprocessing as mp
 import os
 from copy import deepcopy
 from importlib import import_module
@@ -83,8 +84,11 @@ class AutoFlowEstimator(BaseEstimator):
             should_calc_all_metrics: bool = True,
             should_stack_X: bool = True,
             debug_evaluator: bool = False,
+            initial_points=None,
             **kwargs
     ):
+        self.initial_points = initial_points
+        self.logger = get_logger(self)
         self.specific_out_feature_groups_mapper = specific_out_feature_groups_mapper
         self.warm_start = warm_start
         self.debug_evaluator = debug_evaluator
@@ -112,6 +116,10 @@ class AutoFlowEstimator(BaseEstimator):
         self.n_folds = n_folds
         self.min_n_workers = min_n_workers
         self.master_host = master_host
+        if n_jobs_in_algorithm is None:
+            assert isinstance(n_workers, int) and n_workers >= 1, ValueError(f"Invalid n_workers {n_workers}")
+            n_jobs_in_algorithm = int(np.clip(mp.cpu_count() // n_workers, 1, mp.cpu_count()))
+            self.logger.info(f"`n_jobs_in_algorithm` is parsed to {n_jobs_in_algorithm}")
         self.n_jobs_in_algorithm = n_jobs_in_algorithm
         self.n_iterations = n_iterations
         self.concurrent_type = concurrent_type
@@ -141,7 +149,6 @@ class AutoFlowEstimator(BaseEstimator):
         # ---logger------------------------------------
         self.log_path = os.path.expandvars(os.path.expanduser(log_path))
         setup_logger(self.log_path, self.log_config)
-        self.logger = get_logger(self)
         # ---random_state-----------------------------------
         self.random_state = random_state
         # ---hdl_constructor--------------------------
@@ -436,7 +443,7 @@ class AutoFlowEstimator(BaseEstimator):
         else:
             raise NotImplementedError
         budgets = get_budgets(self.min_budget, self.max_budget, self.eta)
-        config_generator = cg_cls(self.config_space, budgets, self.random_state, **self.config_generator_params)
+        config_generator = cg_cls(self.config_space, budgets, self.random_state,self.initial_points, **self.config_generator_params)
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
         if self.warm_start:
             previous_result, incumbents, incumbent_performances = self.resource_manager.get_result_from_trial_table(

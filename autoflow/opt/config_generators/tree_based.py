@@ -11,9 +11,9 @@ class RF(BayesianOptimizationConfigGenerator):
     epm_cls_name = "RF"
 
     def __init__(
-            self, config_space, budgets, random_state=None,
+            self, config_space, budgets, random_state=None, initial_points=None,
             acq_func="LogEI", xi=0, kappa=1.96, n_samples=5000,
-            min_points_in_model=None,loss_transformer="log_scaled",
+            min_points_in_model=None, loss_transformer="log_scaled",
             use_local_search=False,
             # TS
             use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=10,
@@ -51,14 +51,14 @@ class RF(BayesianOptimizationConfigGenerator):
             "acq_func_params": acq_func_params
         }
         super(RF, self).__init__(
-            config_space, budgets, random_state,
+            config_space, budgets, random_state, initial_points,
             self.epm_cls_name, epm_params, "ConfigEvaluator", config_evaluator_params,
             min_points_in_model=min_points_in_model,
             config_transformer_params={"impute": -1, "ohe": False},
             n_samples=n_samples,
             loss_transformer=self.loss_transformer,
             use_local_search=use_local_search,
-            use_thompson_sampling=use_thompson_sampling, # for TS
+            use_thompson_sampling=use_thompson_sampling,  # for TS
             alpha=alpha,
             beta=beta,
             top_n_percent=top_n_percent,
@@ -69,6 +69,7 @@ class RF(BayesianOptimizationConfigGenerator):
             sort_by_EI=sort_by_EI
         )
 
+
 class ET(RF):
     epm_cls_name = "ET"
 
@@ -77,9 +78,9 @@ class GBRT(BayesianOptimizationConfigGenerator):
     epm_cls_name = "GBRT"
 
     def __init__(
-            self, config_space, budgets, random_state=None,
+            self, config_space, budgets, random_state=None, initial_points=None,
             acq_func="LogEI", xi=0, kappa=1.96, n_samples=5000,
-            min_points_in_model=None,loss_transformer="log_scaled",
+            min_points_in_model=None, loss_transformer="log_scaled",
             n_jobs=1
     ):
         self.loss_transformer = loss_transformer
@@ -98,7 +99,7 @@ class GBRT(BayesianOptimizationConfigGenerator):
             "acq_func_params": acq_func_params
         }
         super(GBRT, self).__init__(
-            config_space, budgets, random_state,
+            config_space, budgets, random_state, initial_points,
             self.epm_cls_name, epm_params, "ConfigEvaluator", config_evaluator_params,
             min_points_in_model=min_points_in_model,
             config_transformer_params={"impute": -1, "ohe": False},

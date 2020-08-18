@@ -9,7 +9,7 @@ class TPE(BayesianOptimizationConfigGenerator):
     epm_cls_name = "TPE"
 
     def __init__(
-            self, config_space, budgets, random_state=None,
+            self, config_space, budgets, random_state=None, initial_points=None,
             n_samples=5000,
             min_points_in_model=None,
             # TPE parameters
@@ -32,7 +32,7 @@ class TPE(BayesianOptimizationConfigGenerator):
         config_evaluator_params = {
         }
         super(TPE, self).__init__(
-            config_space, budgets, random_state,
+            config_space, budgets, random_state, initial_points,
             self.epm_cls_name, epm_params, "DensityConfigEvaluator", config_evaluator_params,
             min_points_in_model=min_points_in_model,
             config_transformer_params={"impute": None, "ohe": False},
@@ -45,7 +45,7 @@ class KDE(BayesianOptimizationConfigGenerator):
     epm_cls_name = "KDE"
 
     def __init__(
-            self, config_space, budgets, random_state=None,
+            self, config_space, budgets, random_state=None, initial_points=None,
             n_samples=5000,
             min_points_in_model=None,
             # KDE parameters
@@ -62,7 +62,7 @@ class KDE(BayesianOptimizationConfigGenerator):
         config_evaluator_params = {
         }
         super(KDE, self).__init__(
-            config_space, budgets, random_state,
+            config_space, budgets, random_state, initial_points,
             self.epm_cls_name, epm_params, "DensityConfigEvaluator", config_evaluator_params,
             min_points_in_model=min_points_in_model,
             config_transformer_params={"impute": "random_choice", "ohe": False},

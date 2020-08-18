@@ -9,6 +9,7 @@ from math import ceil
 from typing import Dict, Tuple, List, Union, Any, Optional
 
 import h5py
+import joblib
 import numpy as np
 import pandas as pd
 import peewee as pw
@@ -16,15 +17,15 @@ from frozendict import frozendict
 # from playhouse.fields import PickleField
 from playhouse.reflection import generate_models
 from redis import Redis
-import joblib
+
 from autoflow.constants import RESOURCE_MANAGER_CLOSE_ALL_LOGGER, CONNECTION_POOL_CLOSE_MSG, START_SAFE_CLOSE_MSG, \
     END_SAFE_CLOSE_MSG, ExperimentType, ERR_LOSS
 from autoflow.data_manager import DataManager
 from autoflow.ensemble.mean.regressor import MeanRegressor
 from autoflow.ensemble.vote.classifier import VoteClassifier
+from autoflow.metrics import Scorer
 from autoflow.opt.result import Result
 from autoflow.opt.utils import modify_timestamps
-from autoflow.metrics import Scorer
 from autoflow.utils.dataframe import replace_nan_to_None, get_unique_col_name, replace_dicts, inverse_dict
 from autoflow.utils.dict_ import update_data_structure, object_kwargs2dict
 from autoflow.utils.hash import get_hash_of_str, get_hash_of_dict
@@ -85,6 +86,7 @@ class ResourceManager(StrSignatureMixin):
             del_local_log_path=True,
             cache_system="FsCache",
             cache_system_params=frozendict(),
+            should_record_workflow_step=False
     ):
         '''
 
@@ -125,6 +127,7 @@ class ResourceManager(StrSignatureMixin):
         compress_suffix: str
             compress file's suffix, default is bz2
         '''
+        self.should_record_workflow_step = should_record_workflow_step
         self.cache_system_params = dict(cache_system_params)
         self.cache_system = cache_system
         self.del_local_log_path = del_local_log_path
@@ -168,6 +171,7 @@ class ResourceManager(StrSignatureMixin):
         self.is_init_budget = False
         self.is_init_record_db = False
         self.is_init_dataset_db = False
+        self.is_init_workflow_step = False
         # --some specific path based on file_system---
         self.datasets_dir = self.file_system.join(self.store_path, "datasets")
         self.databases_dir = self.file_system.join(self.store_path, "databases")
@@ -249,7 +253,8 @@ class ResourceManager(StrSignatureMixin):
         self.trial_dir = self.file_system.join(self.parent_trials_dir, str(self.user_id), self.task_id, self.hdl_id)
         self.file_system.mkdir(self.trial_dir)
         # ----get specific URL---------
-        models_path = self.file_system.join(self.trial_dir, f"{model_id}_models.{self.compress_suffix}") # compatible Nitrogen FS
+        models_path = self.file_system.join(self.trial_dir,
+                                            f"{model_id}_models.{self.compress_suffix}")  # compatible Nitrogen FS
         y_info_path = self.file_system.join(self.trial_dir, f"{model_id}_y-info.{self.compress_suffix}")
         if info.get("finally_fit_model") is not None:
             finally_fit_model_path = self.file_system.join(self.trial_dir,
@@ -301,18 +306,18 @@ class ResourceManager(StrSignatureMixin):
         record = self._get_trial_records_by_id(trial_id, self.task_id, self.user_id)[0]
         return record["dict_hyper_param"]
 
-    def _load_estimators_in_trials(self,record):
+    def _load_estimators_in_trials(self, record):
         exists = True
         if not self.file_system.exists(record["models_path"]):
             exists = False
-            estimator=None
+            estimator = None
         else:
-            estimator=self.file_system.load_pickle(record["models_path"])
+            estimator = self.file_system.load_pickle(record["models_path"])
         if exists:
             y_info = self.file_system.load_pickle(record["y_info_path"])
-            y_true_indexes=y_info["y_true_indexes"]
-            y_preds=y_info["y_preds"]
-            return estimator,y_true_indexes,y_preds
+            y_true_indexes = y_info["y_true_indexes"]
+            y_preds = y_info["y_preds"]
+            return estimator, y_true_indexes, y_preds
         else:
             return None
 
@@ -325,10 +330,10 @@ class ResourceManager(StrSignatureMixin):
                 joblib.delayed(self._load_estimators_in_trials)(record)
                 for record in records
             )
-            results=[result  for result in results if result is not None]
-            estimator_list=[result[0] for result in results]
-            y_true_indexes_list=[result[1] for result in results]
-            y_preds_list=[result[2] for result in results]
+            results = [result for result in results if result is not None]
+            estimator_list = [result[0] for result in results]
+            y_true_indexes_list = [result[1] for result in results]
+            y_preds_list = [result[2] for result in results]
         return estimator_list, y_true_indexes_list, y_preds_list
 
     # ----------runhistory------------------------------------------------------------------
@@ -583,7 +588,7 @@ class ResourceManager(StrSignatureMixin):
         tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-        df.to_hdf(tmp_path, "dataset",format="table")
+        df.to_hdf(tmp_path, "dataset", format="table")
         return self.file_system.upload(dataset_path, tmp_path)
 
     def upload_ndarray_to_fs(self, arr: np.ndarray, dataset_path):
@@ -729,7 +734,6 @@ class ResourceManager(StrSignatureMixin):
             self.logger.warning(f"Local log path : '{local_log_path}' didn't exist!")
         # 信息上传数据库
         self.finish_experiment_update_info(experiment_model_path, experiment_log_path, datetime.datetime.now())
-
 
     def finish_experiment_update_info(self, final_model_path, log_path, end_time):
         self.init_experiment_table()
@@ -1207,7 +1211,7 @@ class ResourceManager(StrSignatureMixin):
         experiments = set()
         for record in records:
             experiment_id = record["experiment_id"]
-            if not record["timestamps"]: # default = {}
+            if not record["timestamps"]:  # default = {}
                 continue
             experiment2min_started[experiment_id] = min(experiment2min_started[experiment_id],
                                                         record["timestamps"]["started"])
@@ -1297,3 +1301,64 @@ class ResourceManager(StrSignatureMixin):
                 self.TrialModel.delete().where(
                     self.TrialModel.trial_id.in_(should_delete.select(self.TrialModel.trial_id))).execute()
         return True
+
+    # ----------workflow_step_model------------------------------------------------------------------
+    def get_workflow_step_model(self) -> pw.Model:
+        class WorkflowStep(pw.Model):
+            workflow_step_id = pw.AutoField(primary_key=True)
+            config_id = pw.FixedCharField(max_length=32)
+            experiment_id = pw.IntegerField()
+            config = self.JSONField(default={})  # new
+            step_idx = pw.IntegerField()
+            step_name = pw.CharField(max_length=256, default="")
+            component_name = pw.CharField(max_length=256, default="")
+            hyperparams = self.JSONField(default={})  # new
+            dataset_id = pw.FixedCharField(max_length=32, default="", null=True)
+            hit_cache = pw.BooleanField()
+            cache_key = pw.CharField(max_length=256, default="", null=True)
+
+            class Meta:
+                database = self.record_db
+                table_name = "workflow_step"
+
+        self.record_db.create_tables([WorkflowStep])
+        return WorkflowStep
+
+    def init_workflow_step_table(self):
+        if self.is_init_workflow_step:
+            return
+        self.is_init_workflow_step = True
+        self.init_record_db()
+        self.WorkflowStepModel = self.get_workflow_step_model()
+
+    def close_workflow_step_table(self):
+        self.is_init_workflow_step = False
+        self.WorkflowStepModel = None
+
+    def insert_workflow_step_record(
+            self,
+            config_id,
+            experiment_id,
+            config,
+            step_idx,
+            step_name,
+            component_name,
+            hyperparams,
+            dataset_id,
+            hit_cache,
+            cache_key
+    ):
+        self.init_workflow_step_table()
+        workflow_step_record = self.WorkflowStepModel.create(
+            config_id=config_id,
+            experiment_id=experiment_id,
+            config=config,
+            step_idx=step_idx,
+            step_name=step_name,
+            component_name=component_name,
+            hyperparams=hyperparams,
+            dataset_id=dataset_id,
+            hit_cache=hit_cache,
+            cache_key=cache_key
+        )
+        return workflow_step_record.workflow_step_id

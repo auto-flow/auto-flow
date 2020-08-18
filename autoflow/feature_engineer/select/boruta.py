@@ -277,7 +277,7 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
         self.random_state = check_random_state(self.random_state)
         # setup variables for Boruta
         n_sample, n_feat = X.shape
-        _iter = 1
+        self.iter = 1
         # holds the decision about each feature:
         # 0  - default state = tentative in original code
         # 1  - accepted in original code
@@ -295,7 +295,7 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
             self.estimator.set_params(n_estimators=self.n_estimators)
         start_time = time()
         # main feature selection loop
-        while np.any(dec_reg == 0) and _iter < self.max_iter:
+        while np.any(dec_reg == 0) and self.iter < self.max_iter:
             # find optimal number of trees and depth
             if self.n_estimators == 'auto':
                 # number of features that aren't rejected
@@ -325,16 +325,18 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
 
             # based on hit_reg we check if a feature is doing better than
             # expected by chance
-            dec_reg = self._do_tests(dec_reg, hit_reg, _iter)
+            dec_reg = self._do_tests(dec_reg, hit_reg, self.iter)
             # print out confirmed features
-            if self.verbose > 0 and _iter < self.max_iter:
-                self._print_results(dec_reg, _iter, 0)
+            if self.verbose > 0 and self.iter < self.max_iter:
+                self._print_results(dec_reg, self.iter, 0)
             if time() - start_time > self.budget:
                 self.logger.log(self.logging_level,
-                                f"max time budget {self.budget}s is used up, iter = {_iter}, early stopping ... ")
+                                f"max time budget {self.budget}s is used up, iter = {self.iter}, early stopping ... ")
                 break
-            if _iter < self.max_iter:
-                _iter += 1
+            if self.iter < self.max_iter:
+                self.iter += 1
+
+        self.iter -= 1
 
         # we automatically apply R package's rough fix for tentative ones
         confirmed = np.where(dec_reg == 1)[0]
@@ -361,7 +363,7 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
         self.support_[confirmed] = 1
         self.support_weak_ = np.zeros(n_feat, dtype=np.bool)
         self.support_weak_[tentative] = 1
-
+        self.support_weak_cnt = int(np.count_nonzero(self.support_weak_))
         # ranking, confirmed variables are rank 1
         self.ranking_ = np.ones(n_feat, dtype=np.int)
         # tentative variables are rank 2
@@ -393,7 +395,7 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
 
         # notify user
         if self.verbose > 0:
-            self._print_results(dec_reg, _iter, 1)
+            self._print_results(dec_reg, self.iter, 1)
         return self
 
     def _transform(self, X):

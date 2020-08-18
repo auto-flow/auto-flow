@@ -163,7 +163,7 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         self.always_return_numpy = always_return_numpy
         self.n_jobs = check_n_jobs(n_jobs)
         self.verbose = verbose
-        self.variable_pattern = re.compile(f"[a-zA-Z_][a-zA-Z_0-9]]*")
+        self.variable_pattern = re.compile(f"^[a-zA-Z_][a-zA-Z_0-9]*$")
 
     def __getstate__(self):
         """

@@ -24,7 +24,7 @@ from .density_estimator.kde import KDE4BO
 from .density_estimator.tpe import TreeStructuredParzenEstimator
 from ..structure import Job
 from ..utils import ConfigurationTransformer, LossTransformer, ScaledLossTransformer, \
-    LogScaledLossTransformer, add_configs_origin, process_config_info_pair, pprint_budget
+    LogScaledLossTransformer, add_configs_origin, pprint_budget
 
 epm_str2cls = {
     "ET": ExtraTreesRegressor,
@@ -37,7 +37,8 @@ epm_str2cls = {
 
 class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
     def __init__(
-            self, config_space, budgets, random_state=None, epm="ET", epm_params=frozendict(),
+            self, config_space, budgets, random_state=None, initial_points=None,
+            epm="ET", epm_params=frozendict(),
             config_evaluator_cls="ConfigEvaluator", config_evaluator_params=frozendict(),
             min_points_in_model=None, config_transformer_params=None, n_samples=5000,
             loss_transformer=None,
@@ -49,6 +50,8 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
     ):
         super(BayesianOptimizationConfigGenerator, self).__init__()
         # ----member variable-----------------------
+        self.initial_points = initial_points
+        self.initial_points_index = 0
         self.update_weight_steps = max(5, update_weight_steps)
         if len(budgets) <= 1 and support_ensemble_epms:
             self.logger.warning(
@@ -131,7 +134,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         self.tpe.set_config_transformer(self.tpe_config_transformer)
         # ----budget to empirical_performance_model, observations, config_evaluator----
         self.budget2epm = {budget: None for budget in budgets}
-        self.budget2obvs = {budget: {"losses": [], "configs": [], "vectors": []} for budget in budgets}
+        self.budget2obvs = {budget: {"losses": [], "configs": [], "vectors": [], "locks": []} for budget in budgets}
         # todo: 更好的形式
         if config_evaluator_cls == "ConfigEvaluator":
             config_evaluator_cls = ConfigEvaluator
@@ -295,6 +298,12 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
                 config_evaluator.update_weight(max_budget_epm, X_test, y_test)
 
     def get_config(self, budget):
+        if self.initial_points is not None and self.initial_points_index < len(self.initial_points):
+            initial_point_dict = self.initial_points[self.initial_points_index]
+            initial_point = Configuration(self.config_space, initial_point_dict)
+            initial_point.origin = "User Defined"
+            self.initial_points_index += 1
+            return self.process_config_info_pair(initial_point, {}, budget)
         max_budget = self.get_available_max_budget()
         epm = self.budget2epm[max_budget]
         if epm is None:
@@ -309,14 +318,14 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
                     self.logger.info(f"The sample already exists and needs to be resampled. "
                                      f"It's the {i}-th time sampling in random sampling. ")
                 else:
-                    return process_config_info_pair(config, info_dict)
+                    return self.process_config_info_pair(config, info_dict, budget)
             # todo: 收纳这个代码块
             seed = self.rng.randint(1, 8888)
             self.config_space.seed()
             config = self.config_space.sample_configuration()
             add_configs_origin(config, "Initial Design")
             info_dict.update({"sampling_different_samples_failed": True, "seed": seed})
-            return process_config_info_pair(config, info_dict)
+            return self.process_config_info_pair(config, info_dict, budget)
 
         info_dict = {"model_based_pick": True}
         # thompson sampling
@@ -324,7 +333,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             ts_config, ts_info_dict = self.thompson_sampling(max_budget, info_dict)
             if ts_config is not None:
                 self.logger.info("Using thompson sampling near the dominant samples.")
-                return process_config_info_pair(ts_config, ts_info_dict)
+                return self.process_config_info_pair(ts_config, ts_info_dict, budget)
         # 让config_evaluator给所有的随机样本打分
         configs = self.config_space.sample_configuration(self.n_samples)
         losses, configs_sorted = self.evaluate(configs, max_budget, return_loss_config=True)
@@ -351,16 +360,16 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
                 # 超过 max_repeated_samples ， 用TS算法采样
                 if i >= self.max_repeated_samples and self.use_thompson_sampling:
                     ts_config, ts_info_dict = self.thompson_sampling(max_budget, info_dict, True)
-                    return process_config_info_pair(ts_config, ts_info_dict)
+                    return self.process_config_info_pair(ts_config, ts_info_dict, budget)
             else:
-                return process_config_info_pair(config, info_dict)
+                return self.process_config_info_pair(config, info_dict, budget)
         # todo: 收纳这个代码块
         seed = self.rng.randint(1, 8888)
         self.config_space.seed(seed)
         config = self.config_space.sample_configuration()
         add_configs_origin(config, "Initial Design")
         info_dict.update({"sampling_different_samples_failed": True, "seed": seed})
-        return process_config_info_pair(config, info_dict)
+        return self.process_config_info_pair(config, info_dict, budget)
 
     def get_local_search_initial_points(self, budget, num_points, additional_start_points):
         # 对之前的样本做评价
@@ -538,11 +547,16 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         # return [(a, i) for a, i in zip(acq_val_incumbents, incumbents)]
 
     def is_config_exist(self, budget, config: Configuration):
-        vectors = np.array(self.budget2obvs[budget]["vectors"])
-        if len(vectors) == 0:
+        vectors_list = []  # TODO check
+        budgets = [budget_ for budget_ in list(self.budget2obvs.keys()) if budget_ >= budget]
+        for budget_ in budgets:
+            vectors = np.array(self.budget2obvs[budget_]["locks"])
+            vectors_list.append(vectors)
+        vectors = np.vstack(vectors_list)
+        if np.any(np.array(vectors.shape) == 0):
             return False
         vectors[np.isnan(vectors)] = -1
-        vector = deepcopy(config.get_array())
+        vector = config.get_array().copy()
         vector[np.isnan(vector)] = -1
         if np.any(np.all(vector == vectors, axis=1)):
             return True
@@ -594,3 +608,13 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             info_dict = {"model_based_pick": False}
             return sample, info_dict
         return None, None
+
+    def process_config_info_pair(self, config: Configuration, info_dict: dict, budget):
+        self.budget2obvs[budget]["locks"].append(config.get_array().copy())
+        info_dict = deepcopy(info_dict)
+        if config.origin is None:
+            config.origin = "unknown"
+        info_dict.update({
+            "origin": config.origin
+        })
+        return config.get_dictionary(), info_dict

@@ -12,3 +12,4 @@ class AutoFeatureGenerator(AutoFlowFeatureEngineerAlgorithm):
     module__ = "autoflow.feature_engineer.generate"
     need_y = True
     cache_intermediate = True
+    additional_info_keys = ("new_feat_cols_",)

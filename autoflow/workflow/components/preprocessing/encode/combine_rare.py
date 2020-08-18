@@ -11,3 +11,4 @@ class CombineRare(AutoFlowFeatureEngineerAlgorithm):
     class__ = "CombineRare"
     module__ = "autoflow.feature_engineer.encode"
     cache_intermediate = True
+    additional_info_keys = ("replace_by_other", "invariant_cols")

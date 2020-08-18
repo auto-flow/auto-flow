@@ -24,6 +24,7 @@ class AutoFlowComponent(BaseEstimator):
     cache_intermediate = False
     support_early_stopping = False
     is_fit = False
+    additional_info_keys = tuple()
 
     def __init__(self, **kwargs):
         self.resource_manager = None
@@ -31,12 +32,12 @@ class AutoFlowComponent(BaseEstimator):
         self.in_feature_groups = None
         self.out_feature_groups = None
         self.hyperparams = kwargs
-        self.set_addition_info(kwargs)
+        self.set_inside_dict(kwargs)
         self.logger = get_logger(self)
 
     def update_hyperparams(self, kwargs):
         self.hyperparams.update(kwargs)
-        self.set_addition_info(kwargs)
+        self.set_inside_dict(kwargs)
 
     def _get_param_names(cls):
         return sorted(cls.hyperparams.keys())
@@ -178,7 +179,7 @@ class AutoFlowComponent(BaseEstimator):
                  y_test=None, feature_groups=None, **kwargs):
         return estimator.fit(X, y, **kwargs)
 
-    def set_addition_info(self, dict_: dict):
+    def set_inside_dict(self, dict_: dict):
         for key, value in dict_.items():
             setattr(self, key, value)
 
@@ -240,3 +241,13 @@ class AutoFlowComponent(BaseEstimator):
 
     def before_pred_X(self, X: DataFrameContainer):
         return X.data
+
+    @property
+    def additional_info(self):
+        return dict(self.form_additional_info_pair(key) for key in self.additional_info_keys)
+
+    def form_additional_info_pair(self, key):
+        return (
+            key,
+            getattr(self.component, key, None)
+        )

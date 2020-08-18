@@ -1,8 +1,12 @@
 import hashlib
 from copy import deepcopy
+from time import time
 from typing import Dict
 
+import numpy as np
+import pandas as pd
 from sklearn.pipeline import Pipeline
+from sklearn.utils import check_array
 from sklearn.utils.metaestimators import if_delegate_has_method
 
 from autoflow.data_container import DataFrameContainer
@@ -21,6 +25,8 @@ class ML_Workflow(Pipeline):
     # todo: 现在是用类似拓扑排序的方式实现，但是计算是线性的，希望以后能用更科学的方法！
     # 可以当做Transformer，又可以当做estimator！
     def __init__(self, steps, should_store_intermediate_result=False, resource_manager=None):
+        self.config_id = None
+        self.config = None
         self.logger = get_logger(self)
         if resource_manager is None:
             from autoflow import ResourceManager
@@ -78,7 +84,8 @@ class ML_Workflow(Pipeline):
         )
         return X_stack
 
-    def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, fit_final_estimator=True):
+    def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, fit_final_estimator=True,
+            resouce_manager=None):
         # set default `self.last_data` to prevent exception in only classifier cases
         self.last_data = {
             "X_train": X_train,
@@ -86,12 +93,18 @@ class ML_Workflow(Pipeline):
             "X_test": X_test,
             "X_valid": X_valid,
         }
+        time_cost_list = []
+        # if `is_estimator` or `fit_final_estimator` is True, `with_final` is False
         for (step_idx, step_name, transformer) in self._iter(
                 with_final=(not (fit_final_estimator and self.is_estimator)),
                 filter_passthrough=False):
             # todo : 做中间结果的存储
             cache_intermediate = False
             hyperparams = {}
+            hit_cache = False
+            dataset_id = None
+            cache_key = None
+            start_time = time()
             if getattr(transformer, "cache_intermediate", False):
                 if self.resource_manager is None:
                     self.logger.warning(
@@ -105,8 +118,14 @@ class ML_Workflow(Pipeline):
             if cache_intermediate:
                 if hasattr(transformer, "prepare_X_to_fit"):
                     def stack_X_before_fit(X_train, X_valid, X_test, **kwargs):
-                        X_stack_ = transformer.prepare_X_to_fit(X_train, X_valid, X_test)
-                        X_stack = X_train.copy()
+                        t = transformer
+                        X_train_f = t.filter_feature_groups(X_train)
+                        X_stack_ = t.prepare_X_to_fit(
+                            X_train_f,
+                            t.filter_feature_groups(X_valid),
+                            t.filter_feature_groups(X_test),
+                        )
+                        X_stack = X_train_f.copy()
                         X_stack.data = X_stack_
                         return X_stack
 
@@ -124,16 +143,17 @@ class ML_Workflow(Pipeline):
                 component_hash = get_hash_of_dict(hyperparams, m)
                 cache_key = f"workflow-{component_hash}-{dataset_id}"
                 cache_results = self.resource_manager.cache.get(cache_key)
-                if cache_results is not None and isinstance(cache_results, dict) and "result" in cache_results and "component" in cache_results:
+                if cache_results is not None and isinstance(cache_results, dict) \
+                        and "result" in cache_results and "component" in cache_results:
                     self.logger.debug(f"workflow cache hit, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
                     X_transformed_stack = cache_results["result"]
-                    fitted_transformer = cache_results["component"]
-                    self.steps[step_idx][1] = fitted_transformer
+                    fitted_transformer = cache_results["component"]  # set the variable in later
                     result = {"y_train": y_train}
                     self.assemble_result("X_train", X_train, X_transformed_stack, result)
                     self.assemble_result("X_valid", X_valid, X_transformed_stack, result)
                     self.assemble_result("X_test", X_test, X_transformed_stack, result)
+                    hit_cache = True
                 else:
                     self.logger.debug(f"workflow cache miss, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
@@ -141,6 +161,13 @@ class ML_Workflow(Pipeline):
                     result = transformer.transform(X_train, X_valid, X_test, y_train)
                     X_transformed_stack = self.stack_X_after_transform(**result)
                     X_transformed_stack.resource_manager = None
+                    try:
+                        if np.count_nonzero(~np.isfinite(result["X_test"].data))>0:
+                            print("fuck")
+                    except Exception:
+                        pass
+                    if "col" in result["X_test"].columns:
+                        print('fuck')
                     self.resource_manager.cache.set(
                         cache_key, {
                             "result": X_transformed_stack,
@@ -151,6 +178,19 @@ class ML_Workflow(Pipeline):
             else:
                 fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
                 result = transformer.transform(X_train, X_valid, X_test, y_train)
+            if self.resource_manager.should_record_workflow_step:
+                self.resource_manager.insert_workflow_step_record(
+                    config_id=self.config_id,
+                    experiment_id=self.resource_manager.experiment_id,
+                    config=self.config,
+                    step_idx=step_idx,
+                    step_name=step_name,
+                    component_name=transformer.__class__.__name__,
+                    hyperparams=hyperparams,
+                    dataset_id=dataset_id,
+                    hit_cache=hit_cache,
+                    cache_key=cache_key
+                )
             X_train = result["X_train"]
             X_valid = result.get("X_valid")
             X_test = result.get("X_test")
@@ -162,14 +202,32 @@ class ML_Workflow(Pipeline):
                 self.update_data_container_to_dataset_id(step_name, "X_test", X_test, current_dict)
                 self.update_data_container_to_dataset_id(step_name, "y_train", y_train, current_dict)
                 self.intermediate_result.update({step_name: current_dict})
-
             self.last_data = result
             self.steps[step_idx] = (step_name, fitted_transformer)
+            cost_time = time() - start_time
+            time_cost_list.append([
+                step_idx,
+                step_name,
+                transformer.__class__.__name__,
+                hit_cache,
+                cost_time,
+            ])
+
         if (fit_final_estimator and self.is_estimator):
             # self._final_estimator.resource_manager = self.resource_manager
+            start_time = time()
             self._final_estimator.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
+            cost_time = time() - start_time
+            time_cost_list.append([
+                len(self.steps),
+                self.steps[-1][0],
+                self._final_estimator.__class__.__name__,
+                False,
+                cost_time
+            ])
             # self._final_estimator.resource_manager = None
         self.fitted = True
+        self.time_cost_list = time_cost_list
         return self
 
     def fit_transform(self, X_train, y_train=None, X_valid=None, y_valid=None, X_test=None, y_test=None):
@@ -185,13 +243,26 @@ class ML_Workflow(Pipeline):
             self[-1].set_max_iter(max_iter)
         # 高budget的模型不能在低budget时刻被加载
         if self.fitted and self.budget <= budget:
-            self.last_data = self.transform(X_train, X_valid, X_test, y_train)
+            # todo: transform 的过程中使用缓存（如，gbt_imputer）
+            if self.last_data is None:
+                self.logger.warning(
+                    f"fitted is True, (self.budget = {self.budget}) <= (budget = {budget}), but self.last_data is None !!!")
+                self.last_data = self.transform(X_train, X_valid, X_test, y_train)
             if max_iter > 0:
+                start_time = time()
                 self[-1].fit(
                     self.last_data.get("X_train"), self.last_data.get("y_train"),
                     self.last_data.get("X_valid"), y_valid,
                     self.last_data.get("X_test"), y_test
                 )
+                cost_time = time() - start_time
+                self.time_cost_list.append([
+                    len(self.steps),
+                    self.steps[-1][0],
+                    self._final_estimator.__class__.__name__,
+                    False,
+                    cost_time
+                ])
         else:
             self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         self.set_budget(budget)
@@ -202,13 +273,25 @@ class ML_Workflow(Pipeline):
         X_valid = self.last_data.get("X_valid")
         X_test = self.last_data.get("X_test")
         self.last_data = None  # GC
-        if ml_task.mainTask == "classification":
-            pred_valid = self._final_estimator.predict_proba(X_valid)
-            pred_test = self._final_estimator.predict_proba(X_test) if X_test is not None else None
-        else:
-            pred_valid = self._final_estimator.predict(X_valid)
-            pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
+        try:
+            check_array(X_train.data)
+            check_array(X_valid.data) if X_valid is not None else None
+            if ml_task.mainTask == "classification":
+                pred_valid = self._final_estimator.predict_proba(X_valid)
+                pred_test = self._final_estimator.predict_proba(X_test) if X_test is not None else None
+            else:
+                pred_valid = self._final_estimator.predict(X_valid)
+                pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
+        except Exception as e:
+            self.logger.warning(f"INF: {np.count_nonzero(~np.isfinite(X_test.data), axis=0)}")
+            self.logger.warning(f"NAN: {np.count_nonzero(pd.isna(X_test.data), axis=0)}")
+            self.logger.error(e)
+            pred_test = -65535
+            pred_valid = -65535
         self.resource_manager = None  # 避免触发 resource_manager 的__reduce__导致连接池消失
+
+        if (max_iter > 0 and should_finish_evaluation) or (max_iter <= 0):
+            self.last_data = None
         return {
             "pred_valid": pred_valid,
             "pred_test": pred_test,

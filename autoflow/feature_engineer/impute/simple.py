@@ -72,17 +72,9 @@ class SimpleImputer(BaseImputer):
         self.cat_strategy = cat_strategy
 
     def fit(self, X, y=None, categorical_feature=None, numerical_feature=None, **kwargs):
-        X = super(SimpleImputer, self).fit(X)
+        X = super(SimpleImputer, self).fit(X, y, categorical_feature, numerical_feature)
         cat_cols = self.categorical_feature
         num_cols = self.numerical_feature
-        if cat_cols is None:
-            cat_cols = []
-        cat_cols = np.array(cat_cols)
-        columns = np.array(X.columns)
-        if num_cols is None:
-            num_cols = np.setdiff1d(columns, cat_cols)
-        else:
-            num_cols = np.array([])
         if num_cols.size:
             self.num_imputer = SklearnSimpleImputer(strategy=self.num_strategy).fit(X[num_cols])
         else:

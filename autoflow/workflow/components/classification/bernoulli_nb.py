@@ -1,8 +1,6 @@
-import numpy as np
-
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 
-__all__=["BernoulliNB"]
+__all__ = ["BernoulliNB"]
 
 
 class BernoulliNB(AutoFlowClassificationAlgorithm):

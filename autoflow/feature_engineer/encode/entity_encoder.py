@@ -86,6 +86,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         )
         self.scaler = StandardScaler(copy=True)
         self.keep_going = False
+        self.iter = 0
 
     def fit(self, X, y=None, **kwargs):
         # first check the type
@@ -187,6 +188,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
 
     def callback(self, epoch_index, model, X, y, X_valid, y_valid) -> bool:
         model.eval()
+        self.iter = epoch_index
         should_print = self.verbose > 0 and epoch_index % self.verbose == 0
         n_class = getattr(model, "n_class", 1)
         if n_class == 1:

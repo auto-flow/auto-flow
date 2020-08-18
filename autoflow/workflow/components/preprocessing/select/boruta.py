@@ -12,3 +12,4 @@ class BorutaFeatureSelector(AutoFlowFeatureEngineerAlgorithm):
     module__ = "autoflow.feature_engineer.select"
     need_y = True
     cache_intermediate = True
+    additional_info_keys = ("weak", "iter", "support_weak_cnt")

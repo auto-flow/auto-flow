@@ -365,14 +365,7 @@ def add_configs_origin(configs: List[Configuration], origin):
         config.origin = origin
 
 
-def process_config_info_pair(config: Configuration, info_dict: dict):
-    info_dict = deepcopy(info_dict)
-    if config.origin is None:
-        config.origin = "unknown"
-    info_dict.update({
-        "origin": config.origin
-    })
-    return config.get_dictionary(), info_dict
+
 
 
 if __name__ == '__main__':

@@ -22,9 +22,13 @@ class DataFrameContainer(DataContainer):
     VALID_INSTANCE = (np.ndarray, pd.DataFrame)
     dataset_type = "dataframe"
 
-    def __init__(self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None,
-                 resource_manager=None,
-                 dataset_metadata=frozendict()):
+    def __init__(
+            self, dataset_source="", dataset_path=None, dataset_instance=None, dataset_id=None,
+            resource_manager=None,
+            dataset_metadata=frozendict(),
+            process_dirty=False
+    ):
+        self.process_dirty = process_dirty
         self.column_descriptions = None
         self.feature_groups = pd.Series([])
         self.columns_mapper = {}
@@ -51,16 +55,19 @@ class DataFrameContainer(DataContainer):
                         # 2. replace
                         columns[first_ix] = get_unique_col_name(columns, dup_col)
             # set unique columns to dataset_instance
-            dataset_instance.columns = columns
-            # 2. rename dirty columns
-            for i, column in enumerate(columns):
-                if not VARIABLE_PATTERN.match(column):
-                    columns[i] = get_unique_col_name(columns, "col")
-            # 3. adapt to database standard
-            columns = pd.Series([inflection.underscore(column).lower() for column in columns])
-            # fixme: 可能出现 NAME name 的情况导致重名
-            # 4. assemble columns_mapper
-            self.columns_mapper = dict(zip(origin_columns, columns))
+            dataset_instance.columns = columns.copy()
+            if self.process_dirty:
+                # 2. rename dirty columns
+                for i, column in enumerate(columns):
+                    if not VARIABLE_PATTERN.match(column):
+                        columns[i] = get_unique_col_name(columns, "col")
+                # 3. adapt to database standard
+                columns = pd.Series([inflection.underscore(column).lower() for column in columns])
+                # fixme: 可能出现 NAME name 的情况导致重名
+                # 4. assemble columns_mapper
+                self.columns_mapper = dict(zip(origin_columns, columns))
+            else:
+                self.columns_mapper = {}
         else:
             raise NotImplementedError
         return dataset_instance
@@ -226,12 +233,13 @@ class DataFrameContainer(DataContainer):
             self.logger.debug("new_feature_group is None, return all feature_groups")
             assert values.shape[1] == self.shape[1]
             assert values.shape[0] == self.shape[0]
-            if not  isinstance(values, pd.DataFrame):
-                self.logger.debug(f"values is not DataFrame, is {type(values)}, convert to DataFrame and set column and index same to self.")
-                values=pd.DataFrame(values,columns=self.columns,index=self.index)
+            if not isinstance(values, pd.DataFrame):
+                self.logger.debug(f"values is not DataFrame, is {type(values)}")
+            values = pd.DataFrame(values, columns=self.columns, index=self.index)
             result = self.copy()
             result.data = values
             return result
+
         if isinstance(old_feature_group, str):
             old_feature_group = [old_feature_group]
 
@@ -263,54 +271,65 @@ class DataFrameContainer(DataContainer):
         new_df.index = deleted_df.index  # 非常重要的一步
         return deleted_df.concat_to(new_df)
 
-    def sub_sample(self, index):
-        new_df = self.copy()
-        # fixme iloc 与 loc
-        new_df.data = copy(new_df.data.loc[index, :])
-        return new_df
 
-    def sub_feature(self, index):
-        new_df = self.copy()
-        if isinstance(index, np.ndarray) and index.dtype == int:
-            new_df.data = deepcopy(new_df.data.iloc[:, index])
-            new_df.set_feature_groups(new_df.feature_groups[index])
-        else:
-            # todo: 如果index是列名序列
-            raise NotImplementedError
-        return new_df
+def sub_sample(self, index):
+    new_df = self.copy()
+    # fixme iloc 与 loc
+    new_df.data = copy(new_df.data.loc[index, :])
+    return new_df
 
-    @property
-    def columns(self):
-        return self.data.columns
 
-    @columns.setter
-    def columns(self, columns_):
-        self.data.columns = columns_
+def sub_feature(self, index):
+    new_df = self.copy()
+    if isinstance(index, np.ndarray) and index.dtype == int:
+        new_df.data = deepcopy(new_df.data.iloc[:, index])
+        new_df.set_feature_groups(new_df.feature_groups[index])
+    else:
+        # todo: 如果index是列名序列
+        raise NotImplementedError
+    return new_df
 
-    @property
-    def index(self):
-        return self.data.index
 
-    @index.setter
-    def index(self, index_):
-        self.data.index = index_
+@property
+def columns(self):
+    return self.data.columns
 
-    @property
-    def dtypes(self):
-        return self.data.dtypes
 
-    @dtypes.setter
-    def dtypes(self, dtypes_):
-        self.data.dtypes = dtypes_
+@columns.setter
+def columns(self, columns_):
+    self.data.columns = columns_
 
-    @property
-    def feature_groups_str(self):
-        if len(self.feature_groups) < 20:
-            return str(list(self.feature_groups))
-        return str(self.feature_groups)
 
-    def __str__(self):
-        return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {self.feature_groups_str}"
+@property
+def index(self):
+    return self.data.index
 
-    def __repr__(self):
-        return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {self.feature_groups_str}"
+
+@index.setter
+def index(self, index_):
+    self.data.index = index_
+
+
+@property
+def dtypes(self):
+    return self.data.dtypes
+
+
+@dtypes.setter
+def dtypes(self, dtypes_):
+    self.data.dtypes = dtypes_
+
+
+@property
+def feature_groups_str(self):
+    if len(self.feature_groups) < 20:
+        return str(list(self.feature_groups))
+    return str(self.feature_groups)
+
+
+def __str__(self):
+    return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {self.feature_groups_str}"
+
+
+def __repr__(self):
+    return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {self.feature_groups_str}"

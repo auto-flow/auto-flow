@@ -187,6 +187,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             start_time = datetime.datetime.now()
             confusion_matrices = []
             best_iterations = []
+            component_infos=[]
+            cost_times = []
             for fold_ix, (train_index, valid_index) in enumerate(self.splitter.split(X.data, y.data, self.groups)):
                 cloned_model = model.copy()
                 X: DataFrameContainer
@@ -206,8 +208,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     cloned_model = cached_model
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
-                if weight_mode == "sample_weight": # sample_weight balance
-                    cloned_model[-1].set_addition_info(
+                if weight_mode == "sample_weight":  # sample_weight balance
+                    cloned_model[-1].set_inside_dict(
                         {"sample_weight": self.calc_balanced_sample_weight(y_train.data)})
                 if self.debug:
                     procedure_result = cloned_model.procedure(
@@ -242,6 +244,14 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     # todo: 重构 LGBM等
                     best_iterations.append(getattr(
                         estimator, "best_iteration_", -1))
+                cost_times.append(cloned_model.time_cost_list)
+                component_info={}
+                for step_name, component in cloned_model.steps:
+                    component_name=component.__class__.__name__
+                    component_additional_info=component.additional_info
+                    if bool(component_additional_info):
+                        component_info[component_name]=component.additional_info
+                component_infos.append(component_info)
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
                     y_test_preds.append(y_test_pred)
@@ -261,6 +271,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 additional_info["confusion_matrices"] = confusion_matrices
             if support_early_stopping:
                 additional_info["best_iterations"] = best_iterations
+            additional_info["cost_times"] = cost_times
+            additional_info["component_infos"] = component_infos
             end_time = datetime.datetime.now()
             # finally fit
             if status == "SUCCESS" and self.should_finally_fit:
@@ -335,7 +347,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         # 1. 将php变成model
         config_id = get_hash_of_config(config)
         start = time()
-        dhp, model = self.shp2model(config)
+        dhp, model = self.shp2model(config, config, config_id)
         # 2. 获取数据
         X_train, y_train, X_test, y_test = self.get_Xy()
         # todo: iter budget类型的支持
@@ -367,7 +379,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             },
         }
 
-    def shp2model(self, shp):
+    def shp2model(self, shp, config, config_id):
         shp2dhp = SHP2DHP()
         dhp = shp2dhp(shp)
         # todo : 引入一个参数，描述运行模式。一共有3种模式：普通，深度学习，大数据。对以下三个翻译的步骤进行重构
@@ -380,6 +392,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         preprocessor = self.create_preprocessor(dhp)
         estimator = self.create_estimator(dhp)
         pipeline = concat_pipeline(preprocessor, estimator)
+        pipeline.config = config
+        pipeline.config_id = config_id
         return dhp, pipeline
 
     def parse_key(self, key: str):
@@ -426,7 +440,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
     def _create_component(self, key1, key2, params):
         cls = get_class_object_in_pipeline_components(key1, key2, self.model_registry)
         component = cls(**params)
-        # component.set_addition_info(self.addition_info)
+        # component.set_inside_dict(self.addition_info)
         return component
 
     def create_component(self, sub_dhp: Dict, phase: str, step_name, in_feature_groups="all", out_feature_groups="all",

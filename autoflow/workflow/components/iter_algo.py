@@ -144,7 +144,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
             self.init_variables()
             self.component = None
         self.hyperparams[self.iterations_name] = max_iter
-        self.set_addition_info({self.iterations_name: max_iter})
+        self.set_inside_dict({self.iterations_name: max_iter})
         self.max_iterations_ = max_iter
 
     def finish_evaluation(self):

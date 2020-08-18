@@ -12,3 +12,4 @@ class EntityEncoder(BaseEncoder):
     module__ = "autoflow.feature_engineer.encode"
     need_y = True
     cache_intermediate = True
+    additional_info_keys = ("iter",)

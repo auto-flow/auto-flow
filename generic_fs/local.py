@@ -66,7 +66,7 @@ class LocalFS(FileSystem):
     def upload(self, path, local_path):
         if os.path.exists(path):
             logger.warning(f"{path} already exists, don't upload.")
-            return
+            return path
         shutil.move(local_path, path)
         return path
 

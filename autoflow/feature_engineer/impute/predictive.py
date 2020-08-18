@@ -98,7 +98,10 @@ class PredictiveImputer(BaseImputer):
             misscount_idx = misscount_idx[::-1]
 
         # 3. While new_gammas < old_gammas & self.iter_count_ < max_iter loop:
-        self.iter_count_ = 0
+        self.iter = 0
+        self.gamma_history=[]
+        self.gamma_cat_history=[]
+        self.cost_times=[]
         gamma_new = 0
         gamma_old = np.inf
         gamma_newcat = 0
@@ -109,11 +112,11 @@ class PredictiveImputer(BaseImputer):
         self.logger.log(self.logging_level, "-" * 50)
         while (
                 gamma_new < gamma_old or gamma_newcat < gamma_oldcat) and \
-                self.iter_count_ < self.max_iter:
+                self.iter < self.max_iter:
 
             # 4. store previously imputed matrix
             Ximp_old = Ximp.copy()
-            if self.iter_count_ != 0:
+            if self.iter != 0:
                 gamma_old = gamma_new
                 gamma_oldcat = gamma_newcat
             # 5. loop
@@ -161,20 +164,24 @@ class PredictiveImputer(BaseImputer):
             if self.num_idx is not None:
                 gamma_new = np.sum((Ximp[:, self.num_idx] - Ximp_old[:, self.num_idx]) ** 2) / np.sum(
                     (Ximp[:, self.num_idx]) ** 2)
+
             self.logger.log(self.logging_level,
-                            f"{self.iter_count_} | gamma_new = {gamma_new:.3f}, gamma_old = {gamma_old:.3f}")
+                            f"{self.iter} | gamma_new = {gamma_new:.3f}, gamma_old = {gamma_old:.3f}")
             self.logger.log(self.logging_level,
-                            f"{self.iter_count_} | gamma_newcat = {gamma_newcat:.3f}, gamma_oldcat = {gamma_oldcat:.3f}")
+                            f"{self.iter} | gamma_newcat = {gamma_newcat:.3f}, gamma_oldcat = {gamma_oldcat:.3f}")
             self.logger.log(self.logging_level,
-                            f"{self.iter_count_} | {self.__class__.__name__} Coverage Iteration: {self.iter_count_}")
+                            f"{self.iter} | {self.__class__.__name__} Coverage Iteration: {self.iter}")
             self.logger.log(self.logging_level, "-" * 50)
 
             cost_time = time() - start_time
+            self.gamma_history.append(float(gamma_new))
+            self.gamma_cat_history.append(float(gamma_newcat))
+            self.cost_times.append(cost_time)
             if cost_time > self.budget:
                 self.logger.log(self.logging_level,
                                 f"cost_time = {cost_time:.2f}s, {self.__class__.__name__} early stopping ... ")
                 break
-            self.iter_count_ += 1
+            self.iter += 1
         self.logger.log(self.logging_level,
                         f"{self.__class__.__name__}'s cost_time = {cost_time:.2f}s , budget = {self.budget}s ")
         return Ximp
