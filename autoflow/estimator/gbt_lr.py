@@ -105,7 +105,8 @@ class GBTLRClassifier(LGBMClassifier):
             C=self.C,
             # l1_ratio=self.l1_ratio,
             max_iter=self.iter_step,
-            warm_start=True
+            warm_start=True,
+            class_weight="balanced" if sample_weight is not None else None
         )
         for i, max_iter in enumerate(range(self.iter_step, self.max_iter, self.iter_step)):
             lr.max_iter = max_iter

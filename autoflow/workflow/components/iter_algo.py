@@ -83,7 +83,8 @@ class AutoFlowIterComponent(AutoFlowComponent):
         elif (self.early_stopped):
             self.logger.info(
                 f"{self.__class__.__name__} is early stopping because "
-                f"valid-set performance no longer improves. max_iter = {self.max_iterations}.")
+                f"valid-set performance no longer improves. max_iter = {self.max_iterations}. "
+                f"iteration = {self.iteration}")
             return True
         else:
             return False

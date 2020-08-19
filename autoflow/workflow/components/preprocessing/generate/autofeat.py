@@ -13,3 +13,7 @@ class AutoFeatureGenerator(AutoFlowFeatureEngineerAlgorithm):
     need_y = True
     cache_intermediate = True
     additional_info_keys = ("new_feat_cols_",)
+
+    def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feature_groups=None, **kwargs):
+        return estimator.fit(X, y, X_pool=[X_valid, X_test])

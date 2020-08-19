@@ -358,7 +358,7 @@ class HDL_Constructor(StrSignatureMixin):
         display(self.draw_workflow_space())
         display(self.get_hdl_dataframe())
 
-    def run(self, data_manager, model_registry=None):
+    def run(self, data_manager, model_registry=None, imbalance_threshold=2):
         '''
 
         Parameters
@@ -435,7 +435,7 @@ class HDL_Constructor(StrSignatureMixin):
             y_train = self.data_manager.y_train.data
             most_common = Counter(y_train).most_common()
             imbalance = most_common[0][1] / most_common[-1][1]
-            if imbalance > 2:
+            if imbalance > imbalance_threshold:
                 final_dict["strategies"] = {
                     "balance(choice)": {k: {} for k in self.balance_strategies}
                 }

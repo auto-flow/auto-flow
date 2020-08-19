@@ -4,21 +4,24 @@
 
 from __future__ import unicode_literals, division, print_function, absolute_import
 
-import re
 from builtins import range
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 import pint
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import ExtraTreesClassifier, ExtraTreesRegressor
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sympy.utilities.lambdify import lambdify
 
+from autoflow.constants import VARIABLE_PATTERN
 from autoflow.feature_engineer.select import BorutaFeatureSelector
 from autoflow.utils.data import check_n_jobs
+from autoflow.utils.logging_ import get_logger
 from .feateng import engineer_features, n_cols_generated, colnames2symbols
 from .featsel import FeatureSelector
 
@@ -125,6 +128,7 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
 
         Note: when giving categorical_cols or feateng_cols, X later (i.e. when calling fit/fit_transform) has to be a DataFrame
         """
+        self.logger = get_logger(self)
         self.standardize = standardize
         self.do_final_selection = do_final_selection
         if transformations is None:
@@ -163,7 +167,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         self.always_return_numpy = always_return_numpy
         self.n_jobs = check_n_jobs(n_jobs)
         self.verbose = verbose
-        self.variable_pattern = re.compile(f"^[a-zA-Z_][a-zA-Z_0-9]*$")
 
     def __getstate__(self):
         """
@@ -279,7 +282,7 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         for column in df.columns:
             origin_columns.append(column)
             column = str(column)
-            if self.variable_pattern.match(column):
+            if VARIABLE_PATTERN.match(column):
                 new_columns.append(column)
             else:
                 while (f"x{ix:03d}" in df.columns) or (f"x{ix:03d}" in new_columns):
@@ -289,7 +292,7 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         self.column_mapper = dict(zip(origin_columns, new_columns))
         df.columns = df.columns.map(self.column_mapper)
 
-    def fit(self, X, y):
+    def fit(self, X, y, X_pool: Optional[List[pd.DataFrame]] = None):
         """
         Fits the regression model and returns a new dataframe with the additional features.
 
@@ -331,6 +334,7 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         pre_df = pd.DataFrame(X, columns=cols)
         # if column_name don't match variable regular-expression-pattern, convert it(keep in mind do same conversion in transform process)
         self.convert_colname_to_variables(pre_df)
+
         if pre_df.shape[1] > self.max_used_feats:
             # In order to limit the scale of the problem, the number of features is limited to K
             base_model_cls = ExtraTreesClassifier if self.problem_type == "classification" else ExtraTreesRegressor
@@ -354,6 +358,22 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
             boruta_mask = boruta.support_
         activated_indexes = pre_activated_indexes[boruta_mask]
         df = pre_df.iloc[:, activated_indexes]
+        if X_pool:
+            X_pool_new = []
+            for X_ in X_pool:
+                if X_ is None:
+                    continue
+                if not isinstance(X_, pd.DataFrame):
+                    X_ = pd.DataFrame(X_)
+                X_ = X_.iloc[:, activated_indexes].copy()
+                X_.columns = df.columns
+                X_pool_new.append(X_)
+            if len(X_pool_new) > 0:
+                X_pool = pd.concat(X_pool_new)
+                X_pool.index = range(X_pool.shape[0])
+            else:
+                X_pool = None
+
         self.boruta_1 = boruta
         self.pre_activated_indexes = pre_activated_indexes
         self.activated_indexes = activated_indexes
@@ -403,7 +423,8 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         # generate features
         df_subs, self.feature_formulas_ = engineer_features(df_subs, self.feateng_cols_,
                                                             _parse_units(self.units, verbose=self.verbose),
-                                                            self.feateng_steps, self.transformations, self.verbose)
+                                                            self.feateng_steps, self.transformations, self.verbose,
+                                                            X_pool)
         # select predictive features
         self.core_selector = FeatureSelector(self.problem_type, self.featsel_runs, None, self.n_jobs, self.verbose,
                                              self.random_state, self.consider_other, self.regularization)
@@ -483,5 +504,15 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         if self.valid_cols_ is not None:
             df = df[self.valid_cols_]
         if self.standardizer_ is not None:
-            df =pd.DataFrame(self.standardizer_.transform(df.values), columns=df.columns, index=df.index)
+            df = pd.DataFrame(self.standardizer_.transform(df.values), columns=df.columns, index=df.index)
+        # parse inf, nan to median
+        inf_cnt = np.count_nonzero(~np.isfinite(df), axis=0)
+        if inf_cnt.sum() > 0:
+            self.logger.warning(f"inf_cnt.sum() = {inf_cnt.sum()}, "
+                                f"error-columns are: {df.columns[inf_cnt > 0].tolist()} , "
+                                f"using median-fill handle this")
+            data = df.values
+            data[~np.isfinite(df)] = np.nan
+            data = SimpleImputer(strategy="median").fit_transform(data)  # fixme: 全为0的列
+            df = pd.DataFrame(data, columns=df.columns, index=df.index)
         return df

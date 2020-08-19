@@ -9,14 +9,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils import check_array
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from autoflow.data_container import DataFrameContainer
-from autoflow.data_container.base import DataContainer, get_container_data
+from autoflow.data_container.base import DataContainer
 from autoflow.utils.hash import get_hash_of_dict, get_hash_of_str
 from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
 from autoflow.workflow.components.classification_base import AutoFlowClassificationAlgorithm
 from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgorithm
-from autoflow.workflow.components.utils import stack_Xs
 
 __all__ = ["ML_Workflow"]
 
@@ -66,24 +64,6 @@ class ML_Workflow(Pipeline):
             dataset_id = data_copied.dataset_id
             dict_[name] = dataset_id
 
-    def assemble_result(self, name, X, X_transformed_stack: DataFrameContainer, result):
-        # fixme: 不支持重采样的preprocess
-        if X is not None:
-            data_container = X_transformed_stack.sub_sample(X.index)  # index 对应 loc
-            data_container.resource_manager = self.resource_manager
-            result[name] = data_container
-        else:
-            result[name] = None
-
-    def stack_X_after_transform(self, X_train, X_valid, X_test, **kwargs):
-        X_stack = X_train.copy()
-        X_stack.data = stack_Xs(
-            get_container_data(X_train),
-            get_container_data(X_valid),
-            get_container_data(X_test),
-        )
-        return X_stack
-
     def fit(self, X_train, y_train, X_valid=None, y_valid=None, X_test=None, y_test=None, fit_final_estimator=True,
             resouce_manager=None):
         # set default `self.last_data` to prevent exception in only classifier cases
@@ -125,9 +105,9 @@ class ML_Workflow(Pipeline):
                             t.filter_feature_groups(X_valid),
                             t.filter_feature_groups(X_test),
                         )
-                        X_stack = X_train_f.copy()
-                        X_stack.data = X_stack_
-                        return X_stack
+                        X_stack_pre = X_train_f.copy()
+                        X_stack_pre.data = X_stack_
+                        return X_stack_pre
 
                 else:
                     def stack_X_before_fit(X_train, X_valid, X_test, **kwargs):
@@ -135,34 +115,34 @@ class ML_Workflow(Pipeline):
                             f"In ML Workflow step '{step_name}', transformer haven't attribute 'prepare_X_to_fit'. ")
                         return X_train
 
-                X_stack = stack_X_before_fit(X_train, X_valid, X_test)
-                dataset_id = X_stack.get_hash()
+                X_stack_pre = stack_X_before_fit(X_train, X_valid, X_test)
+                dataset_id = X_stack_pre.get_hash()
                 component_name = transformer.__class__.__name__
                 m = hashlib.md5()
                 get_hash_of_str(component_name, m)
+                get_hash_of_str(str(transformer.in_feature_groups), m)
+                get_hash_of_str(str(transformer.out_feature_groups), m)
                 component_hash = get_hash_of_dict(hyperparams, m)
                 cache_key = f"workflow-{component_hash}-{dataset_id}"
                 cache_results = self.resource_manager.cache.get(cache_key)
                 if cache_results is not None and isinstance(cache_results, dict) \
-                        and "result" in cache_results and "component" in cache_results:
+                        and "X_trans" in cache_results and "component" in cache_results:
                     self.logger.debug(f"workflow cache hit, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
-                    X_transformed_stack = cache_results["result"]
+                    X_trans = cache_results["X_trans"]
                     fitted_transformer = cache_results["component"]  # set the variable in later
-                    result = {"y_train": y_train}
-                    self.assemble_result("X_train", X_train, X_transformed_stack, result)
-                    self.assemble_result("X_valid", X_valid, X_transformed_stack, result)
-                    self.assemble_result("X_test", X_test, X_transformed_stack, result)
+                    X_stack = fitted_transformer.get_X_stack(X_train, X_valid, X_test)
+                    result = fitted_transformer.assemble_all_result(
+                        X_stack, X_trans, X_train, X_valid, X_test, y_train)
                     hit_cache = True
                 else:
                     self.logger.debug(f"workflow cache miss, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
                     fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
-                    result = transformer.transform(X_train, X_valid, X_test, y_train)
-                    X_transformed_stack = self.stack_X_after_transform(**result)
-                    X_transformed_stack.resource_manager = None
+                    X_stack, X_trans = transformer.transform(X_train, X_valid, X_test, y_train, return_stack_trans=True)
+                    result = transformer.assemble_all_result(X_stack, X_trans, X_train, X_valid, X_test, y_train)
                     try:
-                        if np.count_nonzero(~np.isfinite(result["X_test"].data))>0:
+                        if np.count_nonzero(~np.isfinite(result["X_test"].data)) > 0:
                             print("fuck")
                     except Exception:
                         pass
@@ -170,7 +150,7 @@ class ML_Workflow(Pipeline):
                         print('fuck')
                     self.resource_manager.cache.set(
                         cache_key, {
-                            "result": X_transformed_stack,
+                            "X_trans": X_trans,
                             "component": fitted_transformer
                         }
                     )

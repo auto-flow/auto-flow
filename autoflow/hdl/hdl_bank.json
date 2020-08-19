@@ -37,9 +37,9 @@
     },
     "extra_trees": {
       "n_estimators": 1024,
-      "early_stopping_rounds": 4,
+      "early_stopping_rounds": 8,
       "early_stopping_tol": 0.0,
-      "iter_inc": 32,
+      "iter_inc": 16,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
 //      "max_features": {"_type": "uniform", "_value": [0.01, 1.0],"_default": 1},
@@ -172,9 +172,9 @@
     },
     "random_forest": {
       "n_estimators": 1024,
-      "early_stopping_rounds": 4,
+      "early_stopping_rounds": 8,
       "early_stopping_tol": 0.0,
-      "iter_inc": 32,
+      "iter_inc": 16,
       "criterion": {"_type": "choice","_value": ["gini", "entropy"],"_default": "gini"},
       "max_features": {"_type": "choice","_value": ["sqrt","log2"],"_default": "sqrt"},
 //      "max_features": {"_type": "uniform", "_value": [0.01, 1.0],"_default": 1},

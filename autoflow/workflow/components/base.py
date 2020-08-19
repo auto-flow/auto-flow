@@ -93,12 +93,17 @@ class AutoFlowComponent(BaseEstimator):
 
     def filter_invalid(self, cls, hyperparams: Dict) -> Dict:
         hyperparams = deepcopy(hyperparams)
+        origin_hp_set = set(hyperparams.keys())
         validated = {}
         for key, value in hyperparams.items():
             if key in inspect.signature(cls.__init__).parameters.keys():
                 validated[key] = value
             else:
                 pass
+        current_hp_set = set(validated.keys())
+        diff = origin_hp_set - current_hp_set
+        if diff:
+            self.logger.debug(f"{list(diff)} are filtered in {self.__class__.__name__}")
         return validated
 
     def filter_feature_groups(self, X: Optional[DataFrameContainer]):

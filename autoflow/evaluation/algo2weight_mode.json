@@ -8,7 +8,7 @@
   "GradientBoostingClassifier": "sample_weight",
   "KNeighborsClassifier": null,
   "LinearDiscriminantAnalysis": null,
-  "LGBMClassifier": "class_weight",
+  "LGBMClassifier": "sample_weight",
   "LinearSVC": "class_weight",
   "LogisticRegression": "class_weight",
   "MultinomialNB": "sample_weight",

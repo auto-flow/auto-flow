@@ -234,12 +234,12 @@ class DataFrameContainer(DataContainer):
             assert values.shape[1] == self.shape[1]
             assert values.shape[0] == self.shape[0]
             if not isinstance(values, pd.DataFrame):
-                self.logger.debug(f"values is not DataFrame, is {type(values)}")
-            values = pd.DataFrame(values, columns=self.columns, index=self.index)
+                self.logger.debug(f"values is not DataFrame, is {type(values)}, "
+                                  f"convert to DataFrame and set column and index same to self.")
+                values = pd.DataFrame(values, columns=self.columns, index=self.index)
             result = self.copy()
             result.data = values
             return result
-
         if isinstance(old_feature_group, str):
             old_feature_group = [old_feature_group]
 
@@ -271,65 +271,54 @@ class DataFrameContainer(DataContainer):
         new_df.index = deleted_df.index  # 非常重要的一步
         return deleted_df.concat_to(new_df)
 
+    def sub_sample(self, index):
+        new_df = self.copy()
+        # fixme iloc 与 loc
+        new_df.data = copy(new_df.data.loc[index, :])
+        return new_df
 
-def sub_sample(self, index):
-    new_df = self.copy()
-    # fixme iloc 与 loc
-    new_df.data = copy(new_df.data.loc[index, :])
-    return new_df
+    def sub_feature(self, index):
+        new_df = self.copy()
+        if isinstance(index, np.ndarray) and index.dtype == int:
+            new_df.data = deepcopy(new_df.data.iloc[:, index])
+            new_df.set_feature_groups(new_df.feature_groups[index])
+        else:
+            # todo: 如果index是列名序列
+            raise NotImplementedError
+        return new_df
 
+    @property
+    def columns(self):
+        return self.data.columns
 
-def sub_feature(self, index):
-    new_df = self.copy()
-    if isinstance(index, np.ndarray) and index.dtype == int:
-        new_df.data = deepcopy(new_df.data.iloc[:, index])
-        new_df.set_feature_groups(new_df.feature_groups[index])
-    else:
-        # todo: 如果index是列名序列
-        raise NotImplementedError
-    return new_df
+    @columns.setter
+    def columns(self, columns_):
+        self.data.columns = columns_
 
+    @property
+    def index(self):
+        return self.data.index
 
-@property
-def columns(self):
-    return self.data.columns
+    @index.setter
+    def index(self, index_):
+        self.data.index = index_
 
+    @property
+    def dtypes(self):
+        return self.data.dtypes
 
-@columns.setter
-def columns(self, columns_):
-    self.data.columns = columns_
+    @dtypes.setter
+    def dtypes(self, dtypes_):
+        self.data.dtypes = dtypes_
 
+    @property
+    def feature_groups_str(self):
+        if len(self.feature_groups) < 20:
+            return str(list(self.feature_groups))
+        return str(self.feature_groups)
 
-@property
-def index(self):
-    return self.data.index
+    def __str__(self):
+        return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {self.feature_groups_str}"
 
-
-@index.setter
-def index(self, index_):
-    self.data.index = index_
-
-
-@property
-def dtypes(self):
-    return self.data.dtypes
-
-
-@dtypes.setter
-def dtypes(self, dtypes_):
-    self.data.dtypes = dtypes_
-
-
-@property
-def feature_groups_str(self):
-    if len(self.feature_groups) < 20:
-        return str(list(self.feature_groups))
-    return str(self.feature_groups)
-
-
-def __str__(self):
-    return super(DataFrameContainer, self).__str__() + f"\nfeature_groups: {self.feature_groups_str}"
-
-
-def __repr__(self):
-    return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {self.feature_groups_str}"
+    def __repr__(self):
+        return super(DataFrameContainer, self).__repr__() + f"\nfeature_groups: {self.feature_groups_str}"

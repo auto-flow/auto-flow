@@ -1,7 +1,7 @@
 import inspect
 import multiprocessing as mp
 import os
-from copy import deepcopy
+from copy import deepcopy, copy
 from importlib import import_module
 from typing import Union, Optional, Dict, Any, List, Type
 
@@ -85,8 +85,10 @@ class AutoFlowEstimator(BaseEstimator):
             should_stack_X: bool = True,
             debug_evaluator: bool = False,
             initial_points=None,
+            imbalance_threshold=2,
             **kwargs
     ):
+        self.imbalance_threshold = imbalance_threshold
         self.initial_points = initial_points
         self.logger = get_logger(self)
         self.specific_out_feature_groups_mapper = specific_out_feature_groups_mapper
@@ -290,7 +292,7 @@ class AutoFlowEstimator(BaseEstimator):
             sub_sample_indexes=sub_sample_indexes, sub_feature_indexes=sub_feature_indexes)
         self.resource_manager.close_task_table()
         # store other params
-        self.hdl_constructor.run(self.data_manager, self.model_registry)
+        self.hdl_constructor.run(self.data_manager, self.model_registry, self.imbalance_threshold)
         self.hdl = self.hdl_constructor.get_hdl()
         self.config_space: ConfigurationSpace = self.hdl2configSpce(self.hdl)
         self.config_space.seed(self.random_state)
@@ -686,7 +688,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.data_manager: DataManager = self.data_manager.copy(
             keep_data=False) if self.data_manager is not None else None
         self.resource_manager.start_safe_close()
-        res = deepcopy(self)
+        res = copy(self)
         self.resource_manager.end_safe_close()
         self.NS = tmp_NS
         self.evaluators = tmp_evaluators

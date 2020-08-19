@@ -184,7 +184,7 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, estimator=None, max_depth=7, n_estimators="auto", perc=100, alpha=0.05,
-                 two_step=True, max_iter=10, random_state=42, verbose=0, budget=10, weak=True, n_jobs=-1,
+                 two_step=True, max_iter=10, random_state=42, verbose=1, budget=10, weak=True, n_jobs=-1,
                  imp_mask=None):
         self.imp_mask = imp_mask
         self.n_jobs = n_jobs
@@ -336,7 +336,6 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
             if self.iter < self.max_iter:
                 self.iter += 1
 
-        self.iter -= 1
 
         # we automatically apply R package's rough fix for tentative ones
         confirmed = np.where(dec_reg == 1)[0]
@@ -396,6 +395,7 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
         # notify user
         if self.verbose > 0:
             self._print_results(dec_reg, self.iter, 1)
+        self.iter -= 1
         return self
 
     def _transform(self, X):
