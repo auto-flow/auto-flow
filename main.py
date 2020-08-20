@@ -14,6 +14,12 @@ from autoflow.core.classifier import AutoFlowClassifier
 from autoflow.utils.logging_ import setup_logger, get_logger
 from autoflow.utils.sys_ import EnvUtils
 
+try:
+    import Pyro4
+except Exception:
+    os.system("pip install Pyro4")
+
+
 datapath = os.environ["DATAPATH"]
 savedpath = os.getenv("SAVEDPATH", "/home/tqc/Desktop/savedpath")
 log_path = f"{savedpath}/autoflow.log"
