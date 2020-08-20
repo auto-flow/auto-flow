@@ -142,7 +142,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         return (self.X_train), (self.y_train), (self.X_test), (self.y_test)
         # return deepcopy(self.X_train), deepcopy(self.y_train), deepcopy(self.X_test), deepcopy(self.y_test)
 
-    def evaluate(self, config_id, model: ML_Workflow, X, y, X_test, y_test, budget, dhp):
+    def evaluate(self, config_id, model: ML_Workflow, X, y, X_test, y_test, budget, dhp, config):
         warning_info = StringIO()
         additional_info = {}
         final_model = model[-1]
@@ -187,7 +187,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             start_time = datetime.datetime.now()
             confusion_matrices = []
             best_iterations = []
-            component_infos=[]
+            component_infos = []
             cost_times = []
             for fold_ix, (train_index, valid_index) in enumerate(self.splitter.split(X.data, y.data, self.groups)):
                 cloned_model = model.copy()
@@ -224,6 +224,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                         )
                     except Exception as e:
                         self.logger.error(str(e))
+                        self.logger.error(str(config))
                         failed_info = get_trance_back_msg()
                         status = "FAILED"  # todo: 实现 timeout， memory out
                         self.logger.error("re-raise exception")
@@ -245,12 +246,12 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     best_iterations.append(getattr(
                         estimator, "best_iteration_", -1))
                 cost_times.append(cloned_model.time_cost_list)
-                component_info={}
+                component_info = {}
                 for step_name, component in cloned_model.steps:
-                    component_name=component.__class__.__name__
-                    component_additional_info=component.additional_info
+                    component_name = component.__class__.__name__
+                    component_additional_info = component.additional_info
                     if bool(component_additional_info):
-                        component_info[component_name]=component.additional_info
+                        component_info[component_name] = component.additional_info
                 component_infos.append(component_info)
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
@@ -352,7 +353,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         X_train, y_train, X_test, y_test = self.get_Xy()
         # todo: iter budget类型的支持
         # 3. 进行评价
-        info = self.evaluate(config_id, model, X_train, y_train, X_test, y_test, budget, dhp)
+        info = self.evaluate(config_id, model, X_train, y_train, X_test, y_test, budget, dhp, config)
         # 4. 持久化
         cost_time = time() - start
         info["config_id"] = config_id
@@ -447,8 +448,20 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                          outsideEdge_info=None):
         pipeline_list = []
         assert phase in (PHASE1, PHASE2)
-        packages = list(sub_dhp.keys())[0]
-        params = sub_dhp[packages]
+        # packages = list(sub_dhp.keys())[0]
+        # params = sub_dhp[packages]
+        packages = None
+        params = {}
+        for k, v in sub_dhp.items():
+            if isinstance(v, dict):
+                if packages is not None:
+                    self.logger.warning(f"Duplicated packages: {k} , {packages}")
+                packages = k
+                params.update(v)
+            else:
+                self.logger.debug(f"Detect {k} = {v} out of core dict maybe params, type of v is {type(v).__name__}")
+                params.update({k: v})
+        assert packages is not None, ValueError
         packages = packages.split(SERIES_CONNECT_SEPARATOR_TOKEN)
         grouped_params = group_dict_items_before_first_token(params, SERIES_CONNECT_LEADER_TOKEN)
         if len(packages) == 1:

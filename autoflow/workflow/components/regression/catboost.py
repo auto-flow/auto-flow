@@ -10,7 +10,7 @@ from autoflow.workflow.components.regression_base import AutoFlowRegressionAlgor
 __all__ = ["CatBoostRegressor"]
 
 
-class CatBoostRegressor(AutoFlowRegressionAlgorithm, LgbmIterativeMixIn):
+class CatBoostRegressor(AutoFlowRegressionAlgorithm):
     class__ = "CatBoostRegressor"
     module__ = "catboost"
 

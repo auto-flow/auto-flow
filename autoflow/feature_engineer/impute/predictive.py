@@ -28,6 +28,7 @@ class PredictiveImputer(BaseImputer):
             categorical_feature=None,
             numerical_feature=None,
             copy=False,
+            missing_rate=0.4,
             max_iter=10,
             decreasing=False,
             budget=10,
@@ -37,7 +38,8 @@ class PredictiveImputer(BaseImputer):
         super(PredictiveImputer, self).__init__(
             categorical_feature=categorical_feature,
             numerical_feature=numerical_feature,
-            copy=copy
+            copy=copy,
+            missing_rate=missing_rate
         )
         self.params = params
         self.budget = budget
@@ -99,9 +101,9 @@ class PredictiveImputer(BaseImputer):
 
         # 3. While new_gammas < old_gammas & self.iter_count_ < max_iter loop:
         self.iter = 0
-        self.gamma_history=[]
-        self.gamma_cat_history=[]
-        self.cost_times=[]
+        self.gamma_history = []
+        self.gamma_cat_history = []
+        self.cost_times = []
         gamma_new = 0
         gamma_old = np.inf
         gamma_newcat = 0
@@ -134,7 +136,7 @@ class PredictiveImputer(BaseImputer):
 
                 # Get observed values of 's'
                 yobs = Ximp[obs_rows, s]
-
+                n_yobs = np.unique(yobs).size
                 # Get 'X' for both observed and missing 's' column
                 xobs = Ximp[np.ix_(obs_rows, s_prime)]
                 xmis = Ximp[np.ix_(mis_rows, s_prime)]
@@ -143,9 +145,14 @@ class PredictiveImputer(BaseImputer):
                 if self.cat_idx is not None and s in self.cat_idx:
                     yobs = yobs.astype('int32')
                     classifier = clone(classifier)
-                    classifier.fit(X=xobs, y=yobs)
-                    # 7. predict ymis(s) using xmis(x)
-                    ymis = classifier.predict(xmis)
+                    if n_yobs > 1:
+                        classifier.fit(X=xobs, y=yobs)
+                        # 7. predict ymis(s) using xmis(x)
+                        ymis = classifier.predict(xmis)
+                    else:
+                        ymis = np.zeros_like(mis_rows) - 1
+                        self.logger.warning(f"in column index {s}, all value are same,"
+                                            f" var = 0, don not use classifier to fit .")
                     # 8. update imputed matrix using predicted matrix ymis(s)
                     Ximp[mis_rows, s] = ymis
                 else:

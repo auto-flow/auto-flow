@@ -141,13 +141,6 @@ class ML_Workflow(Pipeline):
                     fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
                     X_stack, X_trans = transformer.transform(X_train, X_valid, X_test, y_train, return_stack_trans=True)
                     result = transformer.assemble_all_result(X_stack, X_trans, X_train, X_valid, X_test, y_train)
-                    try:
-                        if np.count_nonzero(~np.isfinite(result["X_test"].data)) > 0:
-                            print("fuck")
-                    except Exception:
-                        pass
-                    if "col" in result["X_test"].columns:
-                        print('fuck')
                     self.resource_manager.cache.set(
                         cache_key, {
                             "X_trans": X_trans,

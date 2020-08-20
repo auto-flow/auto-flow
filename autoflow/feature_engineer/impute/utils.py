@@ -206,7 +206,7 @@ def build_encoder(X: pd.DataFrame, y, categorical_feature, passed_encoder, addit
         encoder = clone(passed_encoder)  # OrdinalEncoder default return float64 dtype
         encoder.fit(masked_col, masked_y)
         column2encoder[column] = encoder
-        col[valid_mask] = encoder.transform(masked_col).squeeze()
+        col[valid_mask] = encoder.transform(masked_col).flatten()
         X[column] = col.astype(target_type)
         # print_func(f"encoder categories: {repr(list(encoder.categories_[0]))}")
         for ad_ix, additional_data in enumerate(result_additional_data_list):

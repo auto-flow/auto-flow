@@ -5,6 +5,7 @@
 from __future__ import unicode_literals, division, print_function, absolute_import
 
 from builtins import range
+from copy import copy
 from typing import List, Optional
 
 import numpy as np
@@ -279,18 +280,22 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         ix = 0
         origin_columns = []
         new_columns = []
-        for column in df.columns:
-            origin_columns.append(column)
-            column = str(column)
-            if VARIABLE_PATTERN.match(column):
-                new_columns.append(column)
-            else:
-                while (f"x{ix:03d}" in df.columns) or (f"x{ix:03d}" in new_columns):
+        keep_columns = []
+        input_columns = df.columns.astype(str).tolist()
+        for column in input_columns:
+            if not VARIABLE_PATTERN.match(column):
+                while (f"x{ix:03d}" in df.columns) or (f"x{ix:03d}" in (new_columns + input_columns)):
                     ix += 1
+                origin_columns.append(column)
                 new_columns.append(f"x{ix:03d}")
                 ix += 1
-        self.column_mapper = dict(zip(origin_columns, new_columns))
-        df.columns = df.columns.map(self.column_mapper)
+            else:
+                keep_columns.append(column)
+        self.column_mapper_ = dict(zip(origin_columns, new_columns))
+        column_mapper = copy(self.column_mapper_)
+        column_mapper.update(dict(zip(keep_columns, keep_columns)))
+        self.column_mapper = column_mapper
+        df.columns = df.columns.map(column_mapper)
 
     def fit(self, X, y, X_pool: Optional[List[pd.DataFrame]] = None):
         """
@@ -407,19 +412,19 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
                 self.feateng_steps, n_cols))
             print("[AutoFeat] With %i data points this new feature matrix would use about %.2f gb of space." % (
                 len(df), n_gb))
-        if self.max_gb and n_gb > self.max_gb:
-            n_rows = int(self.max_gb * 250000000 / n_cols)
-            if self.verbose:
-                print(
-                    "[AutoFeat] As you specified a limit of %.1d gb, the number of data points is subsampled to %i" % (
-                        self.max_gb, n_rows))
-            subsample_idx = np.random.permutation(list(df.index))[:n_rows]
-            df_subs = df.iloc[subsample_idx]
-            df_subs.reset_index(drop=True, inplace=True)
-            target_sub = target[subsample_idx]
-        else:
-            df_subs = df.copy()
-            target_sub = target.copy()
+        # if self.max_gb and n_gb > self.max_gb:
+        #     n_rows = int(self.max_gb * 250000000 / n_cols)
+        #     if self.verbose:
+        #         print(
+        #             "[AutoFeat] As you specified a limit of %.1d gb, the number of data points is subsampled to %i" % (
+        #                 self.max_gb, n_rows))
+        #     subsample_idx = np.random.permutation(list(df.index))[:n_rows]
+        #     df_subs = df.iloc[subsample_idx]
+        #     df_subs.reset_index(drop=True, inplace=True)
+        #     target_sub = target[subsample_idx]
+        # else:
+        df_subs = df.copy()
+        target_sub = target.copy()
         # generate features
         df_subs, self.feature_formulas_ = engineer_features(df_subs, self.feateng_cols_,
                                                             _parse_units(self.units, verbose=self.verbose),

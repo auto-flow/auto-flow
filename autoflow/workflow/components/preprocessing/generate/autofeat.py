@@ -12,7 +12,7 @@ class AutoFeatureGenerator(AutoFlowFeatureEngineerAlgorithm):
     module__ = "autoflow.feature_engineer.generate"
     need_y = True
     cache_intermediate = True
-    additional_info_keys = ("new_feat_cols_",)
+    additional_info_keys = ("new_feat_cols_", "column_mapper_")
 
     def core_fit(self, estimator, X, y, X_valid=None, y_valid=None, X_test=None,
                  y_test=None, feature_groups=None, **kwargs):

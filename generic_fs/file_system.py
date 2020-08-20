@@ -61,3 +61,6 @@ class FileSystem():
 
     def load_csv(self, path,**kwargs)->pd.DataFrame:
         raise NotImplementedError
+
+    def touch_file(self, path):
+        raise NotImplementedError

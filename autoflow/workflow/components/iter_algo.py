@@ -164,6 +164,32 @@ class LgbmIterativeMixIn():
     def finish_evaluation(self):
         pass
 
+    def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feature_groups=None, **kwargs):
+        use_categorical_feature = self.hyperparams.get("use_categorical_feature", False)
+        categorical_features_indices = np.arange(len(feature_groups))[feature_groups == "ordinal"].tolist()
+        if not use_categorical_feature:
+            categorical_features_indices = "auto"
+        self.categorical_features_indices = categorical_features_indices
+        component = estimator.fit(
+            X, y, X_valid, y_valid, categorical_feature=categorical_features_indices,
+            sample_weight=kwargs.get("sample_weight")
+        )
+        self.best_iteration_ = component.model.best_iteration
+        return component
+
+    @property
+    def additional_info(self):  # todo gbt_lr lr的情况
+        lr_dict = {}
+        keys = ["lr_best_iteration", "gbt_cost_time", "ohe_cost_time", "lr_cost_time"]
+        for key in keys:
+            if hasattr(self.component, key):
+                lr_dict[key] = getattr(self.component, key)
+        lr_dict.update({
+            "categorical_features_indices": self.categorical_features_indices
+        })
+        return lr_dict
+
 
 class TabularNNIterativeMixIn():
     def set_max_iter(self, max_iter):
@@ -177,3 +203,19 @@ class TabularNNIterativeMixIn():
     def finish_evaluation(self):
         if self.component is not None:
             self.component.best_estimators = None
+
+    def core_fit(self, estimator, X, y=None, X_valid=None, y_valid=None, X_test=None,
+                 y_test=None, feature_groups=None, **kwargs):
+        categorical_features_indices = np.arange(len(feature_groups))[feature_groups == "ordinal"].tolist()
+        self.categorical_features_indices = categorical_features_indices
+        component = estimator.fit(
+            X, y, X_valid, y_valid, categorical_feature=categorical_features_indices
+        )
+        self.best_iteration_ = component.best_iteration
+        return component
+
+    @property
+    def additional_info(self):
+        return {
+            "categorical_features_indices": self.categorical_features_indices
+        }

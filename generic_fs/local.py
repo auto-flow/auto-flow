@@ -74,3 +74,6 @@ class LocalFS(FileSystem):
         if os.path.exists(local_path):
             os.remove(local_path)
         shutil.copy(path, local_path)
+
+    def touch_file(self, path):
+        Path(path).write_text("")

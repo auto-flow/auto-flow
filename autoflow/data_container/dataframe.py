@@ -231,7 +231,7 @@ class DataFrameContainer(DataContainer):
         if new_feature_group is None:
             # imputer will trigger this
             self.logger.debug("new_feature_group is None, return all feature_groups")
-            assert values.shape[1] == self.shape[1]
+            assert values.shape[1] == len(self.feature_groups)
             assert values.shape[0] == self.shape[0]
             if not isinstance(values, pd.DataFrame):
                 self.logger.debug(f"values is not DataFrame, is {type(values)}, "

@@ -11,4 +11,10 @@ class GBTImputer(BaseImputer):
     class__ = "GBTImputer"
     module__ = "autoflow.feature_engineer.impute"
     need_y = True
-    additional_info_keys = ("iter", "gamma_history", "gamma_cat_history", "cost_times")
+
+    @property
+    def additional_info(self):
+        return dict(
+            self.form_additional_info_pair(key) for key in
+            list(self.additional_info_keys) + ["iter", "gamma_history", "gamma_cat_history", "cost_times"]
+        )

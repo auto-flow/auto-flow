@@ -417,6 +417,10 @@ class HDL_Constructor(StrSignatureMixin):
                 sub_dict[packages] = params
                 sub_dict[packages].update(addition_dict)
             preprocessing_dict[formed_key] = sub_dict
+        # impute -> missing_rate
+        imp_key = 'impute(choice)'
+        if imp_key in preprocessing_dict:
+            preprocessing_dict[imp_key]["missing_rate"] = {"_type": "quniform", "_value": [0.2, 1, 0.2], "_default": 0.4}
         # 构造estimator
         estimator_dict = {}
         for estimator_value in estimator_values:
@@ -440,6 +444,7 @@ class HDL_Constructor(StrSignatureMixin):
                     "balance(choice)": {k: {} for k in self.balance_strategies}
                 }
         final_dict["process_sequence"] = ";".join(DAG_workflow.keys())
+
         self.hdl = final_dict
 
     def get_hdl(self) -> Dict[str, Any]:

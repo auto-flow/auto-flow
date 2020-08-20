@@ -223,6 +223,7 @@ class Worker(object):
                       'exception': None}
         except Exception as e:
             self.logger.error(str(e))
+            self.logger.error(kwargs)
             failed_info = get_trance_back_msg()
             if self.debug:
                 self.logger.error("re-raise exception")

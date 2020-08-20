@@ -1,3 +1,4 @@
+from collections import Counter
 import inspect
 import multiprocessing as mp
 import os
@@ -220,6 +221,7 @@ class AutoFlowEstimator(BaseEstimator):
                     f"TrainSet has {self.n_samples} samples,"
                     f" greater than max n_samples for Cross-Validation "
                     f"(max_n_samples_for_CV = {self.max_n_samples_for_CV}).")
+                # todo: stratified
                 splitter = ShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=self.random_state)
             else:
                 if self.n_folds == 1:
@@ -237,6 +239,16 @@ class AutoFlowEstimator(BaseEstimator):
             self.logger.warning(
                 f"splitter '{splitter}' haven't specific random_state, it's random_state is set default '{self.random_state}'")
             splitter.random_state = self.random_state
+        if self.ml_task.mainTask=="classification":
+            X_train=self.data_manager.X_train.data
+            y_train=self.data_manager.y_train.data
+            for fold_ix,(train_ix, valid_ix) in enumerate(splitter.split(X_train, y_train)):
+                self.logger.info(f"fold-{fold_ix} | y_train count = {dict(Counter(y_train[train_ix]))}")
+                self.logger.info(f"fold-{fold_ix} | y_valid count = {dict(Counter(y_train[valid_ix]))}")
+                # from autoflow.estimator.wrap_lightgbm import LGBMClassifier
+                # lgbm=LGBMClassifier().fit(X_train.iloc[train_ix,:], y_train[train_ix], X_train.iloc[valid_ix,:], y_train[valid_ix])
+                # score=lgbm.score(X_train.iloc[valid_ix,:], y_train[valid_ix])
+                # print(score)
         self.n_splits = splitter.n_splits
         self.splitter = splitter
         # do subsample if n_samples >  n_keep_samples
@@ -604,7 +616,7 @@ class AutoFlowEstimator(BaseEstimator):
             self,
             task_id=None,
             hdl_id=None,
-            trials_fetcher="GetBestK",
+            trials_fetcher_cls="GetBestK",
             trials_fetcher_params=frozendict(k=10),
             ensemble_type="stack",
             ensemble_params=frozendict(),
@@ -630,17 +642,16 @@ class AutoFlowEstimator(BaseEstimator):
                 }
                 self.resource_manager.insert_experiment_record(ExperimentType.ENSEMBLE, experiment_config, {})
                 self.experiment_id = self.resource_manager.experiment_id
-        trials_fetcher_name = trials_fetcher
         from autoflow.ensemble import trials_fetcher
-        assert hasattr(trials_fetcher, trials_fetcher_name)
-        trials_fetcher_cls = getattr(trials_fetcher, trials_fetcher_name)
-        trials_fetcher: TrialsFetcher = trials_fetcher_cls(
+        assert hasattr(trials_fetcher, trials_fetcher_cls)
+        trials_fetcher_cls = getattr(trials_fetcher, trials_fetcher_cls)
+        trials_fetcher_inst: TrialsFetcher = trials_fetcher_cls(
             resource_manager=self.resource_manager,
             task_id=task_id,
             hdl_id=hdl_id,
             **trials_fetcher_params
         )
-        trial_ids = trials_fetcher.fetch()
+        trial_ids = trials_fetcher_inst.fetch()
         estimator_list, y_true_indexes_list, y_preds_list = TrainedDataFetcher(
             task_id, hdl_id, trial_ids, self.resource_manager).fetch()
         # todo: 在这里，只取了验证集的数据，没有取测试集的数据。待拓展

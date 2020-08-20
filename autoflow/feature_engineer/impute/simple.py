@@ -58,13 +58,16 @@ class SimpleImputer(BaseImputer):
             categorical_feature=None,
             numerical_feature=None,
             copy=True,
+            missing_rate=0.4,
             num_strategy="median",
             cat_strategy="most_frequent",
+
     ):
         super(SimpleImputer, self).__init__(
             categorical_feature,
             numerical_feature,
-            copy
+            copy,
+            missing_rate
         )
         assert num_strategy in ("median", "mean")
         assert cat_strategy in ("most_frequent", "constant")

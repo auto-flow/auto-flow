@@ -9,7 +9,7 @@ import numpy as np
 __all__ = ["CatBoostClassifier"]
 
 
-class CatBoostClassifier(AutoFlowClassificationAlgorithm, LgbmIterativeMixIn):
+class CatBoostClassifier(AutoFlowClassificationAlgorithm):
     class__ = "CatBoostClassifier"
     module__ = "catboost"
 
