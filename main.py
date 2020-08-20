@@ -3,6 +3,10 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 import os
+try:
+    import Pyro4
+except Exception:
+    os.system("pip install Pyro4")
 from collections import Counter
 from pathlib import Path
 
@@ -14,10 +18,7 @@ from autoflow.core.classifier import AutoFlowClassifier
 from autoflow.utils.logging_ import setup_logger, get_logger
 from autoflow.utils.sys_ import EnvUtils
 
-try:
-    import Pyro4
-except Exception:
-    os.system("pip install Pyro4")
+
 
 
 datapath = os.environ["DATAPATH"]
