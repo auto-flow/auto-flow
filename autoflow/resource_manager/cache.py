@@ -91,7 +91,11 @@ class FsCache(BaseCache):
         path = self.k2path(k)
         self.res.file_system.dump_pickle(v, path)
         # self.release_k(k)
-        self.res.file_system.delete(lock_path) # release lock
+        try:
+            self.res.file_system.delete(lock_path) # release lock
+        except Exception as e:
+            logger.warning(f"exception when release lock: {e}")
+
 
 
 class RedisCache(BaseCache):
