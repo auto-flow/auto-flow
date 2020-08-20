@@ -1,0 +1,32 @@
+[
+  {
+    "name": "N_WORKERS",
+    "default": 6,
+    "description": ""
+  },
+  {
+    "name": "N_ITERATIONS",
+    "default": 500,
+    "description": ""
+  },
+  {
+    "name": "MIN_POINTS_IN_MODEL",
+    "default": 450,
+    "description": ""
+  },
+  {
+    "name": "TASK_ID",
+    "default": "232",
+    "description": ""
+  },
+  {
+    "name": "TOKEN",
+    "default": "local_test",
+    "description": ""
+  },
+  {
+    "name": "RANDOM_STATE",
+    "default": 0,
+    "description": ""
+  }
+]
