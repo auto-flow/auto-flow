@@ -10,7 +10,6 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-import pint
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import ExtraTreesClassifier, ExtraTreesRegressor
 from sklearn.impute import SimpleImputer
@@ -27,32 +26,6 @@ from .feateng import engineer_features, n_cols_generated, colnames2symbols
 from .featsel import FeatureSelector
 
 
-def _parse_units(units, ureg=None, verbose=0):
-    """
-    Convert a dict with string units to pint quantities.
-
-    Inputs:
-        - units: dict with {"variable_name": "unit"}
-        - ureg: optional: a pint UnitRegistry
-        - verbose: verbosity level (int; default: 0)
-
-    Returns
-        - parsed_units: dict with {"variable_name": pint Quantity}
-    """
-    parsed_units = {}
-    if units:
-        if ureg is None:
-            ureg = pint.UnitRegistry(auto_reduce_dimensions=True, autoconvert_offset_to_baseunit=True)
-        for c in units:
-            try:
-                parsed_units[c] = ureg.parse_expression(units[c])
-            except pint.UndefinedUnitError:
-                if verbose > 0:
-                    print("[AutoFeat] WARNING: unit %r of column %r was not recognized and will be ignored!" % (
-                        units[c], c))
-                parsed_units[c] = ureg.parse_expression("")
-            parsed_units[c].__dict__["_magnitude"] = 1.
-    return parsed_units
 
 
 class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
@@ -94,12 +67,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
                                 0/1 encoding (default: None)
             - feateng_cols: list of column names that should be used for the feature engineering part
                             (default None --> all, with categorical_cols in 0/1 encoding)
-            - units: dictionary with {col_name: unit} where unit is a string that can be converted into a pint unit.
-                     all columns without units are dimensionless and can be combined with any other column.
-                     Note: it is assumed that all features are of comparable magnitude, i.e., not one variable is in
-                           m and another in mm. If this needs to be accounted for, please scale your variables before
-                           passing them to autofeat!
-                     (default: None --> all columns are dimensionless).
             - feateng_steps: number of steps to perform in the feature engineering part (int; default: 2)
             - featsel_runs: number of times to perform in the feature selection part with a random fraction of data points (int; default: 5)
             - max_gb: if an int is given: maximum number of gigabytes to use in the process (i.e. mostly the
@@ -198,27 +165,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
             df.drop(columns=self.categorical_cols, inplace=True)
         return df
 
-    def _apply_pi_theorem(self, df):
-        if self.apply_pi_theorem and self.units:
-            ureg = pint.UnitRegistry(auto_reduce_dimensions=True, autoconvert_offset_to_baseunit=True)
-            parsed_units = _parse_units(self.units, ureg, self.verbose)
-            # use only original features
-            parsed_units = {c: parsed_units[c] for c in self.feateng_cols_ if not parsed_units[c].dimensionless}
-            if self.verbose:
-                print("[AutoFeat] Applying the Pi Theorem")
-            pi_theorem_results = ureg.pi_theorem(parsed_units)
-            for i, r in enumerate(pi_theorem_results, 1):
-                if self.verbose:
-                    print("[AutoFeat] Pi Theorem %i: " % i, pint.formatter(r.items()))
-                # compute the final result by multiplying and taking the power of
-                cols = sorted(r)
-                # only use data points where non of the affected columns are NaNs
-                not_na_idx = df[cols].notna().all(axis=1)
-                ptr = df[cols[0]].to_numpy()[not_na_idx] ** r[cols[0]]
-                for c in cols[1:]:
-                    ptr *= df[c].to_numpy()[not_na_idx] ** r[c]
-                df.loc[not_na_idx, "PT%i_%s" % (i, pint.formatter(r.items()).replace(" ", ""))] = ptr
-        return df
 
     def _generate_features(self, df, new_feat_cols):
         """
@@ -397,12 +343,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
             self.feateng_cols_ = fcols
         else:
             self.feateng_cols_ = list(df.columns)
-        # convert units to proper pint units
-        if self.units:
-            # need units for only and all feateng columns
-            self.units = {c: self.units[c] if c in self.units else "" for c in self.feateng_cols_}
-            # apply pi-theorem -- additional columns are not used for regular feature engineering (for now)!
-            df = self._apply_pi_theorem(df)
         # subsample data points and targets in case we'll generate too many features
         # (n_rows * n_cols * 32/8)/1000000000 <= max_gb
         n_cols = n_cols_generated(len(self.feateng_cols_), self.feateng_steps, len(self.transformations))
@@ -501,7 +441,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         # possibly convert categorical columns
         df = self._transform_categorical_cols(df)
         # possibly apply pi-theorem
-        df = self._apply_pi_theorem(df)
         # generate engineered features
         df = self._generate_features(df, self.new_feat_cols_)
         if self.always_return_numpy:

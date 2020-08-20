@@ -12,7 +12,6 @@ from itertools import combinations, product
 
 import numpy as np
 import pandas as pd
-import pint
 import sympy
 from sklearn.preprocessing import StandardScaler
 from sympy.utilities.lambdify import lambdify
@@ -109,9 +108,6 @@ def engineer_features(
         - df_org: pandas DataFrame with original features in columns
         - start_features: list with column names for df_org with features that should be considered for expansion
                           (default: None --> all columns)
-        - units: a dict with {column_name: pint.Quantity}: some operations like x+y can only be performed if the
-                 features have comparable units (default None: all combinations are allowed)
-                 careful: will be modified in place!
         - max_steps: how many feature engineering steps should be performed. Default is 3, this produces:
             Step 1: transformation of original features
             Step 2: first combination of features
@@ -214,12 +210,6 @@ def engineer_features(
                     # we're simplifying expressions, so we might already have that one
                     if expr_name not in feature_pool:
                         # if we're given units, check if the operation is legal
-                        if units:
-                            try:
-                                units[expr_name] = func_transform_units[ft](units[feat])
-                                units[expr_name].__dict__["_magnitude"] = 1.
-                            except (pint.DimensionalityError, pint.OffsetUnitCalculusError):
-                                continue
                         feature_pool[expr_name] = expr
                         # create temporary variable expression and apply it to precomputed feature
                         t = sympy.symbols("t")
@@ -273,12 +263,6 @@ def engineer_features(
                 expr_name = str(expr)
                 if expr_name not in feature_pool:
                     # if we're given units, check if the operation is legal
-                    if units:
-                        try:
-                            units[expr_name] = func_combinations[fc](units[feat1], units[feat2])
-                            units[expr_name].__dict__["_magnitude"] = 1.
-                        except (pint.DimensionalityError, pint.OffsetUnitCalculusError):
-                            continue
                     feature_pool[expr_name] = expr
                     # create temporary variable expression to apply it to precomputed features
                     s, t = sympy.symbols("s t")
