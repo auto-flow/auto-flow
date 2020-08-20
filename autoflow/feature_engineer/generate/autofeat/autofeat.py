@@ -26,8 +26,6 @@ from .feateng import engineer_features, n_cols_generated, colnames2symbols
 from .featsel import FeatureSelector
 
 
-
-
 class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
 
     def __init__(
@@ -164,7 +162,6 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
             # remove the categorical column from our columns to consider
             df.drop(columns=self.categorical_cols, inplace=True)
         return df
-
 
     def _generate_features(self, df, new_feat_cols):
         """
@@ -366,10 +363,15 @@ class AutoFeatureGenerator(BaseEstimator, TransformerMixin):
         df_subs = df.copy()
         target_sub = target.copy()
         # generate features
-        df_subs, self.feature_formulas_ = engineer_features(df_subs, self.feateng_cols_,
-                                                            _parse_units(self.units, verbose=self.verbose),
-                                                            self.feateng_steps, self.transformations, self.verbose,
-                                                            X_pool)
+        df_subs, self.feature_formulas_ = engineer_features(
+            df_subs,
+            self.feateng_cols_,
+            None,
+            self.feateng_steps,
+            self.transformations,
+            self.verbose,
+            X_pool
+        )
         # select predictive features
         self.core_selector = FeatureSelector(self.problem_type, self.featsel_runs, None, self.n_jobs, self.verbose,
                                              self.random_state, self.consider_other, self.regularization)
