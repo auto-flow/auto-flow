@@ -3,10 +3,17 @@
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
 import os
+
 try:
     import Pyro4
 except Exception:
     os.system("pip install Pyro4")
+try:
+    import sympy
+except Exception:
+    os.system("pip install sympy")
+
+
 from collections import Counter
 from pathlib import Path
 
@@ -17,9 +24,6 @@ from joblib import load
 from autoflow.core.classifier import AutoFlowClassifier
 from autoflow.utils.logging_ import setup_logger, get_logger
 from autoflow.utils.sys_ import EnvUtils
-
-
-
 
 datapath = os.environ["DATAPATH"]
 savedpath = os.getenv("SAVEDPATH", "/home/tqc/Desktop/savedpath")
@@ -58,9 +62,8 @@ else:
     n_folds = 1
 logger.info(f"n_folds : {n_folds}")
 
-random_state=envutil.RANDOM_STATE
+random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
-
 
 pipe = AutoFlowClassifier(
     store_path=f"{savedpath}/autoflow",
