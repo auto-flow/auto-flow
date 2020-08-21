@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
+import base64
+import json
 import os
 
 try:
@@ -124,6 +126,16 @@ else:
 
 n_jobs_in_algorithm = 8
 
+task_info = envutil.TASK_INFO
+if isinstance(task_info, str):
+    try:
+        task_info = json.loads(base64.b64decode(task_info).decode())
+    except Exception as e:
+        logger.warning(f"parse task_info failed: {e}")
+if not isinstance(task_info, dict):
+    task_info = {}
+logger.info(f"task_info:\n{json.dumps(task_info, indent=4)}")
+
 pipe = AutoFlowClassifier(
     store_path=f"{savedpath}/autoflow",
     imbalance_threshold=2,
@@ -165,7 +177,7 @@ pipe = AutoFlowClassifier(
 pipe.fit(
     X_train, y_train,  # X_test, y_test,
     column_descriptions=column_descritions,
-    task_metadata={"openml_task_id": str(envutil.TASK_ID)},
+    task_metadata={"openml_task_id": str(envutil.TASK_ID), **task_info},
     specific_task_token=specific_task_token,
     # is_not_realy_run=True,
     fit_ensemble_params=False
