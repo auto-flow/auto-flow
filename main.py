@@ -6,6 +6,8 @@ import base64
 import json
 import os
 
+import psutil
+
 try:
     import Pyro4
 except Exception:
@@ -27,7 +29,7 @@ from autoflow.utils.logging_ import setup_logger, get_logger
 from autoflow.utils.sys_ import EnvUtils
 
 datapath = os.environ["DATAPATH"]
-savedpath = os.getenv("SAVEDPATH", "/home/tqc/Desktop/savedpath")
+savedpath = os.getenv("SAVEDPATH", "/data/savedpath")
 log_path = f"{savedpath}/{os.getenv('TASK_ID', 'autoflow')}.log"
 setup_logger(log_path)
 logger = get_logger("main")
@@ -113,9 +115,22 @@ if isinstance(task_info, str):
 if not isinstance(task_info, dict):
     task_info = {}
 logger.info(f"task_info:\n{json.dumps(task_info, indent=4)}")
+vm = psutil.virtual_memory()
+total = vm.total / 1024 / 1024
+free = vm.free / 1024 / 1024
+used = vm.used / 1024 / 1024
+task_info.update({
+    "n_fold": n_folds,
+    "n_workers": n_workers,
+    "df_memory_usage": memory_usage,
+    "minors_list": minors,
+    "total": total,
+    "free": free,
+    "used": used
+})
 
 pipe = AutoFlowClassifier(
-    store_path=f"/root/autoflow",
+    store_path=f"/tmp/autoflow",
     imbalance_threshold=2,
     should_record_workflow_step=False,
     save_experiment_model=False,
