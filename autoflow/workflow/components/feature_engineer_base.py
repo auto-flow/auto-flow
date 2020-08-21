@@ -5,6 +5,8 @@ from autoflow.data_container import DataFrameContainer
 from autoflow.data_container.base import get_container_data
 from autoflow.workflow.components.base import AutoFlowComponent
 from autoflow.workflow.components.utils import stack_Xs
+import pandas as pd
+import numpy as np
 
 
 class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
@@ -41,7 +43,11 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
         return X_stack
 
     def transform(self, X_train=None, X_valid=None, X_test=None, y_train=None, return_stack_trans=False):
+        X_stack = self.get_X_stack(X_train, X_valid, X_test)
         if not self.is_fit:
+            if return_stack_trans:
+                X_trans=pd.DataFrame(np.zeros([X_stack.shape[0],0]))
+                return X_stack, X_trans
             self.logger.warning(
                 f"Component: {self.__class__.__name__} is not fitted. Maybe it fit a empty data.\nReturn origin X defaultly.")
             return {
@@ -50,8 +56,8 @@ class AutoFlowFeatureEngineerAlgorithm(AutoFlowComponent, TransformerMixin):
                 "X_valid": X_valid,
                 "X_test": X_test,
             }
+        # fixme return_stack_trans
         # 1. stack_Xs(values)
-        X_stack = self.get_X_stack(X_train, X_valid, X_test)
         # 2. only activated feature_groups
         X_ = X_stack.filter_feature_groups(self.in_feature_groups, copy=True)
         # 3. get core data before transform

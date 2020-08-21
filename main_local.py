@@ -61,6 +61,27 @@ else:
     n_folds = 1
 logger.info(f"n_folds : {n_folds}")
 
+initial_points = [
+    {'estimating:__choice__': 'random_forest', 'preprocessing:normed->final:__choice__': 'select.boruta',
+     'preprocessing:num->normed:__choice__': 'operate.keep_going',
+     'process_sequence': 'num->normed;normed->final', 'estimating:random_forest:bootstrap': 'False:bool',
+     'estimating:random_forest:criterion': 'gini', 'estimating:random_forest:early_stopping_rounds': '8:int',
+     'estimating:random_forest:early_stopping_tol': '0.0:float',
+     'estimating:random_forest:iter_inc': '16:int', 'estimating:random_forest:max_depth': 'None:NoneType',
+     'estimating:random_forest:max_features': 'sqrt',
+     'estimating:random_forest:max_leaf_nodes': 'None:NoneType',
+     'estimating:random_forest:min_impurity_decrease': '0.0:float',
+     'estimating:random_forest:min_samples_leaf': 5, 'estimating:random_forest:min_samples_split': 5,
+     'estimating:random_forest:min_weight_fraction_leaf': '0.0:float',
+     'estimating:random_forest:n_estimators': '1024:int', 'estimating:random_forest:n_jobs': '8:int',
+     'estimating:random_forest:random_state': '42:int',
+     'preprocessing:normed->final:select.boruta:max_depth': 9.0,
+     'preprocessing:normed->final:select.boruta:n_jobs': '8:int',
+     'preprocessing:normed->final:select.boruta:random_state': '42:int',
+     'preprocessing:normed->final:select.boruta:weak': 'True:bool',
+     'preprocessing:num->normed:operate.keep_going:placeholder': 'placeholder'}
+]
+
 random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
 specific_task_token = envutil.TOKEN
@@ -72,6 +93,7 @@ if "local_test" in specific_task_token:
         "port": 5432,
     }
     search_record_db_name = "autoflow_test"
+    n_workers = 6
 else:
     db_params = {
         "user": "postgres",
@@ -80,6 +102,8 @@ else:
         "password": "xenon",
     }
     search_record_db_name = "autoflow"
+
+n_jobs_in_algorithm = 8
 
 pipe = AutoFlowClassifier(
     store_path=f"{savedpath}/autoflow",
@@ -115,7 +139,9 @@ pipe = AutoFlowClassifier(
     max_budget=4,
     n_iterations=envutil.N_ITERATIONS,
     debug_evaluator=False,
-    initial_points=None
+    initial_points=initial_points,
+    n_jobs_in_algorithm=n_jobs_in_algorithm
+
 )
 pipe.fit(
     X_train, y_train,  # X_test, y_test,

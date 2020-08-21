@@ -40,9 +40,9 @@ class HDL_Constructor(StrSignatureMixin):
             hdl_metadata=frozendict(),
             balance_strategies=("weight", "None"),
             included_classifiers=(
-                    "extra_trees", "lightgbm", "logistic_regression", "random_forest", "gbt_lr", "tabular_nn"),
+                    "extra_trees", "lightgbm", "logistic_regression", "random_forest", "tabular_nn"),  # "gbt_lr"
             included_regressors=(
-                    "extra_trees", "lightgbm", "elasticnet", "random_forest", "gbt_lr", "tabular_nn"),
+                    "extra_trees", "lightgbm", "elasticnet", "random_forest", "tabular_nn"),  #  "gbt_lr"
             included_imputers=("impute.simple", "impute.gbt"),
             included_highC_cat_encoders=("encode.entity", "encode.ordinal", "encode.cat_boost"),
             combine_rare=True,

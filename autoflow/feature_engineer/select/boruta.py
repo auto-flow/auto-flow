@@ -346,12 +346,24 @@ class BorutaFeatureSelector(BaseEstimator, TransformerMixin):
         tentative_confirmed = np.where(tentative_median
                                        > np.median(sha_max_history))[0]
         tentative = tentative[tentative_confirmed]
+        self.fraction=1
+        min_feature=min(2, X.shape[1])
+        self.his_ix=None
+        # todo: 存储元数据： fraction his_ix 等
         if confirmed.size == 0 and tentative.size == 0:
-            for fraction in np.linspace(0.999, 0, 1000):
-                new_mask = imp_history[-1, :] > fraction * sha_max_history[-1]
-                if np.count_nonzero(new_mask) >= 2:
-                    tentative = np.where(new_mask == True)[0]
+            self.his_ix = 1
+            for j in range(imp_history.shape[0] - 1, -1, -1):
+                if np.count_nonzero(~np.isnan(imp_history[j])) >= min_feature:
+                    self.his_ix = j
                     break
+            for fraction in np.linspace(0.999, 0, 1000):
+                new_mask = imp_history[self.his_ix] > fraction * sha_max_history[self.his_ix-1]
+                if np.count_nonzero(new_mask) >= min_feature:
+                    tentative = np.where(new_mask == True)[0]
+                    self.fraction=fraction
+                    break
+            if tentative.size == 0:
+                tentative=np.array([np.argmax(imp_history[self.his_ix])])
         # basic result variables
         self.n_features_ = confirmed.shape[0]
         if self.n_features_ == 0 and self.weak == False:
