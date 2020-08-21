@@ -120,7 +120,7 @@ pipe = AutoFlowClassifier(
 pipe.fit(
     X_train, y_train,  # X_test, y_test,
     column_descriptions=column_descritions,
-    task_metadata={"openml_task_id": str(task_id)},
+    task_metadata={"openml_task_id": str(envutil.TASK_ID)},
     specific_task_token=specific_task_token,
     # is_not_realy_run=True,
     fit_ensemble_params=False
