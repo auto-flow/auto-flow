@@ -82,7 +82,7 @@ else:
     search_record_db_name = "autoflow"
 
 pipe = AutoFlowClassifier(
-    store_path=f"{savedpath}/autoflow",
+    store_path=f"/root/autoflow",
     imbalance_threshold=2,
     should_record_workflow_step=False,
     save_experiment_model=False,
