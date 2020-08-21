@@ -26,15 +26,15 @@ from autoflow.utils.sys_ import EnvUtils
 
 datapath = os.environ["DATAPATH"]
 savedpath = os.getenv("SAVEDPATH", "/home/tqc/Desktop/savedpath")
-log_path = f"{savedpath}/autoflow.log"
+log_path = f"{savedpath}/{os.getenv('TASK_ID', 'autoflow')}.log"
 setup_logger(log_path)
 logger = get_logger("main")
 envutil = EnvUtils()
 envutil.from_json(Path(__file__).parent / "main.json")
 envutil.update()
 envutil.print(logger)
-
 X_train, y_train, cat = load(datapath)
+
 cat = np.array(cat)
 column_descritions = {"cat": X_train.columns[cat].tolist()}
 counter = Counter(y_train)
@@ -120,7 +120,7 @@ pipe = AutoFlowClassifier(
 pipe.fit(
     X_train, y_train,  # X_test, y_test,
     column_descriptions=column_descritions,
-    task_metadata={"openml_task_id": str(envutil.TASK_ID)},
+    task_metadata={"openml_task_id": str(task_id)},
     specific_task_token=specific_task_token,
     # is_not_realy_run=True,
     fit_ensemble_params=False

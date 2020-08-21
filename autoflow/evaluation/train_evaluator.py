@@ -377,7 +377,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             "info": {
                 "config_id": config_id,
                 "trial_id": trial_id
-            },
+            }
         }
 
     def shp2model(self, shp, config, config_id):

@@ -125,8 +125,10 @@ class ML_Workflow(Pipeline):
                 component_hash = get_hash_of_dict(hyperparams, m)
                 cache_key = f"workflow-{component_hash}-{dataset_id}"
                 cache_results = self.resource_manager.cache.get(cache_key)
-                if cache_results is not None and isinstance(cache_results, dict) \
+                if X_stack_pre.shape[1] > 0 and \
+                        cache_results is not None and isinstance(cache_results, dict) \
                         and "X_trans" in cache_results and "component" in cache_results:
+                    # hit cache
                     self.logger.debug(f"workflow cache hit, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
                     X_trans = cache_results["X_trans"]
@@ -136,17 +138,19 @@ class ML_Workflow(Pipeline):
                         X_stack, X_trans, X_train, X_valid, X_test, y_train)
                     hit_cache = True
                 else:
+                    # not hit cache
                     self.logger.debug(f"workflow cache miss, component_name = {component_name},"
                                       f" dataset_id = {dataset_id}, cache_key = '{cache_key}'")
                     fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
                     X_stack, X_trans = transformer.transform(X_train, X_valid, X_test, y_train, return_stack_trans=True)
                     result = transformer.assemble_all_result(X_stack, X_trans, X_train, X_valid, X_test, y_train)
-                    self.resource_manager.cache.set(
-                        cache_key, {
-                            "X_trans": X_trans,
-                            "component": fitted_transformer
-                        }
-                    )
+                    if X_stack_pre.shape[1] > 0:
+                        self.resource_manager.cache.set(
+                            cache_key, {
+                                "X_trans": X_trans,
+                                "component": fitted_transformer
+                            }
+                        )
                     # todo: 增加一些元信息
             else:
                 fitted_transformer = transformer.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)

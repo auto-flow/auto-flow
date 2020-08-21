@@ -62,24 +62,28 @@ else:
 logger.info(f"n_folds : {n_folds}")
 
 initial_points = [
-    {'estimating:__choice__': 'random_forest', 'preprocessing:normed->final:__choice__': 'select.boruta',
-     'preprocessing:num->normed:__choice__': 'operate.keep_going',
-     'process_sequence': 'num->normed;normed->final', 'estimating:random_forest:bootstrap': 'False:bool',
-     'estimating:random_forest:criterion': 'gini', 'estimating:random_forest:early_stopping_rounds': '8:int',
-     'estimating:random_forest:early_stopping_tol': '0.0:float',
-     'estimating:random_forest:iter_inc': '16:int', 'estimating:random_forest:max_depth': 'None:NoneType',
-     'estimating:random_forest:max_features': 'sqrt',
+    {'estimating:__choice__': 'random_forest', 'preprocessing:cat->normed:__choice__': 'encode.ordinal',
+     'preprocessing:combined->normed:__choice__': 'encode.ordinal',
+     'preprocessing:highC_cat->combined:__choice__': 'encode.combine_rare',
+     'preprocessing:normed->final:__choice__': 'select.boruta',
+     'process_sequence': 'cat->normed;highC_cat->combined;combined->normed;normed->final',
+     'estimating:random_forest:bootstrap': 'False:bool', 'estimating:random_forest:criterion': 'entropy',
+     'estimating:random_forest:early_stopping_rounds': '8:int',
+     'estimating:random_forest:early_stopping_tol': '0.0:float', 'estimating:random_forest:iter_inc': '16:int',
+     'estimating:random_forest:max_depth': 'None:NoneType', 'estimating:random_forest:max_features': 'log2',
      'estimating:random_forest:max_leaf_nodes': 'None:NoneType',
-     'estimating:random_forest:min_impurity_decrease': '0.0:float',
-     'estimating:random_forest:min_samples_leaf': 5, 'estimating:random_forest:min_samples_split': 5,
-     'estimating:random_forest:min_weight_fraction_leaf': '0.0:float',
+     'estimating:random_forest:min_impurity_decrease': '0.0:float', 'estimating:random_forest:min_samples_leaf': 19,
+     'estimating:random_forest:min_samples_split': 14, 'estimating:random_forest:min_weight_fraction_leaf': '0.0:float',
      'estimating:random_forest:n_estimators': '1024:int', 'estimating:random_forest:n_jobs': '8:int',
      'estimating:random_forest:random_state': '42:int',
-     'preprocessing:normed->final:select.boruta:max_depth': 9.0,
+     'preprocessing:cat->normed:encode.ordinal:placeholder': 'placeholder',
+     'preprocessing:combined->normed:encode.ordinal:placeholder': 'placeholder',
+     'preprocessing:highC_cat->combined:encode.combine_rare:copy': 'False:bool',
+     'preprocessing:highC_cat->combined:encode.combine_rare:minimum_fraction': '0.001:float',
+     'preprocessing:normed->final:select.boruta:max_depth': 5.0,
      'preprocessing:normed->final:select.boruta:n_jobs': '8:int',
      'preprocessing:normed->final:select.boruta:random_state': '42:int',
-     'preprocessing:normed->final:select.boruta:weak': 'True:bool',
-     'preprocessing:num->normed:operate.keep_going:placeholder': 'placeholder'}
+     'preprocessing:normed->final:select.boruta:weak': 'True:bool'}
 ]
 
 random_state = envutil.RANDOM_STATE
@@ -93,7 +97,7 @@ if "local_test" in specific_task_token:
         "port": 5432,
     }
     search_record_db_name = "autoflow_test"
-    n_workers = 6
+    n_workers = 1
 else:
     db_params = {
         "user": "postgres",
