@@ -25,6 +25,11 @@
     "description": ""
   },
   {
+    "name": "TASK_INFO",
+    "default": "{}",
+    "description": ""
+  },
+  {
     "name": "RANDOM_STATE",
     "default": 0,
     "description": ""

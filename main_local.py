@@ -62,34 +62,49 @@ else:
 logger.info(f"n_folds : {n_folds}")
 
 initial_points = [
-    {'estimating:__choice__': 'random_forest', 'preprocessing:cat->normed:__choice__': 'encode.ordinal',
-     'preprocessing:combined->normed:__choice__': 'encode.ordinal',
-     'preprocessing:highC_cat->combined:__choice__': 'encode.combine_rare',
-     'preprocessing:normed->final:__choice__': 'select.boruta',
-     'process_sequence': 'cat->normed;highC_cat->combined;combined->normed;normed->final',
-     'estimating:random_forest:bootstrap': 'False:bool', 'estimating:random_forest:criterion': 'entropy',
-     'estimating:random_forest:early_stopping_rounds': '8:int',
-     'estimating:random_forest:early_stopping_tol': '0.0:float', 'estimating:random_forest:iter_inc': '16:int',
-     'estimating:random_forest:max_depth': 'None:NoneType', 'estimating:random_forest:max_features': 'log2',
-     'estimating:random_forest:max_leaf_nodes': 'None:NoneType',
-     'estimating:random_forest:min_impurity_decrease': '0.0:float', 'estimating:random_forest:min_samples_leaf': 19,
-     'estimating:random_forest:min_samples_split': 14, 'estimating:random_forest:min_weight_fraction_leaf': '0.0:float',
-     'estimating:random_forest:n_estimators': '1024:int', 'estimating:random_forest:n_jobs': '8:int',
-     'estimating:random_forest:random_state': '42:int',
-     'preprocessing:cat->normed:encode.ordinal:placeholder': 'placeholder',
-     'preprocessing:combined->normed:encode.ordinal:placeholder': 'placeholder',
-     'preprocessing:highC_cat->combined:encode.combine_rare:copy': 'False:bool',
-     'preprocessing:highC_cat->combined:encode.combine_rare:minimum_fraction': '0.001:float',
-     'preprocessing:normed->final:select.boruta:max_depth': 5.0,
+    {'estimating:__choice__': 'tabular_nn', 'preprocessing:normed->final:__choice__': 'select.boruta',
+     'preprocessing:num->normed:__choice__': 'operate.keep_going', 'process_sequence': 'num->normed;normed->final',
+     'strategies:balance:__choice__': 'weight', 'estimating:tabular_nn:af_hidden': 'relu',
+     'estimating:tabular_nn:af_output': 'linear', 'estimating:tabular_nn:batch_size': '1024:int',
+     'estimating:tabular_nn:class_weight': 'None:NoneType', 'estimating:tabular_nn:dropout_hidden': 0.35000000000000003,
+     'estimating:tabular_nn:dropout_output': 0.1, 'estimating:tabular_nn:early_stopping_rounds': '16:int',
+     'estimating:tabular_nn:early_stopping_tol': '0:int', 'estimating:tabular_nn:layer1': 320,
+     'estimating:tabular_nn:layer2': 160, 'estimating:tabular_nn:lr': '0.01:float',
+     'estimating:tabular_nn:max_epoch': '128:int', 'estimating:tabular_nn:max_layer_width': '2056:int',
+     'estimating:tabular_nn:min_layer_width': '32:int', 'estimating:tabular_nn:n_jobs': '8:int',
+     'estimating:tabular_nn:optimizer': 'adam', 'estimating:tabular_nn:random_state': '42:int',
+     'estimating:tabular_nn:use_bn': 'True:bool', 'estimating:tabular_nn:verbose': '-1:int',
+     'preprocessing:normed->final:select.boruta:max_depth': 7.0,
      'preprocessing:normed->final:select.boruta:n_jobs': '8:int',
      'preprocessing:normed->final:select.boruta:random_state': '42:int',
-     'preprocessing:normed->final:select.boruta:weak': 'True:bool'}
+     'preprocessing:normed->final:select.boruta:weak': 'False:bool',
+     'preprocessing:num->normed:operate.keep_going:placeholder': 'placeholder',
+     'strategies:balance:weight:placeholder': 'placeholder'}
 ]
 
 random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
 specific_task_token = envutil.TOKEN
 n_workers = envutil.N_WORKERS
+# change n_workers
+memory_usage = X_train.memory_usage().sum() / 1e6
+logger.info(f"X_train memory usage: {memory_usage}M")
+if memory_usage > 250:
+    logger.info(f" memory_usage > 250, n_workers = 5")
+    n_workers = 5
+elif memory_usage > 500:
+    logger.info(f" memory_usage > 500M, n_workers = 4")
+    n_workers = 4
+elif memory_usage > 1000:
+    logger.info(f" memory_usage > 1G, n_workers = 3")
+    n_workers = 3
+elif memory_usage > 2000:
+    logger.info(f" memory_usage > 2G, n_workers = 2")
+    n_workers = 2
+elif memory_usage > 5000:
+    logger.info(f" memory_usage > 5G, n_workers = 1")
+    n_workers = 1
+logger.info(f"n_workers = {n_workers}")
 if "local_test" in specific_task_token:
     db_params = {
         "user": "tqc",

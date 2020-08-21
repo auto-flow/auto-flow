@@ -46,6 +46,11 @@ loggers:
     handlers: [file_handler, console]
     propagate: false
 
+  matplotlib:
+    level: INFO
+    handlers: [file_handler, console]
+    propagate: false
+
   dsmac.optimizer.smbo.SMBO:
     level: DEBUG
     handlers: [file_handler, console]

@@ -1,4 +1,5 @@
-import multiprocessing
+from multiprocessing import Process
+# from billiard.context import Process
 import os
 import pickle
 import socket
@@ -118,7 +119,7 @@ class Worker(object):
         """
         if background:
             if concurrent_type == "process":
-                self.process = multiprocessing.Process(target=self._run, name='worker %s process' % self.worker_id)
+                self.process = Process(target=self._run, name='worker %s process' % self.worker_id)
                 self.process.daemon = True
                 self.process.start()
             elif concurrent_type == "thread":

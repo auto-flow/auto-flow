@@ -1,4 +1,5 @@
 import datetime
+import logging
 from collections import OrderedDict
 from collections import defaultdict
 from contextlib import redirect_stderr
@@ -7,6 +8,7 @@ from time import time
 from typing import Dict, Optional, List
 
 import numpy as np
+import pynisher
 from frozendict import frozendict
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
@@ -56,10 +58,14 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             worker_id=None,
             timeout=None,
             debug: bool = False,
+            time_limit=1200,
+            memory_limit=8000
     ):
         super(TrainEvaluator, self).__init__(
             run_id, nameserver, nameserver_port, host, worker_id, timeout, debug
         )
+        self.memory_limit = memory_limit
+        self.time_limit = time_limit
         self.specific_out_feature_groups_mapper = dict(specific_out_feature_groups_mapper)
         self.algo2weight_mode = algo2weight_mode
         self.max_budget = max_budget
@@ -208,27 +214,18 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     cloned_model = cached_model
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
-                if weight_mode == "sample_weight":  # sample_weight balance
-                    cloned_model[-1].set_inside_dict(
-                        {"sample_weight": self.calc_balanced_sample_weight(y_train.data)})
-                if self.debug:
+                try:
                     procedure_result = cloned_model.procedure(
                         self.ml_task, X_train, y_train, X_valid, y_valid,
                         X_test, y_test, max_iter, budget, (budget == self.max_budget)
                     )
-                else:
-                    try:
-                        procedure_result = cloned_model.procedure(
-                            self.ml_task, X_train, y_train, X_valid, y_valid,
-                            X_test, y_test, max_iter, budget, (budget == self.max_budget)
-                        )
-                    except Exception as e:
-                        self.logger.error(str(e))
-                        self.logger.error(str(config))
-                        failed_info = get_trance_back_msg()
-                        status = "FAILED"  # todo: 实现 timeout， memory out
-                        self.logger.error("re-raise exception")
-                        break
+                except Exception as e:
+                    self.logger.error(str(e))
+                    self.logger.error(str(config))
+                    failed_info = get_trance_back_msg()
+                    status = "FAILED"  # todo: 实现 timeout， memory out
+                    self.logger.error("re-raise exception")
+                    break
                 # save model as cache
                 if (budget_mode == ITERATIONS_BUDGET_MODE and budget <= 1) or \
                         (budget == 1):  # and isinstance(final_model, AutoFlowIterComponent)

@@ -1,13 +1,14 @@
-from collections import Counter
 import inspect
 import multiprocessing as mp
 import os
-from copy import deepcopy, copy
+from collections import Counter
+from copy import copy
 from importlib import import_module
 from typing import Union, Optional, Dict, Any, List, Type
 
 import numpy as np
 import pandas as pd
+import psutil
 from ConfigSpace import ConfigurationSpace
 from frozendict import frozendict
 from sklearn.base import BaseEstimator
@@ -87,8 +88,11 @@ class AutoFlowEstimator(BaseEstimator):
             debug_evaluator: bool = False,
             initial_points=None,
             imbalance_threshold=2,
+            time_limit=1200,
+            memory_limit=None,
             **kwargs
     ):
+        self.time_limit = time_limit
         self.imbalance_threshold = imbalance_threshold
         self.initial_points = initial_points
         self.logger = get_logger(self)
@@ -123,6 +127,19 @@ class AutoFlowEstimator(BaseEstimator):
             assert isinstance(n_workers, int) and n_workers >= 1, ValueError(f"Invalid n_workers {n_workers}")
             n_jobs_in_algorithm = int(np.clip(mp.cpu_count() // n_workers, 1, mp.cpu_count()))
             self.logger.info(f"`n_jobs_in_algorithm` is parsed to {n_jobs_in_algorithm}")
+        # memory
+        vm = psutil.virtual_memory()
+        total = vm.total / 1024 / 1024
+        free = vm.free / 1024 / 1024
+        used = vm.used / 1024 / 1024
+        self.logger.info(f"Computer's Memory Info: total = {total:.2f}M, free = {free:.2f}M, used = {used:.2f}M")
+        if memory_limit is None:
+            self.logger.info(
+                "PER_RUN_MEMORY_LIMIT is None, will calc per_run_memory_limit by 'total / search_thread_num'")
+            memory_limit = total / n_workers
+        self.logger.info(f"memory_limit = {memory_limit}M")
+        self.memory_limit = memory_limit
+        # end memory
         self.n_jobs_in_algorithm = n_jobs_in_algorithm
         self.n_iterations = n_iterations
         self.concurrent_type = concurrent_type
@@ -167,7 +184,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.optimizer = None
 
     def get_holdout_splitter(self):
-        if self.ml_task.mainTask=="classification":
+        if self.ml_task.mainTask == "classification":
             return StratifiedShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=self.random_state)
         else:
             return ShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=self.random_state)
@@ -247,10 +264,10 @@ class AutoFlowEstimator(BaseEstimator):
             self.logger.warning(
                 f"splitter '{splitter}' haven't specific random_state, it's random_state is set default '{self.random_state}'")
             splitter.random_state = self.random_state
-        if self.ml_task.mainTask=="classification":
-            X_train=self.data_manager.X_train.data
-            y_train=self.data_manager.y_train.data
-            for fold_ix,(train_ix, valid_ix) in enumerate(splitter.split(X_train, y_train)):
+        if self.ml_task.mainTask == "classification":
+            X_train = self.data_manager.X_train.data
+            y_train = self.data_manager.y_train.data
+            for fold_ix, (train_ix, valid_ix) in enumerate(splitter.split(X_train, y_train)):
                 self.logger.info(f"fold-{fold_ix} | y_train count = {dict(Counter(y_train[train_ix]))}")
                 self.logger.info(f"fold-{fold_ix} | y_valid count = {dict(Counter(y_train[valid_ix]))}")
                 # from autoflow.estimator.wrap_lightgbm import LGBMClassifier
@@ -409,6 +426,8 @@ class AutoFlowEstimator(BaseEstimator):
             worker_id=worker_id,
             timeout=None,
             debug=self.debug_evaluator,
+            time_limit=self.time_limit,
+            memory_limit=self.memory_limit
         )
         self.worker_cnt += 1
         self.evaluators.append(evaluator)
@@ -466,7 +485,8 @@ class AutoFlowEstimator(BaseEstimator):
         else:
             raise NotImplementedError
         budgets = get_budgets(self.min_budget, self.max_budget, self.eta)
-        config_generator = cg_cls(self.config_space, budgets, self.random_state,self.initial_points, **self.config_generator_params)
+        config_generator = cg_cls(self.config_space, budgets, self.random_state, self.initial_points,
+                                  **self.config_generator_params)
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
         if self.warm_start:
             previous_result, incumbents, incumbent_performances = self.resource_manager.get_result_from_trial_table(

@@ -65,6 +65,26 @@ random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
 specific_task_token = envutil.TOKEN
 n_workers = envutil.N_WORKERS
+# change n_workers
+memory_usage = X_train.memory_usage().sum() / 1e6
+logger.info(f"X_train memory usage: {memory_usage}M")
+if memory_usage > 250:
+    logger.info(f" memory_usage > 250, n_workers = 5")
+    n_workers = 5
+elif memory_usage > 500:
+    logger.info(f" memory_usage > 500M, n_workers = 4")
+    n_workers = 4
+elif memory_usage > 1000:
+    logger.info(f" memory_usage > 1G, n_workers = 3")
+    n_workers = 3
+elif memory_usage > 2000:
+    logger.info(f" memory_usage > 2G, n_workers = 2")
+    n_workers = 2
+elif memory_usage > 5000:
+    logger.info(f" memory_usage > 5G, n_workers = 1")
+    n_workers = 1
+logger.info(f"n_workers = {n_workers}")
+
 if "local_test" in specific_task_token:
     db_params = {
         "user": "tqc",
@@ -120,7 +140,7 @@ pipe = AutoFlowClassifier(
 pipe.fit(
     X_train, y_train,  # X_test, y_test,
     column_descriptions=column_descritions,
-    task_metadata={"openml_task_id": str(envutil.TASK_ID)},
+    task_metadata={"openml_task_id": str(envutil.TASK_ID), **envutil.TASK_INFO},
     specific_task_token=specific_task_token,
     # is_not_realy_run=True,
     fit_ensemble_params=False

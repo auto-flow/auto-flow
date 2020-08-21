@@ -269,11 +269,13 @@ class ML_Workflow(Pipeline):
 
         if (max_iter > 0 and should_finish_evaluation) or (max_iter <= 0):
             self.last_data = None
-        return {
-            "pred_valid": pred_valid,
-            "pred_test": pred_test,
-            "y_train": y_train  # todo: evaluator 中做相应的改变
-        }
+        return (
+            {
+                "pred_valid": pred_valid,
+                "pred_test": pred_test,
+                "y_train": y_train  # todo: evaluator 中做相应的改变
+            }
+        )
 
     def transform(self, X_train, X_valid=None, X_test=None, y_train=None):
         for _, _, transformer in self._iter(with_final=(not self.is_estimator)):
