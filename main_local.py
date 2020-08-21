@@ -143,7 +143,7 @@ pipe = AutoFlowClassifier(
     max_budget=4,
     n_iterations=envutil.N_ITERATIONS,
     debug_evaluator=False,
-    initial_points=initial_points,
+    initial_points=None,
     n_jobs_in_algorithm=n_jobs_in_algorithm
 
 )

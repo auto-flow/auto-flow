@@ -97,7 +97,7 @@ def is_cat(s: Union[pd.Series, np.ndarray], consider_ordinal_as_cat):
         s = pd.Series(s)
     if s.dtype == object:
         for elem in s:
-            if isinstance(elem, (float, int)):
+            if isinstance(elem, (float, int)):  # todo: faster
                 continue
             else:
                 return True
@@ -111,6 +111,7 @@ def is_cat(s: Union[pd.Series, np.ndarray], consider_ordinal_as_cat):
         if tp in valid_types:
             return True
     return False
+
 
 def is_ignore(s: Union[pd.Series, np.ndarray]):
     if np.count_nonzero(pd.isna(s)):
@@ -145,10 +146,9 @@ def is_nan(s: pd.Series):
 
 
 def to_array(X):
-    if X is None:
-        return X
     if isinstance(X, (pd.DataFrame, pd.Series)):
-        return X.values
+        X = X.values
+    # X = X.astype("float32")
     return X
 
 
@@ -162,7 +162,7 @@ def is_text(s, cat_been_checked=False):
     s = s.astype(str)
     s = s.str.split(" ")
     s = s.apply(len)
-    return np.all(s >= 2) # todo 参考 AG
+    return np.all(s >= 2)  # todo 参考 AG
 
 
 def is_date(s, cat_been_checked=False):

@@ -590,8 +590,10 @@ class ResourceManager(StrSignatureMixin):
         tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-        df.to_hdf(tmp_path, "dataset", format="table")
-        return self.file_system.upload(dataset_path, tmp_path)
+        # fixme: restore
+        # df.to_hdf(tmp_path, "dataset", format="table")
+        # return self.file_system.upload(dataset_path, tmp_path)
+        return ""
 
     def upload_ndarray_to_fs(self, arr: np.ndarray, dataset_path):
         tmp_path = f"/tmp/tmp_arr_{os.getpid()}.h5"

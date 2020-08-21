@@ -134,6 +134,8 @@ class DataManager(StrSignatureMixin):
             self.label_encoder = LabelEncoder()
             y_train = self.label_encoder.fit_transform(y_train)
             y_test = self.encode_label(y_test)
+        y_train = y_train.astype("float32")
+        y_test = y_test.astype("float32") if y_test is not None else None
         if y_train is not None:
             y_train = NdArrayContainer("TrainLabel", dataset_instance=y_train,
                                        resource_manager=self.resource_manager)
