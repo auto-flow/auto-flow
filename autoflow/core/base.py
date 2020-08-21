@@ -184,16 +184,17 @@ class AutoFlowEstimator(BaseEstimator):
         self.optimizer = None
 
     def get_holdout_splitter(self):
+        # fix random_state to prevent change of task_id
         if self.ml_task.mainTask == "classification":
-            return StratifiedShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=self.random_state)
+            return StratifiedShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=0)
         else:
-            return ShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=self.random_state)
+            return ShuffleSplit(n_splits=1, test_size=self.holdout_test_size, random_state=0)
 
     def get_cv_splitter(self):
         if self.ml_task.mainTask == "classification":
-            return StratifiedKFold(n_splits=self.n_folds, shuffle=True, random_state=self.random_state)
+            return StratifiedKFold(n_splits=self.n_folds, shuffle=True, random_state=0)
         else:
-            return KFold(n_splits=self.n_folds, shuffle=True, random_state=self.random_state)
+            return KFold(n_splits=self.n_folds, shuffle=True, random_state=0)
 
     def hdl2configSpce(self, hdl: Dict):
         hdl2shps = HDL2SHPS()

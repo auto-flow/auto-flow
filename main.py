@@ -66,25 +66,26 @@ logger.info(f"n_folds : {n_folds}")
 random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
 specific_task_token = envutil.TOKEN
-n_workers = envutil.N_WORKERS
 # change n_workers
 memory_usage = X_train.memory_usage().sum() / 1e6
 logger.info(f"X_train memory usage: {memory_usage}M")
-if memory_usage > 250:
-    logger.info(f" memory_usage > 250, n_workers = 5")
-    n_workers = 5
-elif memory_usage > 500:
-    logger.info(f" memory_usage > 500M, n_workers = 4")
-    n_workers = 4
-elif memory_usage > 1000:
-    logger.info(f" memory_usage > 1G, n_workers = 3")
-    n_workers = 3
-elif memory_usage > 2000:
-    logger.info(f" memory_usage > 2G, n_workers = 2")
-    n_workers = 2
-elif memory_usage > 5000:
-    logger.info(f" memory_usage > 5G, n_workers = 1")
-    n_workers = 1
+n_workers = envutil.N_WORKERS
+if n_workers is None:
+    if memory_usage > 250:
+        logger.info(f" memory_usage > 250, n_workers = 5")
+        n_workers = 5
+    elif memory_usage > 500:
+        logger.info(f" memory_usage > 500M, n_workers = 4")
+        n_workers = 4
+    elif memory_usage > 1000:
+        logger.info(f" memory_usage > 1G, n_workers = 3")
+        n_workers = 3
+    elif memory_usage > 2000:
+        logger.info(f" memory_usage > 2G, n_workers = 2")
+        n_workers = 2
+    elif memory_usage > 5000:
+        logger.info(f" memory_usage > 5G, n_workers = 1")
+        n_workers = 1
 logger.info(f"n_workers = {n_workers}")
 
 if "local_test" in specific_task_token:

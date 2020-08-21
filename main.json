@@ -1,7 +1,7 @@
 [
   {
     "name": "N_WORKERS",
-    "default": 6,
+    "default": "None",
     "description": ""
   },
   {
