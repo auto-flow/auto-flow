@@ -54,25 +54,28 @@ class FsCache(BaseCache):
             ".".join([k, suffix])
         )
 
-    def wait_lock(self, lock_path):
+    def wait_lock(self, lock_path, status="read"):
         tol = 0
         while True:
             if self.res.file_system.exists(lock_path):
-                if tol >= 10:
-                    logger.error(f"lock[{lock_path}] wait 10 times, break.")
-                    break
-                logger.warning(f"lock[{lock_path}] is writing, sleep 0.1s ...")
+                if tol >= 1000:
+                    logger.error(f"{status} | lock[{lock_path}] wait 1000 times, return False.")
+                    return False
+                logger.warning(f"{status} | lock[{lock_path}] is writing, sleep 0.1s ...")
                 sleep(0.1)
                 tol += 1
             else:
                 break
+        return True
 
     def get(self, k: str) -> Any:
         super(FsCache, self).get(k)
         path = self.k2path(k)
         lock_path = self.k2path(k, "lock")
         if self.res.file_system.exists(path):
-            self.wait_lock(lock_path) # wait lock
+            ok = self.wait_lock(lock_path, "read") # wait lock
+            if not ok:
+                return None
             value = None
             for trial in range(self.max_trials):
                 try:
@@ -86,7 +89,10 @@ class FsCache(BaseCache):
     def set(self, k: str, v: Any):
         super(FsCache, self).set(k, v)
         lock_path = self.k2path(k, "lock")
-        self.wait_lock(lock_path) # wait lock
+        if self.res.file_system.exists(lock_path):
+            logger.info(f"lock[{lock_path}] exists, other process is writing, ignore store this k-v, return.")
+            return
+        self.wait_lock(lock_path, "write") # wait lock
         self.res.file_system.touch_file(lock_path) # add lock
         path = self.k2path(k)
         self.res.file_system.dump_pickle(v, path)
