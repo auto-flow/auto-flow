@@ -64,23 +64,27 @@ else:
 logger.info(f"n_folds : {n_folds}")
 
 initial_points = [
-    {'estimating:__choice__': 'tabular_nn', 'preprocessing:normed->final:__choice__': 'select.boruta',
-     'preprocessing:num->normed:__choice__': 'operate.keep_going', 'process_sequence': 'num->normed;normed->final',
-     'strategies:balance:__choice__': 'weight', 'estimating:tabular_nn:af_hidden': 'relu',
-     'estimating:tabular_nn:af_output': 'linear', 'estimating:tabular_nn:batch_size': '1024:int',
-     'estimating:tabular_nn:class_weight': 'None:NoneType', 'estimating:tabular_nn:dropout_hidden': 0.35000000000000003,
-     'estimating:tabular_nn:dropout_output': 0.1, 'estimating:tabular_nn:early_stopping_rounds': '16:int',
-     'estimating:tabular_nn:early_stopping_tol': '0:int', 'estimating:tabular_nn:layer1': 320,
-     'estimating:tabular_nn:layer2': 160, 'estimating:tabular_nn:lr': '0.01:float',
-     'estimating:tabular_nn:max_epoch': '128:int', 'estimating:tabular_nn:max_layer_width': '2056:int',
-     'estimating:tabular_nn:min_layer_width': '32:int', 'estimating:tabular_nn:n_jobs': '8:int',
-     'estimating:tabular_nn:optimizer': 'adam', 'estimating:tabular_nn:random_state': '42:int',
-     'estimating:tabular_nn:use_bn': 'True:bool', 'estimating:tabular_nn:verbose': '-1:int',
-     'preprocessing:normed->final:select.boruta:max_depth': 7.0,
-     'preprocessing:normed->final:select.boruta:n_jobs': '8:int',
-     'preprocessing:normed->final:select.boruta:random_state': '42:int',
-     'preprocessing:normed->final:select.boruta:weak': 'False:bool',
-     'preprocessing:num->normed:operate.keep_going:placeholder': 'placeholder',
+    {'estimating:__choice__': 'extra_trees', 'preprocessing:cat->normed:__choice__': 'encode.one_hot',
+     'preprocessing:combined->normed:__choice__': 'encode.cat_boost',
+     'preprocessing:highC_cat->combined:__choice__': 'encode.combine_rare',
+     'preprocessing:impute:__choice__': 'impute.gbt', 'preprocessing:impute:missing_rate': 0.6000000000000001,
+     'preprocessing:normed->final:__choice__': 'operate.keep_going',
+     'process_sequence': 'impute;cat->normed;highC_cat->combined;combined->normed;normed->final',
+     'strategies:balance:__choice__': 'weight', 'estimating:extra_trees:bootstrap': 'True:bool',
+     'estimating:extra_trees:criterion': 'entropy', 'estimating:extra_trees:early_stopping_rounds': '8:int',
+     'estimating:extra_trees:early_stopping_tol': '0.0:float', 'estimating:extra_trees:iter_inc': '16:int',
+     'estimating:extra_trees:max_depth': 'None:NoneType', 'estimating:extra_trees:max_features': 'sqrt',
+     'estimating:extra_trees:max_leaf_nodes': 'None:NoneType', 'estimating:extra_trees:min_impurity_decrease': '0:int',
+     'estimating:extra_trees:min_samples_leaf': 2, 'estimating:extra_trees:min_samples_split': 8,
+     'estimating:extra_trees:min_weight_fraction_leaf': '0:int', 'estimating:extra_trees:n_estimators': '1024:int',
+     'estimating:extra_trees:n_jobs': '12:int', 'estimating:extra_trees:random_state': '42:int',
+     'preprocessing:cat->normed:encode.one_hot:placeholder': 'placeholder',
+     'preprocessing:combined->normed:encode.cat_boost:placeholder': 'placeholder',
+     'preprocessing:highC_cat->combined:encode.combine_rare:copy': 'False:bool',
+     'preprocessing:highC_cat->combined:encode.combine_rare:minimum_fraction': '0.01:float',
+     'preprocessing:impute:impute.gbt:copy': 'False:bool', 'preprocessing:impute:impute.gbt:n_jobs': '12:int',
+     'preprocessing:impute:impute.gbt:random_state': '42:int',
+     'preprocessing:normed->final:operate.keep_going:placeholder': 'placeholder',
      'strategies:balance:weight:placeholder': 'placeholder'}
 ]
 
@@ -124,7 +128,7 @@ else:
     }
     search_record_db_name = "autoflow"
 
-n_jobs_in_algorithm = 8
+n_jobs_in_algorithm = 12
 
 task_info = envutil.TASK_INFO
 if isinstance(task_info, str):
@@ -170,7 +174,7 @@ pipe = AutoFlowClassifier(
     max_budget=4,
     n_iterations=envutil.N_ITERATIONS,
     debug_evaluator=False,
-    initial_points=None,
+    initial_points=initial_points,
     n_jobs_in_algorithm=n_jobs_in_algorithm
 
 )

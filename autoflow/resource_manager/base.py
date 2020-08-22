@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import json
 import os
 import shutil
 import traceback
@@ -719,7 +720,7 @@ class ResourceManager(StrSignatureMixin):
         experiment_log_path = self.file_system.join(self.experiment_path, "log_file.log")
         experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
         # 实验结果模型序列化
-        experiment_model_path=""
+        experiment_model_path = ""
         if self.save_experiment_model:
             final_model = final_model.copy()
             assert final_model.data_manager.is_empty()
@@ -1133,6 +1134,7 @@ class ResourceManager(StrSignatureMixin):
             except Exception as e:
                 self.logger.error(e)
                 self.logger.error(f"Insert 'trial' table failed, {i + 1} try.")
+                self.logger.info(json.dumps(info, indent=4))
                 # 关闭连接池， 重新连接
                 self.close_trial_table()
                 self.close_record_db()

@@ -55,7 +55,6 @@ class PredictiveImputer(BaseImputer):
         # Count missing per column
         if isinstance(Ximp, pd.DataFrame):
             Ximp = Ximp.values
-        np.sum(mask[:, self.cat_idx], axis=0)
         nan_cat_cols = np.count_nonzero(np.sum(mask[:, self.cat_idx], axis=0))
         nan_num_cols = np.count_nonzero(np.sum(mask[:, self.num_idx], axis=0))
         self.logger.log(self.logging_level,
@@ -65,7 +64,7 @@ class PredictiveImputer(BaseImputer):
         # Get col and row indices for missing
         missing_rows, missing_cols = np.where(mask)
         regressor = classifier = n_catmissing = None
-        if self.numerical_feature.size:
+        if self.num_idx.size:
             # Only keep indices for numerical vars
             keep_idx_num = np.in1d(missing_cols, self.num_idx)
             missing_num_rows = missing_rows[keep_idx_num]
@@ -78,7 +77,7 @@ class PredictiveImputer(BaseImputer):
             # Instantiate regression model
             regressor = self.reg_cls(**self.update_params(self.params, "regression"))
         # If needed, repeat for categorical variables
-        if self.categorical_feature.size:
+        if self.cat_idx.size:
             # Calculate total number of missing categorical values (used later)
             n_catmissing = np.sum(mask[:, self.cat_idx])
             self.logger.log(self.logging_level, f"n_catmissing = {n_catmissing}")
@@ -142,7 +141,7 @@ class PredictiveImputer(BaseImputer):
                 xmis = Ximp[np.ix_(mis_rows, s_prime)]
 
                 # 6. Fit a random forest over observed and predict the missing
-                if self.cat_idx is not None and s in self.cat_idx:
+                if self.cat_idx.size and s in self.cat_idx:
                     yobs = yobs.astype('int32')
                     classifier = clone(classifier)
                     if n_yobs > 1:
@@ -165,10 +164,10 @@ class PredictiveImputer(BaseImputer):
                     Ximp[mis_rows, s] = ymis
 
             # 9. Update gamma (stopping criterion)
-            if self.cat_idx is not None:
+            if self.cat_idx.size:
                 gamma_newcat = np.sum(
                     (Ximp[:, self.cat_idx] != Ximp_old[:, self.cat_idx])) / n_catmissing
-            if self.num_idx is not None:
+            if self.num_idx.size:
                 gamma_new = np.sum((Ximp[:, self.num_idx] - Ximp_old[:, self.num_idx]) ** 2) / np.sum(
                     (Ximp[:, self.num_idx]) ** 2)
 
@@ -181,8 +180,14 @@ class PredictiveImputer(BaseImputer):
             self.logger.log(self.logging_level, "-" * 50)
 
             cost_time = time() - start_time
-            self.gamma_history.append(float(gamma_new))
-            self.gamma_cat_history.append(float(gamma_newcat))
+            gamma_new=float(gamma_new)
+            if np.isinf(gamma_new):
+                gamma_new=0
+            gamma_newcat=float(gamma_newcat)
+            if np.isinf(gamma_newcat):
+                gamma_newcat=0
+            self.gamma_history.append(gamma_new)
+            self.gamma_cat_history.append(gamma_newcat)
             self.cost_times.append(cost_time)
             if cost_time > self.budget:
                 self.logger.log(self.logging_level,
