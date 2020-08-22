@@ -12,7 +12,10 @@ from sklearn.utils.multiclass import type_of_target
 
 from autoflow.metrics import classification_metrics
 from autoflow.utils.array_ import sanitize_array
+from autoflow.utils.logging_ import get_logger
 from autoflow.utils.ml_task import MLTask
+
+logger = get_logger("metrics")
 
 
 class Scorer(object, metaclass=ABCMeta):
@@ -358,4 +361,10 @@ def calculate_confusion_matrix(y_true, y_pred) -> List[List[int]]:
     # return 2d list
     if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
         y_pred = np.argmax(y_pred, axis=1)
-    return confusion_matrix(y_true, y_pred).tolist()
+    result = confusion_matrix(y_true, y_pred)
+    if np.any(np.isnan(result)):
+        logger.warning("confusion_matrix contain NaN")
+        logger.debug(f"y_true = {y_true.tolist()}")
+        logger.debug(f"y_pred = {y_pred.tolist()}")
+        result[np.isnan(result)] = -1
+    return result.tolist()
