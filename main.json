@@ -33,5 +33,10 @@
     "name": "RANDOM_STATE",
     "default": 0,
     "description": ""
+  },
+  {
+    "name": "ONLY_IMPUTE_GBT",
+    "default": false,
+    "description": ""
   }
 ]

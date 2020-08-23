@@ -128,6 +128,9 @@ task_info.update({
     "free": free,
     "used": used
 })
+kwargs={}
+if envutil.ONLY_IMPUTE_GBT:
+    kwargs.update(dict(included_imputers="impute.gbt"))
 
 pipe = AutoFlowClassifier(
     store_path=f"/tmp/autoflow",
@@ -142,15 +145,9 @@ pipe = AutoFlowClassifier(
     config_generator="ET",
     max_n_samples_for_CV=10000,
     config_generator_params={
-        # "acq_func": "EI",
-        # "xi": 0,
-        # "loss_transformer":None,
-        # "bw_method": "scott",
-        # "n_samples": 5000,
         "min_points_in_model": envutil.MIN_POINTS_IN_MODEL,
         "use_local_search": False,
         "use_thompson_sampling": False,
-        # "kde_sample_weight_scaler": None
     },
     n_folds=n_folds,
     warm_start=False,
@@ -163,7 +160,8 @@ pipe = AutoFlowClassifier(
     max_budget=4,
     n_iterations=envutil.N_ITERATIONS,
     debug_evaluator=False,
-    initial_points=None
+    initial_points=None,
+    **kwargs
 )
 pipe.fit(
     X_train, y_train,  # X_test, y_test,
