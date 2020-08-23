@@ -64,34 +64,27 @@ else:
 logger.info(f"n_folds : {n_folds}")
 
 initial_points = [
-    {
-        "estimating:__choice__": "extra_trees",
-        "preprocessing:impute:__choice__": "impute.gbt",
-        "preprocessing:impute:missing_rate": 0.8,
-        "preprocessing:normed->final:__choice__": "operate.keep_going",
-        "preprocessing:num->normed:__choice__": "scale.standard",
-        "process_sequence": "impute;num->normed;normed->final",
-        "estimating:extra_trees:bootstrap": "False:bool",
-        "estimating:extra_trees:criterion": "gini",
-        "estimating:extra_trees:early_stopping_rounds": "8:int",
-        "estimating:extra_trees:early_stopping_tol": "0.0:float",
-        "estimating:extra_trees:iter_inc": "16:int",
-        "estimating:extra_trees:max_depth": "None:NoneType",
-        "estimating:extra_trees:max_features": "log2",
-        "estimating:extra_trees:max_leaf_nodes": "None:NoneType",
-        "estimating:extra_trees:min_impurity_decrease": "0:int",
-        "estimating:extra_trees:min_samples_leaf": 18,
-        "estimating:extra_trees:min_samples_split": 20,
-        "estimating:extra_trees:min_weight_fraction_leaf": "0:int",
-        "estimating:extra_trees:n_estimators": "1024:int",
-        "estimating:extra_trees:n_jobs": "12:int",
-        "estimating:extra_trees:random_state": "42:int",
-        "preprocessing:impute:impute.gbt:copy": "False:bool",
-        "preprocessing:impute:impute.gbt:n_jobs": "12:int",
-        "preprocessing:impute:impute.gbt:random_state": "42:int",
-        "preprocessing:normed->final:operate.keep_going:placeholder": "placeholder",
-        "preprocessing:num->normed:scale.standard:placeholder": "placeholder"
-    }
+    {'estimating:__choice__': 'lightgbm', 'preprocessing:combined->normed:__choice__': 'encode.cat_boost',
+     'preprocessing:highC_cat->combined:__choice__': 'encode.combine_rare',
+     'preprocessing:impute:__choice__': 'impute.gbt', 'preprocessing:impute:missing_rate': 0.2,
+     'preprocessing:normed->final:__choice__': 'operate.keep_going',
+     'preprocessing:num->normed:__choice__': 'operate.keep_going',
+     'process_sequence': 'impute;highC_cat->combined;combined->normed;num->normed;normed->final',
+     'estimating:lightgbm:bagging_fraction': 0.8500000000000001, 'estimating:lightgbm:bagging_freq': 1,
+     'estimating:lightgbm:boosting_type': 'gbdt', 'estimating:lightgbm:early_stopping_rounds': '256:int',
+     'estimating:lightgbm:feature_fraction': 0.5, 'estimating:lightgbm:lambda_l1': 0.11668881531659175,
+     'estimating:lightgbm:lambda_l2': 3.6319278007808956e-05, 'estimating:lightgbm:learning_rate': 0.03154263921905257,
+     'estimating:lightgbm:max_depth': 59, 'estimating:lightgbm:min_child_weight': 0.4450283129212729,
+     'estimating:lightgbm:n_estimators': '2048:int', 'estimating:lightgbm:n_jobs': '12:int',
+     'estimating:lightgbm:num_leaves': 100, 'estimating:lightgbm:random_state': '42:int',
+     'estimating:lightgbm:subsample_for_bin': 260000, 'estimating:lightgbm:use_categorical_feature': 'True:bool',
+     'preprocessing:combined->normed:encode.cat_boost:placeholder': 'placeholder',
+     'preprocessing:highC_cat->combined:encode.combine_rare:copy': 'False:bool',
+     'preprocessing:highC_cat->combined:encode.combine_rare:minimum_fraction': '0.01:float',
+     'preprocessing:impute:impute.gbt:copy': 'False:bool', 'preprocessing:impute:impute.gbt:n_jobs': '12:int',
+     'preprocessing:impute:impute.gbt:random_state': '42:int',
+     'preprocessing:normed->final:operate.keep_going:placeholder': 'placeholder',
+     'preprocessing:num->normed:operate.keep_going:placeholder': 'placeholder'}
     ]
 random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
@@ -177,7 +170,7 @@ pipe = AutoFlowClassifier(
     max_budget=4,
     n_iterations=envutil.N_ITERATIONS,
     debug_evaluator=False,
-    initial_points=None,
+    initial_points=initial_points,
     **kwargs
 )
 pipe.fit(

@@ -180,12 +180,12 @@ class PredictiveImputer(BaseImputer):
             self.logger.log(self.logging_level, "-" * 50)
 
             cost_time = time() - start_time
-            gamma_new=float(gamma_new)
-            if np.isinf(gamma_new):
-                gamma_new=0
-            gamma_newcat=float(gamma_newcat)
-            if np.isinf(gamma_newcat):
-                gamma_newcat=0
+            gamma_new = float(gamma_new)
+            if not np.isfinite(gamma_new):
+                gamma_new = 0
+            gamma_newcat = float(gamma_newcat)
+            if not np.isfinite(gamma_newcat):
+                gamma_newcat = 0
             self.gamma_history.append(gamma_new)
             self.gamma_cat_history.append(gamma_newcat)
             self.cost_times.append(cost_time)

@@ -36,6 +36,7 @@ from autoflow.utils.ml_task import MLTask
 from generic_fs import FileSystem
 from generic_fs.utils.db import get_db_class_by_db_type, get_JSONField, create_database
 from generic_fs.utils.fs import get_file_system
+from generic_fs.utils.http import CustomJsonEncoder
 from . import cache as cache_module
 
 
@@ -1134,7 +1135,7 @@ class ResourceManager(StrSignatureMixin):
             except Exception as e:
                 self.logger.error(e)
                 self.logger.error(f"Insert 'trial' table failed, {i + 1} try.")
-                self.logger.info(json.dumps(info, indent=4))
+                self.logger.info(json.dumps(info, indent=4, cls=CustomJsonEncoder))
                 # 关闭连接池， 重新连接
                 self.close_trial_table()
                 self.close_record_db()
