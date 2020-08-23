@@ -82,7 +82,7 @@ class LGBMEstimator(BaseEstimator):
                 else:
                     raise ValueError(f"Invalid target_type {target_type}!")
             else:
-                self.objective = "regxiadression"
+                self.objective = "regression"
         param = dict(
             verbose=-1,
             boosting_type=self.boosting_type,

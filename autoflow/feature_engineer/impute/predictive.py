@@ -223,9 +223,9 @@ class PredictiveImputer(BaseImputer):
             raise ValueError("One or more columns have all rows missing.")
 
         # Now, make initial guess for missing values
-        col_means = np.nanmean(X[self.numerical_feature], axis=0) if self.numerical_feature.size else None
+        col_means = np.nanmean(X[self.numerical_feature], axis=0) if self.numerical_feature.size else np.array([])
         col_modes = CategoricalImputer(strategy="most_frequent") \
-            .fit(X[self.categorical_feature]).statistics_ if self.categorical_feature.size else None
+            .fit(X[self.categorical_feature]).statistics_ if self.categorical_feature.size else np.array([])
 
         self.statistics_ = {"col_means": col_means, "col_modes": col_modes}
         if col_means is not None:

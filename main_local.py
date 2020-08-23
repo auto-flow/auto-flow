@@ -64,30 +64,35 @@ else:
 logger.info(f"n_folds : {n_folds}")
 
 initial_points = [
-    {'estimating:__choice__': 'extra_trees', 'preprocessing:cat->normed:__choice__': 'encode.one_hot',
-     'preprocessing:combined->normed:__choice__': 'encode.cat_boost',
-     'preprocessing:highC_cat->combined:__choice__': 'encode.combine_rare',
-     'preprocessing:impute:__choice__': 'impute.gbt', 'preprocessing:impute:missing_rate': 0.6000000000000001,
-     'preprocessing:normed->final:__choice__': 'operate.keep_going',
-     'process_sequence': 'impute;cat->normed;highC_cat->combined;combined->normed;normed->final',
-     'strategies:balance:__choice__': 'weight', 'estimating:extra_trees:bootstrap': 'True:bool',
-     'estimating:extra_trees:criterion': 'entropy', 'estimating:extra_trees:early_stopping_rounds': '8:int',
-     'estimating:extra_trees:early_stopping_tol': '0.0:float', 'estimating:extra_trees:iter_inc': '16:int',
-     'estimating:extra_trees:max_depth': 'None:NoneType', 'estimating:extra_trees:max_features': 'sqrt',
-     'estimating:extra_trees:max_leaf_nodes': 'None:NoneType', 'estimating:extra_trees:min_impurity_decrease': '0:int',
-     'estimating:extra_trees:min_samples_leaf': 2, 'estimating:extra_trees:min_samples_split': 8,
-     'estimating:extra_trees:min_weight_fraction_leaf': '0:int', 'estimating:extra_trees:n_estimators': '1024:int',
-     'estimating:extra_trees:n_jobs': '12:int', 'estimating:extra_trees:random_state': '42:int',
-     'preprocessing:cat->normed:encode.one_hot:placeholder': 'placeholder',
-     'preprocessing:combined->normed:encode.cat_boost:placeholder': 'placeholder',
-     'preprocessing:highC_cat->combined:encode.combine_rare:copy': 'False:bool',
-     'preprocessing:highC_cat->combined:encode.combine_rare:minimum_fraction': '0.01:float',
-     'preprocessing:impute:impute.gbt:copy': 'False:bool', 'preprocessing:impute:impute.gbt:n_jobs': '12:int',
-     'preprocessing:impute:impute.gbt:random_state': '42:int',
-     'preprocessing:normed->final:operate.keep_going:placeholder': 'placeholder',
-     'strategies:balance:weight:placeholder': 'placeholder'}
-]
-
+    {
+        "estimating:__choice__": "extra_trees",
+        "preprocessing:impute:__choice__": "impute.gbt",
+        "preprocessing:impute:missing_rate": 0.8,
+        "preprocessing:normed->final:__choice__": "operate.keep_going",
+        "preprocessing:num->normed:__choice__": "scale.standard",
+        "process_sequence": "impute;num->normed;normed->final",
+        "estimating:extra_trees:bootstrap": "False:bool",
+        "estimating:extra_trees:criterion": "gini",
+        "estimating:extra_trees:early_stopping_rounds": "8:int",
+        "estimating:extra_trees:early_stopping_tol": "0.0:float",
+        "estimating:extra_trees:iter_inc": "16:int",
+        "estimating:extra_trees:max_depth": "None:NoneType",
+        "estimating:extra_trees:max_features": "log2",
+        "estimating:extra_trees:max_leaf_nodes": "None:NoneType",
+        "estimating:extra_trees:min_impurity_decrease": "0:int",
+        "estimating:extra_trees:min_samples_leaf": 18,
+        "estimating:extra_trees:min_samples_split": 20,
+        "estimating:extra_trees:min_weight_fraction_leaf": "0:int",
+        "estimating:extra_trees:n_estimators": "1024:int",
+        "estimating:extra_trees:n_jobs": "12:int",
+        "estimating:extra_trees:random_state": "42:int",
+        "preprocessing:impute:impute.gbt:copy": "False:bool",
+        "preprocessing:impute:impute.gbt:n_jobs": "12:int",
+        "preprocessing:impute:impute.gbt:random_state": "42:int",
+        "preprocessing:normed->final:operate.keep_going:placeholder": "placeholder",
+        "preprocessing:num->normed:scale.standard:placeholder": "placeholder"
+    }
+    ]
 random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
 specific_task_token = envutil.TOKEN

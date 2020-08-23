@@ -5,7 +5,7 @@
 import logging
 import pickle
 from multiprocessing import Manager
-from time import sleep
+from time import sleep, time
 from typing import Any
 
 lock = Manager().dict()
@@ -73,7 +73,7 @@ class FsCache(BaseCache):
         path = self.k2path(k)
         lock_path = self.k2path(k, "lock")
         if self.res.file_system.exists(path):
-            ok = self.wait_lock(lock_path, "read") # wait lock
+            ok = self.wait_lock(lock_path, "read")  # wait lock
             if not ok:
                 return None
             value = None
@@ -88,19 +88,26 @@ class FsCache(BaseCache):
 
     def set(self, k: str, v: Any):
         super(FsCache, self).set(k, v)
+        start_time = time()
         lock_path = self.k2path(k, "lock")
         if self.res.file_system.exists(lock_path):
             logger.info(f"lock[{lock_path}] exists, other process is writing, ignore store this k-v, return.")
             return
-        self.wait_lock(lock_path, "write") # wait lock
-        self.res.file_system.touch_file(lock_path) # add lock
+        self.wait_lock(lock_path, "write")  # wait lock
+        self.res.file_system.touch_file(lock_path)  # add lock
         path = self.k2path(k)
         self.res.file_system.dump_pickle(v, path)
-        # self.release_k(k)
         try:
-            self.res.file_system.delete(lock_path) # release lock
+            self.res.file_system.delete(lock_path)  # release lock
         except Exception as e:
             logger.warning(f"exception when release lock: {e}")
+        cost_time = time() - start_time
+        level = 10
+        if cost_time > 1:
+            level = 20
+        if cost_time > 10:
+            level = 30
+        logger.log(level, f"set k-v cost {cost_time}s")
 
 
 
