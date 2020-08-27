@@ -1,6 +1,3 @@
-import logging
-import traceback
-
 from autoflow.utils.logging_ import get_logger
 
 
@@ -10,6 +7,7 @@ class BaseConfigGenerator(object):
     complexity, from random sampling to the construction of complex empirical prediction models for promising
     configurations.
     """
+
     def __init__(self):
         """
         Parameters
@@ -26,7 +24,7 @@ class BaseConfigGenerator(object):
 
         """
 
-        self.logger=get_logger(self)
+        self.logger = get_logger(self)
 
     def get_config(self, budget):
         """
@@ -42,7 +40,7 @@ class BaseConfigGenerator(object):
         returns: (config, info_dict)
             must return a valid configuration and a (possibly empty) info dict
         """
-        raise NotImplementedError('This function needs to be overwritten in %s.'%(self.__class__.__name__))
+        raise NotImplementedError('This function needs to be overwritten in %s.' % (self.__class__.__name__))
 
     def new_result(self, job, update_model=True):
         """

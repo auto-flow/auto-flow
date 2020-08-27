@@ -9,6 +9,7 @@ run_qsar_reg.py
 run_classifier.py
 run_ova_clf.py
 
+*.pkl
 move.py
 *.db
 *.gv

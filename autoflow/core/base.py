@@ -24,6 +24,7 @@ from autoflow.ensemble.trained_data_fetcher import TrainedDataFetcher
 from autoflow.ensemble.trials_fetcher import TrialsFetcher
 from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2budget_mode, get_default_algo2weight_mode
+from autoflow.evaluation.strategy import parse_evaluation_strategy
 from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
@@ -51,17 +52,19 @@ class AutoFlowEstimator(BaseEstimator):
             max_budget: Optional[float] = None,
             eta: Optional[float] = None,
             SH_only: bool = False,
-            budget2kfold: Optional[Dict[float, int]] = None,
+            budget2kfold: Optional[Dict[float, int]] = None,  # todo  remove this
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
             specific_out_feature_groups_mapper: Dict[str, str] = frozendict({"encode.ordinal": "ordinal"}),
             only_use_subsamples_budget_mode: bool = False,
-            n_folds: int = 5,
+            k_folds: int = 5,
             holdout_test_size: float = 1 / 3,
-            n_keep_samples: int = 30000,
-            min_n_samples_for_SH: int = 1000,
-            max_n_samples_for_CV: int = 5000,
+            evaluation_strategy="auto",  # will rewrite k_folds, refit, min_budget, max_budget, eta
+            SH_holdout_condition="s > 1e5 or (s * f > 1e6 and s > 1e3)",
+            n_keep_samples: int = 30000,  # todo remove this
+            min_n_samples_for_SH: int = 1000,  # todo remove this
+            max_n_samples_for_CV: int = 5000,  # todo remove this
             warm_start=True,
             config_generator: Union[str, Type] = "ET",
             config_generator_params: dict = frozendict(),
@@ -92,6 +95,8 @@ class AutoFlowEstimator(BaseEstimator):
             memory_limit=None,
             **kwargs
     ):
+        self.SH_holdout_condition = SH_holdout_condition
+        self.evaluation_strategy = evaluation_strategy
         self.time_limit = time_limit
         self.imbalance_threshold = imbalance_threshold
         self.initial_points = initial_points
@@ -116,11 +121,11 @@ class AutoFlowEstimator(BaseEstimator):
         self.min_n_samples_for_SH = min_n_samples_for_SH
         self.n_keep_samples = n_keep_samples
         self.config_generator_params = dict(config_generator_params)
-        assert isinstance(n_folds, int) and n_folds >= 1
+        assert isinstance(k_folds, int) and k_folds >= 1
         # fixme: support int
         assert isinstance(holdout_test_size, float) and 0 < holdout_test_size < 1
         self.holdout_test_size = holdout_test_size
-        self.n_folds = n_folds
+        self.k_folds = k_folds
         self.min_n_workers = min_n_workers
         self.master_host = master_host
         if n_jobs_in_algorithm is None:
@@ -192,14 +197,22 @@ class AutoFlowEstimator(BaseEstimator):
 
     def get_cv_splitter(self):
         if self.ml_task.mainTask == "classification":
-            return StratifiedKFold(n_splits=self.n_folds, shuffle=True, random_state=0)
+            return StratifiedKFold(n_splits=self.k_folds, shuffle=True, random_state=0)
         else:
-            return KFold(n_splits=self.n_folds, shuffle=True, random_state=0)
+            return KFold(n_splits=self.k_folds, shuffle=True, random_state=0)
 
     def hdl2configSpce(self, hdl: Dict):
         hdl2shps = HDL2SHPS()
         hdl2shps.set_task(self.ml_task)
         return hdl2shps(hdl)
+
+    def update_evaluation_strategy(self, dict_: dict):
+        for k, v in dict_.items():
+            if v is not None:
+                pv = getattr(self, k)
+                if pv != v:
+                    self.logger.info(f"update evaluation_strategy | {k}: {pv} -> {v}")
+                    setattr(self, k, v)
 
     def input_experiment_data(
             self,
@@ -242,6 +255,16 @@ class AutoFlowEstimator(BaseEstimator):
                     self.logger.error(
                         f"This task is supposed to be {self.checked_mainTask} task ,but the target data is {self.ml_task}.")
                     raise ValueError
+        if self.ml_task.mainTask == "regression":
+            self.n_classes = 1
+        else:
+            self.n_classes = pd.Series(self.data_manager.y_train).nunique()
+        self.n_samples, self.n_features = X_train.shape
+        # evaluation strategy
+        dict_ = parse_evaluation_strategy(self.evaluation_strategy, self.SH_holdout_condition,
+                                          self.n_samples, self.n_features, self.n_classes, self.ml_task)
+        self.update_evaluation_strategy(dict_)
+        # todo log update
         # parse splitter
         self.groups = groups
         self.n_samples = self.data_manager.X_train.shape[0]
@@ -253,7 +276,7 @@ class AutoFlowEstimator(BaseEstimator):
                     f"(max_n_samples_for_CV = {self.max_n_samples_for_CV}).")
                 splitter = self.get_holdout_splitter()
             else:
-                if self.n_folds == 1:
+                if self.k_folds == 1:
                     splitter = self.get_holdout_splitter()
                 else:
                     splitter = self.get_cv_splitter()

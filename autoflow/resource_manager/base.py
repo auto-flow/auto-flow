@@ -204,6 +204,7 @@ class ResourceManager(StrSignatureMixin):
         self.close_budget_table()
         self.close_dataset_db()
         self.close_record_db()
+        self.close_workflow_step_table()
         self.file_system.close_fs()
         self.close_all_logger.warning(CONNECTION_POOL_CLOSE_MSG)
         stack_txt = "".join(traceback.format_stack())
