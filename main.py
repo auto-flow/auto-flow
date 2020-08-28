@@ -152,7 +152,6 @@ pipe = AutoFlowClassifier(
     n_folds=n_folds,
     warm_start=False,
     random_state=random_state,
-    min_n_samples_for_SH=50,
     concurrent_type="process",
     n_workers=n_workers,
     SH_only=True,
