@@ -1,5 +1,4 @@
 import datetime
-import logging
 from collections import OrderedDict
 from collections import defaultdict
 from contextlib import redirect_stderr
@@ -8,7 +7,6 @@ from time import time
 from typing import Dict, Optional, List
 
 import numpy as np
-import pynisher
 from frozendict import frozendict
 
 from autoflow.constants import PHASE2, PHASE1, SERIES_CONNECT_LEADER_TOKEN, SERIES_CONNECT_SEPARATOR_TOKEN, \
@@ -44,9 +42,9 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             splitter,
             should_store_intermediate_result: bool,
             should_stack_X: bool,
-            should_finally_fit: bool,  # todo: rename to refit
+            refit: bool,
+            fit_transformer_per_cv: bool,
             model_registry: dict,
-            budget2kfold: Optional[Dict[float, int]] = None,
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
@@ -64,6 +62,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         super(TrainEvaluator, self).__init__(
             run_id, nameserver, nameserver_port, host, worker_id, timeout, debug
         )
+        self.fit_transformer_per_cv = fit_transformer_per_cv
         self.memory_limit = memory_limit
         self.time_limit = time_limit
         self.specific_out_feature_groups_mapper = dict(specific_out_feature_groups_mapper)
@@ -71,14 +70,13 @@ class TrainEvaluator(Worker, StrSignatureMixin):
         self.max_budget = max_budget
         self.algo2iter = algo2iter
         self.algo2budget_mode = algo2budget_mode
-        self.budget2kfold = budget2kfold
         self.timeout = timeout
         self.id = worker_id
         self.host = host
         self.nameserver_port = nameserver_port
         self.nameserver = nameserver
         self.model_registry = model_registry
-        self.should_finally_fit = should_finally_fit
+        self.refit = refit
         self.resource_manager = resource_manager
         self.should_stack_X = should_stack_X
         self.should_store_intermediate_result = should_store_intermediate_result
@@ -193,15 +191,24 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             start_time = datetime.datetime.now()
             confusion_matrices = []
             best_iterations = []
-            component_infos = []
-            cost_times = []
-            for fold_ix, (train_index, valid_index) in enumerate(self.splitter.split(X.data, y.data, self.groups)):
+            component_infos = {}
+            cost_times = None
+            estimator_cost_times=[]
+            X_ = X.copy(copy_data=True)
+            y_ = y.copy(copy_data=True)
+            self.logger.debug(f"X hash = {X_.get_hash()}")
+            self.logger.debug(f"X_test hash = {X_test.get_hash() if X_test is not None else None}")
+            if not self.fit_transformer_per_cv:
+                model.fit(X_train=X_, y_train=y_, X_valid=None, y_valid=None,
+                          X_test=X_test, y_test=y_test, fit_final_estimator=False)
+                model.last_data = None
+            for fold_ix, (train_index, valid_index) in enumerate(self.splitter.split(X_.data, y_.data, self.groups)):
                 cloned_model = model.copy()
                 X: DataFrameContainer
-                X_train = X.sub_sample(train_index)
-                X_valid = X.sub_sample(valid_index)
-                y_train = y.sub_sample(train_index)
-                y_valid = y.sub_sample(valid_index)
+                X_train = X_.sub_sample(train_index)
+                X_valid = X_.sub_sample(valid_index)
+                y_train = y_.sub_sample(train_index)
+                y_valid = y_.sub_sample(valid_index)
                 # subsamples budget_mode.
                 if fold_ix == 0 and budget_mode == SUBSAMPLES_BUDGET_MODE and budget < 1:
                     X_train, y_train, (X_valid, X_test) = implement_subsample_budget(
@@ -212,6 +219,8 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 cached_model = self.resource_manager.cache.get(cache_key)
                 if cached_model is not None:
                     cloned_model = cached_model
+                if cloned_model.resource_manager is None:
+                    cloned_model.resource_manager = model.resource_manager
                 # 如果是iterations budget mode, 采用一个统一的接口调整 max_iter
                 # 未来争取做到能缓存ML_Workflow, 只训练最后的拟合器
                 try:
@@ -242,14 +251,14 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                     # todo: 重构 LGBM等
                     best_iterations.append(getattr(
                         estimator, "best_iteration_", -1))
-                cost_times.append(cloned_model.time_cost_list)
-                component_info = {}
-                for step_name, component in cloned_model.steps:
-                    component_name = component.__class__.__name__
-                    component_additional_info = component.additional_info
-                    if bool(component_additional_info):
-                        component_info[component_name] = component.additional_info
-                component_infos.append(component_info)
+                cost_times=cloned_model.time_cost_list
+                estimator_cost_times.append(cloned_model.time_cost_list[-1])
+                if fold_ix==0:
+                    for step_name, component in cloned_model.steps:
+                        component_name = component.__class__.__name__
+                        component_additional_info = component.additional_info
+                        if bool(component_additional_info):
+                            component_infos[component_name] = component.additional_info
                 y_preds.append(y_pred)
                 if y_test_pred is not None:
                     y_test_preds.append(y_test_pred)
@@ -257,23 +266,24 @@ class TrainEvaluator(Worker, StrSignatureMixin):
                 losses.append(float(loss))
                 all_scores.append(all_score)
                 # when  budget  <= 1 , hold out validation
-                if fold_ix == 0 and budget <= 1:
-                    break
+                # if fold_ix == 0 and budget <= 1:
+                #     break
                 # when  budget  > 1 , budget will be interpreted as kfolds num by 'budget2kfold'
                 # for example, budget = 4 , budget2kfold = {4: 10}, we only do 10 times cross-validation,
                 # so we break when fold_ix == 10 - 1 == 9
-                if isinstance(self.budget2kfold, dict) and budget in self.budget2kfold:
-                    if budget > 1 and fold_ix == self.budget2kfold[budget] - 1:
-                        break
+                # if isinstance(self.budget2kfold, dict) and budget in self.budget2kfold:
+                #     if budget > 1 and fold_ix == self.budget2kfold[budget] - 1:
+                #         break
             if self.ml_task.mainTask == "classification":
                 additional_info["confusion_matrices"] = confusion_matrices
             if support_early_stopping:
                 additional_info["best_iterations"] = best_iterations
             additional_info["cost_times"] = cost_times
             additional_info["component_infos"] = component_infos
+            additional_info["estimator_cost_times"] = estimator_cost_times
             end_time = datetime.datetime.now()
             # finally fit
-            if status == "SUCCESS" and self.should_finally_fit:
+            if status == "SUCCESS" and self.refit:
                 # make sure have resource_manager to do things like connect redis
                 model.resource_manager = self.resource_manager
                 finally_fit_model = model.fit(X, y, X_test=X_test, y_test=y_test)
@@ -323,7 +333,7 @@ class TrainEvaluator(Worker, StrSignatureMixin):
             # todo
             if y_test is not None:
                 # 验证集训练模型的组合去预测测试集的数据
-                if self.should_finally_fit:
+                if self.refit:
                     y_test_pred = y_test_pred_by_finally_fit_model
                 else:
                     if self.ml_task.mainTask == "classification":

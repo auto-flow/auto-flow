@@ -52,7 +52,7 @@ class AutoFlowEstimator(BaseEstimator):
             max_budget: Optional[float] = None,
             eta: Optional[float] = None,
             SH_only: bool = False,
-            budget2kfold: Optional[Dict[float, int]] = None,  # todo  remove this
+            # budget2kfold: Optional[Dict[float, int]] = None,  # todo  remove this
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
@@ -62,9 +62,9 @@ class AutoFlowEstimator(BaseEstimator):
             holdout_test_size: float = 1 / 3,
             evaluation_strategy="auto",  # will rewrite k_folds, refit, min_budget, max_budget, eta
             SH_holdout_condition="s > 1e5 or (s * f > 1e6 and s > 1e3)",
-            n_keep_samples: int = 30000,  # todo remove this
-            min_n_samples_for_SH: int = 1000,  # todo remove this
-            max_n_samples_for_CV: int = 5000,  # todo remove this
+            # n_keep_samples: int = 30000,  # todo remove this
+            # min_n_samples_for_SH: int = 1000,  # todo remove this
+            # max_n_samples_for_CV: int = 5000,  # todo remove this
             warm_start=True,
             config_generator: Union[str, Type] = "ET",
             config_generator_params: dict = frozendict(),
@@ -85,7 +85,8 @@ class AutoFlowEstimator(BaseEstimator):
             highC_cat_threshold: int = 4,
             consider_ordinal_as_cat: bool = False,
             should_store_intermediate_result: bool = False,
-            should_finally_fit: bool = False,
+            refit: bool = False,
+            fit_transformer_per_cv:bool=False,
             should_calc_all_metrics: bool = True,
             should_stack_X: bool = True,
             debug_evaluator: bool = False,
@@ -95,6 +96,7 @@ class AutoFlowEstimator(BaseEstimator):
             memory_limit=None,
             **kwargs
     ):
+        self.fit_transformer_per_cv = fit_transformer_per_cv
         self.SH_holdout_condition = SH_holdout_condition
         self.evaluation_strategy = evaluation_strategy
         self.time_limit = time_limit
@@ -116,10 +118,10 @@ class AutoFlowEstimator(BaseEstimator):
         self.algo2iter = algo2iter
         self.algo2budget_mode = algo2budget_mode
         self.algo2weight_mode = algo2weight_mode
-        self.budget2kfold = budget2kfold
-        self.max_n_samples_for_CV = max_n_samples_for_CV
-        self.min_n_samples_for_SH = min_n_samples_for_SH
-        self.n_keep_samples = n_keep_samples
+        # self.budget2kfold = budget2kfold
+        # self.max_n_samples_for_CV = max_n_samples_for_CV
+        # self.min_n_samples_for_SH = min_n_samples_for_SH
+        # self.n_keep_samples = n_keep_samples
         self.config_generator_params = dict(config_generator_params)
         assert isinstance(k_folds, int) and k_folds >= 1
         # fixme: support int
@@ -165,7 +167,7 @@ class AutoFlowEstimator(BaseEstimator):
         for key, value in model_registry.items():
             assert inspect.isclass(value)
         self.model_registry = model_registry
-        self.should_finally_fit = should_finally_fit
+        self.refit = refit
         self.should_store_intermediate_result = should_store_intermediate_result
         self.should_calc_all_metrics = should_calc_all_metrics
         self.log_config = log_config
@@ -261,25 +263,18 @@ class AutoFlowEstimator(BaseEstimator):
             self.n_classes = pd.Series(self.data_manager.y_train).nunique()
         self.n_samples, self.n_features = X_train.shape
         # evaluation strategy
-        dict_ = parse_evaluation_strategy(self.evaluation_strategy, self.SH_holdout_condition,
-                                          self.n_samples, self.n_features, self.n_classes, self.ml_task)
-        self.update_evaluation_strategy(dict_)
-        # todo log update
+        if self.evaluation_strategy is not None:
+            dict_ = parse_evaluation_strategy(self.evaluation_strategy, self.SH_holdout_condition,
+                                              self.n_samples, self.n_features, self.n_classes, self.ml_task)
+            self.update_evaluation_strategy(dict_)
         # parse splitter
         self.groups = groups
         self.n_samples = self.data_manager.X_train.shape[0]
         if splitter is None:
-            if self.n_samples > self.max_n_samples_for_CV:
-                self.logger.info(
-                    f"TrainSet has {self.n_samples} samples,"
-                    f" greater than max n_samples for Cross-Validation "
-                    f"(max_n_samples_for_CV = {self.max_n_samples_for_CV}).")
+            if self.k_folds == 1:
                 splitter = self.get_holdout_splitter()
             else:
-                if self.k_folds == 1:
-                    splitter = self.get_holdout_splitter()
-                else:
-                    splitter = self.get_cv_splitter()
+                splitter = self.get_cv_splitter()
             self.logger.info(f"splitter is parsed to `{splitter}`")
         assert hasattr(splitter, "split") and hasattr(splitter, "n_splits"), \
             "Parameter 'splitter' should be a train-valid splitter, " \
@@ -300,34 +295,7 @@ class AutoFlowEstimator(BaseEstimator):
                 # print(score)
         self.n_splits = splitter.n_splits
         self.splitter = splitter
-        # do subsample if n_samples >  n_keep_samples
-        if self.n_samples > self.n_keep_samples:
-            self.logger.info(
-                f"TrainSet has {self.n_samples} samples,"
-                f" greater than n_keep_samples({self.n_keep_samples}). ")
-            # todo: subsample
-        # set min_budget, max_budget, eta, budget2kfold
-        if self.n_samples < self.min_n_samples_for_SH:
-            self.min_budget = self.max_budget = self.eta = 1
-        else:
-            # todo: 可以改进得更灵活
-            if self.min_budget is None:
-                self.min_budget = 1 / 16
-            if self.max_budget is None:
-                if self.n_splits > 1:
-                    self.max_budget = 4
-                else:
-                    self.max_budget = 1
-            if self.eta is None:
-                self.eta = 4
-            if self.budget2kfold is None:
-                if self.max_budget <= 1:
-                    self.budget2kfold = {}
-                else:
-                    self.budget2kfold = {self.max_budget: self.n_splits}
-        if self.budget2kfold is None:
-            self.budget2kfold = {}
-        # set n_iterations
+        # todo  set n_iterations
         # fixme: 有拍脑袋的嫌疑
         if self.n_iterations is None:
             if self.min_budget != self.max_budget:
@@ -343,6 +311,7 @@ class AutoFlowEstimator(BaseEstimator):
             if self.ml_task.mainTask == "regression":
                 metric = r2
             elif self.ml_task.mainTask == "classification":
+                # todo 多分类用f1_macro
                 metric = accuracy
             else:
                 raise NotImplementedError()
@@ -365,7 +334,6 @@ class AutoFlowEstimator(BaseEstimator):
         self.resource_manager.close_hdl_table()
         self.resource_manager.insert_budget_record({
             "algo2budget_mode": self.algo2budget_mode,
-            "budget2kfold": self.budget2kfold,
             "algo2iter": self.algo2iter,
             "min_budget": self.min_budget,
             "max_budget": self.max_budget,
@@ -391,7 +359,7 @@ class AutoFlowEstimator(BaseEstimator):
         # now we get task_id and hdl_id, we can insert current runtime information into "experiments.experiments" database
         experiment_config = {
             "should_stack_X": self.should_stack_X,
-            "should_finally_fit": self.should_finally_fit,
+            "refit": self.refit,
             "should_calc_all_metric": self.should_calc_all_metrics,
             "should_store_intermediate_result": self.should_store_intermediate_result,
             "fit_ensemble_params": str(fit_ensemble_params),
@@ -436,9 +404,9 @@ class AutoFlowEstimator(BaseEstimator):
             splitter=self.splitter,
             should_store_intermediate_result=self.should_store_intermediate_result,
             should_stack_X=self.should_stack_X,
-            should_finally_fit=self.should_finally_fit,
+            refit=self.refit,
+            fit_transformer_per_cv=self.fit_transformer_per_cv,
             model_registry=self.model_registry,
-            budget2kfold=self.budget2kfold,
             algo2budget_mode=self.algo2budget_mode,
             algo2weight_mode=self.algo2weight_mode,
             algo2iter=self.algo2iter,
@@ -660,7 +628,7 @@ class AutoFlowEstimator(BaseEstimator):
             should_store_intermediate_result=self.should_store_intermediate_result,
             should_stack_X=self.should_stack_X,
             resource_manager=resource_manager,
-            should_finally_fit=self.should_finally_fit,
+            refit=self.refit,
             model_registry=self.model_registry,
             instance_id=self.instance_id
         )

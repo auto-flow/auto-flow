@@ -76,7 +76,7 @@ class ML_Workflow(Pipeline):
         time_cost_list = []
         # if `is_estimator` or `fit_final_estimator` is True, `with_final` is False
         for (step_idx, step_name, transformer) in self._iter(
-                with_final=(not (fit_final_estimator and self.is_estimator)),
+                with_final=(not self.is_estimator),
                 filter_passthrough=False):
             # todo : 做中间结果的存储
             cache_intermediate = False
@@ -219,27 +219,26 @@ class ML_Workflow(Pipeline):
             # set final model' max_iter param
             self[-1].set_max_iter(max_iter)
         # 高budget的模型不能在低budget时刻被加载
-        if self.fitted and self.budget <= budget:
+        if self.fitted and self.budget <= budget and max_iter > 0:
             # todo: transform 的过程中使用缓存（如，gbt_imputer）
             if self.last_data is None:
-                self.logger.warning(
-                    f"fitted is True, (self.budget = {self.budget}) <= (budget = {budget}), but self.last_data is None !!!")
+                self.logger.debug(
+                    f"fitted is True, (self.budget = {self.budget}) <= (budget = {budget}), self.last_data is None ")
                 self.last_data = self.transform(X_train, X_valid, X_test, y_train)
-            if max_iter > 0:
-                start_time = time()
-                self[-1].fit(
-                    self.last_data.get("X_train"), self.last_data.get("y_train"),
-                    self.last_data.get("X_valid"), y_valid,
-                    self.last_data.get("X_test"), y_test
-                )
-                cost_time = time() - start_time
-                self.time_cost_list.append([
-                    len(self.steps),
-                    self.steps[-1][0],
-                    self._final_estimator.__class__.__name__,
-                    False,
-                    cost_time
-                ])
+            start_time = time()
+            self[-1].fit(
+                self.last_data.get("X_train"), self.last_data.get("y_train"),
+                self.last_data.get("X_valid"), y_valid,
+                self.last_data.get("X_test"), y_test
+            )
+            cost_time = time() - start_time
+            self.time_cost_list.append([
+                len(self.steps),
+                self.steps[-1][0],
+                self._final_estimator.__class__.__name__,
+                False,
+                cost_time
+            ])
         else:
             self.fit(X_train, y_train, X_valid, y_valid, X_test, y_test)
         self.set_budget(budget)
@@ -251,7 +250,7 @@ class ML_Workflow(Pipeline):
         X_test = self.last_data.get("X_test")
         self.last_data = None  # GC
         try:
-            check_array(X_train.data)
+            check_array(X_test.data) if X_test is not None else None
             check_array(X_valid.data) if X_valid is not None else None
             if ml_task.mainTask == "classification":
                 pred_valid = self._final_estimator.predict_proba(X_valid)
@@ -260,8 +259,8 @@ class ML_Workflow(Pipeline):
                 pred_valid = self._final_estimator.predict(X_valid)
                 pred_test = self._final_estimator.predict(X_test) if X_test is not None else None
         except Exception as e:
-            self.logger.warning(f"INF: {np.count_nonzero(~np.isfinite(X_test.data), axis=0)}")
-            self.logger.warning(f"NAN: {np.count_nonzero(pd.isna(X_test.data), axis=0)}")
+            # self.logger.warning(f"INF: {np.count_nonzero(~np.isfinite(X_test.data), axis=0)}")
+            # self.logger.warning(f"NAN: {np.count_nonzero(pd.isna(X_test.data), axis=0)}")
             self.logger.error(e)
             pred_test = -65535
             pred_valid = -65535

@@ -274,7 +274,7 @@ class DataFrameContainer(DataContainer):
     def sub_sample(self, index):
         new_df = self.copy()
         # fixme iloc 与 loc
-        new_df.data = copy(new_df.data.loc[index, :])
+        new_df.data = new_df.data.loc[index, :].copy()
         return new_df
 
     def sub_feature(self, index):

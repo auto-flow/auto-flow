@@ -89,7 +89,8 @@ class ResourceManager(StrSignatureMixin):
             cache_system="FsCache",
             cache_system_params=frozendict(),
             should_record_workflow_step=False,
-            save_experiment_model=True
+            save_experiment_model=True,
+            store_dataset=True
     ):
         '''
 
@@ -130,6 +131,7 @@ class ResourceManager(StrSignatureMixin):
         compress_suffix: str
             compress file's suffix, default is bz2
         '''
+        self.store_dataset = store_dataset
         self.save_experiment_model = save_experiment_model
         self.should_record_workflow_step = should_record_workflow_step
         self.cache_system_params = dict(cache_system_params)
@@ -593,9 +595,9 @@ class ResourceManager(StrSignatureMixin):
         tmp_path = f"/tmp/tmp_df_{os.getpid()}.h5"
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-        # fixme: restore
-        # df.to_hdf(tmp_path, "dataset", format="table")
-        # return self.file_system.upload(dataset_path, tmp_path)
+        if self.store_dataset:
+            df.to_hdf(tmp_path, "dataset", format="table")
+            return self.file_system.upload(dataset_path, tmp_path)
         return ""
 
     def upload_ndarray_to_fs(self, arr: np.ndarray, dataset_path):
@@ -722,7 +724,6 @@ class ResourceManager(StrSignatureMixin):
         experiment_log_path = self.file_system.join(self.experiment_path, "log_file.log")
         experiment_model_path = self.file_system.join(self.experiment_path, "model.bz2")
         # 实验结果模型序列化
-        experiment_model_path = ""
         if self.save_experiment_model:
             final_model = final_model.copy()
             assert final_model.data_manager.is_empty()
@@ -959,7 +960,6 @@ class ResourceManager(StrSignatureMixin):
             budget_id = pw.FixedCharField(max_length=32)
             user_id = pw.IntegerField()
             algo2budget_mode = self.JSONField()
-            budget2kfold = self.JSONField()
             algo2iter = self.JSONField()
             min_budget = pw.FloatField()
             max_budget = pw.FloatField()
@@ -994,7 +994,6 @@ class ResourceManager(StrSignatureMixin):
                 budget_id=budget_id,
                 user_id=user_id,
                 algo2budget_mode=info.get("algo2budget_mode", {}),
-                budget2kfold=info.get("budget2kfold", {}),
                 algo2iter=info.get("algo2iter", {}),
                 min_budget=info.get("min_budget", 0),
                 max_budget=info.get("max_budget", 0),

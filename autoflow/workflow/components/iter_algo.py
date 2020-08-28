@@ -150,6 +150,7 @@ class AutoFlowIterComponent(AutoFlowComponent):
 
     def finish_evaluation(self):
         self.best_estimators = None
+        self.backup_component = None
 
 
 class LgbmIterativeMixIn():

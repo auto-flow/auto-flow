@@ -58,5 +58,5 @@ class NdArrayContainer(DataContainer):
 
     def sub_sample(self, index):
         new_arr = self.copy()
-        new_arr.data = deepcopy(self.data[index])  # fixme: 是否有copy的必要？
+        new_arr.data = self.data[index].copy()  # fixme: 是否有copy的必要？
         return new_arr

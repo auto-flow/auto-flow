@@ -75,7 +75,7 @@ class DataContainer():
     def __repr__(self):
         return f"{self.__class__.__name__}: \n" + repr(self.data)
 
-    def copy(self):
+    def copy(self, copy_data=False):
         if self is None:
             return None
         data = self.data
@@ -84,7 +84,10 @@ class DataContainer():
         self.resource_manager = None
         self_res = deepcopy(self)
         self_res.resource_manager = rm
-        self_res.data = data
+        if copy_data:
+            self_res.data = data.copy()
+        else:
+            self_res.data = data.copy()
         self.data = data
         self.resource_manager = rm
         return self_res

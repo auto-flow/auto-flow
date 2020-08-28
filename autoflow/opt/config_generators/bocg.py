@@ -551,7 +551,10 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         budgets = [budget_ for budget_ in list(self.budget2obvs.keys()) if budget_ >= budget]
         for budget_ in budgets:
             vectors = np.array(self.budget2obvs[budget_]["locks"])
-            vectors_list.append(vectors)
+            if vectors.size:
+                vectors_list.append(vectors)
+        if len(vectors_list)==0:
+            return False
         vectors = np.vstack(vectors_list)
         if np.any(np.array(vectors.shape) == 0):
             return False
