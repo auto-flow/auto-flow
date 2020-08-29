@@ -56,12 +56,12 @@ logger.info(f"nfeatures : {X_train.shape[0]}")
 logger.info(f"nrows : {X_train.shape[1]}")
 nfeatures = X_train.shape[0]
 if 0 <= nfeatures < 1000:
-    n_folds = 5
+    k_folds = 5
 elif 1000 <= nfeatures < 5000:
-    n_folds = 3
+    k_folds = 3
 else:
-    n_folds = 1
-logger.info(f"n_folds : {n_folds}")
+    k_folds = 1
+logger.info(f"k_folds : {k_folds}")
 
 initial_points = [
     {'estimating:__choice__': 'lightgbm', 'preprocessing:combined->normed:__choice__': 'encode.cat_boost',
@@ -159,7 +159,7 @@ pipe = AutoFlowClassifier(
         "use_local_search": False,
         "use_thompson_sampling": False,
     },
-    n_folds=n_folds,
+    k_folds=k_folds,
     warm_start=False,
     random_state=random_state,
     min_n_samples_for_SH=50,

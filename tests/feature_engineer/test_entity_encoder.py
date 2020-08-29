@@ -7,7 +7,7 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 
-from autoflow.feature_engineer.encode.entity_encoder import EntityEncoder
+from autoflow.feature_engineer.encode.entity import EntityEncoder
 from autoflow.tests.base import EstimatorTestCase
 from autoflow.utils.logging_ import setup_logger
 

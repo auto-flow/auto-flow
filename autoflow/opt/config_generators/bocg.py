@@ -43,7 +43,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             min_points_in_model=None, config_transformer_params=None, n_samples=5000,
             loss_transformer=None,
             use_local_search=False,
-            use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=8,
+            use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=8,  # use_thompson_sampling: 0 1 2
             tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True,
             # meta learn and multi task learn
             meta_alpha=40, meta_beta=10, support_ensemble_epms=True, update_weight_steps=10

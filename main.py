@@ -56,14 +56,14 @@ X_train = X_train.loc[X_train.index[mask], :]
 
 logger.info(f"nfeatures : {X_train.shape[0]}")
 logger.info(f"nrows : {X_train.shape[1]}")
-nfeatures = X_train.shape[0]
-if 0 <= nfeatures < 1000:
-    n_folds = 5
-elif 1000 <= nfeatures < 5000:
-    n_folds = 3
+n_samples = X_train.shape[0]
+if 0 <= n_samples < 1000:
+    k_folds = 5
+elif 1000 <= n_samples < 5000:
+    k_folds = 3
 else:
-    n_folds = 1
-logger.info(f"n_folds : {n_folds}")
+    k_folds = 1
+logger.info(f"k_folds : {k_folds}")
 
 random_state = envutil.RANDOM_STATE
 logger.info(f"random_state : {random_state}")
@@ -120,7 +120,7 @@ total = vm.total / 1024 / 1024
 free = vm.free / 1024 / 1024
 used = vm.used / 1024 / 1024
 task_info.update({
-    "n_fold": n_folds,
+    "n_fold": k_folds,
     "n_workers": n_workers,
     "df_memory_usage": memory_usage,
     "minors_list": minors,
@@ -149,7 +149,7 @@ pipe = AutoFlowClassifier(
         "use_thompson_sampling": False,
     },
     evaluation_strategy=None,
-    n_folds=n_folds,
+    k_folds=k_folds,
     warm_start=False,
     random_state=random_state,
     concurrent_type="process",
