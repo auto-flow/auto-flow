@@ -50,7 +50,7 @@ class BaseTNN(nn.Module):
             seq.append(nn.Dropout(dropout_rate))
         return nn.Sequential(*seq)
 
-    def initializing_modules(self,modules):
+    def initializing_modules(self, modules):
         for m in modules:
             if isinstance(m, nn.Linear):
                 m.weight.data.normal_(0, 0.02)

@@ -4,7 +4,7 @@
 # @Contact    : tqichun@gmail.com
 import functools
 import warnings
-from copy import copy
+from copy import copy, deepcopy
 from time import time
 
 import category_encoders.utils as util
@@ -42,8 +42,20 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
             optimizer="adam",
             normalize=True,
             copy=True,
-            budget=10
+            budget=10,
+            early_stopping_rounds=5,
+            # warm_start=False,
+            # accepted_samples=30,
+            update_epoch=5,
+            update_accepted_samples=10,
+            update_used_samples=100,
     ):
+        self.update_used_samples = update_used_samples
+        self.update_epoch = update_epoch
+        self.update_accepted_samples = update_accepted_samples
+        # self.accepted_samples = accepted_samples
+        # self.warm_start = warm_start
+        self.early_stopping_rounds = early_stopping_rounds
         self.budget = budget
         self.normalize = normalize
         self.copy = copy
@@ -72,7 +84,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
             "dropout1": self.dropout1,
             "dropout2": self.dropout2,
         }
-        self.rng = check_random_state(self.random_state)
+        self.rng: np.random.RandomState = check_random_state(self.random_state)
         self.trainer = TrainEntityEmbeddingNN(
             lr=self.lr,
             max_epoch=self.max_epoch,
@@ -87,42 +99,126 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         self.scaler = StandardScaler(copy=True)
         self.keep_going = False
         self.iter = 0
+        self.is_classification = None
+        self.samples_db = [pd.DataFrame(), np.array([])]
+        self.final_observations = self.get_initial_final_observations()
+        self.n_uniques = None
+        self.transform_matrix = None
+        self.stage = ""
+        self.refit_times = 0
 
-    def fit(self, X, y=None, **kwargs):
-        # first check the type
-        X = util.convert_input(X)
-        self._dim = X.shape[1]
-        self.start_time = time()
+    def get_initial_final_observations(self):
+        return [pd.DataFrame(), np.array([])]
+
+    def init_variables(self):
+        self.learning_curve = [
+            [],  # train_sizes_abs [0]
+            [],  # train_scores    [1]
+        ]
+        self.performance_history = np.full(self.early_stopping_rounds, -np.inf)
+        self.iteration_history = np.full(self.early_stopping_rounds, 0, dtype="int32")
+        N = len(self.performance_history)
+        self.best_estimators = np.zeros([N], dtype="object")
+        self.early_stopped = False
+        self.best_iteration = 0
+
+    def initial_fit(self, X: pd.DataFrame, y: np.ndarray):
         # if columns aren't passed, just use every string column
         if self.cols is None:
             self.cols = util.get_obj_cols(X)
         else:
             self.cols = util.convert_cols_to_list(self.cols)
-        if len(self.cols) == 0:
-            self.keep_going = True
-            return self
         self.ordinal_encoder = OrdinalEncoder(dtype=np.int)
         # 1. use sklearn's OrdinalEncoder convert categories to int
         self.ordinal_encoder.fit(X[self.cols])
-        X_ordinal = self.ordinal_encoder.transform(X[self.cols])
-        n_uniques = X_ordinal.max(axis=0).astype("int") + 1
-        if self.normalize and type_of_target(y) != "continuous":
+        self.is_classification = (type_of_target(y) != "continuous")
+        if self.normalize and self.is_classification:
             self.normalize = False
         if self.normalize:
-            y = self.scaler.fit_transform(y[:, None]).flatten()
+            self.scaler.fit(y[:, None])
+
+    def _fit(self, X: pd.DataFrame, y: np.ndarray):
+        X_ordinal = self.ordinal_encoder.transform(X[self.cols])
+        if self.n_uniques is None:
+            self.n_uniques = X_ordinal.max(axis=0).astype("int") + 1
+        if self.normalize:
+            y = self.scaler.transform(y[:, None]).flatten()
         # 2. train_entity_embedding_nn
         self.model = self.trainer.train(
             self.model, EntityEmbeddingNN, X_ordinal, y, None, None,
-            self.callback, n_uniques=n_uniques
+            self.callback, n_uniques=self.n_uniques
         )
+
+    def fit(self, X, y=None, **kwargs):
+        self.init_variables()
+        # first check the type
+        X = util.convert_input(X)
+        # fixme : 默认是warm start的
+        self._dim = X.shape[1]
+        # todo add logging_level, verbose
+        if self.samples_db[0].shape[0] == 0:
+            self.logger.info('Initial fitting')
+            # todo handle n_choices <=3 by using equidistence_encoder
+            self.initial_fit(X, y)
+        if len(self.cols) == 0:
+            self.keep_going = True
+            return self
+        self.start_time = time()
+        if self.samples_db[0].shape[0] == 0:
+            self.trainer.max_epoch = self.max_epoch
+            self._fit(X, y)
+            self.samples_db[0] = pd.concat([self.samples_db[0], X], axis=0).reset_index(drop=True)
+            self.samples_db[1] = np.hstack([self.samples_db[1], y])
+            self.transform_matrix = self.get_transform_matrix()
+            self.stage = "Initial fitting"
+            # todo early_stopping choose best model
+        else:
+            self.model.max_epoch = 0
+            self.trainer.max_epoch = self.update_epoch
+            # update final_observations
+            self.final_observations[0] = pd.concat([self.final_observations[0], X], axis=0).reset_index(drop=True)
+            self.final_observations[1] = np.hstack([self.final_observations[1], y])
+            observations = self.final_observations[0].shape[0]
+            if observations < self.update_accepted_samples:
+                self.logger.info(f"only have {observations} observations, didnt training model.")
+                self.transform_matrix = None
+            else:
+                n_used_samples = min(self.update_used_samples - observations, self.samples_db[0].shape[0])
+                indexes = self.rng.choice(np.arange(self.samples_db[0].shape[0]), n_used_samples, False)
+                # origin samples_db + final_observations -> X, y
+                X_ = pd.concat([self.samples_db[0].loc[indexes, :], self.final_observations[0]]).reset_index(drop=True)
+                y_ = np.hstack([self.samples_db[1][indexes], self.final_observations[1]])
+                # fitting (using previous model)
+                self._fit(X_, y_)
+                # update samples_db by final_observations
+                self.samples_db[0] = pd.concat([self.samples_db[0], self.final_observations[0]], axis=0). \
+                    reset_index(drop=True)
+                self.samples_db[1] = np.hstack([self.samples_db[1], self.final_observations[1]])
+                # clear final_observations
+                self.final_observations = self.get_initial_final_observations()
+                self.transform_matrix = self.get_transform_matrix()
+                self.refit_times += 1
+                self.stage = f"refit-{self.refit_times}-times"
         return self
+
+    def get_transform_matrix(self):
+        # todo: 测试多个离散变量字段的情况
+        N = self.n_uniques.max()
+        M = self.n_uniques.size
+        X_ordinal = np.zeros([N, M])
+        for i, n_unique in enumerate(self.n_uniques):
+            X_ordinal[:, i][:n_unique] = np.arange(n_unique)
+        X_embeds, _ = self.model(X_ordinal)
+        X_embeds = [X_embed.detach().numpy() for X_embed in X_embeds]
+        for i, n_unique in enumerate(self.n_uniques):
+            X_embeds[i] = X_embeds[i][:n_unique, :]
+        return X_embeds
 
     def transform(self, X):
         if self.keep_going:
             return X
         if self._dim is None:
-            raise ValueError(
-                'Must train encoder before it can be used to transform data.')
+            raise ValueError('Must train encoder before it can be used to transform data.')
 
         # first check the type
         X = util.convert_input(X)
@@ -212,4 +308,13 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         if time() - self.start_time > self.budget:
             self.logger.info(f"Exceeded budget time({self.budget}), {self.__class__.__name__} is early stopping ...")
             return True
-        return False
+        if np.any(train_score > self.performance_history):
+            index = epoch_index % self.early_stopping_rounds
+            self.best_estimators[index] = deepcopy(model)
+            self.performance_history[index] = train_score
+            self.iteration_history[index] = epoch_index
+        else:
+            self.early_stopped = True
+            self.logger.info(f"performance in training set no longer increase "
+                             f"in {self.early_stopping_rounds} times, early stopping ...")
+        return self.early_stopped
