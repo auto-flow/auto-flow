@@ -207,3 +207,15 @@ if __name__ == '__main__':
         '456',
         '256'
     ]))
+
+
+def pairwise_distance(X, Y):
+    A, M = X.shape
+    B, _ = Y.shape
+    matrix1 = X.reshape([A, 1, M])
+    matrix1 = np.repeat(matrix1, B, axis=1)
+    matrix2 = Y.reshape([1, B, M])
+    matrix2 = np.repeat(matrix2, A, axis=0)
+    distance_sqr = np.sum((matrix1 - matrix2) ** 2, axis=-1)  # A, B
+    # didnt sqrt
+    return distance_sqr

@@ -9,6 +9,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import check_array
 
+from autoflow.utils.data import pairwise_distance
+
 
 def get_equidistance_matrix(N):
     '''
@@ -23,18 +25,6 @@ def get_equidistance_matrix(N):
 
     '''
     return np.vstack([np.eye(N - 1), np.ones([1, N - 1]) * ((1 - np.sqrt(N)) / (N - 1))])
-
-
-def pairwise_distance(X, Y):
-    A, M = X.shape
-    B, _ = Y.shape
-    matrix1 = X.reshape([A, 1, M])
-    matrix1 = np.repeat(matrix1, B, axis=1)
-    matrix2 = Y.reshape([1, B, M])
-    matrix2 = np.repeat(matrix2, A, axis=0)
-    distance_sqr = np.sum((matrix1 - matrix2) ** 2, axis=-1)  # A, B
-    # didnt sqrt
-    return distance_sqr
 
 
 class EquidistanceEncoder(BaseEstimator, TransformerMixin):
