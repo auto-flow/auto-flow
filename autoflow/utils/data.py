@@ -162,7 +162,7 @@ def is_text(s, cat_been_checked=False):
     s = s.astype(str)
     s = s.str.split(" ")
     s = s.apply(len)
-    return np.all(s >= 2)  # todo 参考 AG
+    return np.all(s >= 4)  # todo 参考 AG
 
 
 def is_date(s, cat_been_checked=False):

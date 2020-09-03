@@ -80,7 +80,7 @@ def parse_evaluation_strategy(evaluation_strategy, SH_holdout_condition, n_sampl
     # 解析 evaluate_strategy
     value_error = ValueError(f"Unrecognizable evaluation_strategy {evaluation_strategy}")
     assert isinstance(evaluation_strategy, str), value_error
-    pattern = re.compile("^(?P<SH>SH\-)?(?P<CV_holdout>((?P<k_folds>\d)CV)|holdout)$")
+    pattern = re.compile("^(?P<SH>SH\-)?(?P<CV_holdout>((?P<k_folds>\d+)CV)|holdout)$")
     m = pattern.match(evaluation_strategy)
     assert m is not None, value_error
     CV_holdout = m.group("CV_holdout")

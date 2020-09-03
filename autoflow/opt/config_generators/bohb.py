@@ -49,7 +49,7 @@ class BOHB(BaseConfigGenerator):
         self.bandwidth_factor = bandwidth_factor
         self.min_bandwidth = min_bandwidth
         self.min_points_in_model = min_points_in_model
-        self.transformer = ConfigurationTransformer(impute=None, ohe=False).fit(configspace)
+        self.transformer = ConfigurationTransformer(impute=None, encoder=False).fit(configspace)
         self.n_variables = self.transformer.n_variables
         if min_points_in_model is None:
             self.min_points_in_model = self.n_variables + 1

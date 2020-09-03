@@ -128,7 +128,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         # ----TPE------------------------
         self.tpe_params.update({"top_n_percent": self.top_n_percent})
         self.tpe = TreeStructuredParzenEstimator(**self.tpe_params)
-        self.tpe_config_transformer = ConfigurationTransformer(impute=False, ohe=False)
+        self.tpe_config_transformer = ConfigurationTransformer(impute=False, encoder=False)
         self.tpe_loss_transformer = LossTransformer()
         self.tpe_config_transformer.fit(self.config_space)
         self.tpe.set_config_transformer(self.tpe_config_transformer)

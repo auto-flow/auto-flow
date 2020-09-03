@@ -1,7 +1,7 @@
 import logging
 import random
-from copy import deepcopy
-from typing import List, Union, Dict
+from copy import copy, deepcopy
+from typing import List, Union, Dict, Tuple
 
 import numpy as np
 from ConfigSpace import ConfigurationSpace, Configuration, CategoricalHyperparameter, OrdinalHyperparameter, Constant, \
@@ -25,6 +25,10 @@ def replace_phps(shps: ConfigurationSpace, key, value):
     for hp in shps.get_hyperparameters():
         if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
             hp.value = _encode(value)
+    for cond in shps.get_conditions():
+        hp = cond.child
+        if hp.__class__.__name__ == "Constant" and hp.name.endswith(key):
+            hp.value = _encode(value)
 
 
 def get_grid_initial_configs(shps: ConfigurationSpace, n_configs=-1, random_state=42):
@@ -42,6 +46,66 @@ def estimate_config_space_numbers(cs: ConfigurationSpace):
     for config in cs.get_hyperparameters():
         result *= (config.get_num_neighbors() + 1)
     return result
+
+
+def config_regulation(
+        config_space: ConfigurationSpace,
+        configs: List[Configuration],
+        random_state=0
+) -> Tuple[List[Configuration], np.ndarray]:
+    const_mapper = {}
+    var_keys = set()
+    drop_keys = set()
+    # build additional_cs_list
+    additional_cs_list = []
+    for top_hp in config_space.get_hyperparameters():
+        cur_parents = config_space.get_parents_of(top_hp.name)
+        # config_space have, configs dont have  (top level)
+        if len(cur_parents) == 0 and top_hp.name not in configs[0]:
+            conditions = []
+            for condition in config_space.get_conditions():
+                if condition.parent.name == top_hp.name:
+                    conditions.append(condition)
+            child_configs = []
+            for hp in config_space.get_hyperparameters():
+                cur_parents = config_space.get_parents_of(hp.name)
+                if len(cur_parents) > 0 and cur_parents[0].name == top_hp.name:
+                    child_configs.append(hp)
+            cs = ConfigurationSpace()
+            cs.add_hyperparameters(deepcopy(child_configs))
+            cs.add_hyperparameter(deepcopy(top_hp))
+            cs.add_conditions(deepcopy(conditions))
+            cs.seed(random_state)
+            additional_cs_list.append(cs)
+    result_configs = []
+    result_vectors = []
+    for config in configs:
+        config_ = copy(config)
+        passed_keys = set(const_mapper.keys()) | var_keys | drop_keys
+        unk_config_ = {k: v for k, v in config_.items() if k not in passed_keys}
+        # update const_mapper, var_keys, drop_keys
+        for k, v in unk_config_.items():
+            if k in config_space:
+                hp = config_space.get_hyperparameter(k)
+                if isinstance(hp, Constant):
+                    const_mapper[hp.name] = hp.value
+                else:
+                    var_keys.add(k)
+            else:
+                # config_space dont have, configs have
+                drop_keys.add(k)
+        # replace by const_mapper
+        config_ = {k: const_mapper[k] if k in const_mapper else v for k, v in config_.items()}
+        # drop_keys
+        for key in drop_keys:
+            config_.pop(key, None)
+        # add additional_configs
+        for cs in additional_cs_list:
+            config_.update(cs.sample_configuration().get_dictionary())
+        config_checked = Configuration(config_space, values=config_)
+        result_configs.append(config_checked.get_dictionary())
+        result_vectors.append(config_checked.get_array())
+    return result_configs, np.array(result_vectors)
 
 
 class ConfigSpaceGrid:

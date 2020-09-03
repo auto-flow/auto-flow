@@ -78,12 +78,13 @@ def run_subset():
     encoder.fit(df, y)
     plot_embedding(encoder)
 
+
 def run_multi_cat_vars():
     df = pd.read_csv("estimator_accuracy.csv")
-    df = df[['estimator','feature_engineer','loss','highc_cat_encoder','cost_time','minimum_fraction', 'accuracy']]
+    df = df[['estimator', 'feature_engineer', 'loss', 'highc_cat_encoder', 'cost_time', 'minimum_fraction', 'accuracy']]
     y = df.pop('accuracy')
     encoder = EntityEncoder(
-        cols=['estimator','feature_engineer','highc_cat_encoder','minimum_fraction'],
+        cols=['estimator', 'feature_engineer', 'highc_cat_encoder', 'minimum_fraction'],
         max_epoch=300,
         early_stopping_rounds=100,
         update_accepted_samples=10,
@@ -91,42 +92,100 @@ def run_multi_cat_vars():
         budget=np.inf
     )
     encoder.fit(df, y)
-    X_trans=encoder.transform(df)
-    X_inv=encoder.inverse_transform(X_trans)
+    X_trans = encoder.transform(df)
+    X_inv = encoder.inverse_transform(X_trans)
     print(X_inv)
     np.all(X_inv == df)
     # for i in range(4):
     #     plot_embedding(encoder,i)
 
+
 def run_contain_nan():
     df = pd.read_csv("estimator_accuracy.csv")
-    df = df[['estimator','feature_engineer','loss','highc_cat_encoder','cost_time','minimum_fraction', 'af_hidden', 'accuracy']]
+    df = df[['estimator', 'feature_engineer', 'loss', 'highc_cat_encoder', 'cost_time', 'minimum_fraction', 'af_hidden',
+             'accuracy']]
     y = df.pop('accuracy')
     encoder = EntityEncoder(
-        cols=['estimator','feature_engineer','highc_cat_encoder','minimum_fraction','af_hidden'],
+        cols=['estimator', 'feature_engineer', 'highc_cat_encoder', 'minimum_fraction', 'af_hidden'],
         max_epoch=200,
         early_stopping_rounds=100,
         update_accepted_samples=10,
         update_used_samples=100,
-        budget=np.inf,n_jobs=1
+        budget=np.inf, n_jobs=1
     )
     encoder.fit(df, y)
     for i in range(5):
-        plot_embedding(encoder,i)
-    X_trans=encoder.transform(df)
+        plot_embedding(encoder, i)
+    X_trans = encoder.transform(df)
     print(X_trans)
-    X_trans[pd.isna(X_trans)]=0
-    X_inv=encoder.inverse_transform(X_trans)
-    df2=df.copy()
+    X_trans[pd.isna(X_trans)] = 0
+    X_inv = encoder.inverse_transform(X_trans)
+    df2 = df.copy()
     df2['af_hidden'][pd.isna(df2['af_hidden'])] = 'leaky_relu'
     print(X_inv)
-    assert np.all(df2==X_inv)
+    assert np.all(df2 == X_inv)
     # np.all(X_inv == df)
+
+
+def run_current_cols(exp=1):
+    from joblib import load, dump
+    import os
+    df = pd.read_csv("estimator_accuracy.csv")
+    df = df[['estimator', 'feature_engineer', 'loss', 'highc_cat_encoder', 'cost_time', 'minimum_fraction', 'af_hidden',
+             'accuracy']]
+    y = df.pop('accuracy')
+    fname = "ee.bz2"
+    if os.path.exists(fname):
+        encoder = load(fname)
+    else:
+        encoder = EntityEncoder(
+            cols=['estimator', 'feature_engineer', 'highc_cat_encoder', 'minimum_fraction', 'af_hidden'],
+            max_epoch=200,
+            early_stopping_rounds=100,
+            update_accepted_samples=10,
+            update_used_samples=100,
+            budget=np.inf, n_jobs=1
+        )
+        encoder.fit(df, y)
+        dump(encoder, fname)
+    # for i in range(5):
+    #     plot_embedding(encoder,i)
+    if exp==1:
+        # experiment 1.  subtractive
+        df_exp1 = df.copy()
+        df_exp1.pop('highc_cat_encoder')
+        df_exp1_res = encoder.transform(
+            df_exp1,
+            current_cols=['estimator', 'feature_engineer', 'minimum_fraction', 'af_hidden']
+        )
+    elif exp==2:
+        # experiment 2. additive
+        rng = np.random.RandomState(42)
+        df_exp2 = df.copy()
+        df_exp2['dummy'] = rng.randint(0, 5, [500])
+        df_exp2_res = encoder.transform(
+            df_exp2,
+            current_cols=['estimator', 'feature_engineer', 'highc_cat_encoder', 'minimum_fraction', 'af_hidden', 'dummy']
+        )
+    elif exp==3:
+        # experiment 3. subtractive + additive
+        rng = np.random.RandomState(42)
+        df_exp3 = df.copy()
+        df_exp3.pop('highc_cat_encoder')
+        df_exp3['dummy'] = rng.randint(0, 5, [500])
+        df_exp3_res = encoder.transform(
+            df_exp3,
+            current_cols=['estimator', 'feature_engineer', 'minimum_fraction', 'af_hidden',
+                          'dummy']
+        )
+        print(df_exp3_res)
+
 
 if __name__ == '__main__':
     setup_logger()
     # run_contain_nan()
     # run_multi_cat_vars()
-    run_iterative()
+    # run_iterative()
     # run_all()
     # run_subset()
+    run_current_cols(exp=3)

@@ -16,8 +16,10 @@ class BaseImputer(BaseEstimator, TransformerMixin):
             categorical_feature=None,
             numerical_feature=None,
             copy=True,
-            missing_rate=0.4
+            missing_rate=0.4,
+            inclusive=True,
     ):
+        self.inclusive = inclusive
         self.missing_rate = missing_rate
         self.numerical_feature = numerical_feature
         self.copy = copy
@@ -51,7 +53,10 @@ class BaseImputer(BaseEstimator, TransformerMixin):
         # todo: 统计各列的缺失率，过高则删除
         missing_rates = np.count_nonzero(pd.isna(X), axis=0) / X.shape[0]
         self.missing_rates = missing_rates.tolist()
-        drop_mask = missing_rates >= self.missing_rate
+        if self.inclusive:
+            drop_mask = missing_rates >= self.missing_rate
+        else:
+            drop_mask = missing_rates > self.missing_rate
         self.drop_mask = drop_mask
         drop_columns = X.columns[drop_mask]
         self.drop_columns = drop_columns.tolist()

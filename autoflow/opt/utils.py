@@ -199,9 +199,9 @@ class MixedTsneEncoder(TransformerMixin, BaseEstimator):
 
 
 class ConfigurationTransformer():
-    def __init__(self, impute: Optional[float] = -1, ohe: bool = False):
+    def __init__(self, impute: Optional[float] = -1, encoder=None):
         self.impute = impute
-        self.ohe = ohe
+        self.encoder = encoder
 
     def fit(self, config_space: ConfigurationSpace):
         mask = []
@@ -249,23 +249,27 @@ class ConfigurationTransformer():
         self.n_top_levels = n_top_levels
         return self
 
+    def fit_encoder(self, vectors):
+        vectors = vectors[:, self.mask]
+        if self.encoder is not None:
+            self.encoder.fit(vectors)
+
     def transform(self, vectors: np.ndarray) -> np.ndarray:
         vectors = vectors[:, self.mask]
-        if self.ohe:
-            self.encoder = OneHotEncoder(self.n_choices_list)
-            vectors = self.encoder.fit_transform(vectors)
-
+        if self.encoder is not None:
+            vectors = self.encoder.transform(vectors)
         if self.impute is not None:
             if self.impute == "random_choice":
                 vectors = self.impute_conditional_data(vectors)
-            else:
+            else:  # is numeric
                 vectors[np.isnan(vectors)] = float(self.impute)
         return vectors
 
     def inverse_transform(self, array: np.ndarray, return_vector=False) -> Union[np.ndarray, None, Configuration]:
         # todo: 没有考虑涉及OHE的部分
         # fixme: 一般用在对KDE或TPE的l(x)采样后，用vector构建一个Configuration
-        assert self.ohe == False
+        if self.encoder is not None:
+            array = self.encoder.inverse_transform(array)  # fixme
         result = np.zeros([len(self.mask)])
         result[self.mask] = array
         if return_vector:
@@ -363,9 +367,6 @@ def add_configs_origin(configs: List[Configuration], origin):
         configs = [configs]
     for config in configs:
         config.origin = origin
-
-
-
 
 
 if __name__ == '__main__':

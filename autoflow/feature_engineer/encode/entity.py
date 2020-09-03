@@ -16,10 +16,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import StandardScaler
-from sklearn.utils import check_array
 from sklearn.utils._random import check_random_state
 from sklearn.utils.multiclass import type_of_target
 
+from autoflow.feature_engineer.encode.equidistance import EquidistanceEncoder
 from autoflow.feature_engineer.impute.simple import CategoricalImputer
 from autoflow.tnn.entity_embedding_nn import TrainEntityEmbeddingNN, EntityEmbeddingNN
 from autoflow.utils.data import pairwise_distance
@@ -116,6 +116,8 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         self.num_fill_value = -1
         self.imputer = CategoricalImputer(
             strategy="constant", fill_value=self.cat_fill_value, numeric_fill_value=self.num_fill_value)
+        self.current_cols = None
+        self.equidistance_encoder = None
 
     def get_initial_final_observations(self):
         return [pd.DataFrame(), np.array([])]
@@ -240,34 +242,55 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         categories = []
         for tm, category in zip(transform_matrix, self.ordinal_encoder.categories_):
             if is_numeric_dtype(category.dtype):
-                mask = category==self.num_fill_value
+                mask = category == self.num_fill_value
             else:
-                mask = category==self.cat_fill_value
+                mask = category == self.cat_fill_value
             categories.append(category[~mask])
             results.append(tm[~mask, :])
         return results, categories
 
-    def transform(self, X, return_df=True):
+    def transform(self, X, return_df=True, current_cols=None):
+        if current_cols is not None:
+            self.current_cols = current_cols
         if self.keep_going:
             return X
         if self._dim is None:
             raise ValueError('Must train encoder before it can be used to transform data.')
-        isna = pd.isna(X[self.cols]).values
         # first check the type
         X = util.convert_input(X)
         if self.copy:
             X = copy(X)
         index = X.index
         X.index = range(X.shape[0])
-        # then make sure that it is the right size
-        if X.shape[1] != self._dim:
-            raise ValueError('Unexpected input dimension %d, expected %d' % (X.shape[1], self._dim,))
-
-        if not self.cols:
-            return X if return_df else X.values
-        X_cat = X[self.cols]
-        X_impute = self.imputer.fit_transform(X_cat)
+        # check current_cols
+        if self.current_cols is None:
+            self.current_cols = copy(self.cols)
+            additive = np.array([])
+            subtractive = np.array([])
+            subtracted_cols=copy(self.cols)
+        else:
+            additive = np.setdiff1d(self.current_cols, self.cols)
+            subtractive = np.setdiff1d(self.cols, self.current_cols)
+            subtracted_cols=np.setdiff1d(self.cols,subtractive)
+        # isna
+        isna = pd.isna(X[subtracted_cols]).values
+        # return directly
+        # if not self.cols:
+        #     return X if return_df else X.values
         # 1. convert X to X_ordinal, and handle unknown categories
+        if subtractive.size:
+            X_cat_list = []
+            for i, col in enumerate(self.cols):
+                if col in subtractive:
+                    s = pd.Series([self.ordinal_encoder.categories_[i][0]] * X.shape[0])
+                    X_cat_list.append(s)
+                else:
+                    X_cat_list.append(X[col])
+            X_cat = pd.concat(X_cat_list, axis=1)
+            X_cat.columns = self.cols
+        else:
+            X_cat = X[self.cols]
+        X_impute = self.imputer.fit_transform(X_cat)
         is_known_categories = []
         for i, col in enumerate(self.cols):
             categories = self.ordinal_encoder.categories_[i]
@@ -276,26 +299,30 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
                 X_impute.loc[~is_known_category, col] = categories[0]
             is_known_categories.append(is_known_category)
         X_ordinal = self.ordinal_encoder.transform(X_impute)
-
         # 2. embedding by nn, and handle unknown categories by fill 0
         X_embeds, _ = self.model(X_ordinal)
         X_embeds = [X_embed.detach().numpy() for X_embed in X_embeds]
         for i, is_known_category in enumerate(is_known_categories):
             if not np.all(is_known_category):
                 X_embeds[i][~is_known_category, :] = 0
+        # using map[column, value] instead of list[value]
+        X_embeds_mapper = {column: X_embeds[i] for i, column in enumerate(self.cols)}
+        isna_mapper = {column: isna[:, i] for i, column in enumerate(subtracted_cols)}
+        for col in subtractive:
+            isna_mapper[col]=np.zeros([X.shape[0]], dtype="bool")
         # 3. replace origin
         get_valid_col_name = functools.partial(self.get_valid_col_name, df=X)
-        col2idx = dict(zip(self.cols, range(len(self.cols))))
+        # col2idx = dict(zip(self.cols, range(len(self.cols))))
         result_df_list = []
         cur_columns = []
         for column in X.columns:
-            if column in self.cols:
+            if column in subtracted_cols:
                 if len(cur_columns) > 0:
                     result_df_list.append(X[cur_columns])
                     cur_columns = []
-                idx = col2idx[column]
-                embed = X_embeds[idx]
-                na_mask = isna[:, idx]
+                # idx = col2idx[column]
+                embed = X_embeds_mapper[column]
+                na_mask = isna_mapper[column]
                 if np.any(na_mask):
                     embed[na_mask, :] = np.nan
                 new_columns = [f"{column}_{i}" for i in range(embed.shape[1])]
@@ -309,6 +336,10 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
             result_df_list.append(X[cur_columns])
             cur_columns = []
         X = pd.concat(result_df_list, axis=1)
+        # if additive exists, encode additive by
+        if additive.size:
+            self.equidistance_encoder = EquidistanceEncoder(cols=additive.tolist())
+            X = self.equidistance_encoder.fit_transform(X)
         X.index = index
         if return_df:
             return X
@@ -317,7 +348,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, X, return_df=True):
         # X: np.ndarray = check_array(X)
-        X=np.array(X)
+        X = np.array(X)
         assert self.n_columns == X.shape[1] - (np.sum(self.model.embed_dims) - len(self.n_uniques))
         transform_matrix, categories = self.get_origin_transform_matrix(self.transform_matrix)
         results = np.zeros([X.shape[0], 0], dtype="float")

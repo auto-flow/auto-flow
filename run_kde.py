@@ -9,7 +9,7 @@ from autoflow.opt.config_generators.density_estimator.tpe import TreeStructuredP
 from autoflow.opt.utils import ConfigurationTransformer
 
 config_space = load("config_space.bz2")
-config_space_transformer = ConfigurationTransformer(impute=None, ohe=False)
+config_space_transformer = ConfigurationTransformer(impute=None, encoder=False)
 config_space_transformer.fit(config_space)
 tpe = TreeStructuredParzenEstimator()
 

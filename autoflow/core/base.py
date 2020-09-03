@@ -1,9 +1,12 @@
 import inspect
+import json
 import multiprocessing as mp
 import os
 from collections import Counter
 from copy import copy
 from importlib import import_module
+from pathlib import Path
+from time import time
 from typing import Union, Optional, Dict, Any, List, Type
 
 import numpy as np
@@ -12,7 +15,9 @@ import psutil
 from ConfigSpace import ConfigurationSpace
 from frozendict import frozendict
 from sklearn.base import BaseEstimator
+from sklearn.metrics import pairwise_distances
 from sklearn.model_selection import KFold, StratifiedKFold, ShuffleSplit, StratifiedShuffleSplit
+from sklearn.preprocessing import MinMaxScaler
 
 import autoflow.opt.core.nameserver as hpns
 from autoflow import constants
@@ -26,14 +31,16 @@ from autoflow.ensemble.vote.classifier import VoteClassifier
 from autoflow.evaluation.budget import get_default_algo2iter, get_default_algo2budget_mode, get_default_algo2weight_mode
 from autoflow.evaluation.strategy import parse_evaluation_strategy
 from autoflow.evaluation.train_evaluator import TrainEvaluator
+from autoflow.feature_engineer.encode import EntityEncoder
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
+from autoflow.metalearning.metafeatures.calc import calculate_metafeatures
 from autoflow.metrics import r2, accuracy
 from autoflow.opt.result_logger import DatabaseResultLogger
-from autoflow.opt.utils import get_max_SH_iter, get_budgets
+from autoflow.opt.utils import get_max_SH_iter, get_budgets, ConfigurationTransformer
 from autoflow.optimizer import Optimizer
 from autoflow.resource_manager.base import ResourceManager
-from autoflow.utils.config_space import replace_phps
+from autoflow.utils.config_space import replace_phps, config_regulation
 from autoflow.utils.klass import instancing, get_valid_params_in_kwargs, set_if_not_None
 from autoflow.utils.list_ import multiply_to_list
 from autoflow.utils.logging_ import get_logger, setup_logger
@@ -52,7 +59,6 @@ class AutoFlowEstimator(BaseEstimator):
             max_budget: float = 1,
             eta: float = 4,
             SH_only: bool = True,
-            # budget2kfold: Optional[Dict[float, int]] = None,  # todo  remove this
             algo2budget_mode: Optional[Dict[str, str]] = None,
             algo2weight_mode: Optional[Dict[str, str]] = None,
             algo2iter: Optional[Dict[str, int]] = None,
@@ -60,11 +66,8 @@ class AutoFlowEstimator(BaseEstimator):
             only_use_subsamples_budget_mode: bool = False,
             k_folds: int = 5,
             holdout_test_size: float = 1 / 3,
-            evaluation_strategy="auto",  # will rewrite k_folds, refit, min_budget, max_budget, eta
+            evaluation_strategy="simple",  # will rewrite k_folds, refit, min_budget, max_budget, eta
             SH_holdout_condition="s > 1e5 or (s * f > 1e6 and s > 1e3)",
-            # n_keep_samples: int = 30000,  # todo remove this
-            # min_n_samples_for_SH: int = 1000,  # todo remove this
-            # max_n_samples_for_CV: int = 5000,  # todo remove this
             warm_start=True,
             config_generator: Union[str, Type] = "ET",
             config_generator_params: dict = frozendict(),
@@ -86,7 +89,7 @@ class AutoFlowEstimator(BaseEstimator):
             consider_ordinal_as_cat: bool = False,
             should_store_intermediate_result: bool = False,
             refit: bool = False,
-            fit_transformer_per_cv:bool=False,
+            fit_transformer_per_cv: bool = False,
             should_calc_all_metrics: bool = True,
             should_stack_X: bool = True,
             debug_evaluator: bool = False,
@@ -94,8 +97,16 @@ class AutoFlowEstimator(BaseEstimator):
             imbalance_threshold=2,
             time_limit=1200,
             memory_limit=None,
+            mtl_path="~/autoflow/metalearning",
+            mtl_kND=6,
+            mtl_suggestions_per_ND=5,
+            mtl_metafeatures=None,
             **kwargs
     ):
+        self.mtl_metafeatures = mtl_metafeatures
+        self.mtl_suggestions_per_ND = mtl_suggestions_per_ND
+        self.mtl_kND = mtl_kND
+        self.mtl_path = os.path.expandvars(os.path.expanduser(mtl_path))
         self.fit_transformer_per_cv = fit_transformer_per_cv
         self.SH_holdout_condition = SH_holdout_condition
         self.evaluation_strategy = evaluation_strategy
@@ -118,10 +129,6 @@ class AutoFlowEstimator(BaseEstimator):
         self.algo2iter = algo2iter
         self.algo2budget_mode = algo2budget_mode
         self.algo2weight_mode = algo2weight_mode
-        # self.budget2kfold = budget2kfold
-        # self.max_n_samples_for_CV = max_n_samples_for_CV
-        # self.min_n_samples_for_SH = min_n_samples_for_SH
-        # self.n_keep_samples = n_keep_samples
         self.config_generator_params = dict(config_generator_params)
         assert isinstance(k_folds, int) and k_folds >= 1
         # fixme: support int
@@ -139,6 +146,7 @@ class AutoFlowEstimator(BaseEstimator):
         total = vm.total / 1024 / 1024
         free = vm.free / 1024 / 1024
         used = vm.used / 1024 / 1024
+        self.free_memory = free
         self.logger.info(f"Computer's Memory Info: total = {total:.2f}M, free = {free:.2f}M, used = {used:.2f}M")
         if memory_limit is None:
             self.logger.info(
@@ -182,6 +190,24 @@ class AutoFlowEstimator(BaseEstimator):
         self.hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
         # ---resource_manager-----------------------------------
         self.resource_manager: ResourceManager = instancing(resource_manager, ResourceManager, kwargs)
+        # ---metalearning file structure------------------------
+        fs = self.resource_manager.file_system
+        fs.mkdir(self.mtl_path)
+        self.mtl_repo_path = fs.join(self.mtl_path, "repository")
+        self.mtl_metafeatures_path = fs.join(self.mtl_path, "metafeatures.csv")
+        # todo: generalize to s3, hdfs
+        if fs.exists(self.mtl_metafeatures_path):
+            origin_mtl_metafeatures = pd.read_csv(self.mtl_metafeatures_path, index_col=0)
+        else:
+            origin_mtl_metafeatures = pd.DataFrame()
+        if self.mtl_metafeatures is None and origin_mtl_metafeatures.shape[0] == 0:
+            import autoflow.metalearning as mtl_module
+            mtl_metafeatures_csv = Path(mtl_module.__file__).parent / "metafeatures.csv"
+            self.logger.info(f"Initially loading mtl_metafeatures_csv: '{mtl_metafeatures_csv}'")
+            origin_mtl_metafeatures = pd.read_csv(mtl_metafeatures_csv, index_col=0)
+            origin_mtl_metafeatures.to_csv(self.mtl_metafeatures_path)
+        # todo: 设计一种机制，如果相比较原来的有更新，就写入原来的
+        self.mtl_metafeatures_ = origin_mtl_metafeatures
         # ---member_variable------------------------------------
         self.estimator = None
         self.ensemble_estimator = None
@@ -509,6 +535,61 @@ class AutoFlowEstimator(BaseEstimator):
     # Semantic compatibility with opt
     run_master = run_optimizer
 
+    def run_metalearning(self):
+        # calculate metafeatures
+        metafeatures: dict = calculate_metafeatures(
+            self.data_manager.feature_groups,
+            self.data_manager.X_train.data.values,
+            self.data_manager.y_train.data,
+            self.ml_task,
+            self.free_memory
+        )
+        metafeatures_ = pd.Series(metafeatures)
+        # finding k nearest neighbors
+        mtl_metafeatures_ = self.mtl_metafeatures_[metafeatures_.index].values
+        metafeatures_ = metafeatures_.values.reshape(1, -1)
+        scaler = MinMaxScaler()
+        scaler.fit(mtl_metafeatures_)
+        mtl_metafeatures_ = scaler.transform(mtl_metafeatures_)
+        metafeatures_ = scaler.transform(metafeatures_)
+        pds = pairwise_distances(metafeatures_, mtl_metafeatures_, metric="l1").flatten()
+        indexes = pds.argsort()[:self.mtl_kND]
+        self.kND = self.mtl_metafeatures_.iloc[indexes, :].index.tolist()
+        # config regulation
+        ND2repo = {}
+        start_time = time()
+        fs = self.resource_manager.file_system
+        for ND in self.kND:  # todo 传s3 lazy下载
+            json_path = fs.join(self.mtl_repo_path, f"{ND}.json")
+            with open(json_path, "r") as f:
+                ND2repo[ND] = json.load(f)
+        ND2obvs = {}
+        metric_name = self.metric.name
+        for dataset_name, repo in ND2repo.items():
+            ND2obvs[dataset_name] = {"configs": [], "losses": []}
+            for row in repo:
+                ND2obvs[dataset_name]["configs"].append(row[0])
+                ND2obvs[dataset_name]["losses"].append(1 - row[1][metric_name])  # todo: generization
+            configs, vectors = config_regulation(self.config_space, ND2obvs[dataset_name]["configs"],
+                                                 random_state=self.random_state)
+            ND2obvs[dataset_name]["configs"] = configs
+            ND2obvs[dataset_name]["vectors"] = configs
+        cost_time = time() - start_time
+        self.logger.info(f"config_regulation cost {cost_time:.3f}s")
+        # train+store/load entity encoders
+        start_time = time()
+        ND2ees = {}
+        entity_encoder = EntityEncoder(max_epoch=1000,early_stopping_rounds=100)
+        config_transformer = ConfigurationTransformer(impute=None, encoder=entity_encoder)
+        cost_time = time() - start_time
+        self.logger.info(f"train+store/load entity encoders cost {cost_time:.3f}s")
+        print()
+        # 1. 配置规整
+        # 2. 训练 entity encoders
+        # 3. 应用 entity encoders 对 Configuration array 降维，转为低维连续空间
+        # 4. 用kmeans 对前10%的优势样本聚类，为5类，取每类的最好样本
+        # 5. 用4的样本做initial point，并训练6个代理模型
+
     def fit(
             self,
             X_train: Union[np.ndarray, pd.DataFrame, DataFrameContainer, str],
@@ -574,6 +655,7 @@ class AutoFlowEstimator(BaseEstimator):
         self.insert_experiment_record(
             additional_info, fit_ensemble_params
         )
+        self.run_metalearning()
         self.run_nameserver()
         self.run_evaluators()
         self.run_optimizer()
