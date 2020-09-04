@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
-from sklearn.utils import check_array
 
 from autoflow.utils.data import pairwise_distance
 
@@ -91,7 +90,8 @@ class EquidistanceEncoder(BaseEstimator, TransformerMixin):
             return X.values
 
     def inverse_transform(self, X):
-        X: np.ndarray = check_array(X, force_all_finite=True)
+        # X: np.ndarray = check_array(X, force_all_finite=True)
+        X = np.array(X)
         assert self.n_columns == X.shape[1] - (np.sum(self.n_choices_list) - 2 * len(self.n_choices_list))
         results = np.zeros([X.shape[0], 0], dtype="float")
         cur_cnt = 0
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     X[:, 1] = rng.randint(0, 5, [10])
     X[:, 4] = rng.randint(0, 8, [10])
     X[:, 3] = rng.randint(0, 8, [10])
-    encoder = EquidistanceEncoder(cols=[0,1,3,4], return_df=True).fit(X)
+    encoder = EquidistanceEncoder(cols=[0, 1, 3, 4], return_df=True).fit(X)
     X_trans = encoder.transform(X)
     X_inv = encoder.inverse_transform(X_trans)
     assert np.all(X_inv == X)
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     X[:, 2] = rng.randint(0, 5, [10])
     X[:, 4] = rng.randint(0, 8, [10])
     X[:, 3] = rng.randint(0, 8, [10])
-    encoder = EquidistanceEncoder(cols=[0,1,2,3,4], return_df=True).fit(X)
+    encoder = EquidistanceEncoder(cols=[0, 1, 2, 3, 4], return_df=True).fit(X)
     X_trans = encoder.transform(X)
     X_inv = encoder.inverse_transform(X_trans)
     assert np.all(X_inv == X)

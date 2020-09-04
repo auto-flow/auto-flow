@@ -3,7 +3,7 @@ import json
 import multiprocessing as mp
 import os
 from collections import Counter
-from copy import copy
+from copy import copy, deepcopy
 from importlib import import_module
 from pathlib import Path
 from time import time
@@ -98,14 +98,15 @@ class AutoFlowEstimator(BaseEstimator):
             time_limit=1200,
             memory_limit=None,
             mtl_path="~/autoflow/metalearning",
-            mtl_kND=6,
-            mtl_suggestions_per_ND=5,
+            mtl_kND=25,
+            mtl_meta_epms=5,
             mtl_metafeatures=None,
             **kwargs
     ):
+        self.mtl_meta_epms = mtl_meta_epms
         self.mtl_metafeatures = mtl_metafeatures
-        self.mtl_suggestions_per_ND = mtl_suggestions_per_ND
         self.mtl_kND = mtl_kND
+        assert self.mtl_meta_epms <= self.mtl_kND
         self.mtl_path = os.path.expandvars(os.path.expanduser(mtl_path))
         self.fit_transformer_per_cv = fit_transformer_per_cv
         self.SH_holdout_condition = SH_holdout_condition
@@ -503,8 +504,21 @@ class AutoFlowEstimator(BaseEstimator):
         else:
             raise NotImplementedError
         budgets = get_budgets(self.min_budget, self.max_budget, self.eta)
-        config_generator = cg_cls(self.config_space, budgets, self.random_state, self.initial_points,
-                                  **self.config_generator_params)
+        self.config_generator_params.update(meta_encoder=self.config_transformer.encoder)
+        config_generator_ = cg_cls(self.config_space, budgets, self.random_state, self.initial_points,
+                                   **self.config_generator_params)
+        # training meta epms
+        start_time = time()
+        meta_epms = {}
+        smac_config_transformer = ConfigurationTransformer(impute=-1, encoder=None).fit(self.config_space)
+        for i in range(self.mtl_meta_epms):
+            epm = copy(config_generator_.epm)
+            X = smac_config_transformer.transform(self.ND2obvs[self.kND[i]]["vectors"])
+            y = config_generator_.loss_transformer.fit_transform(self.ND2obvs[self.kND[i]]["losses"])
+            meta_epms[-i] = epm.fit(X, y)
+        config_generator_.budget2epm.update(meta_epms)
+        cost_time = time() - start_time
+        self.logger.info(f"training meta epms cost {cost_time:.3f}s")
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
         if self.warm_start:
             previous_result, incumbents, incumbent_performances = self.resource_manager.get_result_from_trial_table(
@@ -515,9 +529,10 @@ class AutoFlowEstimator(BaseEstimator):
             )
         else:
             previous_result, incumbents, incumbent_performances = None, None, None
+
         self.optimizer = Optimizer(
             self.run_id,
-            config_generator,
+            config_generator_,
             nameserver=self.ns_host,
             nameserver_port=self.ns_port,
             host=self.master_host,
@@ -530,7 +545,7 @@ class AutoFlowEstimator(BaseEstimator):
             incumbents=incumbents,
             incumbent_performances=incumbent_performances
         )
-        self.hpbandstr_result = self.optimizer.run(self.n_iterations, self.min_n_workers)
+        self.opt_result = self.optimizer.run(self.n_iterations, self.min_n_workers)
 
     # Semantic compatibility with opt
     run_master = run_optimizer
@@ -555,6 +570,7 @@ class AutoFlowEstimator(BaseEstimator):
         pds = pairwise_distances(metafeatures_, mtl_metafeatures_, metric="l1").flatten()
         indexes = pds.argsort()[:self.mtl_kND]
         self.kND = self.mtl_metafeatures_.iloc[indexes, :].index.tolist()
+        # assemble data
         # config regulation
         ND2repo = {}
         start_time = time()
@@ -565,30 +581,38 @@ class AutoFlowEstimator(BaseEstimator):
                 ND2repo[ND] = json.load(f)
         ND2obvs = {}
         metric_name = self.metric.name
-        for dataset_name, repo in ND2repo.items():
+        for i, (dataset_name, repo) in enumerate(ND2repo.items()):
             ND2obvs[dataset_name] = {"configs": [], "losses": []}
-            for row in repo:
-                ND2obvs[dataset_name]["configs"].append(row[0])
-                ND2obvs[dataset_name]["losses"].append(1 - row[1][metric_name])  # todo: generization
+            is_meta_epms = i < self.mtl_meta_epms
+            if is_meta_epms:
+                for row in repo:
+                    ND2obvs[dataset_name]["configs"].append(row[0])
+                    ND2obvs[dataset_name]["losses"].append(1 - row[1][metric_name])  # todo: generization
+            else:
+                losses = [1 - row[1][metric_name] for row in repo]
+                best_idx = int(np.argmin(losses))
+                ND2obvs[dataset_name]["configs"].append(repo[best_idx][0])
+                ND2obvs[dataset_name]["losses"].append(losses[best_idx])
             configs, vectors = config_regulation(self.config_space, ND2obvs[dataset_name]["configs"],
                                                  random_state=self.random_state)
-            ND2obvs[dataset_name]["configs"] = configs
-            ND2obvs[dataset_name]["vectors"] = configs
+            ND2obvs[dataset_name]["configs_reg"] = configs
+            ND2obvs[dataset_name]["vectors"] = vectors
+            if is_meta_epms:
+                best_idx = int(np.argmin(ND2obvs[dataset_name]['losses']))
+                ND2obvs[dataset_name]['best_config'] = ND2obvs[dataset_name]["configs_reg"][best_idx]
+            else:
+                ND2obvs[dataset_name]['best_config'] = ND2obvs[dataset_name]["configs_reg"][0]
+        suggestions = [ND2obvs[dataset_name]['best_config'] for dataset_name in self.kND]
         cost_time = time() - start_time
         self.logger.info(f"config_regulation cost {cost_time:.3f}s")
-        # train+store/load entity encoders
-        start_time = time()
-        ND2ees = {}
-        entity_encoder = EntityEncoder(max_epoch=1000,early_stopping_rounds=100)
+        # training load entity encoders
+        entity_encoder = EntityEncoder(max_epoch=100, early_stopping_rounds=50, n_jobs=1, verbose=0)
         config_transformer = ConfigurationTransformer(impute=None, encoder=entity_encoder)
-        cost_time = time() - start_time
-        self.logger.info(f"train+store/load entity encoders cost {cost_time:.3f}s")
-        print()
-        # 1. 配置规整
-        # 2. 训练 entity encoders
-        # 3. 应用 entity encoders 对 Configuration array 降维，转为低维连续空间
-        # 4. 用kmeans 对前10%的优势样本聚类，为5类，取每类的最好样本
-        # 5. 用4的样本做initial point，并训练6个代理模型
+        config_transformer.fit(self.config_space)
+        config_transformer.fit_encoder(ND2obvs[self.kND[0]]['vectors'], ND2obvs[self.kND[0]]['losses'])
+        config_transformer.encoder.samples_db = [pd.DataFrame(), np.array([])]
+        self.config_transformer = deepcopy(config_transformer)
+        self.ND2obvs = ND2obvs
 
     def fit(
             self,

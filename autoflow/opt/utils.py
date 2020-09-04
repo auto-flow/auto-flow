@@ -2,17 +2,19 @@
 # -*- coding: utf-8 -*-
 # @Author  : qichun tang
 # @Contact    : tqichun@gmail.com
-from copy import deepcopy
+from copy import deepcopy, copy
 from fractions import Fraction
 from typing import Dict, Optional, Union, List
 
 import numpy as np
+import pandas as pd
 from ConfigSpace import ConfigurationSpace, Constant, CategoricalHyperparameter, Configuration
 from ConfigSpace.util import deactivate_inactive_hyperparameters
 from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.utils import check_array
 
 from autoflow.constants import ERR_LOSS
 from autoflow.utils.logging_ import get_logger
@@ -247,12 +249,17 @@ class ConfigurationTransformer():
         self.n_constants = n_constants
         self.n_variables = n_variables
         self.n_top_levels = n_top_levels
+        self.hp_names = pd.Series([hp.name for hp in config_space.get_hyperparameters()])[self.mask]
+        self.cols = self.hp_names[np.array(self.n_choices_list) > 2]
+        if self.encoder is not None:
+            self.encoder.cols = copy(self.cols)
         return self
 
-    def fit_encoder(self, vectors):
+    def fit_encoder(self, vectors, losses):
         vectors = vectors[:, self.mask]
+        df = pd.DataFrame(vectors, columns=self.hp_names)
         if self.encoder is not None:
-            self.encoder.fit(vectors)
+            self.encoder.fit(df, losses)
 
     def transform(self, vectors: np.ndarray) -> np.ndarray:
         vectors = vectors[:, self.mask]
@@ -317,7 +324,7 @@ class ConfigurationTransformer():
 
 class LossTransformer(TransformerMixin, BaseEstimator):
     def fit_transform(self, y, *args):
-        y = deepcopy(y)
+        y: np.ndarray = check_array(y, ensure_2d=False)
         # cutoff
         y[y >= ERR_LOSS] = y[y < ERR_LOSS].max() + 0.1
         self.y_max = y.max()
@@ -325,7 +332,6 @@ class LossTransformer(TransformerMixin, BaseEstimator):
         self.y_mean = y.mean()
         self.y_std = y.std()
         self.perc = np.percentile(y, 5)
-
         return y
 
 

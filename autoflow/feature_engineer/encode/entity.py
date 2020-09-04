@@ -6,7 +6,7 @@ import functools
 import warnings
 from copy import copy, deepcopy
 from time import time
-from typing import List
+from typing import List, Optional
 
 import category_encoders.utils as util
 import numpy as np
@@ -16,6 +16,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import StandardScaler
+from sklearn.utils import check_array
 from sklearn.utils._random import check_random_state
 from sklearn.utils.multiclass import type_of_target
 
@@ -117,7 +118,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         self.imputer = CategoricalImputer(
             strategy="constant", fill_value=self.cat_fill_value, numeric_fill_value=self.num_fill_value)
         self.current_cols = None
-        self.equidistance_encoder = None
+        self.equidistance_encoder: Optional[EquidistanceEncoder] = None
 
     def get_initial_final_observations(self):
         return [pd.DataFrame(), np.array([])]
@@ -172,6 +173,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         self.init_variables()
         # first check the type
         X = util.convert_input(X)
+        y = check_array(y, ensure_2d=False)
         # fixme : 默认是warm start的
         self._dim = X.shape[1]
         # todo add logging_level, verbose
@@ -267,11 +269,11 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
             self.current_cols = copy(self.cols)
             additive = np.array([])
             subtractive = np.array([])
-            subtracted_cols=copy(self.cols)
+            subtracted_cols = copy(self.cols)
         else:
             additive = np.setdiff1d(self.current_cols, self.cols)
             subtractive = np.setdiff1d(self.cols, self.current_cols)
-            subtracted_cols=np.setdiff1d(self.cols,subtractive)
+            subtracted_cols = np.setdiff1d(self.cols, subtractive)
         # isna
         isna = pd.isna(X[subtracted_cols]).values
         # return directly
@@ -309,7 +311,7 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         X_embeds_mapper = {column: X_embeds[i] for i, column in enumerate(self.cols)}
         isna_mapper = {column: isna[:, i] for i, column in enumerate(subtracted_cols)}
         for col in subtractive:
-            isna_mapper[col]=np.zeros([X.shape[0]], dtype="bool")
+            isna_mapper[col] = np.zeros([X.shape[0]], dtype="bool")
         # 3. replace origin
         get_valid_col_name = functools.partial(self.get_valid_col_name, df=X)
         # col2idx = dict(zip(self.cols, range(len(self.cols))))
@@ -346,7 +348,9 @@ class EntityEncoder(BaseEstimator, TransformerMixin):
         else:
             return X.values
 
-    def inverse_transform(self, X, return_df=True):
+    def inverse_transform(self, X, return_df=True, current_cols=None):
+        if current_cols is not None:
+            self.current_cols = current_cols
         # X: np.ndarray = check_array(X)
         X = np.array(X)
         assert self.n_columns == X.shape[1] - (np.sum(self.model.embed_dims) - len(self.n_uniques))

@@ -16,6 +16,8 @@ from sklearn.preprocessing import KBinsDiscretizer
 from skopt.learning.forest import RandomForestRegressor, ExtraTreesRegressor
 from skopt.learning.gbrt import GradientBoostingQuantileRegressor
 
+from autoflow.feature_engineer.encode.equidistance import EquidistanceEncoder
+
 get_one_exchange_neighbourhood = partial(get_one_exchange_neighbourhood, stdev=0.05, num_neighbors=8)
 from autoflow.utils.klass import get_valid_params_in_kwargs
 from .base import BaseConfigGenerator
@@ -43,13 +45,16 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             min_points_in_model=None, config_transformer_params=None, n_samples=5000,
             loss_transformer=None,
             use_local_search=False,
-            use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=8,  # use_thompson_sampling: 0 1 2
+            use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=8,
+            # use_thompson_sampling: 0 1 2
             tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True,
             # meta learn and multi task learn
-            meta_alpha=40, meta_beta=10, support_ensemble_epms=True, update_weight_steps=10
+            meta_alpha=40, meta_beta=10, support_ensemble_epms=True, update_weight_steps=10,
+            meta_encoder=None
     ):
         super(BayesianOptimizationConfigGenerator, self).__init__()
         # ----member variable-----------------------
+        self.meta_encoder = meta_encoder
         self.initial_points = initial_points
         self.initial_points_index = 0
         self.update_weight_steps = max(5, update_weight_steps)
@@ -93,16 +98,6 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         if epm_cls is not None:
             self.epm = epm_cls(**self.epm_params)
         # ----config_transformer-----------------------
-        # todo: 没有必要做这一步，由子类决定 (config_transformer_params的默认参数变成fronzendict())
-        if config_transformer_params is None:
-            if epm in ("ET", "RF", "GBRT"):
-                config_transformer_params = {"impute": -1, "ohe": False}
-            elif epm in ("GP", "GP-MCMC", "GP-MCMC-NN", "KDE-NN"):
-                config_transformer_params = {"impute": 0, "ohe": True}
-            elif epm in ("KDE",):
-                config_transformer_params = {"impute": "random_choice", "ohe": False}
-            elif epm in ("TPE",):
-                config_transformer_params = {"impute": None, "ohe": False}
         self.config_transformer_params = dict(config_transformer_params)
         self.config_transformer = ConfigurationTransformer(**self.config_transformer_params)
         self.config_transformer.fit(config_space)
@@ -128,7 +123,11 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
         # ----TPE------------------------
         self.tpe_params.update({"top_n_percent": self.top_n_percent})
         self.tpe = TreeStructuredParzenEstimator(**self.tpe_params)
-        self.tpe_config_transformer = ConfigurationTransformer(impute=False, encoder=False)
+        if self.meta_encoder is None:
+            encoder = EquidistanceEncoder()
+        else:
+            encoder = self.meta_encoder
+        self.tpe_config_transformer = ConfigurationTransformer(impute=False, encoder=encoder)
         self.tpe_loss_transformer = LossTransformer()
         self.tpe_config_transformer.fit(self.config_space)
         self.tpe.set_config_transformer(self.tpe_config_transformer)
@@ -553,7 +552,7 @@ class BayesianOptimizationConfigGenerator(BaseConfigGenerator):
             vectors = np.array(self.budget2obvs[budget_]["locks"])
             if vectors.size:
                 vectors_list.append(vectors)
-        if len(vectors_list)==0:
+        if len(vectors_list) == 0:
             return False
         vectors = np.vstack(vectors_list)
         if np.any(np.array(vectors.shape) == 0):
