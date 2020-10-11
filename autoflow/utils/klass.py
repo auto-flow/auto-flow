@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author  : qichun tang
+# @Contact    : tqichun@gmail.com
+import inspect
+from typing import Dict, Any, Sequence, Type
+
+NONE_TOKEN = "NaN"
+
+
+class StrSignatureMixin():
+    def __str__(self):
+        result = f"{self.__class__.__name__}("
+        valid_params = []
+        for key in inspect.signature(self.__init__).parameters.keys():
+            value = getattr(self, key, NONE_TOKEN)
+            if isinstance(value, str) and value == NONE_TOKEN:
+                pass
+            else:
+                valid_params.append([key, value])
+        valid_params_str_list = [f"{key}={repr(value)}" for key, value in valid_params]
+        N = len(valid_params_str_list)
+        if N > 0:
+            result += "\n"
+        for i, valid_params_str in enumerate(valid_params_str_list):
+            result += f"\t{valid_params_str}"
+            if i == N - 1:
+                result += ", "
+            result += "\n"
+        result += ")"
+        return result
+
+    def __repr__(self):
+        return self.__str__()
+
+
+def get_valid_params_in_kwargs(func, kwargs: Dict[str, Any]):
+    validated = {}
+    for key, value in kwargs.items():
+        if key in inspect.signature(func).parameters.keys():
+            validated[key] = value
+    return validated
+
+
+def gather_kwargs_from_signature_and_attributes(klass, instance):
+    return get_valid_params_in_kwargs(klass.__init__, instance.__dict__)
+
+
+def set_if_not_None(obj, variable_name, value):
+    if value is not None:
+        setattr(obj, variable_name, value)
+
+
+def get_class_full_name(klass: Type) -> str:
+    return f"{klass.__module__}.{klass.__name__}"
+
+
+def instancing(variable, klass, kwargs):
+    if variable is None:
+        variable = klass(**get_valid_params_in_kwargs(klass.__init__, kwargs))
+    elif isinstance(variable, dict):
+        variable = klass(**variable)
+    elif isinstance(variable, klass):
+        pass
+    else:
+        raise NotImplementedError
+    return variable
+
+
+def sequencing(variable, klass):
+    if not isinstance(variable, Sequence):
+        variable = [variable]
+    variables: Sequence[klass] = variable
+    return variables

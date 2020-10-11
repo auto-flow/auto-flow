@@ -1,0 +1,14 @@
+# Created by .ignore support plugin (hsz.mobi)
+#run_*
+autoflow*
+*.png
+*.html
+*.xls
+*.xlsx
+*.csv
+run*.py
+!run_complex_timelimit.py
+!run_estimator_http.py
+!run_optimizer*.py
+!run_get_results.py
+!run_bohb_ensemble.py

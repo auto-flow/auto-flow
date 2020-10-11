@@ -1,0 +1,67 @@
+[
+  {
+    "name": "N_WORKERS",
+    "default": 1,
+    "description": ""
+  },
+  {
+    "name": "MIN_POINTS_IN_MODEL",
+    "default": 15,
+    "description": ""
+  },
+  {
+    "name": "USE_LOCAL_SEARCH",
+    "default": false,
+    "description": ""
+  },
+  {
+    "name": "USE_THOMPSON_SAMPLING",
+    "default": 1,
+    "description": ""
+  },
+  {
+    "name": "TASK_ID",
+    "default": "232",
+    "description": ""
+  },
+  {
+    "name": "TOKEN",
+    "default": "local_test",
+    "description": ""
+  },
+  {
+    "name": "TASK_INFO",
+    "default": "{}",
+    "description": ""
+  },
+  {
+    "name": "FOLD",
+    "default": 0,
+    "description": ""
+  },
+  {
+    "name": "RANDOM_STATE",
+    "default": 0,
+    "description": ""
+  },
+  {
+    "name": "PER_RUN_TIME_LIMIT",
+    "default": 300,
+    "description": ""
+  },
+  {
+    "name": "TIME_LEFT_FOR_THIS_TASK",
+    "default": 3600,
+    "description": ""
+  },
+  {
+    "name": "WARM_START",
+    "default": false,
+    "description": ""
+  },
+  {
+    "name": "USE_WORKFLOW_CACHE",
+    "default": true,
+    "description": ""
+  }
+]

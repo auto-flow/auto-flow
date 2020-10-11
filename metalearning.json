@@ -1,0 +1,52 @@
+[
+  {
+    "name": "N_WORKERS",
+    "default": "None",
+    "description": ""
+  },
+  {
+    "name": "N_ITERATIONS",
+    "default": 500,
+    "description": ""
+  },
+  {
+    "name": "MIN_POINTS_IN_MODEL",
+    "default": 450,
+    "description": ""
+  },
+  {
+    "name": "TASK_ID",
+    "default": "232",
+    "description": ""
+  },
+  {
+    "name": "TOKEN",
+    "default": "local_test",
+    "description": ""
+  },
+  {
+    "name": "TASK_INFO",
+    "default": "{}",
+    "description": ""
+  },
+  {
+    "name": "RANDOM_STATE",
+    "default": 0,
+    "description": ""
+  },
+  {
+    "name": "ONLY_IMPUTE_GBT",
+    "default": false,
+    "description": ""
+  },
+  {
+    "name": "PER_RUN_TIME_LIMIT",
+    "default": 300,
+    "description": ""
+  },
+  {
+    "name": "WARM_START",
+    "default": false,
+    "description": ""
+  }
+]

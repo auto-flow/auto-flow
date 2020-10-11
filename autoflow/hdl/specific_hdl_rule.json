@@ -1,0 +1,19 @@
+{
+  //todo: consider too many features, too few samples
+  //todo: missing_rate_range, minimum_fraction
+  //large dataset
+  "s>=1e4 and f>=500": {
+    "normed2final_workflow": ["operate.keep_going", "select.boruta"],
+    "included_cat_encoders": ["encode.one_hot", "encode.ordinal"],
+    "included_highC_cat_encoders": ["encode.cat_boost"],
+    "included_imputers": ["impute.simple"]
+  },
+  //many features
+  "f>=5000": {
+    "normed2final_workflow": ["operate.keep_going", "select.boruta"],
+  },
+  //predictive imputer cannot handle large dataset
+  "s>=1e4": {
+    "included_imputers": ["impute.simple"]
+  }
+}
