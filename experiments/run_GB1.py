@@ -19,11 +19,13 @@ from autoflow.hdl.hdl2cs import HDL2CS
 
 # 当前实验配置
 experiment_param = dict(
-    max_iter=1000,
+    max_iter=400,
     repetitions=20,
     random_state=50,
     min_points_in_model=20,
-    use_thompson_sampling=2, n_candidates=1000, bandwidth_factor=3, alpha=20, beta=30
+    # for ambo core
+    use_thompson_sampling=1, n_candidates=1000,
+    bandwidth_factor=1, alpha=40, beta=10
 )
 
 # 构造超参空间
