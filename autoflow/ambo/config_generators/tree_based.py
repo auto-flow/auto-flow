@@ -15,10 +15,13 @@ class RFBasedAMBO(AdaptiveMetaBayesianOptimization):
             acq_func="LogEI", xi=0, kappa=1.96, n_samples=5000,
             min_points_in_model=15, loss_transformer="log_scaled",
             use_local_search=False,
-            # TS
-            use_thompson_sampling=True, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=10,
+            # TPE thompson sampling
+            use_thompson_sampling=1, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=10,
             tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True,
-            meta_encoder=None, bandwidth_factor=3,
+            meta_encoder=None, bandwidth_factor=3, plot_encoder=True,
+            # meta learn and multi task learn
+            support_ensemble_epms=True, update_weight_accepted_samples=10, update_weight_steps=3,
+            ensemble_test_size=0.33,
             # RF parameters
             n_estimators=10, max_depth=None, min_samples_split=2,
             min_samples_leaf=1, min_weight_fraction_leaf=0, max_features="auto",
@@ -38,7 +41,8 @@ class RFBasedAMBO(AdaptiveMetaBayesianOptimization):
             bootstrap=bootstrap,
             oob_score=oob_score,
             n_jobs=n_jobs,
-            min_variance=min_variance
+            min_variance=min_variance,
+            random_state=random_state
         )
         acq_func_params = {}
         if acq_func in ("EI", "LogEI", "PI"):
@@ -69,7 +73,12 @@ class RFBasedAMBO(AdaptiveMetaBayesianOptimization):
             n_candidates=n_candidates,
             sort_by_EI=sort_by_EI,
             meta_encoder=meta_encoder,
-            bandwidth_factor=bandwidth_factor
+            bandwidth_factor=bandwidth_factor,
+            plot_encoder=plot_encoder,
+            support_ensemble_epms=support_ensemble_epms,
+            update_weight_accepted_samples=update_weight_accepted_samples,
+            update_weight_steps=update_weight_steps,
+            ensemble_test_size=ensemble_test_size
         )
 
 

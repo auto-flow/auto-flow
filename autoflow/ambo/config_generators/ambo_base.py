@@ -119,13 +119,14 @@ class AdaptiveMetaBayesianOptimization(BaseConfigGenerator):
             # TPE thompson sampling
             use_thompson_sampling=1, alpha=10, beta=40, top_n_percent=15, hit_top_n_percent=10,
             tpe_params=frozendict(), max_repeated_samples=3, n_candidates=64, sort_by_EI=True,
-            meta_encoder=None, bandwidth_factor=3,
+            meta_encoder=None, bandwidth_factor=3, plot_encoder=True,
             # meta learn and multi task learn
             support_ensemble_epms=True, update_weight_accepted_samples=10, update_weight_steps=3,
             ensemble_test_size=0.33,
     ):
         super(AdaptiveMetaBayesianOptimization, self).__init__()
         # ----member variable-----------------------
+        self.plot_encoder = plot_encoder
         self.bandwidth_factor = bandwidth_factor
         self.update_weight_steps = update_weight_steps
         self.ensemble_test_size = ensemble_test_size
@@ -211,7 +212,7 @@ class AdaptiveMetaBayesianOptimization(BaseConfigGenerator):
         self.tpe_loss_transformer = LossTransformer()
         self.tpe_config_transformer.fit(self.config_space)
         if self.meta_encoder is None:
-            vectors=np.array([config.get_array() for config in self.config_space.sample_configuration(5000)])
+            vectors = np.array([config.get_array() for config in self.config_space.sample_configuration(5000)])
             self.tpe_config_transformer.fit_encoder(vectors)
         self.tpe.set_config_transformer(self.tpe_config_transformer)
         # ----budget to empirical_performance_model, observations, config_evaluator----
@@ -301,10 +302,16 @@ class AdaptiveMetaBayesianOptimization(BaseConfigGenerator):
         ### 7. incrementaly trainning entity encoder ###
         ################################################
         if self.has_entity_encoder and budget == self.get_available_min_budget():
-            X = np.array([self.budget2obvs[budget]["vectors"][-1]])
-            y = np.array([self.budget2obvs[budget]["losses"][-1]])
-            self.tpe_config_transformer.fit_encoder(X, y)
-            if self.tpe_config_transformer.encoder.transform_matrix_status == "Updated":
+            if self.tpe_config_transformer.encoder.fitted:
+                X = np.array([self.budget2obvs[budget]["vectors"][-1]])
+                y = np.array([self.budget2obvs[budget]["losses"][-1]])
+                self.tpe_config_transformer.fit_encoder(X, y)
+            else:
+                X = np.array(self.budget2obvs[budget]["vectors"])
+                y = self.loss_transformer.fit_transform(self.budget2obvs[budget]["losses"])
+                self.tpe_config_transformer.fit_encoder(X, y)
+
+            if self.plot_encoder and self.tpe_config_transformer.encoder.transform_matrix_status == "Updated":
                 self.plot_entity_encoder_points()
 
     def transform(self, configs: List[Configuration]):
@@ -735,7 +742,7 @@ class AdaptiveMetaBayesianOptimization(BaseConfigGenerator):
                 "n_candidates": self.n_candidates,
                 "sort_by_EI": self.sort_by_EI,
                 "random_state": self.rng,
-                "bandwidth_factor":self.bandwidth_factor
+                "bandwidth_factor": self.bandwidth_factor
             }
             samples = sampler.sample(**get_valid_params_in_kwargs(sampler.sample, kwargs))
             for i, sample in enumerate(samples):
