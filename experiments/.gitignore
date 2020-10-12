@@ -3,3 +3,4 @@ plot_configs
 entity_encoder
 epms_weight
 *.json
+*.png
