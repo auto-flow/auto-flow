@@ -4,11 +4,9 @@
 # @Contact    : tqichun@gmail.com
 import logging
 import pickle
-from multiprocessing import Manager
 from time import sleep, time
 from typing import Any
 
-lock = Manager().dict()
 logger = logging.getLogger("CacheLock")
 
 

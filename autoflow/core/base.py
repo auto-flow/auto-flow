@@ -34,7 +34,6 @@ from autoflow.evaluation.train_evaluator import TrainEvaluator
 from autoflow.feature_engineer.encode import EntityEncoder
 from autoflow.hdl.hdl2shps import HDL2SHPS
 from autoflow.hdl.hdl_constructor import HDL_Constructor
-from autoflow.metalearning.metafeatures.calc import calculate_metafeatures
 from autoflow.metrics import r2, accuracy
 from autoflow.opt.result_logger import DatabaseResultLogger
 from autoflow.opt.utils import get_max_SH_iter, get_budgets, ConfigurationTransformer
@@ -97,17 +96,8 @@ class AutoFlowEstimator(BaseEstimator):
             imbalance_threshold=2,
             time_limit=1200,
             memory_limit=None,
-            mtl_path="~/autoflow/metalearning",
-            mtl_kND=25,
-            mtl_meta_epms=5,
-            mtl_metafeatures=None,
             **kwargs
     ):
-        self.mtl_meta_epms = mtl_meta_epms
-        self.mtl_metafeatures = mtl_metafeatures
-        self.mtl_kND = mtl_kND
-        assert self.mtl_meta_epms <= self.mtl_kND
-        self.mtl_path = os.path.expandvars(os.path.expanduser(mtl_path))
         self.fit_transformer_per_cv = fit_transformer_per_cv
         self.SH_holdout_condition = SH_holdout_condition
         self.evaluation_strategy = evaluation_strategy
@@ -191,24 +181,6 @@ class AutoFlowEstimator(BaseEstimator):
         self.hdl_constructor = instancing(hdl_constructor, HDL_Constructor, kwargs)
         # ---resource_manager-----------------------------------
         self.resource_manager: ResourceManager = instancing(resource_manager, ResourceManager, kwargs)
-        # ---metalearning file structure------------------------
-        fs = self.resource_manager.file_system
-        fs.mkdir(self.mtl_path)
-        self.mtl_repo_path = fs.join(self.mtl_path, "repository")
-        self.mtl_metafeatures_path = fs.join(self.mtl_path, "metafeatures.csv")
-        # todo: generalize to s3, hdfs
-        if fs.exists(self.mtl_metafeatures_path):
-            origin_mtl_metafeatures = pd.read_csv(self.mtl_metafeatures_path, index_col=0)
-        else:
-            origin_mtl_metafeatures = pd.DataFrame()
-        if self.mtl_metafeatures is None and origin_mtl_metafeatures.shape[0] == 0:
-            import autoflow.metalearning as mtl_module
-            mtl_metafeatures_csv = Path(mtl_module.__file__).parent / "metafeatures.csv"
-            self.logger.info(f"Initially loading mtl_metafeatures_csv: '{mtl_metafeatures_csv}'")
-            origin_mtl_metafeatures = pd.read_csv(mtl_metafeatures_csv, index_col=0)
-            origin_mtl_metafeatures.to_csv(self.mtl_metafeatures_path)
-        # todo: 设计一种机制，如果相比较原来的有更新，就写入原来的
-        self.mtl_metafeatures_ = origin_mtl_metafeatures
         # ---member_variable------------------------------------
         self.estimator = None
         self.ensemble_estimator = None
@@ -504,19 +476,9 @@ class AutoFlowEstimator(BaseEstimator):
         else:
             raise NotImplementedError
         budgets = get_budgets(self.min_budget, self.max_budget, self.eta)
-        self.config_generator_params.update(meta_encoder=self.config_transformer.encoder)
-        config_generator_ = cg_cls(self.config_space, budgets, self.random_state, self.initial_points,
-                                   **self.config_generator_params)
+        config_generator_ = cg_cls(self.config_space, budgets, self.random_state, self.initial_points)
         # training meta epms
         start_time = time()
-        meta_epms = {}
-        smac_config_transformer = ConfigurationTransformer(impute=-1, encoder=None).fit(self.config_space)
-        for i in range(self.mtl_meta_epms):
-            epm = copy(config_generator_.epm)
-            X = smac_config_transformer.transform(self.ND2obvs[self.kND[i]]["vectors"])
-            y = config_generator_.loss_transformer.fit_transform(self.ND2obvs[self.kND[i]]["losses"])
-            meta_epms[-i] = epm.fit(X, y)
-        config_generator_.budget2epm.update(meta_epms)
         cost_time = time() - start_time
         self.logger.info(f"training meta epms cost {cost_time:.3f}s")
         self.database_result_logger = DatabaseResultLogger(self.resource_manager)
@@ -550,69 +512,6 @@ class AutoFlowEstimator(BaseEstimator):
     # Semantic compatibility with opt
     run_master = run_optimizer
 
-    def run_metalearning(self):
-        # calculate metafeatures
-        metafeatures: dict = calculate_metafeatures(
-            self.data_manager.feature_groups,
-            self.data_manager.X_train.data.values,
-            self.data_manager.y_train.data,
-            self.ml_task,
-            self.free_memory
-        )
-        metafeatures_ = pd.Series(metafeatures)
-        # finding k nearest neighbors
-        mtl_metafeatures_ = self.mtl_metafeatures_[metafeatures_.index].values
-        metafeatures_ = metafeatures_.values.reshape(1, -1)
-        scaler = MinMaxScaler()
-        scaler.fit(mtl_metafeatures_)
-        mtl_metafeatures_ = scaler.transform(mtl_metafeatures_)
-        metafeatures_ = scaler.transform(metafeatures_)
-        pds = pairwise_distances(metafeatures_, mtl_metafeatures_, metric="l1").flatten()
-        indexes = pds.argsort()[:self.mtl_kND]
-        self.kND = self.mtl_metafeatures_.iloc[indexes, :].index.tolist()
-        # assemble data
-        # config regulation
-        ND2repo = {}
-        start_time = time()
-        fs = self.resource_manager.file_system
-        for ND in self.kND:  # todo 传s3 lazy下载
-            json_path = fs.join(self.mtl_repo_path, f"{ND}.json")
-            with open(json_path, "r") as f:
-                ND2repo[ND] = json.load(f)
-        ND2obvs = {}
-        metric_name = self.metric.name
-        for i, (dataset_name, repo) in enumerate(ND2repo.items()):
-            ND2obvs[dataset_name] = {"configs": [], "losses": []}
-            is_meta_epms = i < self.mtl_meta_epms
-            if is_meta_epms:
-                for row in repo:
-                    ND2obvs[dataset_name]["configs"].append(row[0])
-                    ND2obvs[dataset_name]["losses"].append(1 - row[1][metric_name])  # todo: generization
-            else:
-                losses = [1 - row[1][metric_name] for row in repo]
-                best_idx = int(np.argmin(losses))
-                ND2obvs[dataset_name]["configs"].append(repo[best_idx][0])
-                ND2obvs[dataset_name]["losses"].append(losses[best_idx])
-            configs, vectors = config_regulation(self.config_space, ND2obvs[dataset_name]["configs"],
-                                                 random_state=self.random_state)
-            ND2obvs[dataset_name]["configs_reg"] = configs
-            ND2obvs[dataset_name]["vectors"] = vectors
-            if is_meta_epms:
-                best_idx = int(np.argmin(ND2obvs[dataset_name]['losses']))
-                ND2obvs[dataset_name]['best_config'] = ND2obvs[dataset_name]["configs_reg"][best_idx]
-            else:
-                ND2obvs[dataset_name]['best_config'] = ND2obvs[dataset_name]["configs_reg"][0]
-        suggestions = [ND2obvs[dataset_name]['best_config'] for dataset_name in self.kND]
-        cost_time = time() - start_time
-        self.logger.info(f"config_regulation cost {cost_time:.3f}s")
-        # training load entity encoders
-        entity_encoder = EntityEncoder(max_epoch=100, early_stopping_rounds=50, n_jobs=1, verbose=0)
-        config_transformer = ConfigurationTransformer(impute=None, encoder=entity_encoder)
-        config_transformer.fit(self.config_space)
-        config_transformer.fit_encoder(ND2obvs[self.kND[0]]['vectors'], ND2obvs[self.kND[0]]['losses'])
-        config_transformer.encoder.samples_db = [pd.DataFrame(), np.array([])]
-        self.config_transformer = deepcopy(config_transformer)
-        self.ND2obvs = ND2obvs
 
     def fit(
             self,
@@ -679,7 +578,6 @@ class AutoFlowEstimator(BaseEstimator):
         self.insert_experiment_record(
             additional_info, fit_ensemble_params
         )
-        self.run_metalearning()
         self.run_nameserver()
         self.run_evaluators()
         self.run_optimizer()

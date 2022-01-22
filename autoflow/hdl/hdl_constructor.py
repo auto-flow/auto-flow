@@ -80,11 +80,10 @@ class HDL_Constructor(StrSignatureMixin):
         self.logger = get_logger(self)
         self.hdl_bank_path = hdl_bank_path
         self.DAG_workflow = DAG_workflow
-        if hdl_bank is None:
-            if hdl_bank_path:
-                hdl_bank = get_hdl_bank(hdl_bank_path)
-            else:
-                hdl_bank = get_default_hdl_bank()
+        if hdl_bank is not None:
+            hdl_bank = get_hdl_bank(hdl_bank_path)
+        else:
+            hdl_bank = get_default_hdl_bank()
         if hdl_bank is None:
             hdl_bank = {}
             self.logger.warning("No hdl_bank, will use DAG_descriptions only.")

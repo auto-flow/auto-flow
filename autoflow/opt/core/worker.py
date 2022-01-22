@@ -118,16 +118,16 @@ class Worker(object):
                 work.
         """
         if background:
-            if concurrent_type == "process":
-                self.process = Process(target=self._run, name='worker %s process' % self.worker_id)
-                self.process.daemon = True
-                self.process.start()
-            elif concurrent_type == "thread":
-                # maybe in a same thread
-                self.worker_id += f"_{threading.get_ident()}"
-                self.thread = threading.Thread(target=self._run, name='worker %s thread' % self.worker_id)
-                self.thread.daemon = True
-                self.thread.start()
+            # if concurrent_type == "process":
+            #     self.process = Process(target=self._run, name='worker %s process' % self.worker_id)
+            #     self.process.daemon = True
+            #     self.process.start()
+            # elif concurrent_type == "thread":
+            # maybe in a same thread
+            self.worker_id += f"_{threading.get_ident()}"
+            self.thread = threading.Thread(target=self._run, name='worker %s thread' % self.worker_id)
+            self.thread.daemon = True
+            self.thread.start()
         else:
             self._run()
 

@@ -16,11 +16,6 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
 
 
-if os.name != 'posix':
-    raise ValueError(
-        'Detected unsupported operating system: %s. '
-    )
-
 if sys.version_info <= (3, 5):
     raise ValueError(
         'Unsupported Python version %d.%d.%d found. AutoFlow requires Python '

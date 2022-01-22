@@ -31,11 +31,11 @@ def get_hdl_bank(path: str, logger=None) -> Dict:
 
 
 def _get_default_hdl_bank() -> Dict:
-    return json.loads((Path(hdl.__file__).parent / "hdl_bank.json").read_text())
+    return json.loads((Path(hdl.__file__).parent / "hdl_bank.json").read_text(encoding='utf-8'))
 
 
-memory = Memory(JOBLIB_CACHE, verbose=1)
-get_default_hdl_bank = memory.cache(_get_default_hdl_bank)
+
+get_default_hdl_bank = _get_default_hdl_bank
 
 
 def get_origin_models(raw_models: List[str]):
